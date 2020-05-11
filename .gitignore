@@ -1,0 +1,6 @@
+*.o
+*~
+*.pyc
+INSTALL*
+RUNTIME*
+data/KiDS-NS_KV450_footprint_healpix.fits
