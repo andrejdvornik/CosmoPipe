@@ -1,0 +1,27 @@
+file_type: FITS
+
+# What are the names of the columns for ra, dec and what kind of values do they have:
+ra_col: ALPHA_J2000          # The column name for RA values in the input file
+dec_col: DELTA_J2000        # The column name for Dec values in the input file
+ra_units: degrees   # The units of the RA values
+dec_units: degrees  # The units of the Dec values
+
+# What are the names of the columns for the lensing observables to be correlated
+g1_col: e1_A      # The column name of the g1 component of shear
+g2_col: e2_A      # The column name of the g2 component of shear
+w_col: @WEIGHTNAME@
+#flip_g2: True
+
+# Define the binning.  Binning in TreeCorr uses bins that are equally spaced in log(r).
+# (i.e. Natural log, not log10.)  There are four parameters of which you may specify any 3.
+min_sep: @THETAMINCOV@    # The minimum separation that you want included.
+max_sep: @THETAMAXCOV@    # The maximum separation that you want included.
+nbins: @NTHETABINCOV@     # The number of bins
+sep_units: arcmin
+bin_slop: 0.05
+
+# Set the level of verbosity that you want.
+# 0 prints nothing unless there is an error.
+# 1 is the default, which prints warnings and a few progress lines.
+# 2 and 3 print more information about what is happening at each stage.
+verbose: 2
