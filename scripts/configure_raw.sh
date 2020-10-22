@@ -155,11 +155,18 @@ then
   for PATCH in $PATCHLIST $ALLPATCH
   do 
     echo -n "Subsetting the sources in patch ${PATCH} by Column ${SHEARSUBSET} (Keeping ${SHEARSUBSET}!=0)"
-    ldacfilter -i ${PATCHPATH}/${SURVEY}_${PATCH}_reweight_${RECALGRID}${FILESUFFIX}.cat \
-             -o ${PATCHPATH}/${SURVEY}_${PATCH}_reweight_${RECALGRID}${FILESUFFIX}_${SHEARSUBSET}.cat \
+    echo ""
+    list=`${THELIPATH}/ldacdesc -i ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}.cat -t OBJECTS | 
+          grep "Key name" | awk -F. '{print $NF}' | 
+          grep "_WORLD\|_IMAGE\|MAG_GAAP_\|FLAG_GAAP_\|MAG_LIM_\|BPZ_\|MAG_AUTO\|SeqNr\|MAGERR_\|FLUX_\|FLUXERR_\|ID"`
+    ${THELIPATH}/ldacdelkey -i ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}.cat\
+             -k ${list} -o ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}_temp.cat \
+             > ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}.log 2>&1
+    ${THELIPATH}/ldacfilter -i ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}_temp.cat \
+             -o ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}.cat \
     	       -t OBJECTS \
     	       -c "(${SHEARSUBSET}!=0);" \
-             > ${PATCHPATH}/${SURVEY}_${PATCH}_reweight_${RECALGRID}${FILESUFFIX}_${SHEARSUBSET}.log 2>&1
+             >> ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}.log 2>&1
     echo " - Done!"
   done 
   echo "Updating File Suffix ${FILESUFFIX} to ${FILESUFFIX}_${SHEARSUBSET}!!"
