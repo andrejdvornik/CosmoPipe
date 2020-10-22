@@ -38,7 +38,7 @@ SNR_in=ldac_table['model_SNratio']
 PSFe1_in=ldac_table['PSF_e1']
 PSFe2_in=ldac_table['PSF_e2']
 scalelength=ldac_table['bias_corrected_scalelength_pixels']
-KVbandflag=ldac_table['GAAP_Flag_ugriZYJHKs']
+KVbandflag=ldac_table['@GAAPFLAG@']
 
 ngals_all = len(e1_in)
 

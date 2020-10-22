@@ -38,8 +38,8 @@ ldac_table = ldac_cat['OBJECTS']
 # read in the useful columns
 KiDS_RA = ldac_table['ALPHA_J2000']
 KiDS_Dec = ldac_table['DELTA_J2000']
-Xpos_in = ldac_table['Xpos_THELI']
-Ypos_in = ldac_table['Ypos_THELI']
+Xpos_in = ldac_table['@XPIX@']
+Ypos_in = ldac_table['@YPIX@']
 weight_in = ldac_table['@WEIGHTNAME@']
 
 Nobj = np.shape(Xpos_in)[0]

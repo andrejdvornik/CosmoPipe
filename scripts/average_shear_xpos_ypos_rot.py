@@ -110,8 +110,8 @@ ldac_table = ldac_cat['OBJECTS']
 # read in the useful columns
 KiDS_RA=ldac_table['ALPHA_J2000']
 KiDS_Dec=ldac_table['DELTA_J2000']
-Xpos_in=ldac_table['Xpos_THELI']
-Ypos_in=ldac_table['Ypos_THELI']
+Xpos_in=ldac_table['@XPIX@']
+Ypos_in=ldac_table['@YPIX@']
 
 e1_in=ldac_table['@E1VAR@']
 e2_in=ldac_table['@E2VAR@']
@@ -121,7 +121,7 @@ e2_in=ldac_table['@E2VAR@']
 weight_in=ldac_table['@WEIGHTNAME@']
 mag_in=ldac_table['MAG_AUTO']
 mask=ldac_table['MASK']
-flag=ldac_table['GAAP_Flag_ugriZYJHKs']
+flag=ldac_table['@GAAPFLAG@']
 
 we1_in=e1_in*weight_in
 we2_in=e2_in*weight_in

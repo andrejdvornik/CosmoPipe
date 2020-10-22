@@ -37,6 +37,11 @@ DATE=@DATE@
 DZPRIORMU="@DZPRIORMU@"
 DZPRIORSD="@DZPRIORSD@"
 DZPRIORNSIG="@DZPRIORNSIG@"
+#Pixel positions variables
+XPIX="Xpos_THELI"
+YPIX="Ypos_THELI"
+#Combined GAAP flag
+GAAPFLAG="GAAP_Flag_ugriZYJHKs"
 #Shape mesurement variables 
 E1VAR=bias_corrected_e1
 E2VAR=bias_corrected_e2
@@ -158,7 +163,7 @@ then
     echo ""
     list=`${THELIPATH}/ldacdesc -i ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}.cat -t OBJECTS | 
           grep "Key name" | awk -F. '{print $NF}' | 
-          grep "_WORLD\|_IMAGE\|MAG_GAAP_\|FLAG_GAAP_\|MAG_LIM_\|BPZ_\|MAG_AUTO\|SeqNr\|MAGERR_\|FLUX_\|FLUXERR_\|ID"`
+          grep "_WORLD\|_IMAGE\|MAG_GAAP_\|MAG_LIM_\|BPZ_\|SeqNr\|MAGERR_\|FLUX_\|FLUXERR_\|ID"`
     ${THELIPATH}/ldacdelkey -i ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}.cat\
              -k ${list} -o ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}_temp.cat \
              > ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}.log 2>&1
@@ -166,6 +171,8 @@ then
              -o ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}.cat \
     	       -t OBJECTS \
     	       -c "(${SHEARSUBSET}!=0);" \
+             >> ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}.log 2>&1
+    rm ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}_temp.cat \
              >> ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}.log 2>&1
     echo " - Done!"
   done 
@@ -195,6 +202,9 @@ sed -i "s#\@DZPRIORSDVEC\@#${DZPRIORSDVEC}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUN
 sed -i "s#\@DZPRIORNSIG\@#${DZPRIORNSIG}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
 sed -i "s#\@E1VAR\@#${E1VAR}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
 sed -i "s#\@E2VAR\@#${E2VAR}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
+sed -i "s#\@XPIX\@#${XPIX}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
+sed -i "s#\@YPIX\@#${YPIX}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
+sed -i "s#\@GAAPFLAG\@#${GAAPFLAG}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
 sed -i "s#\@FILESUFFIX\@#${FILESUFFIX}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
 sed -i "s#\@COSMOFISHER\@#${COSMOFISHER}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
 sed -i "s#\@LIKELIHOOD\@#${LIKELIHOOD}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
