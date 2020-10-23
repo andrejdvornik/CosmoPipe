@@ -291,7 +291,7 @@ bash Anaconda2-4.3.0-Linux-x86_64.sh -b -p ./anaconda2/ > Anaconda_install.log 2
 export PYTHONPATH=${RUNROOT}/INSTALL/anaconda2/bin/python2:${RUNROOT}/INSTALL/anaconda2/lib/
 export PATH=${RUNROOT}/INSTALL/anaconda2/bin/:${PATH}
 ${RUNROOT}/INSTALL/anaconda2/bin/pip install numpy scipy pyfits cython matplotlib \
-  palettable fitsio corner > python_packages.log 2>&1 <<EOF
+  palettable fitsio==1.1.1 corner > python_packages.log 2>&1 <<EOF
 yes
 EOF
 ${RUNROOT}/INSTALL/anaconda2/bin/conda install -c conda-forge openmp >> python_packages.log 2>&1 <<EOF
