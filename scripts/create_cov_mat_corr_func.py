@@ -15,11 +15,11 @@ import sys
 
 m_bias = "@MBIASVALUES@"
 m_bias = m_bias.split()
-m_bias = [float(i) for i in m_bias]
+m_bias = np.array([float(i) for i in m_bias])
 
 m_bias_err = "@MBIASERRORS@"
 m_bias_err = m_bias_err.split()
-m_bias_err = [float(i) for i in m_bias_err]
+m_bias_err = np.array([float(i) for i in m_bias_err])
 
 tomolims="@TOMOLIMS@"
 tomolims=tomolims.split()
