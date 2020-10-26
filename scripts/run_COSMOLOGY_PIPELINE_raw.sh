@@ -110,6 +110,9 @@ fi
 
 #Run the pipeline
 
+#Do not require Tk (useful on headless machines)
+export MPLBACKEND=AGG
+
 #Steps in Cosmology pipeline execution:
 #Step 1: run the 2D c-term estimate {{{
 echo -e "###\033[0;34m Running Step 1/7: Compute the 2D c-term for all patches & tomographic bins\033[0m ###"
