@@ -109,7 +109,6 @@ cd @RUNROOT@/@STORAGEPATH@/MCMC/
 
 @PYTHONBIN@/python2 @RUNROOT@/@SCRIPTPATH@/plot_xi_triangle_cov_model_highOm.py \
        @RUNROOT@/@STORAGEPATH@/MCMC/output/@RUNID@_@BLIND@/plots/@SURVEY@_@ALLPATCH@_ZBALL_xip_cmcorr_cov_output_triangle.png \
-       @RUNROOT@/@STORAGEPATH@/MCMC/output/@RUNID@_@BLIND@/plots/@SURVEY@_@ALLPATCH@_ZBALL_xip_cmcorr_cov_output_triangle.png \
        @RUNROOT@/@STORAGEPATH@/MCMC/output/@RUNID@_@BLIND@/plots/@SURVEY@_@ALLPATCH@_ZBALL_xip_cmcorr_cov_output_triangle.pdf \
        @RUNROOT@/@STORAGEPATH@/MCMC/KV450_INPUT/@BLINDING@/@SURVEY@_reweight_@RECALGRID@@FILESUFFIX@_xipm_mcor_@NTOMO@bin.dat \
        @RUNROOT@/@STORAGEPATH@/MCMC/KV450_INPUT/@BLINDING@/cov_matrix_ana_mcorr_@RUNID@.dat \
