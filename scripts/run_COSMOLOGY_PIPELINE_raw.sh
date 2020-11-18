@@ -150,7 +150,7 @@ do
     fi 
     echo -n "Constructing catalogue for tomographic bin ${i} ($Z_B_low < Z_B <= $Z_B_high)"
     #Create the tomographic bin catalogues
-    ${LDACFILTER_PY} -i @PATCHPATH@/@SURVEY@_@ALLPATCH@_reweight_@RECALGRID@@FILESUFFIX@.cat \
+    @RUNROOT@/@SCRIPTPATH@/ldacfilter.py -i @PATCHPATH@/@SURVEY@_@ALLPATCH@_reweight_@RECALGRID@@FILESUFFIX@.cat \
     	       -o @PATCHPATH@/@SURVEY@_@ALLPATCH@_reweight_@RECALGRID@@FILESUFFIX@_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
     	       -t OBJECTS \
     	       -c "(Z_B>${Z_B_low_cut})AND(Z_B<=${Z_B_high_cut});" \

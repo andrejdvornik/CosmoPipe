@@ -41,7 +41,7 @@ do
   fi 
   echo -n "Creating Filtered (i.e. good phot) catalogue for patch ${patch}"
   #Select only sources with good 9-band photometry
-	${LDACFILTER_PY} -i @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@.cat \
+	@RUNROOT@/@SCRIPTPATH@/ldacfilter.py -i @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@.cat \
     		   -t OBJECTS \
     		   -c "@GAAPFLAG@==0;" \
     		   -o @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt.cat \
@@ -76,7 +76,7 @@ do
     fi 
 
     echo -n "Creating Tomographic Bin ${ZBIN} ($Z_B_low < Z_B <= $Z_B_high) catalogue for filtered patch ${patch}"
-	  ${LDACFILTER_PY} -i @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt.cat \
+	  @RUNROOT@/@SCRIPTPATH@/ldacfilter.py -i @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt.cat \
 	  	   -o $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_tmp.cat_$$ \
 	  	   -t OBJECTS \
          -c "(Z_B>${Z_B_low_cut})AND(Z_B<=${Z_B_high_cut});" \
