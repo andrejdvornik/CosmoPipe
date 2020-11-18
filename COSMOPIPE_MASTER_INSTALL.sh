@@ -352,6 +352,11 @@ cd theli-1.6.1/pipesetup
 bash install.sh -m ALL >> THELI_install.log 2>&1
 echo -e "\033[0;31m - Done! \033[0m" 
 #}}}
+#Install tabeval {{{
+echo -en "   >\033[0;34m Installing tabeval\033[0m" 
+${RUNROOT}/INSTALL/anaconda2/bin/pip install git+https://github.com/jlvdb/tabeval.git > ${RUNROOT}/INSTALL/tabeval_install.log 2>&1
+echo -e "\033[0;31m - Done! \033[0m" 
+#}}}
 #Add PostProcessing tools to PYTHONPATH {{{
 echo -en "   >\033[0;34m Adding Post Processing tools to PYTHONPATH\033[0m" 
 export PYTHONPATH=${RUNROOT}/INSTALL/post_process_mcmcs:${PYTHONPATH}
