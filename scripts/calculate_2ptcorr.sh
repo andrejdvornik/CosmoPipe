@@ -43,7 +43,7 @@ do
   #Select only sources with good 9-band photometry
 	${LDACFILTER_PY} -i @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@.cat \
     		   -t OBJECTS \
-    		   -c "@GAAPFLAG@=0;" \
+    		   -c "@GAAPFLAG@==0;" \
     		   -o @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt.cat \
            > @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt.log 2>&1 
   echo -e " - Done!"
@@ -191,6 +191,7 @@ do
       @PYTHONBIN@/corr2 @CONFIGPATH@/treecorr_params.yaml \
 			file_name=$wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
 			file_name2=$wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str2}t${Z_B_high_str2}.cat \
+      hdu=2 \
 			gg_file_name=$wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
 			g1_col=e1_corr \
 			g2_col=e2_corr \

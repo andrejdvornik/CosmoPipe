@@ -452,7 +452,10 @@ if __name__ == "__main__":
     print("accessing table:     %s" % args.t)
     tab = cat[args.t]
 
-    print("applying filter:     %s" % condition.code)
+    try:
+        print("applying filter:     %s" % condition.code)
+    except AttributeError:
+        raise SyntaxError("invalid expression '%s'" % args.c.strip(";"))
     mask = condition(tab)
     selected = sum(mask)
     if selected == 0:
