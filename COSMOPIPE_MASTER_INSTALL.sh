@@ -15,6 +15,18 @@ trap 'abort' 0
 set -e 
 #}}}
 
+#Full List of available options {{{ 
+OPTLIST="ALLPATCH CONFIGPATH DATE DZPRIORMU DZPRIORSD DZPRIORNSIG SHEARSUBSET \
+FILESUFFIX LIKELIHOOD COSMOPIPECFNAME NZFILEID NZFILESUFFIX NZSTEP MASKFILE \
+PACKROOT PATCHPATH COSMOFISHER PATCHLIST PYTHONBIN RECALGRID RUNROOT RUNID \
+RUNTIME SCRIPTPATH STORAGEPATH SURVEY SURVEYAREA THELIPATH TOMOLIMS USER \
+WEIGHTNAME THETAMINCOV THETAMAXCOV NTHETABINCOV XIPLUSLIMS XIMINUSLIMS"
+#}}}
+
+#Generate the list of possible command-line arguments {{{
+COMMOPTS=`echo ${OPTLIST} | awk '{print "--" tolower($1)}'`
+#}}}
+
 #Set the default variables to determine the installation paths  {{{
 #Do we want to run the configure file? (1=NO, else YES)
 NOCONFIG=0
@@ -374,42 +386,46 @@ MACHINE=`uname`
 THELIPATH=`echo ${RUNROOT}/INSTALL/theli-1.6.1/bin/${MACHINE}*`
 PYTHONBIN=${RUNROOT}/INSTALL/anaconda2/bin/
 cp ${PACKROOT}/scripts/configure_raw.sh ${RUNROOT}/configure.sh 
-sed -i "s#\@ALLPATCH\@#${ALLPATCH}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@CONFIGPATH\@#${CONFIGPATH}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@DATE\@#`date +%Y-%m-%d`#g" ${RUNROOT}/configure.sh
-sed -i "s#\@DZPRIORMU\@#${DZPRIORMU}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@DZPRIORSD\@#${DZPRIORSD}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@DZPRIORNSIG\@#${DZPRIORNSIG}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@SHEARSUBSET\@#${SHEARSUBSET}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@FILESUFFIX\@#${FILESUFFIX}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@LIKELIHOOD\@#${LIKELIHOOD}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@COSMOPIPECFNAME\@#${COSMOPIPECFNAME}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@NZFILEID\@#${NZFILEID}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@NZFILESUFFIX\@#${NZFILESUFFIX}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@NZSTEP\@#${NZSTEP}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@MASKFILE\@#${MASKFILE}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@PACKROOT\@#${PACKROOT}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@PATCHPATH\@#${PATCHPATH}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@COSMOFISHER\@#${COSMOFISHER}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@PATCHLIST\@#\"${PATCHLIST}\"#g" ${RUNROOT}/configure.sh
-sed -i "s#\@PYTHONBIN\@#${PYTHONBIN}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@RECALGRID\@#${RECALGRID}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@RUNROOT\@#${RUNROOT}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@RUNID\@#${RUNID}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@RUNTIME\@#${RUNTIME}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@SCRIPTPATH\@#${SCRIPTPATH}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@STORAGEPATH\@#${STORAGEPATH}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@SURVEY\@#${SURVEY}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@SURVEYAREA\@#${SURVEYAREA}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@THELIPATH\@#${THELIPATH}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@TOMOLIMS\@#\"${TOMOLIMS}\"#g" ${RUNROOT}/configure.sh
-sed -i "s#\@USER\@#${USER}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@WEIGHTNAME\@#${WEIGHTNAME}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@THETAMINCOV\@#${THETAMINCOV}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@THETAMAXCOV\@#${THETAMAXCOV}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@NTHETABINCOV\@#${NTHETABINCOV}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@XIPLUSLIMS\@#${XIPLUSLIMS}#g" ${RUNROOT}/configure.sh
-sed -i "s#\@XIMINUSLIMS\@#${XIMINUSLIMS}#g" ${RUNROOT}/configure.sh
+for OPT in $OPTLIST
+do 
+  sed -i "s#\@${OPT}\@#${!OPT}#g" ${RUNROOT}/configure.sh run_PhotoPipe.sh ${RUNROOT}/${SCRIPTPATH}/*.*
+done 
+#sed -i "s#\@ALLPATCH\@#${ALLPATCH}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@CONFIGPATH\@#${CONFIGPATH}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@DATE\@#`date +%Y-%m-%d`#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@DZPRIORMU\@#${DZPRIORMU}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@DZPRIORSD\@#${DZPRIORSD}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@DZPRIORNSIG\@#${DZPRIORNSIG}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@SHEARSUBSET\@#${SHEARSUBSET}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@FILESUFFIX\@#${FILESUFFIX}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@LIKELIHOOD\@#${LIKELIHOOD}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@COSMOPIPECFNAME\@#${COSMOPIPECFNAME}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@NZFILEID\@#${NZFILEID}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@NZFILESUFFIX\@#${NZFILESUFFIX}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@NZSTEP\@#${NZSTEP}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@MASKFILE\@#${MASKFILE}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@PACKROOT\@#${PACKROOT}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@PATCHPATH\@#${PATCHPATH}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@COSMOFISHER\@#${COSMOFISHER}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@PATCHLIST\@#\"${PATCHLIST}\"#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@PYTHONBIN\@#${PYTHONBIN}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@RECALGRID\@#${RECALGRID}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@RUNROOT\@#${RUNROOT}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@RUNID\@#${RUNID}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@RUNTIME\@#${RUNTIME}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@SCRIPTPATH\@#${SCRIPTPATH}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@STORAGEPATH\@#${STORAGEPATH}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@SURVEY\@#${SURVEY}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@SURVEYAREA\@#${SURVEYAREA}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@THELIPATH\@#${THELIPATH}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@TOMOLIMS\@#\"${TOMOLIMS}\"#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@USER\@#${USER}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@WEIGHTNAME\@#${WEIGHTNAME}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@THETAMINCOV\@#${THETAMINCOV}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@THETAMAXCOV\@#${THETAMAXCOV}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@NTHETABINCOV\@#${NTHETABINCOV}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@XIPLUSLIMS\@#${XIPLUSLIMS}#g" ${RUNROOT}/configure.sh
+#sed -i "s#\@XIMINUSLIMS\@#${XIMINUSLIMS}#g" ${RUNROOT}/configure.sh
 echo -e "\033[0;31m - Done! \033[0m" 
 #}}}
 
