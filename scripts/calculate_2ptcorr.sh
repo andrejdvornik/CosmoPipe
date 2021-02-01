@@ -43,7 +43,7 @@ do
   #Select only sources with good 9-band photometry
 	ldacfilter -i @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@.cat \
     		   -t OBJECTS \
-    		   -c "GAAP_Flag_ugriZYJHKs=0;" \
+    		   -c "@GAAPFLAG@=0;" \
     		   -o @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt.cat \
            > @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt.log 2>&1 
   echo -e " - Done!"

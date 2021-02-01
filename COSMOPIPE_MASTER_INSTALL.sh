@@ -303,7 +303,7 @@ bash Anaconda2-4.3.0-Linux-x86_64.sh -b -p ./anaconda2/ > Anaconda_install.log 2
 export PYTHONPATH=${RUNROOT}/INSTALL/anaconda2/bin/python2:${RUNROOT}/INSTALL/anaconda2/lib/
 export PATH=${RUNROOT}/INSTALL/anaconda2/bin/:${PATH}
 ${RUNROOT}/INSTALL/anaconda2/bin/pip install numpy scipy pyfits cython matplotlib \
-  palettable fitsio corner > python_packages.log 2>&1 <<EOF
+  palettable fitsio==1.1.1 corner > python_packages.log 2>&1 <<EOF
 yes
 EOF
 ${RUNROOT}/INSTALL/anaconda2/bin/conda install -c conda-forge openmp >> python_packages.log 2>&1 <<EOF
@@ -454,7 +454,9 @@ then
   echo -e "\033[0;34mTherefore, if you would like to proceed with the use of CosmoPipe then\033[0m"
   echo -e "\033[0;34myou can do one of two things: 033[0m"
   echo -e "\033[0;34m   1)\033[0;31m Request this repository directly\033[0;34m from \033[0m"
-  echo -e "               \033[0;34m Benjamin Joachimi (joachimi AT ucl.ac.uk); or \033[0m"
+  echo -e "\033[0;34m      Benjamin Joachimi (joachimi AT ucl.ac.uk) \033[0m"
+  echo -e "      NOTE:\033[0;34m This may require increasing the value of \033[0m#define nmaxline_surveywindow 10000 "
+  echo -e "\033[0;34m            in psvareos/proc/thps_func.c \033[0m"
   echo -e "\033[0;34m   2)\033[0;31m Provide you're own covariance matrix to the pipeline.\033[0m"
   echo -e "\033[0;34mHowever the latter may not be trivial, as the covariance matrix must be specified in the \033[0m"
   echo -e "\033[0;34msame format as is expected of the outputs from CosmoFischerForecast... \033[0m"

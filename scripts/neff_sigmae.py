@@ -20,7 +20,7 @@ try:
   e2=catalogue.field('@E2VAR@')
   weight=catalogue.field('@WEIGHTNAME@')
   Z_B=catalogue.field('Z_B')
-  GAAP_Flag=catalogue.field('GAAP_Flag_ugriZYJHKs')
+  GAAP_Flag=catalogue.field('@GAAPFLAG@')
 except:
   ldac_cat = ldac.LDACCat(sys.argv[1])
   catalogue = ldac_cat['OBJECTS']
@@ -28,7 +28,7 @@ except:
   e2=catalogue['@E2VAR@']
   weight=catalogue['@WEIGHTNAME@']
   Z_B=catalogue['Z_B']
-  GAAP_Flag=catalogue['GAAP_Flag_ugriZYJHKs']
+  GAAP_Flag=catalogue['@GAAPFLAG@']
 
 area=float(sys.argv[2])
 
