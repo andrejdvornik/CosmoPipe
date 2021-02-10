@@ -18,17 +18,15 @@ wd=MCMC/
 mkdir -p $md/$wd/@SURVEY@_INPUT/DATA_VECTOR
 
 ZBLIMS="@TOMOLIMS@"
-NTOMO=`echo $ZBLIMS | awk '{print NF-1}'` 
 
-
-for ZBIN1 in `seq $NTOMO`
+for ZBIN1 in `seq @NTOMOBINS@`
 do
   Z_B_low=`echo $ZBLIMS | awk -v n=$ZBIN1 '{print $n}'`
   Z_B_high=`echo $ZBLIMS | awk -v n=$ZBIN1 '{print $(n+1)}'`
 	Z_B_low_str=`echo $Z_B_low | sed 's/\./p/g'`
 	Z_B_high_str=`echo $Z_B_high | sed 's/\./p/g'`
 	
-	for ZBIN2 in `seq $ZBIN1 $NTOMO`
+	for ZBIN2 in `seq $ZBIN1 @NTOMOBINS@`
 	do
     Z_B_low2=`echo $ZBLIMS | awk -v n=$ZBIN2 '{print $n}'`
     Z_B_high2=`echo $ZBLIMS | awk -v n=$ZBIN2 '{print $(n+1)}'`

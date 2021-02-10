@@ -29,7 +29,8 @@ OPTLIST="ALLPATCH BLIND BLINDING CONFIGPATH DATE DZPRIORMU DZPRIORSD \
   FILEBODY PACKROOT RUNID RUNROOT RUNTIME SCRIPTPATH STORAGEPATH \
   SURVEY SURVEYAREA THELIPATH TOMOLIMS USER WEIGHTNAME BINNING \
   THETAMINCOV THETAMAXCOV NTHETABINCOV THETAMINXI THETAMAXXI \
-  NTHETABINXI XIPLUSLIMS XIMINUSLIMS WEIGHTNAME"
+  NTHETABINXI XIPLUSLIMS XIMINUSLIMS WEIGHTNAME NMAXCOSEBIS \
+  NTOMOBINS"
 
 #Paths and variables for configuration
 #Designation for "all patches"
@@ -116,6 +117,8 @@ NTHETABINCOV="@NTHETABINCOV@"
 THETAMINXI="@THETAMINXI@"
 THETAMAXXI="@THETAMAXXI@"
 NTHETABINXI="@NTHETABINXI@"
+#Number of modes for COSEBIs
+NMAXCOSEBIS=20
 #Xi plus/minus limits 
 XIPLUSLIMS="@XIPLUSLIMS@"
 XIMINUSLIMS="@XIMINUSLIMS@"
@@ -138,7 +141,7 @@ fi
 # Set up the tomographic bin limit vectors (for MCMC configuration) {{{
 TOMOLIMSLOVEC=`echo $TOMOLIMS | awk '{$NF = ""; print $0}' | sed 's/ $//g' | sed 's/ /,/g'`
 TOMOLIMSHIVEC=`echo $TOMOLIMS | awk '{$1  = ""; print $0}' | sed 's/^ //g' | sed 's/ /,/g'`
-NTOMO=`echo $TOMOLIMS | awk '{print NF-1}'`
+NTOMOBINS=`echo $TOMOLIMS | awk '{print NF-1}'`
 #}}}
 
 #Construct the DZPRIOR python vectors (for modifying likelihood etc) {{{

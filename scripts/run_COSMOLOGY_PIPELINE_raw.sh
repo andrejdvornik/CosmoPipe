@@ -59,7 +59,6 @@ export LD_LIBRARY_PATH=@RUNROOT@/INSTALL/MultiNest/lib/
 #Predefine any useful variables {{{ 
 PATCHLISTMAT="@PATCHLIST@"
 PATCHLISTMAT=`echo {${PATCHLISTMAT// /,}}`
-NTOMO=`echo @TOMOLIMS@ | awk '{print NF-1}'`
 #}}}
 
 #Starting Prompt {{{
@@ -137,7 +136,7 @@ echo " - Done!"
 #}}}
 
 #Compute the tomographic bin c-terms {{{
-for i in `seq ${NTOMO}`
+for i in `seq @NTOMOBINS@`
 do
     Z_B_low=`echo @TOMOLIMS@ | awk -v n=$i '{print $n}'`
     Z_B_high=`echo @TOMOLIMS@ | awk -v n=$i '{print $(n+1)}'`
@@ -212,7 +211,7 @@ then
 fi 
 ln -s @RUNROOT@/@STORAGEPATH@/@NZFILEID@*@NZFILESUFFIX@ @RUNROOT@/@STORAGEPATH@/covariance/input/
 #}}}
-#Check for and Remove any previous Nz links {{{
+#Check for and Remove any previous ggcorr links {{{
 nlink=`ls @RUNROOT@/@STORAGEPATH@/covariance/input/@SURVEY@_*_ggcorr.out | wc -l `
 if [ "${nlink}" != "0" ]
 then
@@ -282,7 +281,7 @@ echo -e "###\033[0;34m Running Step 5/7: Prepare the data for MCMC:\033[0m ###"
 
   cp @RUNROOT@/@CONFIGPATH@/@COSMOPIPECFNAME@.param \
      @RUNROOT@/@STORAGEPATH@/MCMC/@SURVEY@_INPUT/
-  for i in `seq @NTOMO@`
+  for i in `seq @NTOMOBINS@`
   do
     dzmu_i=`echo ${dzmu} | awk -v n=${i} '{print $n}'`
     dzsd_i=`echo ${dzsd} | awk -v n=${i} '{print $n}'`
@@ -310,7 +309,7 @@ echo -e "###\033[0;34m Running Step 5/7: Prepare the data for MCMC:\033[0m ###"
   #}}}
 
   #Prepare Nz files {{{
-  for i in `seq ${NTOMO}`
+  for i in `seq @NTOMOBINS@`
   do
     zlo=`echo @TOMOLIMS@ | awk -v n=$i '{print $n}'`
     zhi=`echo @TOMOLIMS@ | awk -v n=$i '{print $(n+1)}'`
@@ -321,10 +320,10 @@ echo -e "###\033[0;34m Running Step 5/7: Prepare the data for MCMC:\033[0m ###"
   #}}}
   
   #Construct the cut values file {{{
-  echo "# min(Xi_pl), max(Xi_pl); min(Xi_min), max(Xi_min) " > @RUNROOT@/@STORAGEPATH@/MCMC/@SURVEY@_INPUT/@BLINDING@/cut_values_${NTOMO}bin.dat
-  for i in `seq ${NTOMO}`
+  echo "# min(Xi_pl), max(Xi_pl); min(Xi_min), max(Xi_min) " > @RUNROOT@/@STORAGEPATH@/MCMC/@SURVEY@_INPUT/@BLINDING@/cut_values_@NTOMOBINS@bin.dat
+  for i in `seq @NTOMOBINS@`
   do
-    echo "@XIPLUSLIMS@ @XIMINUSLIMS@" >> @RUNROOT@/@STORAGEPATH@/MCMC/@SURVEY@_INPUT/@BLINDING@/cut_values_${NTOMO}bin.dat
+    echo "@XIPLUSLIMS@ @XIMINUSLIMS@" >> @RUNROOT@/@STORAGEPATH@/MCMC/@SURVEY@_INPUT/@BLINDING@/cut_values_@NTOMOBINS@bin.dat
   done
   #}}}
 

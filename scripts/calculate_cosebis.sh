@@ -9,7 +9,7 @@
     ## KiDS data
     treePath=$1
     filetail=$2 
-    outcosebis=@STORAGEPATH@/
+    outcosebis=@STORAGEPATH@/2ptStat/
 
     # check does the correct input xi file exist?
     test -f "${treePath}" || \
@@ -50,7 +50,7 @@
     # --root = TLogsRootsAndNorms/Root_${tmin}-${tmax}.table
 
     @PYTHONBIN@/python @RUNROOT@/@SCRIPTPATH@/run_measure_cosebis_cats2stats.py -i ${treePath} -t 1 -p 3 -m 4 \
-            --cfoldername ${outcosebis} -o ${filetail} -b @BINNING@ -n 20 -s @THETAMINCOV@ \
+            --cfoldername ${outcosebis} -o ${filetail} -b @BINNING@ -n @NMAXCOSEBIS@ -s @THETAMINCOV@ \
             -l @THETAMAXCOV@ --tfoldername ${SRCLOC}/Tplus_minus \
             --norm ${normfile} --root ${rootfile}
 
