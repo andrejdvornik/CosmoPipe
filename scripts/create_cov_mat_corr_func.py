@@ -36,7 +36,7 @@ if __name__ == '__main__':
     path_to_trimmed = root_path + '@BLINDING@/'
     
     # load thetas for trimmed cov:
-    fname = path_to_trimmed + '@SURVEY@_reweight_@RECALGRID@@FILESUFFIX@_xipm_mcor_{:}bin.dat'.format(nzbins)
+    fname = path_to_trimmed + '@SURVEY@_@FILEBODY@@FILESUFFIX@_xipm_mcor_{:}bin.dat'.format(nzbins)
     tmp = np.loadtxt(fname)
     thetas = tmp[:, 0]
     

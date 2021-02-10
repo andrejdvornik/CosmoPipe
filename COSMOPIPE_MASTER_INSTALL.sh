@@ -17,10 +17,11 @@ set -e
 
 #Full List of available options {{{ 
 OPTLIST="ALLPATCH CONFIGPATH DATE DZPRIORMU DZPRIORSD DZPRIORNSIG SHEARSUBSET \
-FILESUFFIX LIKELIHOOD COSMOPIPECFNAME NZFILEID NZFILESUFFIX NZSTEP MASKFILE \
-PACKROOT PATCHPATH COSMOFISHER PATCHLIST PYTHONBIN RECALGRID RUNROOT RUNID \
+FILESUFFIX LIKELIHOOD COSMOPIPELFNAME NZFILEID NZFILESUFFIX NZSTEP MASKFILE \
+PACKROOT PATCHPATH COSMOFISHER PATCHLIST PYTHONBIN FILEBODY RUNROOT RUNID \
 RUNTIME SCRIPTPATH STORAGEPATH SURVEY SURVEYAREA THELIPATH TOMOLIMS USER \
-WEIGHTNAME THETAMINCOV THETAMAXCOV NTHETABINCOV XIPLUSLIMS XIMINUSLIMS"
+WEIGHTNAME THETAMINCOV THETAMAXCOV NTHETABINCOV THETAMINXI THETAMAXXI \
+NTHETABINXI XIPLUSLIMS XIMINUSLIMS"
 #}}}
 
 #Generate the list of possible command-line arguments {{{
@@ -41,7 +42,7 @@ RUNID=sci
 #Directory for runtime storage
 RUNTIME=RUNTIME
 #Survey ID  
-SURVEY=KV450 
+SURVEY=K1000
 #Survey Area in arcmin^2
 SURVEYAREA="1.22865e+06"
 #Nz File ID
@@ -51,28 +52,28 @@ NZFILESUFFIX=_DIRsom_Nz.asc
 #Nz File binsize 
 NZSTEP=0.05
 #Survey Footprint Mask file
-MASKFILE=KiDS-NS_KV450_footprint_healpix.fits
+MASKFILE=KiDS_K1000_healpix.fits
 #Path to CosmoFischerForecast Repository
 COSMOFISHER=/path/to/CosmoFisherForecast/
 #Path to Patchwise Catalogues
-PATCHPATH=/path/to/KV450_CATALOGUES_PATCH_V0.5.9_v2/
+PATCHPATH=/path/to/K1000_CATALOGUES_PATCH_V1.0.0/
 #List of Patches 
-PATCHLIST="G9 G12 G15 G23 GS"
+PATCHLIST="'N1 N2'"
 #Designator for "All patches"
-ALLPATCH="GALL"
+ALLPATCH="NB"
 #ID for chosen blinding
-BLINDING=UNBLINDED
+BLINDING=C
 #Patch catalogue suffix 
-FILESUFFIX=_v2_good
+FILESUFFIX=
 #Username (default: `whoami`) 
 USER=`whoami`
 #Do we want plots (1=yes, 0=no)
 #Name of shape weight variable
-WEIGHTNAME=recal_weight
+WEIGHTNAME=recal_weight_C
 #weight definition grid 
-RECALGRID=3x4x4
+FILEBODY=3x4x4
 #Limits of the tomographic bins
-TOMOLIMS="0.1 0.3 0.5 0.7 0.9 1.2"
+TOMOLIMS='"0.1 0.3 0.5 0.7 0.9 1.2"'
 #Path to results
 STORAGEPATH=work_${SURVEY}
 #Path to configuration files
@@ -84,12 +85,16 @@ DZPRIORMU="0.0 0.0 0.0 0.0 0.0"
 DZPRIORSD="0.039 0.023 0.026 0.012 0.011"
 DZPRIORNSIG=3.0
 #Name of the likelihood function to use
-LIKELIHOOD=kv450_cf_likelihood_public
+LIKELIHOOD=k1000_cf_likelihood_public
 #Name of the likelihood when in use (stops crosstalk between simulatneous runs)
-COSMOPIPECFNAME=COSMOPIPE_CF
+COSMOPIPELFNAME=COSMOPIPE_COSEBIs
 #Theta limits for covariance 
+THETAMINXI="0.37895134266193781"
+THETAMAXXI="395.82918204307509"
+NTHETABINXI="326"
+#Theta limits for xipm
 THETAMINCOV=0.5
-THETAMAXCOV=300.0
+THETAMAXCOV=300
 NTHETABINCOV=9
 #Xi plus/minus limits 
 XIPLUSLIMS="0.7 100"
@@ -122,7 +127,7 @@ do
     "--filesuffix") shift; FILESUFFIX=$1; shift;;
     "--user") shift; USER=$1; shift;;
     "--weightname") shift; WEIGHTNAME=$1; shift;;
-    "--recalgrid") shift; RECALGRID=$1; shift;;
+    "--filebody") shift; FILEBODY=$1; shift;;
     "--tomolims") shift; TOMOLIMS=$1; shift;;
     "--storagepath") shift; STORAGEPATH=$1; shift;;
     "--configpath") shift; CONFIGPATH=$1; shift;;
@@ -131,11 +136,14 @@ do
     "--dzpriorsd") shift; DZPRIORSD=$1; shift;;
     "--dzpriornsig") shift; DZPRIORNSIG=$1; shift;;
     "--likelihood") shift; LIKELIHOOD=$1; shift;;
-    "--cosmopipecfname") shift; COSMOPIPECFNAME=$1; shift;;
+    "--cosmopipelfname") shift; COSMOPIPELFNAME=$1; shift;;
     "--xipluslims") shift; XIPLUSLIMS=$1; shift;;
     "--thetamaxcov") shift; THETAMAXCOV=$1; shift;;
     "--thetamincov") shift; THETAMinCOV=$1; shift;;
     "--nthetabincov") shift; NTHETABINCOV=$1; shift;;
+    "--thetamaxxi") shift; THETAMAXXI=$1; shift;;
+    "--thetaminxi") shift; THETAMinXI=$1; shift;;
+    "--nthetabinxi") shift; NTHETABINXI=$1; shift;;
     "--ximinuslims") shift; XIMINUSLIMS=$1; shift;;
     "--class_backuptar") shift; CLASS_BACKUPTAR=$1; shift;;
     *) echo "ERROR - unknown option $1!"; exit 1;;
@@ -162,7 +170,7 @@ echo -e "    ALLPATCH\033[0;34m=\033[0;31m$ALLPATCH \033[0m"
 echo -e "    FILESUFFIX\033[0;34m=\033[0;31m$FILESUFFIX \033[0m"
 echo -e "    USER\033[0;34m=\033[0;31m$USER \033[0m"
 echo -e "    WEIGHTNAME\033[0;34m=\033[0;31m$WEIGHTNAME \033[0m"
-echo -e "    RECALGRID\033[0;34m=\033[0;31m$RECALGRID \033[0m"
+echo -e "    FILEBODY\033[0;34m=\033[0;31m$FILEBODY \033[0m"
 echo -e "    TOMOLIMS\033[0;34m=\033[0;31m\"$TOMOLIMS\" \033[0m"
 echo -e "    SCRIPTPATH\033[0;34m=\033[0;31m$SCRIPTPATH \033[0m"
 echo -e "    STORAGEPATH\033[0;34m=\033[0;31m$STORAGEPATH \033[0m"
@@ -187,7 +195,7 @@ spinner()
   done
 }
 
-sleep 10 & spinner 
+sleep 1 & spinner 
 
 echo " OK!"
 sleep 1
@@ -196,189 +204,196 @@ sleep .5
 echo -e "\033[0;34m=======================================\033[0m"
 #}}}
 
-#Move into the install directory {{{
-if [ -d ${RUNROOT}/INSTALL ]
-then 
-  echo -e "   >\033[0;31m ERROR: There is a previous pipeline installation in \033[0m" 
-  echo -e "   >\033[0;34m ${RUNROOT}/INSTALL \033[0m" 
-  echo -e "   >\033[0;31m If you want to rerun the installation, then you must delete it!\033[0m" 
-  echo -e "\033[0;34m=======================================\033[0m"
-  trap : 0 
-  exit 1 
-fi 
-echo -en "   >\033[0;34m Creating Initial Directory structure \033[0m" 
-mkdir -p ${RUNROOT}/INSTALL 
+##Move into the install directory {{{
+#if [ -d ${RUNROOT}/INSTALL ]
+#then 
+#  echo -e "   >\033[0;31m ERROR: There is a previous pipeline installation in \033[0m" 
+#  echo -e "   >\033[0;34m ${RUNROOT}/INSTALL \033[0m" 
+#  echo -e "   >\033[0;31m If you want to rerun the installation, then you must delete it!\033[0m" 
+#  echo -e "\033[0;34m=======================================\033[0m"
+#  trap : 0 
+#  exit 1 
+#fi 
+#echo -en "   >\033[0;34m Creating Initial Directory structure \033[0m" 
+#mkdir -p ${RUNROOT}/INSTALL 
 cd ${RUNROOT}/INSTALL
-echo -e "\033[0;31m - Done! \033[0m" 
+#echo -e "\033[0;31m - Done! \033[0m" 
+##}}}
+#
+##Run the Script and Package Installations {{{
+##Clone the KiDS Likelihood repository {{{
+##echo -en "   >\033[0;34m Cloning KiDS Likelihood Git repository\033[0m" 
+##if [ -d ${RUNROOT}/INSTALL/kv450_cf_likelihood_public ] 
+##then 
+##  rm -fr kv450_cf_likelihood_public
+##fi
+##git clone https://github.com/fkoehlin/kv450_cf_likelihood_public.git > gitclone_output.log 2>&1
+##echo -e "\033[0;31m - Done! \033[0m" 
+##}}}
+##Clone CLASS {{{
+#echo -en "   >\033[0;34m Cloning CLASS Git repository\033[0m" 
+##Clone the repository
+#if [ -d ${RUNROOT}/INSTALL/class_public ] 
+#then 
+#  rm -fr class_public
+#fi
+#git clone https://github.com/lesgourg/class_public.git -b 2.8 >> gitclone_output.log 2>&1 && success=1 || success=0
+#if [ "${success}" == "0" ]
+#then
+#  echo -e "\033[0;31m - Failed. CLASS version 2.8 not available. \033[0m" 
+#  echo -en "     |->\033[0;34m Attempting to fetch local CLASS v2.6.3 install \033[0m" 
+#  mkdir -p ${RUNROOT}/INSTALL/class_public
+#  cd ${RUNROOT}/INSTALL/class_public
+#  tar -xf ${CLASS_BACKUPTAR} >> gitclone_output.log 2>&1 && success=1 || success=0
+#  if [ "${success}" == "0" ]
+#  then 
+#    echo -e "\033[0;31m - Failed. CLASS backup version v2.6.3 not found. \033[0m\n"
+#    echo -e "\033[0;31m===============\033[0m CLASS Installation Error \033[0;31m==============\033[31m"
+#    echo -e "\033[0;34mThis pipeline requires CLASS version >= \033[0;31mv2.8\033[0;34m or \033[0;31mv2.6.3\033[0;34m. \033[0m"
+#    echo -e "\033[0;34mVersion 2.8 could not be cloned (it may not be released \033[0m"
+#    echo -e "\033[0;34myet!) and the backup version was not found. If you do  \033[0m"
+#    echo -e "\033[0;34mnot have the backup version, then you should \033[0;31mrequest  \033[0m"
+#    echo -e "\033[0;34m\033[0;31mit directly\033[0;34m from Samuel Brieden (sbrieden@icc.ub.edu). \033[0m"
+#    echo -e "\033[0;34mOnce you have the v2.6.3 tarball (typically named \033[0m"
+#    echo -e "\033[0;34m'\033[0;31mclass_with_hmcode.tar.gz\033[0;34m', you can point the \033[0m"
+#    echo -e "\033[0;34m'\033[0;31mCLASS_BACKUPTAR\033[0;34m' variable to this tarball and rerun \033[0m"
+#    echo -e "\033[0;34mthe installation. \033[0m"
+#    echo -e "\033[0;31m=======================================================\033[0m\n"
+#    trap : 0
+#    exit 1
+#  fi 
+#  cd ${RUNROOT}/INSTALL
+#fi 
+#echo -e "\033[0;31m - Done! \033[0m" 
+##}}}
+##Clone MontePython {{{
+#echo -en "   >\033[0;34m Cloning MontePython Git repository\033[0m" 
+##Clone the repository
+#if [ -d ${RUNROOT}/INSTALL/montepython_public ] 
+#then 
+#  rm -fr montepython_public
+#fi
+#git clone https://github.com/BStoelzner/montepython_public.git -b gaussian_prior  >> gitclone_output.log 2>&1
+#echo -e "\033[0;31m - Done! \033[0m" 
+##}}}
+##Clone PyMultiNest {{{
+#echo -en "   >\033[0;34m Cloning PyMultiNest Git repository\033[0m" 
+##Clone the repository
+#if [ -d ${RUNROOT}/INSTALL/PyMultiNest ] 
+#then 
+#  rm -fr PyMultiNest
+#fi
+#git clone https://github.com/JohannesBuchner/PyMultiNest.git  >> gitclone_output.log 2>&1
+#echo -e "\033[0;31m - Done! \033[0m" 
+##}}}
+##Clone MultiNest {{{
+#echo -en "   >\033[0;34m Cloning MultiNest Git repository\033[0m" 
+##Clone the repository
+#if [ -d ${RUNROOT}/INSTALL/MultiNest ] 
+#then 
+#  rm -fr MultiNest
+#fi
+#git clone https://github.com/JohannesBuchner/MultiNest.git  >> gitclone_output.log 2>&1
+#echo -e "\033[0;31m - Done! \033[0m" 
+##}}}
+##Clone PostProcessing Repository {{{
+#echo -en "   >\033[0;34m Cloning Post Processing Git repository\033[0m" 
+##Clone the repository
+#if [ -d ${RUNROOT}/INSTALL/post_process_mcmcs ] 
+#then 
+#  rm -fr post_process_mcmcs
+#fi
+#git clone https://bitbucket.org/fkoehlin/post_process_mcmcs.git  >> gitclone_output.log 2>&1
+#echo -e "\033[0;31m - Done! \033[0m" 
+#echo -en "   >\033[0;34m Installing Local Anaconda Python2.7 \033[0m" 
+#if [ "`uname`" == "Darwin" ]
+#then 
+#  wget http://repo.continuum.io/archive/Anaconda2-4.3.0-MacOSX-x86_64.sh > python_wget.log 2>&1
+#  bash Anaconda2-4.3.0-MacOSX-x86_64.sh -b -p ./anaconda2/ > Anaconda_install.log 2>&1
+#else 
+#  wget http://repo.continuum.io/archive/Anaconda2-4.3.0-Linux-x86_64.sh > python_wget.log 2>&1
+#  bash Anaconda2-4.3.0-Linux-x86_64.sh -b -p ./anaconda2/ > Anaconda_install.log 2>&1
+#fi 
+#export PYTHONPATH=${RUNROOT}/INSTALL/anaconda2/bin/python2:${RUNROOT}/INSTALL/anaconda2/lib/
+#export PATH=${RUNROOT}/INSTALL/anaconda2/bin/:${PATH}
+#${RUNROOT}/INSTALL/anaconda2/bin/pip install tqdm numpy scipy pyfits cython matplotlib \
+#  palettable fitsio==1.1.1 corner > python_packages.log 2>&1 <<EOF
+#yes
+#EOF
+#${RUNROOT}/INSTALL/anaconda2/bin/conda install -c conda-forge openmp >> python_packages.log 2>&1 <<EOF
+#y
+#EOF
+#echo -e "\033[0;31m - Done! \033[0m" 
+##}}}
+##Install montepython {{{
+#echo -en "   >\033[0;34m Installing MontePython\033[0m" 
+#export PATH=${RUNROOT}/INSTALL/montepython_public/:${PATH}
+#sed -i'' "s@NS_auto_arguments = {@&\n    'base_dir': {'type': str},@g" ${RUNROOT}/INSTALL/montepython_public/montepython/MultiNest.py 
+#echo -e "\033[0;31m - Done! \033[0m" 
+#echo -en "   >\033[0;34m Installing CLASS\033[0m" 
+#cd ${RUNROOT}/INSTALL/class_public
+#make clean > ${RUNROOT}/INSTALL/CLASS_install_progress.log 2>&1 
+#make > ${RUNROOT}/INSTALL/CLASS_install_progress.log  2>&1
+#cd ${RUNROOT}/INSTALL/class_public/python
+#${RUNROOT}/INSTALL/anaconda2/bin/python2 setup.py build > python_class_install.log 2>&1
+#cd ${RUNROOT}/INSTALL
+#echo -e "\033[0;31m - Done! \033[0m" 
+##}}}
+##Install TreeCorr {{{
+#echo -en "   >\033[0;34m Installing TreeCorr\033[0m" 
+#${RUNROOT}/INSTALL/anaconda2/bin/pip install treecorr > ${RUNROOT}/INSTALL/TreeCorr_install.log 2>&1
+#echo -e "\033[0;31m - Done! \033[0m" 
+##}}}
+##Install GetDist {{{
+#echo -en "   >\033[0;34m Installing GetDist\033[0m" 
+#${RUNROOT}/INSTALL/anaconda2/bin/pip install getdist > ${RUNROOT}/INSTALL/getdist_install.log 2>&1
+#echo -e "\033[0;31m - Done! \033[0m" 
+##}}}
+##Install MultiNest {{{
+#echo -en "   >\033[0;34m Installing MultiNest\033[0m" 
+#cd ${RUNROOT}/INSTALL/MultiNest/build
+#cmake .. > ${RUNROOT}/INSTALL/MultiNest_install.log 2>&1
+#make >> ${RUNROOT}/INSTALL/MultiNest_install.log 2>&1
+#cd ${RUNROOT}/INSTALL
+#echo -e "\033[0;31m - Done! \033[0m" 
+##}}}
+##Install PyMultiNest {{{
+#echo -en "   >\033[0;34m Installing PyMultiNest\033[0m" 
+#cd ${RUNROOT}/INSTALL/PyMultiNest
+#${RUNROOT}/INSTALL/anaconda2/bin/python2 setup.py install > ${RUNROOT}/INSTALL/PyMultiNest_install.log 2>&1
+#cd ${RUNROOT}/INSTALL
+#echo -e "\033[0;31m - Done! \033[0m" 
+##}}}
+##Install THELI LDAC tools {{{
+#echo -en "   >\033[0;34m Installing THELI LDAC tools\033[0m" 
+#if [ -f ${RUNROOT}/../INSTALL/theli-1.6.1.tgz ]
+#then 
+#  ln -s ${RUNROOT}/../INSTALL/theli-1.6.1.tgz .
+#else 
+#  wget https://marvinweb.astro.uni-bonn.de/data_products/theli/theli-1.6.1.tgz > ${RUNROOT}/INSTALL/THELI_wget.log 2>&1
+#fi 
+#tar -xf theli-1.6.1.tgz >> THELI_install.log 2>&1
+#rm -f theli-1.6.1.tgz  >> THELI_install.log 2>&1
+#cd theli-1.6.1/pipesetup
+#bash install.sh -m ALL >> THELI_install.log 2>&1
+#echo -e "\033[0;31m - Done! \033[0m" 
+##}}}
+##Add PostProcessing tools to PYTHONPATH {{{
+#echo -en "   >\033[0;34m Adding Post Processing tools to PYTHONPATH\033[0m" 
+#export PYTHONPATH=${RUNROOT}/INSTALL/post_process_mcmcs:${PYTHONPATH}
+#echo -e "\033[0;31m - Done! \033[0m" 
+##}}}
+#Add useful Functions to Python Lib {{{
+#echo -en "   >\033[0;34m Adding usefull functions to python lib \033[0m" 
+#cd ${RUNROOT}/INSTALL/anaconda2/lib/
+#cp ${PACKROOT}/scripts/{fitting,ldac,measure_cosebis}.py . > ${RUNROOT}/INSTALL/LDAC_wget.log 2>&1
+#cd ${RUNROOT}/INSTALL
+#echo -e "\033[0;31m - Done! \033[0m" 
+##}}}
+#echo -e "\033[0;31m   ##Script Installations all done!##\033[0m" 
 #}}}
 
-#Run the Script and Package Installations {{{
-#Clone the KiDS Likelihood repository {{{
-echo -en "   >\033[0;34m Cloning KiDS Likelihood Git repository\033[0m" 
-if [ -d ${RUNROOT}/INSTALL/kv450_cf_likelihood_public ] 
-then 
-  rm -fr kv450_cf_likelihood_public
-fi
-git clone https://github.com/fkoehlin/kv450_cf_likelihood_public.git > gitclone_output.log 2>&1
-echo -e "\033[0;31m - Done! \033[0m" 
-#}}}
-#Clone CLASS {{{
-echo -en "   >\033[0;34m Cloning CLASS Git repository\033[0m" 
-#Clone the repository
-if [ -d ${RUNROOT}/INSTALL/class_public ] 
-then 
-  rm -fr class_public
-fi
-git clone https://github.com/lesgourg/class_public.git -b 2.8 >> gitclone_output.log 2>&1 && success=1 || success=0
-if [ "${success}" == "0" ]
-then
-  echo -e "\033[0;31m - Failed. CLASS version 2.8 not available. \033[0m" 
-  echo -en "     |->\033[0;34m Attempting to fetch local CLASS v2.6.3 install \033[0m" 
-  mkdir -p ${RUNROOT}/INSTALL/class_public
-  cd ${RUNROOT}/INSTALL/class_public
-  tar -xf ${CLASS_BACKUPTAR} >> gitclone_output.log 2>&1 && success=1 || success=0
-  if [ "${success}" == "0" ]
-  then 
-    echo -e "\033[0;31m - Failed. CLASS backup version v2.6.3 not found. \033[0m\n"
-    echo -e "\033[0;31m===============\033[0m CLASS Installation Error \033[0;31m==============\033[31m"
-    echo -e "\033[0;34mThis pipeline requires CLASS version >= \033[0;31mv2.8\033[0;34m or \033[0;31mv2.6.3\033[0;34m. \033[0m"
-    echo -e "\033[0;34mVersion 2.8 could not be cloned (it may not be released \033[0m"
-    echo -e "\033[0;34myet!) and the backup version was not found. If you do  \033[0m"
-    echo -e "\033[0;34mnot have the backup version, then you should \033[0;31mrequest  \033[0m"
-    echo -e "\033[0;34m\033[0;31mit directly\033[0;34m from Samuel Brieden (sbrieden@icc.ub.edu). \033[0m"
-    echo -e "\033[0;34mOnce you have the v2.6.3 tarball (typically named \033[0m"
-    echo -e "\033[0;34m'\033[0;31mclass_with_hmcode.tar.gz\033[0;34m', you can point the \033[0m"
-    echo -e "\033[0;34m'\033[0;31mCLASS_BACKUPTAR\033[0;34m' variable to this tarball and rerun \033[0m"
-    echo -e "\033[0;34mthe installation. \033[0m"
-    echo -e "\033[0;31m=======================================================\033[0m\n"
-    trap : 0
-    exit 1
-  fi 
-  cd ${RUNROOT}/INSTALL
-fi 
-echo -e "\033[0;31m - Done! \033[0m" 
-#}}}
-#Clone MontePython {{{
-echo -en "   >\033[0;34m Cloning MontePython Git repository\033[0m" 
-#Clone the repository
-if [ -d ${RUNROOT}/INSTALL/montepython_public ] 
-then 
-  rm -fr montepython_public
-fi
-git clone https://github.com/brinckmann/montepython_public.git  >> gitclone_output.log 2>&1
-echo -e "\033[0;31m - Done! \033[0m" 
-#}}}
-#Clone PyMultiNest {{{
-echo -en "   >\033[0;34m Cloning PyMultiNest Git repository\033[0m" 
-#Clone the repository
-if [ -d ${RUNROOT}/INSTALL/PyMultiNest ] 
-then 
-  rm -fr PyMultiNest
-fi
-git clone https://github.com/JohannesBuchner/PyMultiNest.git  >> gitclone_output.log 2>&1
-echo -e "\033[0;31m - Done! \033[0m" 
-#}}}
-#Clone MultiNest {{{
-echo -en "   >\033[0;34m Cloning MultiNest Git repository\033[0m" 
-#Clone the repository
-if [ -d ${RUNROOT}/INSTALL/MultiNest ] 
-then 
-  rm -fr MultiNest
-fi
-git clone https://github.com/JohannesBuchner/MultiNest.git  >> gitclone_output.log 2>&1
-echo -e "\033[0;31m - Done! \033[0m" 
-#}}}
-#Clone PostProcessing Repository {{{
-echo -en "   >\033[0;34m Cloning Post Processing Git repository\033[0m" 
-#Clone the repository
-if [ -d ${RUNROOT}/INSTALL/post_process_mcmcs ] 
-then 
-  rm -fr post_process_mcmcs
-fi
-git clone https://bitbucket.org/fkoehlin/post_process_mcmcs.git  >> gitclone_output.log 2>&1
-echo -e "\033[0;31m - Done! \033[0m" 
-echo -en "   >\033[0;34m Installing Local Anaconda Python2.7 \033[0m" 
-wget http://repo.continuum.io/archive/Anaconda2-4.3.0-Linux-x86_64.sh > python_wget.log 2>&1
-bash Anaconda2-4.3.0-Linux-x86_64.sh -b -p ./anaconda2/ > Anaconda_install.log 2>&1
-export PYTHONPATH=${RUNROOT}/INSTALL/anaconda2/bin/python2:${RUNROOT}/INSTALL/anaconda2/lib/
-export PATH=${RUNROOT}/INSTALL/anaconda2/bin/:${PATH}
-${RUNROOT}/INSTALL/anaconda2/bin/pip install numpy scipy pyfits cython matplotlib \
-  palettable fitsio==1.1.1 corner > python_packages.log 2>&1 <<EOF
-yes
-EOF
-${RUNROOT}/INSTALL/anaconda2/bin/conda install -c conda-forge openmp >> python_packages.log 2>&1 <<EOF
-y
-EOF
-echo -e "\033[0;31m - Done! \033[0m" 
-#}}}
-#Install montepython {{{
-echo -en "   >\033[0;34m Installing MontePython\033[0m" 
-export PATH=${RUNROOT}/INSTALL/montepython_public/:${PATH}
-sed -i "s@NS_auto_arguments = {@&\n    'base_dir': {'type': str},@g" ${RUNROOT}/INSTALL/montepython_public/montepython/MultiNest.py 
-echo -e "\033[0;31m - Done! \033[0m" 
-echo -en "   >\033[0;34m Installing CLASS\033[0m" 
-cd ${RUNROOT}/INSTALL/class_public
-make clean > ${RUNROOT}/INSTALL/CLASS_install_progress.log 2>&1 
-make > ${RUNROOT}/INSTALL/CLASS_install_progress.log  2>&1
-cd ${RUNROOT}/INSTALL/class_public/python
-${RUNROOT}/INSTALL/anaconda2/bin/python2 setup.py build > python_class_install.log 2>&1
-cd ${RUNROOT}/INSTALL
-echo -e "\033[0;31m - Done! \033[0m" 
-#}}}
-#Install TreeCorr {{{
-echo -en "   >\033[0;34m Installing TreeCorr\033[0m" 
-${RUNROOT}/INSTALL/anaconda2/bin/pip install treecorr > ${RUNROOT}/INSTALL/TreeCorr_install.log 2>&1
-echo -e "\033[0;31m - Done! \033[0m" 
-#}}}
-#Install GetDist {{{
-echo -en "   >\033[0;34m Installing GetDist\033[0m" 
-${RUNROOT}/INSTALL/anaconda2/bin/pip install getdist > ${RUNROOT}/INSTALL/getdist_install.log 2>&1
-echo -e "\033[0;31m - Done! \033[0m" 
-#}}}
-#Install MultiNest {{{
-echo -en "   >\033[0;34m Installing MultiNest\033[0m" 
-cd ${RUNROOT}/INSTALL/MultiNest/build
-cmake .. > ${RUNROOT}/INSTALL/MultiNest_install.log 2>&1
-make >> ${RUNROOT}/INSTALL/MultiNest_install.log 2>&1
-cd ${RUNROOT}/INSTALL
-echo -e "\033[0;31m - Done! \033[0m" 
-#}}}
-#Install PyMultiNest {{{
-echo -en "   >\033[0;34m Installing PyMultiNest\033[0m" 
-cd ${RUNROOT}/INSTALL/PyMultiNest
-${RUNROOT}/INSTALL/anaconda2/bin/python2 setup.py install > ${RUNROOT}/INSTALL/PyMultiNest_install.log 2>&1
-cd ${RUNROOT}/INSTALL
-echo -e "\033[0;31m - Done! \033[0m" 
-#}}}
-#Install THELI LDAC tools {{{
-echo -en "   >\033[0;34m Installing THELI LDAC tools\033[0m" 
-if [ -f ${RUNROOT}/../INSTALL/theli-1.6.1.tgz ]
-then 
-  ln -s ${RUNROOT}/../INSTALL/theli-1.6.1.tgz .
-else 
-  wget https://marvinweb.astro.uni-bonn.de/data_products/theli/theli-1.6.1.tgz > ${RUNROOT}/INSTALL/THELI_wget.log 2>&1
-fi 
-tar -xf theli-1.6.1.tgz >> THELI_install.log 2>&1
-rm -f theli-1.6.1.tgz  >> THELI_install.log 2>&1
-cd theli-1.6.1/pipesetup
-bash install.sh -m ALL >> THELI_install.log 2>&1
-echo -e "\033[0;31m - Done! \033[0m" 
-#}}}
-#Add PostProcessing tools to PYTHONPATH {{{
-echo -en "   >\033[0;34m Adding Post Processing tools to PYTHONPATH\033[0m" 
-export PYTHONPATH=${RUNROOT}/INSTALL/post_process_mcmcs:${PYTHONPATH}
-echo -e "\033[0;31m - Done! \033[0m" 
-#}}}
-#Add useful Functions to Python Lib {{{
-echo -en "   >\033[0;34m Adding usefull functions to python lib \033[0m" 
-cd ${RUNROOT}/INSTALL/anaconda2/lib/
-cp ${PACKROOT}/scripts/{fitting,ldac}.py . > ${RUNROOT}/INSTALL/LDAC_wget.log 2>&1
-cd ${RUNROOT}/INSTALL
-echo -e "\033[0;31m - Done! \033[0m" 
-#}}}
-echo -e "\033[0;31m   ##Script Installations all done!##\033[0m" 
 cd ${RUNROOT}
-#}}}
 
 #Update the Configure script for this run {{{
 echo -en "   >\033[0;34m Update the configure script \033[0m" 
@@ -388,44 +403,8 @@ PYTHONBIN=${RUNROOT}/INSTALL/anaconda2/bin/
 cp ${PACKROOT}/scripts/configure_raw.sh ${RUNROOT}/configure.sh 
 for OPT in $OPTLIST
 do 
-  sed -i "s#\@${OPT}\@#${!OPT}#g" ${RUNROOT}/configure.sh run_PhotoPipe.sh ${RUNROOT}/${SCRIPTPATH}/*.*
+  sed -i '' "s#\@${OPT}\@#${!OPT}#g" ${RUNROOT}/configure.sh 
 done 
-#sed -i "s#\@ALLPATCH\@#${ALLPATCH}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@CONFIGPATH\@#${CONFIGPATH}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@DATE\@#`date +%Y-%m-%d`#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@DZPRIORMU\@#${DZPRIORMU}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@DZPRIORSD\@#${DZPRIORSD}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@DZPRIORNSIG\@#${DZPRIORNSIG}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@SHEARSUBSET\@#${SHEARSUBSET}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@FILESUFFIX\@#${FILESUFFIX}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@LIKELIHOOD\@#${LIKELIHOOD}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@COSMOPIPECFNAME\@#${COSMOPIPECFNAME}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@NZFILEID\@#${NZFILEID}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@NZFILESUFFIX\@#${NZFILESUFFIX}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@NZSTEP\@#${NZSTEP}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@MASKFILE\@#${MASKFILE}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@PACKROOT\@#${PACKROOT}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@PATCHPATH\@#${PATCHPATH}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@COSMOFISHER\@#${COSMOFISHER}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@PATCHLIST\@#\"${PATCHLIST}\"#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@PYTHONBIN\@#${PYTHONBIN}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@RECALGRID\@#${RECALGRID}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@RUNROOT\@#${RUNROOT}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@RUNID\@#${RUNID}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@RUNTIME\@#${RUNTIME}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@SCRIPTPATH\@#${SCRIPTPATH}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@STORAGEPATH\@#${STORAGEPATH}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@SURVEY\@#${SURVEY}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@SURVEYAREA\@#${SURVEYAREA}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@THELIPATH\@#${THELIPATH}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@TOMOLIMS\@#\"${TOMOLIMS}\"#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@USER\@#${USER}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@WEIGHTNAME\@#${WEIGHTNAME}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@THETAMINCOV\@#${THETAMINCOV}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@THETAMAXCOV\@#${THETAMAXCOV}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@NTHETABINCOV\@#${NTHETABINCOV}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@XIPLUSLIMS\@#${XIPLUSLIMS}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@XIMINUSLIMS\@#${XIMINUSLIMS}#g" ${RUNROOT}/configure.sh
 echo -e "\033[0;31m - Done! \033[0m" 
 #}}}
 

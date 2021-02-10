@@ -33,19 +33,19 @@ test ! -d $wd && mkdir $wd
 ## Prepare the patch-wide catalogues ###
 for patch in @ALLPATCH@ @PATCHLIST@
 do
-  if [ -f @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt.cat ]
+  if [ -f @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt.cat ]
   then 
     echo -n "Removing previous Filtered (i.e. good phot) catalogue for patch ${patch}"
-    rm -f @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt.cat
+    rm -f @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt.cat
     echo -e " - Done!"
   fi 
   echo -n "Creating Filtered (i.e. good phot) catalogue for patch ${patch}"
   #Select only sources with good 9-band photometry
-	ldacfilter -i @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@.cat \
+	ldacfilter -i @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@.cat \
     		   -t OBJECTS \
-    		   -c "@GAAPFLAG@=0;" \
-    		   -o @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt.cat \
-           > @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt.log 2>&1 
+           -c "(@GAAPFLAG@=0);" \
+    		   -o @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt.cat \
+           > @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt.log 2>&1 
   echo -e " - Done!"
   #Create the tomographic bin catalogues 
 	for ZBIN in `seq $NTOMO` 
@@ -59,8 +59,8 @@ do
     ZSEL=`echo $Z_B_low $Z_B_high | awk '{print ($1+$2)/2.0}'`
 
     echo -n "Retriving c-terms for Bin ${ZBIN} (<z>=$ZSEL) in patch ${patch}"
-	  c1=`awk '{if ($1=='$ZSEL') printf "%1.10f\n", $3}' @STORAGEPATH@/e_vs_ZB_${patch}_@RECALGRID@_@WEIGHTNAME@.dat`
-	  c2=`awk '{if ($1=='$ZSEL') printf "%1.10f\n", $5}' @STORAGEPATH@/e_vs_ZB_${patch}_@RECALGRID@_@WEIGHTNAME@.dat`
+	  c1=`awk '{if ($1=='$ZSEL') printf "%1.10f\n", $3}' @STORAGEPATH@/e_vs_ZB_${patch}_@FILEBODY@_@WEIGHTNAME@.dat`
+	  c2=`awk '{if ($1=='$ZSEL') printf "%1.10f\n", $5}' @STORAGEPATH@/e_vs_ZB_${patch}_@FILEBODY@_@WEIGHTNAME@.dat`
     if [ "$c1" == "" -o "$c2" == "" ]
     then
       echo "\033[0;31m - ERROR!\033[0m\nOne or both of the c-terms was unable to be retrieved! Cannot correct biases!"
@@ -68,43 +68,43 @@ do
     fi 
     echo -e " - Done!"
 
-    if [ -f $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.cat ]
+    if [ -f $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.cat ]
     then 
       echo -n "Removing previous Tomographic Bin ${ZBIN} catalogue for filtered patch ${patch}"
-      rm -f $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.cat
+      rm -f $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.cat
       echo -e " - Done!"
     fi 
 
     echo -n "Creating Tomographic Bin ${ZBIN} ($Z_B_low < Z_B <= $Z_B_high) catalogue for filtered patch ${patch}"
-	  ldacfilter -i @PATCHPATH@/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt.cat \
-	  	   -o $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_tmp.cat_$$ \
+	  ldacfilter -i @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt.cat \
+	  	   -o $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_tmp.cat_$$ \
 	  	   -t OBJECTS \
          -c "(Z_B>${Z_B_low_cut})AND(Z_B<=${Z_B_high_cut});" \
-	  	   > $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.log 2>&1
+	  	   > $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.log 2>&1
     echo -e " - Done!"
 
     echo -n "Correcting ellipticities with c-terms c1=${c1} and c2=${c2}"
-	  ldaccalc -i $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_tmp.cat_$$ \
-	  	 -o $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
+	  ldaccalc -i $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_tmp.cat_$$ \
+	  	 -o $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
 	  	 -t OBJECTS \
 	  	 -c "@E1VAR@-(${c1});" -n e1_corr "" -k FLOAT \
 	  	 -c "@E2VAR@-(${c2});" -n e2_corr "" -k FLOAT \
-	  	 >> $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.log 2>&1
+	  	 >> $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.log 2>&1
     echo -e " - Done!"
 
-    if [ -f $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_wcs.asc ]
+    if [ -f $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_wcs.asc ]
     then 
       echo -n "Removing previous WCS catalogue for this filtered tomographic bin"
-      rm -f $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_wcs.asc
+      rm -f $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_wcs.asc
       echo -e " - Done!"
     fi 
 
     echo -n "Outputting WCS catalogue for this filtered tomographic bin"
-	  ldactoasc -i $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
+	  ldactoasc -i $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
 		    -t OBJECTS -b -k ALPHA_J2000 DELTA_J2000 \
-		    > $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_wcs.asc \
-		    2> $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_wcs.log
-    nlines=`wc -l $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_wcs.asc | awk '{ print $1} '`
+		    > $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_wcs.asc \
+		    2> $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_wcs.log
+    nlines=`wc -l $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_wcs.asc | awk '{ print $1} '`
     if [ "$nlines" == "0" ]
     then 
       echo "\033[0;31m - ERROR!\033[0m\nNo lines were output in WCS catalogue. The catalogue manipulation above must have failed somewhere!"
@@ -118,18 +118,18 @@ rm $wd/*_$$
 # Calculate xi's with treecor {{{
 for PATCH in @PATCHLIST@
 do
-  if [ -f @PATCHPATH@/@SURVEY@_${PATCH}_reweight_@RECALGRID@@FILESUFFIX@_filt_c12.cat ]
+  if [ -f @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt_c12.cat ]
   then 
     echo -n "Removing previous c12 mock for patch ${PATCH}"
-    rm -f @PATCHPATH@/@SURVEY@_${PATCH}_reweight_@RECALGRID@@FILESUFFIX@_filt_c12.cat
+    rm -f @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt_c12.cat
     echo " - Done!"
   fi
   echo -n "Constructing c12 mock for patch ${PATCH}"
   @PYTHONBIN@/python2 @RUNROOT@/@SCRIPTPATH@/create_c12_mock.py \
   	   @STORAGEPATH@ \
-  	   @PATCHPATH@/@SURVEY@_${PATCH}_reweight_@RECALGRID@@FILESUFFIX@_filt.cat \
-  	   @PATCHPATH@/@SURVEY@_${PATCH}_reweight_@RECALGRID@@FILESUFFIX@_filt_c12.cat \
-       > @PATCHPATH@/@SURVEY@_${PATCH}_reweight_@RECALGRID@@FILESUFFIX@_filt_c12.log 2>&1
+  	   @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt.cat \
+  	   @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt_c12.cat \
+       > @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt_c12.log 2>&1
   echo " - Done!"
 
   if [ -f @STORAGEPATH@/@SURVEY@_${PATCH}_c12_treecorr.out ]
@@ -141,7 +141,7 @@ do
 
   echo -n "Constructing correlation function of c12 for patch ${PATCH}"
   @PYTHONBIN@/corr2 @CONFIGPATH@/treecorr_params.yaml \
-  	  file_name=@PATCHPATH@/@SURVEY@_${PATCH}_reweight_@RECALGRID@@FILESUFFIX@_filt_c12.cat \
+  	  file_name=@PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt_c12.cat \
   	  gg_file_name=@STORAGEPATH@/@SURVEY@_${PATCH}_c12_treecorr.out \
   	  g1_col=c1 \
   	  g2_col=c2 \
@@ -180,21 +180,21 @@ do
 	    Z_B_low_str2=`echo $Z_B_low2 | sed 's/\./p/g'`
 	    Z_B_high_str2=`echo $Z_B_high2 | sed 's/\./p/g'`
 		
-      if [ -f $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out ]
+      if [ -f $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out ]
       then 
         echo -n "    -> Removing previous Bin $ZBIN1 x Bin $ZBIN2 correlation function"
-        rm -f $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out
+        rm -f $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out
         echo -e " - Done!"
       fi 
 
       echo -n "    -> Bin $ZBIN1 ($Z_B_low < Z_B <= $Z_B_high) x Bin $ZBIN2 ($Z_B_low2 < Z_B <= $Z_B_high2)"
       @PYTHONBIN@/corr2 @CONFIGPATH@/treecorr_params.yaml \
-			file_name=$wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
-			file_name2=$wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str2}t${Z_B_high_str2}.cat \
-			gg_file_name=$wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
+			file_name=$wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
+			file_name2=$wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str2}t${Z_B_high_str2}.cat \
+			gg_file_name=$wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
 			g1_col=e1_corr \
 			g2_col=e2_corr \
-      > $wd/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.log 2>&1 
+      > $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.log 2>&1 
       echo -e " - Done!"
     done
 	done
@@ -215,15 +215,25 @@ do
     Z_B_high2=`echo $ZBLIMS | awk -v n=$ZBIN2 '{print $(n+1)}'`
 	  Z_B_low_str2=`echo $Z_B_low2 | sed 's/\./p/g'`
 	  Z_B_high_str2=`echo $Z_B_high2 | sed 's/\./p/g'`
-    if [ -f $wd/@SURVEY@_@ALLPATCH@_combined_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out ]
+    if [ -f $wd/@SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out ]
     then 
       echo -n "    -> Removing previous Bin $ZBIN1 x Bin $ZBIN2 patch combined correlation function"
-      rm -f $wd/@SURVEY@_@ALLPATCH@_combined_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out
+      rm -f $wd/@SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out
       echo -e " - Done!"
     fi 
+    echo -n "    -> Constructing Bin $ZBIN1 x Bin $ZBIN2 patch-combined correlation function"
     @PYTHONBIN@/python2 @RUNROOT@/@SCRIPTPATH@/combine_xi_patches.py \
-      $wd/@SURVEY@_@ALLPATCH@_combined_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
-  		 `echo echo $wd/@SURVEY@_${PATCHLISTMAT}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out | bash` #Ensures correct file ordering 
+      $wd/@SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
+  		 `echo echo $wd/@SURVEY@_${PATCHLISTMAT}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out | bash` #Ensures correct file ordering 
+    echo -e " - Done!"
+
+    #Construct the COSEBIs
+    echo -n "    -> Constructing Bin $ZBIN1 x Bin $ZBIN2 patch-combined BandPowers"
+    bash @RUNROOT@/@SCRIPTPATH@/calculate_bandpowers.sh \
+      $wd/@SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
+      @SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_bandpower
+    echo -e " - Done!"
+ 
 	done
 done
 

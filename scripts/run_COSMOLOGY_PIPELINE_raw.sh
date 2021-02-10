@@ -99,7 +99,10 @@ mkdir -p @STORAGEPATH@/PLOTS/
 
 #Check that the Mask File is present {{{
 #(this saves you having an error halfway...)
-if [ ! -f @RUNROOT@/@STORAGEPATH@/@MASKFILE@ ]
+if [ -f @PATCHPATH@/@MASKFILE@ ]
+then 
+  ln -sf @PATCHPATH@/@MASKFILE@ @RUNROOT@/@STORAGEPATH@/@MASKFILE@
+elif [ ! -f @RUNROOT@/@STORAGEPATH@/@MASKFILE@ ]
 then 
   echo -e "\033[0;34m\033[31m ERROR - Survey Mask not Found at designated location:\033[0m"
   echo -e "\033[0;34m@RUNROOT@/@STORAGEPATH@/@MASKFILE@"
@@ -118,19 +121,19 @@ export MPLBACKEND=AGG
 echo -e "###\033[0;34m Running Step 1/7: Compute the 2D c-term for all patches & tomographic bins\033[0m ###"
 #Compute the 2D c-term for ALL patches & All sources {{{
 echo -n "Computing the 2D c-term for all patches & sources"
-${P_PYTHON} @RUNROOT@/@SCRIPTPATH@/average_shear_xpos_ypos_rot.py \
-  @STORAGEPATH@ @ALLPATCH@ @PATCHPATH@/@SURVEY@_@ALLPATCH@_reweight_@RECALGRID@@FILESUFFIX@.cat > @STORAGEPATH@/ALL_fit.txt 
+#${P_PYTHON} @RUNROOT@/@SCRIPTPATH@/average_shear_xpos_ypos_rot.py \
+#  @STORAGEPATH@ @ALLPATCH@ @PATCHPATH@/@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@.cat > @STORAGEPATH@/ALL_fit.txt 
 echo " - Done!"
 #}}}
 
 #Compute the per patch 2D c-term {{{
-for PATCH in @PATCHLIST@
-do 
-  echo -n "Computing the 2D c-term for all sources in patch ${PATCH}"
-  ${P_PYTHON} @RUNROOT@/@SCRIPTPATH@/average_shear_xpos_ypos_rot.py \
-    @STORAGEPATH@ ${PATCH} @PATCHPATH@/@SURVEY@_${PATCH}_reweight_@RECALGRID@@FILESUFFIX@.cat > @STORAGEPATH@/${PATCH}_fit.txt
-  echo " - Done!"
-done 
+#for PATCH in @PATCHLIST@
+#do 
+#  echo -n "Computing the 2D c-term for all sources in patch ${PATCH}"
+#  ${P_PYTHON} @RUNROOT@/@SCRIPTPATH@/average_shear_xpos_ypos_rot.py \
+#    @STORAGEPATH@ ${PATCH} @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@.cat > @STORAGEPATH@/${PATCH}_fit.txt
+#  echo " - Done!"
+#done 
 #}}}
 
 #Compute the tomographic bin c-terms {{{
@@ -142,35 +145,35 @@ do
     Z_B_high_str=`echo $Z_B_high | sed 's/\./p/g'`
     Z_B_low_cut=`echo $Z_B_low   | awk '{print $1+0.001}'`
     Z_B_high_cut=`echo $Z_B_high | awk '{print $1+0.001}'`
-    if [ -f @PATCHPATH@/@SURVEY@_@ALLPATCH@_reweight_@RECALGRID@@FILESUFFIX@_ZB${Z_B_low_str}t${Z_B_high_str}.cat ] 
+    if [ -f @PATCHPATH@/@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@_ZB${Z_B_low_str}t${Z_B_high_str}.cat ] 
     then 
       echo -n "Removing previous catalogue for tomographic bin ${i} ($Z_B_low < Z_B <= $Z_B_high)"
-      rm -f @PATCHPATH@/@SURVEY@_@ALLPATCH@_reweight_@RECALGRID@@FILESUFFIX@_ZB${Z_B_low_str}t${Z_B_high_str}.cat
+      rm -f @PATCHPATH@/@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@_ZB${Z_B_low_str}t${Z_B_high_str}.cat
       echo " - Done!"
     fi 
     echo -n "Constructing catalogue for tomographic bin ${i} ($Z_B_low < Z_B <= $Z_B_high)"
     #Create the tomographic bin catalogues
-    ldacfilter -i @PATCHPATH@/@SURVEY@_@ALLPATCH@_reweight_@RECALGRID@@FILESUFFIX@.cat \
-    	       -o @PATCHPATH@/@SURVEY@_@ALLPATCH@_reweight_@RECALGRID@@FILESUFFIX@_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
+    ldacfilter -i @PATCHPATH@/@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@.cat \
+    	       -o @PATCHPATH@/@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
     	       -t OBJECTS \
     	       -c "(Z_B>${Z_B_low_cut})AND(Z_B<=${Z_B_high_cut});" \
-             > @PATCHPATH@/@SURVEY@_@ALLPATCH@_reweight_@RECALGRID@@FILESUFFIX@_ZB${Z_B_low_str}t${Z_B_high_str}.log 2>&1
+             > @PATCHPATH@/@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@_ZB${Z_B_low_str}t${Z_B_high_str}.log 2>&1
     echo " - Done!"
-    #Construct the 2D c-terms 
-    echo -n "Computing the 2D c-term for all sources in tomographic bin ${i} (patch @ALLPATCH@)"
-    python @RUNROOT@/@SCRIPTPATH@/average_shear_xpos_ypos_rot.py \
-    	   @STORAGEPATH@ \
-    	   ZB${Z_B_low_str}t${Z_B_high_str} \
-    	   @PATCHPATH@/@SURVEY@_@ALLPATCH@_reweight_@RECALGRID@@FILESUFFIX@_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
-	   > @STORAGEPATH@/ZB${Z_B_low_str}t${Z_B_high_str}_fit.txt
-    echo " - Done!"
+    ##Construct the 2D c-terms 
+    #echo -n "Computing the 2D c-term for all sources in tomographic bin ${i} (patch @ALLPATCH@)"
+    #python @RUNROOT@/@SCRIPTPATH@/average_shear_xpos_ypos_rot.py \
+    #	   @STORAGEPATH@ \
+    #	   ZB${Z_B_low_str}t${Z_B_high_str} \
+    #	   @PATCHPATH@/@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
+	  # > @STORAGEPATH@/ZB${Z_B_low_str}t${Z_B_high_str}_fit.txt
+    #echo " - Done!"
 done
 #}}}
 
-#Produce the Ac_prior table {{{
-awk '{if (FNR==5) printf "%s: Ac = %1.4f +/- %1.4f ; variance = %1.4f\n",FILENAME,$2,$5,$5**2}' \
-    @STORAGEPATH@/ZB0p?t[01]p?_fit.txt  > @STORAGEPATH@/Ac_prior_table.txt
-#}}}
+##Produce the Ac_prior table {{{
+#awk '{if (FNR==5) printf "%s: Ac = %1.4f +/- %1.4f ; variance = %1.4f\n",FILENAME,$2,$5,$5**2}' \
+#    @STORAGEPATH@/ZB0p?t[01]p?_fit.txt  > @STORAGEPATH@/Ac_prior_table.txt
+##}}}
 #}}}
 
 #Step 2: calculate the 1D c-terms {{{
@@ -179,15 +182,15 @@ for PATCH in @PATCHLIST@ @ALLPATCH@
 do 
   echo -n "Computing the 1D c-term for all sources in patch ${PATCH}"
   ${P_PYTHON} @RUNROOT@/@SCRIPTPATH@/ave_e_vs_ZB_rot.py \
-    ${PATCH} @WEIGHTNAME@ @RECALGRID@ > @STORAGEPATH@/e_vs_ZB_${PATCH}_@RECALGRID@_@WEIGHTNAME@.dat
+    ${PATCH} @WEIGHTNAME@ @FILEBODY@ > @STORAGEPATH@/e_vs_ZB_${PATCH}_@FILEBODY@_@WEIGHTNAME@.dat
   echo " - Done!"
 done
 
 #Plot the 1D c-term 
 ${P_PYTHON} @RUNROOT@/@SCRIPTPATH@/plot_c_term.py \
-  @STORAGEPATH@/e_vs_ZB_ALL_@RECALGRID@_@WEIGHTNAME@.png \
-  @STORAGEPATH@/e_vs_ZB_@ALLPATCH@_@RECALGRID@_@WEIGHTNAME@.dat \
-  `echo echo @STORAGEPATH@/e_vs_ZB_${PATCHLISTMAT}_@RECALGRID@_@WEIGHTNAME@.dat | bash` #ensures correct file order
+  @STORAGEPATH@/e_vs_ZB_ALL_@FILEBODY@_@WEIGHTNAME@.png \
+  @STORAGEPATH@/e_vs_ZB_@ALLPATCH@_@FILEBODY@_@WEIGHTNAME@.dat \
+  `echo echo @STORAGEPATH@/e_vs_ZB_${PATCHLISTMAT}_@FILEBODY@_@WEIGHTNAME@.dat | bash` #ensures correct file order
 #}}}
 
 #Step 3: run the 2pt correlation functions {{{
@@ -220,7 +223,7 @@ ln -s @RUNROOT@/@STORAGEPATH@/2ptcorr/@SURVEY@_*_ggcorr.out @RUNROOT@/@STORAGEPA
 
 #Perform n_effective and sigma_e calculations
 @PYTHONBIN@/python2 @RUNROOT@/@SCRIPTPATH@/neff_sigmae.py \
-  @PATCHPATH@/@SURVEY@_@ALLPATCH@_reweight_@RECALGRID@@FILESUFFIX@.cat \
+  @PATCHPATH@/@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@.cat \
   @SURVEYAREA@ > @RUNROOT@/@STORAGEPATH@/covariance/input/@SURVEY@_neff_sigmae.txt 
 
 #Run covariance calculation
