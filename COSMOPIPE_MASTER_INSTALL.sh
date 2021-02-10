@@ -204,6 +204,15 @@ sleep .5
 echo -e "\033[0;34m=======================================\033[0m"
 #}}}
 
+#Define inplace sed command (different on OSX) {{{
+if [ "`uname`" == "Darwin" ]
+then
+  P_SED_INPLACE='sed -i "" '
+else 
+  P_SED_INPLACE='sed -i '
+fi
+#}}}
+
 ##Move into the install directory {{{
 #if [ -d ${RUNROOT}/INSTALL ]
 #then 
@@ -316,7 +325,7 @@ cd ${RUNROOT}/INSTALL
 #fi 
 #export PYTHONPATH=${RUNROOT}/INSTALL/anaconda2/bin/python2:${RUNROOT}/INSTALL/anaconda2/lib/
 #export PATH=${RUNROOT}/INSTALL/anaconda2/bin/:${PATH}
-#${RUNROOT}/INSTALL/anaconda2/bin/pip install tqdm numpy scipy pyfits cython matplotlib \
+#${RUNROOT}/INSTALL/anaconda2/bin/pip install numpy scipy pyfits cython matplotlib \
 #  palettable fitsio==1.1.1 corner > python_packages.log 2>&1 <<EOF
 #yes
 #EOF
@@ -328,7 +337,7 @@ cd ${RUNROOT}/INSTALL
 ##Install montepython {{{
 #echo -en "   >\033[0;34m Installing MontePython\033[0m" 
 #export PATH=${RUNROOT}/INSTALL/montepython_public/:${PATH}
-#sed -i'' "s@NS_auto_arguments = {@&\n    'base_dir': {'type': str},@g" ${RUNROOT}/INSTALL/montepython_public/montepython/MultiNest.py 
+#${P_SED_INPLACE} "s@NS_auto_arguments = {@&\n    'base_dir': {'type': str},@g" ${RUNROOT}/INSTALL/montepython_public/montepython/MultiNest.py 
 #echo -e "\033[0;31m - Done! \033[0m" 
 #echo -en "   >\033[0;34m Installing CLASS\033[0m" 
 #cd ${RUNROOT}/INSTALL/class_public
@@ -384,13 +393,13 @@ cd ${RUNROOT}/INSTALL
 #echo -e "\033[0;31m - Done! \033[0m" 
 ##}}}
 #Add useful Functions to Python Lib {{{
-#echo -en "   >\033[0;34m Adding usefull functions to python lib \033[0m" 
-#cd ${RUNROOT}/INSTALL/anaconda2/lib/
-#cp ${PACKROOT}/scripts/{fitting,ldac,measure_cosebis}.py . > ${RUNROOT}/INSTALL/LDAC_wget.log 2>&1
-#cd ${RUNROOT}/INSTALL
-#echo -e "\033[0;31m - Done! \033[0m" 
-##}}}
-#echo -e "\033[0;31m   ##Script Installations all done!##\033[0m" 
+echo -en "   >\033[0;34m Adding usefull functions to python lib \033[0m" 
+cd ${RUNROOT}/INSTALL/anaconda2/lib/
+cp ${PACKROOT}/scripts/{fitting,ldac,measure_cosebis}.py . > ${RUNROOT}/INSTALL/LDAC_wget.log 2>&1
+cd ${RUNROOT}/INSTALL
+echo -e "\033[0;31m - Done! \033[0m" 
+#}}}
+echo -e "\033[0;31m   ##Script Installations all done!##\033[0m" 
 #}}}
 
 cd ${RUNROOT}
@@ -403,7 +412,7 @@ PYTHONBIN=${RUNROOT}/INSTALL/anaconda2/bin/
 cp ${PACKROOT}/scripts/configure_raw.sh ${RUNROOT}/configure.sh 
 for OPT in $OPTLIST
 do 
-  sed -i '' "s#\@${OPT}\@#${!OPT}#g" ${RUNROOT}/configure.sh 
+    ${P_SED_INPLACE} "s#\@${OPT}\@#${!OPT}#g" ${RUNROOT}/configure.sh
 done 
 echo -e "\033[0;31m - Done! \033[0m" 
 #}}}

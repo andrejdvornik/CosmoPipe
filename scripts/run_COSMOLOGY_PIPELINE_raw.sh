@@ -195,7 +195,7 @@ ${P_PYTHON} @RUNROOT@/@SCRIPTPATH@/plot_c_term.py \
 
 #Step 3: run the 2pt correlation functions {{{
 echo -e "###\033[0;34m Running Step 3/7: Compute 2pt Shear Correlation Functions\033[0m ###"
-bash @RUNROOT@/@SCRIPTPATH@/calculate_2ptcorr.sh 
+bash @RUNROOT@/@SCRIPTPATH@/calculate_2ptStat.sh 
 #}}}
 
 #Step 4: run the covariance matrix {{{
@@ -218,16 +218,11 @@ if [ "${nlink}" != "0" ]
 then
   rm -f @RUNROOT@/@STORAGEPATH@/covariance/input/@SURVEY@_*_ggcorr.out
 fi 
-ln -s @RUNROOT@/@STORAGEPATH@/2ptcorr/@SURVEY@_*_ggcorr.out @RUNROOT@/@STORAGEPATH@/covariance/input/
+ln -s @RUNROOT@/@STORAGEPATH@/2ptStat/@SURVEY@_*_ggcorr.out @RUNROOT@/@STORAGEPATH@/covariance/input/
 #}}}
 
-#Perform n_effective and sigma_e calculations
-@PYTHONBIN@/python2 @RUNROOT@/@SCRIPTPATH@/neff_sigmae.py \
-  @PATCHPATH@/@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@.cat \
-  @SURVEYAREA@ > @RUNROOT@/@STORAGEPATH@/covariance/input/@SURVEY@_neff_sigmae.txt 
-
 #Run covariance calculation
-bash @RUNROOT@/@SCRIPTPATH@/run_covariance.sh 
+bash @RUNROOT@/@SCRIPTPATH@/run_covariance_cosebis.sh 
 #}}}
 
 #Step 5: prepare the data for MCMC {{{

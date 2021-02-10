@@ -36,11 +36,11 @@ do
 	  Z_B_high_str2=`echo $Z_B_high2 | sed 's/\./p/g'`
 
     #grep -v '^#' \
-		#$md/2ptcorr/@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
+		#$md/2ptStat/@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
 	  #| awk '{print $2, $4, $5, $8, $9}' \
 		#> $md/$wd/@SURVEY@_INPUT/DATA_VECTOR/TC_@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@_xi_e1cor_e2cor_A_tomo_${ZBIN1}_${ZBIN2}_logbin.dat
 	  awk '{print $2, $4, $5, $8, $9}' \
-		$md/2ptcorr/@SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
+		$md/2ptStat/@SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
 		> $md/$wd/@SURVEY@_INPUT/DATA_VECTOR/TC_@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@_xi_e1cor_e2cor_A_tomo_${ZBIN1}_${ZBIN2}_logbin.dat
   done
 done

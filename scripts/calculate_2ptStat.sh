@@ -10,7 +10,7 @@ export LC_ALL=en_US.UTF-8
 abort()
 {
   echo -e "\033[0;31m - !FAILED!" >&2
-  echo -e "\033[0;34m An error occured during the calculate_2ptcorr.sh step \033[0m" >&2
+  echo -e "\033[0;34m An error occured during the calculate_2ptStat.sh step \033[0m" >&2
   echo >&2
   exit 1
 }
@@ -21,7 +21,7 @@ set -e
 #Predefine any useful variables {{{ 
 ZBLIMS="@TOMOLIMS@"
 md=@STORAGEPATH@
-wd=$md/2ptcorr/
+wd=$md/2ptStat/
 PATCHLISTMAT="@PATCHLIST@"
 PATCHLISTMAT=`echo {${PATCHLISTMAT// /,}}`
 #}}}
@@ -228,10 +228,10 @@ do
     echo -e " - Done!"
 
     #Construct the COSEBIs
-    echo -n "    -> Constructing Bin $ZBIN1 x Bin $ZBIN2 patch-combined BandPowers"
-    bash @RUNROOT@/@SCRIPTPATH@/calculate_bandpowers.sh \
+    echo -n "    -> Constructing Bin $ZBIN1 x Bin $ZBIN2 patch-combined COSEBIs"
+    bash @RUNROOT@/@SCRIPTPATH@/calculate_cosebis.sh \
       $wd/@SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
-      @SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_bandpower
+      @SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_cosebis
     echo -e " - Done!"
  
 	done
