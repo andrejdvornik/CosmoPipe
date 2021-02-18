@@ -16,7 +16,7 @@
       { echo "Error: KiDS-${PATCH} XI results ${treePath} do not exist. Either Run MODE XI (N/S) or COMBINE (ALL)!"; exit 1; }
 
     # check that the pre-computed COSEBIS tables exist
-    SRCLOC=@CONFIGPATH@/cosebis
+    SRCLOC=@RUNROOT@/@CONFIGPATH@/cosebis
     normfile=${SRCLOC}/TLogsRootsAndNorms/Normalization_@THETAMINCOV@-@THETAMAXCOV@.table
     rootfile=${SRCLOC}/TLogsRootsAndNorms/Root_@THETAMINCOV@-@THETAMAXCOV@.table
 
@@ -49,7 +49,7 @@
     # --norm = TLogsRootsAndNorms/Normalization_${tmin}-${tmax}.table
     # --root = TLogsRootsAndNorms/Root_${tmin}-${tmax}.table
 
-    @PYTHONBIN@/python @RUNROOT@/@SCRIPTPATH@/run_measure_cosebis_cats2stats.py -i ${treePath} -t 1 -p 3 -m 4 \
+    @PYTHON3BIN@/python @RUNROOT@/@SCRIPTPATH@/run_measure_cosebis_cats2stats.py -i ${treePath} -t 1 -p 3 -m 4 \
             --cfoldername ${outcosebis} -o ${filetail} -b @BINNING@ -n @NMAXCOSEBIS@ -s @THETAMINCOV@ \
             -l @THETAMAXCOV@ --tfoldername ${SRCLOC}/Tplus_minus \
             --norm ${normfile} --root ${rootfile}

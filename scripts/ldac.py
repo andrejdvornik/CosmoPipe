@@ -5,6 +5,7 @@
 #
 # @brief Utilities to make accessing LDAC cats easier within Python
 ###############
+
 # HISTORY INFORMATION:
 # ====================
 #
@@ -76,14 +77,20 @@
 # - In the LDACTable class I had to change the name of the private
 #   function '__update()' to '_update()' to be able to use it within
 #   the LDACCat class.
+#
+# 09.11.2015:
+# I implemented the __delitem__ method in the LDACTable class
+#
+# 28.07.2016:
+# I converted the script to python3.
 
 """
 Wrapper module to work with LDAC catalogues and tables
 """
 
-from __future__ import with_statement
 
-# standard-library includes: 
+
+# standard-library includes:
 import sys
 import astropy.io.fits as aif
 import numpy
@@ -159,7 +166,7 @@ class LDACCat(object):
             # check whether a table with name exists already:
             exists = False
 
-            for i in xrange(len(self.ldactables)):
+            for i in range(len(self.ldactables)):
                 if self.ldactables[i].hdu.name == name:
                     self.ldactables[i] = table
                     exists = True
@@ -174,7 +181,6 @@ class LDACCat(object):
 
         >>> c = a.tables()  # gives a list of table names in catalogue 'a'
         """
-        
         tablenames = []
 
         for table in self.ldactables:
@@ -197,35 +203,34 @@ class LDACCat(object):
         """
         Appends table b to table a and returns a new LDAC table.
         Tables 'a' and 'b' must be identical (keys and key types).
-        
+
         >>> c = a + b   # appends table b to a and saves it
                         # as a LDAC table again
         """
-        
         # First check if both tables have the same number of
         # columns:
-        if len(a.keys()) != len(b.keys()):
-            print "Tables do not have the same number of columns / keywords!"
-            print "First table has " + str(len(a.keys())) + \
-                " colums / keywords."
-            print "Second table has " + str(len(b.keys())) + \
-                " colums / keywords."
+        if len(list(a.keys())) != len(list(b.keys())):
+            print("Tables do not have the same number of columns / keywords!")
+            print("First table has " + str(len(list(a.keys()))) + \
+                " colums / keywords.")
+            print("Second table has " + str(len(list(b.keys()))) + \
+                " colums / keywords.")
             return None
 
         # Now let's check if all kewords from the first table are also
         # present in the second table and also at the same place!
-        for i in range(len(a.keys())):
-            if b.has_key(a.keys()[i]) == False:
-                print "Key " + str(a.keys()[i]) + \
-                    " is not present in the second table!"
+        for i in range(len(list(a.keys()))):
+            if (list(a.keys())[i] in b) == False:
+                print("Key " + str(list(a.keys())[i]) + \
+                    " is not present in the second table!")
                 return None
-        
+
         arows = a.hdu.data.shape[0]
         brows = b.hdu.data.shape[0]
         nrows = arows + brows
         hdu = aif.BinTableHDU.from_columns(a.hdu.columns, nrows=nrows)
-	
-        for i in a.keys():
+
+        for i in list(a.keys()):
             hdu.data.field(i)[:arows] = a.hdu.data.field(i)
             hdu.data.field(i)[arows:] = b.hdu.data.field(i)
 
@@ -233,7 +238,7 @@ class LDACCat(object):
         hdu.header.update('NAXIS2', nrows)
         hdu.columns = a.hdu.columns
         hdu.name = a.hdu.name
-      
+
         return LDACTable(hdu)
 
     def has_table(self, tablename):
@@ -257,13 +262,13 @@ class LDACCat(object):
         # create an empty header if necessary
         if self.header is None:
             self.header = aif.Header()
-            
-        # just delegate the work to an astropy method:    
+
+        # just delegate the work to an astropy method:
         self.header.add_history('') # empty line for separation from other
                                     # comment/history lines
         self.header.add_history(keyvalue)
 
-    def saveas(self, file, clobber=False):
+    def saveas(self, filename, clobber=False):
         """
         save the LDAC catalogue to a file.
 
@@ -282,9 +287,9 @@ class LDACCat(object):
 
             hdulist.append(table.hdu)
 
-        hdulist.writeto(file, clobber=clobber)
-        
-                
+        hdulist.writeto(filename, clobber=clobber)
+
+
 class LDACTable(object):
     """
     Class to represent an LDAC table
@@ -307,7 +312,7 @@ class LDACTable(object):
 
         self.update = 0 # does the table need an update (e.g. when
                         # new columns were added?
-    
+
     def __len__(self):
         """
         return the number of table entries (objects)
@@ -350,9 +355,9 @@ class LDACTable(object):
                 keyindex = int(key[startind + 1:endind]) - 1
 
                 try:
-                   return self.hdu.data.field(keyname)[:,keyindex]
+                    return self.hdu.data.field(keyname)[:, keyindex]
                 except AttributeError:
-                   raise KeyError(key) 
+                    raise KeyError(key)
             else:
                 try:
                     return self.hdu.data.field(key)
@@ -367,7 +372,7 @@ class LDACTable(object):
 
         a['Xpos'] = b # sets the key 'Xpos' in the table 'a' to the
                       # values in numpy array 'b'. If the key does
-                      # not yet exist it is created.
+                      # not yet exist, it is created.
         """
         # VERY uncomplete implementation for the moment!
         # - we only treat scalars for the moment!
@@ -390,13 +395,13 @@ class LDACTable(object):
                     self.hdu.data.field(key)[:] = val
                 else:
                     # determine format for the new column:
-                    colformat=""
+                    colformat = ""
                     if numpy.issubdtype(val.dtype, float) == True:
-                        colformat="1E"
-                    
+                        colformat = "1E"
+
                     if numpy.issubdtype(val.dtype, int) == True:
-                        colformat="1I"
-                    
+                        colformat = "1I"
+
                     # now create the new column and create a 'new' table
                     # with the old plus the new column (I did not find a
                     # way to just append a new column to an existing
@@ -411,7 +416,9 @@ class LDACTable(object):
         #raise NotImplementedError
 
     def __delitem__(self, key):
-        raise NotImplementedError
+        if self.__contains__(key):
+            self.hdu.columns.del_col(key)
+            self.update = 1
 
     def _update(self):
         # update the table if necessary:
@@ -443,7 +450,7 @@ class LDACTable(object):
         if self.update == 1:
             self._update()
 
-        return item in self.keys()
+        return item in list(self.keys())
 
     def has_key(self, key):
         """
@@ -472,7 +479,7 @@ class LDACTable(object):
 
         self.hdu.name = name
 
-    def saveas(self, file, clobber=False):
+    def saveas(self, filename, clobber=False):
         """
         save the LDAC table as a catalogue. The produced
         catalogue will only consist of this table!
@@ -487,7 +494,7 @@ class LDACTable(object):
         if self.update == 1:
             self._update()
 
-        self.hdu.writeto(file, clobber=clobber)
+        self.hdu.writeto(filename, clobber=clobber)
 
 
 def openObjects(hdulist, table='OBJECTS'):
@@ -503,9 +510,9 @@ def openObjects(hdulist, table='OBJECTS'):
             pass
 
     if tablehdu is None:
-        print "Table %s not present in catalogue %s" % (table,
-                                                        hdulist.filename())
-        print "Creating an empty LDAC table"
+        print("Table %s not present in catalogue %s" % (table,
+                                                        hdulist.filename()))
+        print("Creating an empty LDAC table")
 
     return LDACTable(tablehdu)
 
@@ -516,5 +523,3 @@ def openObjectFile(filename, table='OBJECTS'):
 
     return openObjects(hdulist, table)
 
-        
-        

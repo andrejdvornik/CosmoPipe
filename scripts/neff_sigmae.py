@@ -39,8 +39,7 @@ tomolims=tomolims.split()
 #Nbins is nTOMO + 1 (ALL) = len(tomolims)-1+1
 nbins=len(tomolims)
 
-
-print "# zlow zhigh n_obj n_eff[1/arcmin^2] sigma_e1 sigma_e2 sigma_e1_wsq sigma_e2_wsq"
+print "# zlow zhigh n_obj n_eff[1/arcmin^2] sigma_e1 sigma_e2 sigma_e1_wsq sigma_e2_wsq sigma_e"
 
 for j in range(nbins):
   if (j<nbins-1) :
@@ -67,4 +66,6 @@ for j in range(nbins):
   sigma_e1_wsq = weighted_avg_and_std(e1[all_cuts],weight[all_cuts]**2)[1]
   sigma_e2_wsq = weighted_avg_and_std(e2[all_cuts],weight[all_cuts]**2)[1]
 
-  print low_z, high_z, number, n_eff, sigma_e1, sigma_e2, sigma_e1_wsq, sigma_e2_wsq
+  sigma_e = np.sqrt(sigma_e1*sigma_e2)
+
+  print low_z, high_z, number, n_eff, sigma_e1, sigma_e2, sigma_e1_wsq, sigma_e2_wsq, sigma_e

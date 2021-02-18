@@ -20,7 +20,7 @@ NTOMO=`echo @TOMOLIMS@ | awk '{print NF-1}'`
 
 # binnings
 nz_fg=2         # no. of fg redshift bins
-nz_bg=@NTOMO@          # no. of bg redshift bins
+nz_bg=@NTOMOBINS@          # no. of bg redshift bins
 nt_xi=@NTHETABINCOV@   # no. of angular bins (direct corr. fct covariance)
 tbmin_xi=@THETAMINCOV@    # min. angular bin boundary [arcmin]
 tbmax_xi=@THETAMAXCOV@   # max. angular bin boundary [arcmin]

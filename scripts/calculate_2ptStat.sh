@@ -20,7 +20,7 @@ set -e
 
 #Predefine any useful variables {{{ 
 ZBLIMS="@TOMOLIMS@"
-md=@STORAGEPATH@
+md=@RUNROOT@/@STORAGEPATH@
 wd=$md/2ptStat/
 PATCHLISTMAT="@PATCHLIST@"
 PATCHLISTMAT=`echo {${PATCHLISTMAT// /,}}`
@@ -39,11 +39,12 @@ do
   fi 
   echo -n "Creating Filtered (i.e. good phot) catalogue for patch ${patch}"
   #Select only sources with good 9-band photometry
-	ldacfilter -i @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@.cat \
-    		   -t OBJECTS \
-           -c "(@GAAPFLAG@=0);" \
-    		   -o @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt.cat \
-           > @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt.log 2>&1 
+  @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
+    -i @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@.cat \
+    -t OBJECTS \
+    -c "(@GAAPFLAG@==0);" \
+    -o @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt.cat \
+    > @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt.log 2>&1 
   echo -e " - Done!"
   #Create the tomographic bin catalogues 
 	for ZBIN in `seq @NTOMOBINS@` 
@@ -74,11 +75,12 @@ do
     fi 
 
     echo -n "Creating Tomographic Bin ${ZBIN} ($Z_B_low < Z_B <= $Z_B_high) catalogue for filtered patch ${patch}"
-	  ldacfilter -i @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt.cat \
-	  	   -o $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_tmp.cat_$$ \
-	  	   -t OBJECTS \
-         -c "(Z_B>${Z_B_low_cut})AND(Z_B<=${Z_B_high_cut});" \
-	  	   > $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.log 2>&1
+    @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
+      -i @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt.cat \
+      -o $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_tmp.cat_$$ \
+      -t OBJECTS \
+      -c "(Z_B>${Z_B_low_cut})AND(Z_B<=${Z_B_high_cut});" \
+      > $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.log 2>&1
     echo -e " - Done!"
 
     echo -n "Correcting ellipticities with c-terms c1=${c1} and c2=${c2}"
@@ -87,7 +89,15 @@ do
 	  	 -t OBJECTS \
 	  	 -c "@E1VAR@-(${c1});" -n e1_corr "" -k FLOAT \
 	  	 -c "@E2VAR@-(${c2});" -n e2_corr "" -k FLOAT \
+	  	 -c "@WEIGHTNAME@*@WEIGHTNAME@;" -n @WEIGHTNAME@_sq "" -k FLOAT \
 	  	 >> $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.log 2>&1
+    echo -e " - Done!"
+
+
+    echo -n "Converting LDAC Catalogue to simple FITS"
+    @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/prepare_treecorr_fits.py \
+      $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
+      $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.fits
     echo -e " - Done!"
 
     if [ -f $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_wcs.asc ]
@@ -112,53 +122,53 @@ do
 	done
 done
 rm $wd/*_$$
-
-# Calculate xi's with treecor {{{
-for PATCH in @PATCHLIST@
-do
-  if [ -f @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt_c12.cat ]
-  then 
-    echo -n "Removing previous c12 mock for patch ${PATCH}"
-    rm -f @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt_c12.cat
-    echo " - Done!"
-  fi
-  echo -n "Constructing c12 mock for patch ${PATCH}"
-  @PYTHONBIN@/python2 @RUNROOT@/@SCRIPTPATH@/create_c12_mock.py \
-  	   @STORAGEPATH@ \
-  	   @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt.cat \
-  	   @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt_c12.cat \
-       > @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt_c12.log 2>&1
-  echo " - Done!"
-
-  if [ -f @STORAGEPATH@/@SURVEY@_${PATCH}_c12_treecorr.out ]
-  then 
-    echo -n "Removing previous c12 correlation function for patch ${PATCH}"
-    rm -f @STORAGEPATH@/@SURVEY@_${PATCH}_c12_treecorr.out
-    echo -e " - Done!"
-  fi 
-
-  echo -n "Constructing correlation function of c12 for patch ${PATCH}"
-  @PYTHONBIN@/corr2 @CONFIGPATH@/treecorr_params.yaml \
-  	  file_name=@PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt_c12.cat \
-  	  gg_file_name=@STORAGEPATH@/@SURVEY@_${PATCH}_c12_treecorr.out \
-  	  g1_col=c1 \
-  	  g2_col=c2 \
-      > @STORAGEPATH@/@SURVEY@_${PATCH}_c12_treecorr.log 2>&1 
-  echo " - Done!"
-done
-#}}}
-#Combine the patch xi's {{{
-if [ -f @STORAGEPATH@/@SURVEY@_ALL_c12_treecorr.out ]
-then 
-  echo -n "Removing previous combined c12 correlation function"
-  rm -f @STORAGEPATH@/@SURVEY@_ALL_c12_treecorr.out
-  echo -e " - Done!"
-fi 
-@PYTHONBIN@/python2 @RUNROOT@/@SCRIPTPATH@/combine_xi_patches.py \
-       @STORAGEPATH@/@SURVEY@_ALL_c12_treecorr.out \
-       `echo echo @STORAGEPATH@/@SURVEY@_${PATCHLISTMAT}_c12_treecorr.out | bash` #ensures correct file order
-#}}}
-
+#
+## Calculate xi's with treecor {{{
+#for PATCH in @PATCHLIST@
+#do
+#  if [ -f @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt_c12.cat ]
+#  then 
+#    echo -n "Removing previous c12 mock for patch ${PATCH}"
+#    rm -f @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt_c12.cat
+#    echo " - Done!"
+#  fi
+#  echo -n "Constructing c12 mock for patch ${PATCH}"
+#  @PYTHON2BIN@/python2 @RUNROOT@/@SCRIPTPATH@/create_c12_mock.py \
+#  	   @STORAGEPATH@ \
+#  	   @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt.cat \
+#  	   @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt_c12.cat \
+#       > @PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt_c12.log 2>&1
+#  echo " - Done!"
+#
+#  if [ -f @STORAGEPATH@/@SURVEY@_${PATCH}_c12_treecorr.out ]
+#  then 
+#    echo -n "Removing previous c12 correlation function for patch ${PATCH}"
+#    rm -f @STORAGEPATH@/@SURVEY@_${PATCH}_c12_treecorr.out
+#    echo -e " - Done!"
+#  fi 
+#
+#  echo -n "Constructing correlation function of c12 for patch ${PATCH}"
+#  @PYTHON2BIN@/corr2 @CONFIGPATH@/treecorr_params.yaml \
+#  	  file_name=@PATCHPATH@/@SURVEY@_${PATCH}_@FILEBODY@@FILESUFFIX@_filt_c12.cat \
+#  	  gg_file_name=@STORAGEPATH@/@SURVEY@_${PATCH}_c12_treecorr.out \
+#  	  g1_col=c1 \
+#  	  g2_col=c2 \
+#      > @STORAGEPATH@/@SURVEY@_${PATCH}_c12_treecorr.log 2>&1 
+#  echo " - Done!"
+#done
+##}}}
+##Combine the patch xi's {{{
+#if [ -f @STORAGEPATH@/@SURVEY@_ALL_c12_treecorr.out ]
+#then 
+#  echo -n "Removing previous combined c12 correlation function"
+#  rm -f @STORAGEPATH@/@SURVEY@_ALL_c12_treecorr.out
+#  echo -e " - Done!"
+#fi 
+#@PYTHON2BIN@/python2 @RUNROOT@/@SCRIPTPATH@/combine_xi_patches.py \
+#       @STORAGEPATH@/@SURVEY@_ALL_c12_treecorr.out \
+#       `echo echo @STORAGEPATH@/@SURVEY@_${PATCHLISTMAT}_c12_treecorr.out | bash` #ensures correct file order
+##}}}
+#
 ### Estimate corrrelation functions ###
 echo "Estimating Correlation Functions:"
 for patch in @ALLPATCH@ @PATCHLIST@
@@ -186,13 +196,17 @@ do
       fi 
 
       echo -n "    -> Bin $ZBIN1 ($Z_B_low < Z_B <= $Z_B_high) x Bin $ZBIN2 ($Z_B_low2 < Z_B <= $Z_B_high2)"
-      @PYTHONBIN@/corr2 @CONFIGPATH@/treecorr_params.yaml \
-			file_name=$wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
-			file_name2=$wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str2}t${Z_B_high_str2}.cat \
-			gg_file_name=$wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
-			g1_col=e1_corr \
-			g2_col=e2_corr \
-      > $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.log 2>&1 
+      @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/calc_xi_w_treecorr.py \
+        @NTHETABINXI@ @THETAMINXI@ @THETAMAXXI@ @BINNING@ \
+        $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.fits \
+        $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str2}t${Z_B_high_str2}.fits \
+        $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
+        "weighted" \
+        "e1_corr" "e2_corr" "e1_corr" "e2_corr" 
+        > $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.log 2>&1 
+      #Duplicate file with simpler naming 
+      ln -sf $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
+        $wd/XI_@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_nBins_@NTOMOBINS@_Bin${ZBIN1}_Bin${ZBIN2}.ascii
       echo -e " - Done!"
     done
 	done
@@ -220,16 +234,19 @@ do
       echo -e " - Done!"
     fi 
     echo -n "    -> Constructing Bin $ZBIN1 x Bin $ZBIN2 patch-combined correlation function"
-    @PYTHONBIN@/python2 @RUNROOT@/@SCRIPTPATH@/combine_xi_patches.py \
+    #NB: Last echo echo ensures the correct file ordering
+    @PYTHON2BIN@/python2 @RUNROOT@/@SCRIPTPATH@/combine_xi_patches.py \
       $wd/@SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
-  		 `echo echo $wd/@SURVEY@_${PATCHLISTMAT}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out | bash` #Ensures correct file ordering 
+  		 `echo echo $wd/@SURVEY@_${PATCHLISTMAT}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out | bash` \
+       >> $wd/@SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.log 2>&1
     echo -e " - Done!"
 
     #Construct the COSEBIs
     echo -n "    -> Constructing Bin $ZBIN1 x Bin $ZBIN2 patch-combined COSEBIs"
     bash @RUNROOT@/@SCRIPTPATH@/calculate_cosebis.sh \
       $wd/@SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
-      @SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_cosebis
+      @SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_cosebis \
+       >> $wd/@SURVEY@_@ALLPATCH@_combined_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_cosebis.log 2>&1
     echo -e " - Done!"
  
 	done

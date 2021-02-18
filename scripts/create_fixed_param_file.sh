@@ -19,7 +19,7 @@ n=`wc -l $best_fit | awk '{print $1}'`
 param_list=`awk -v n=$n '{if (NR==n-1) print $0}' $best_fit | sed 's/#//g' | sed 's/,//g'`
 value_list=`awk -v n=$n '{if (NR==n) print $0}' $best_fit`
 
-echo "data.experiments=['@COSMOPIPECFNAME@']"
+echo "data.experiments=['@COSMOPIPELFNAME@']"
 
 i=1
 for param in $param_list

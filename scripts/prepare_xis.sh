@@ -42,6 +42,6 @@ do
 		> $md/$wd/@SURVEY@_INPUT/DATA_VECTOR/TC_@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@_xi_e1cor_e2cor_A_tomo_${ZBIN1}_${ZBIN2}_logbin.dat
   done
 done
-@PYTHONBIN@/python @RUNROOT@/@SCRIPTPATH@/rebinned_corr_func_data_vec.py
+@PYTHON2BIN@/python @RUNROOT@/@SCRIPTPATH@/rebinned_corr_func_data_vec.py
 
 trap : 0

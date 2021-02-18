@@ -25,24 +25,25 @@ set -e
 OPTLIST="ALLPATCH BLIND BLINDING CONFIGPATH DATE DZPRIORMU DZPRIORSD \
   DZPRIORNSIG XPIX YPIX GAAPFLAG E1VAR E2VAR FILESUFFIX COSMOFISHER \
   SHEARSUBSET LIKELIHOOD COSMOPIPELFNAME NZFILEID NZFILESUFFIX NZSTEP \
-  MASKFILE MBIASVALUES MBIASERRORS PATCHPATH PATCHLIST PYTHONBIN \
+  MASKFILE MBIASVALUES MBIASERRORS PATCHPATH PATCHLIST PYTHON2BIN \
   FILEBODY PACKROOT RUNID RUNROOT RUNTIME SCRIPTPATH STORAGEPATH \
   SURVEY SURVEYAREA THELIPATH TOMOLIMS USER WEIGHTNAME BINNING \
   THETAMINCOV THETAMAXCOV NTHETABINCOV THETAMINXI THETAMAXXI \
   NTHETABINXI XIPLUSLIMS XIMINUSLIMS WEIGHTNAME NMAXCOSEBIS \
-  NTOMOBINS"
+  NTOMOBINS PYTHON3BIN MBIASCORR SURVEYAREADEG NZCOVFILE \
+  SSCMATRIX SSCELLVEC"
 
 #Paths and variables for configuration
 #Designation for "all patches"
 ALLPATCH=@ALLPATCH@
 #Blind Character
-BLIND=UNBLINDED #A B C UNBLINDED
+BLIND=@BLIND@ #A B C 
 #Blind identifier
-BLINDING=${BLIND} #blind${BLIND} or ${BLIND}
+BLINDING=@BLINDING@ #blind${BLIND} or UNBLINDED
 #Path to pipeline config files 
 CONFIGPATH=@CONFIGPATH@
 #Date
-DATE=@DATE@
+DATE="@DATE@"
 #Prior values for the gaussian dz's (per tomo bin)
 DZPRIORMU="@DZPRIORMU@"
 DZPRIORSD="@DZPRIORSD@"
@@ -67,6 +68,8 @@ LIKELIHOOD=@LIKELIHOOD@
 COSMOPIPELFNAME=@COSMOPIPELFNAME@
 #Nz file name 
 NZFILEID=@NZFILEID@
+#File containing Nz Covariance Matrix 
+NZCOVFILE=@NZCOVFILE@
 #Nz file suffix
 NZFILESUFFIX=@NZFILESUFFIX@
 #Nz delta-z stepsize
@@ -76,11 +79,13 @@ MASKFILE=@MASKFILE@
 #List of m-bias values and errors 
 MBIASVALUES="-0.0128 -0.0104 -0.0114 +0.0072 +0.0061"
 MBIASERRORS="0.02 0.02 0.02 0.02 0.02"
+MBIASCORR=0.99
 #Path to Patchwise Catalogues
 PATCHPATH=@PATCHPATH@
 PATCHLIST=@PATCHLIST@
 #Path to python binary folder
-PYTHONBIN=@PYTHONBIN@
+PYTHON2BIN=@PYTHON2BIN@
+PYTHON3BIN=@PYTHON3BIN@
 #Format of the recal_weight estimation grid 
 FILEBODY=@FILEBODY@
 #Root directory for pipeline scripts
@@ -113,12 +118,15 @@ BINNING='log'
 THETAMINCOV="@THETAMINCOV@"
 THETAMAXCOV="@THETAMAXCOV@"
 NTHETABINCOV="@NTHETABINCOV@"
+#Super Sample Covariance Matrix 
+SSCMATRIX=thps_cov_kids1000_apr5_cl_obs_source_matrix.dat
+SSCELLVEC=input_nonGaussian_ell_vec.ascii
 #Theta limits for xipm (can be highres for BP/COSEBIs)
 THETAMINXI="@THETAMINXI@"
 THETAMAXXI="@THETAMAXXI@"
 NTHETABINXI="@NTHETABINXI@"
 #Number of modes for COSEBIs
-NMAXCOSEBIS=20
+NMAXCOSEBIS=5
 #Xi plus/minus limits 
 XIPLUSLIMS="@XIPLUSLIMS@"
 XIMINUSLIMS="@XIMINUSLIMS@"
@@ -190,11 +198,12 @@ then
     echo ""
     list=`${THELIPATH}/ldacdesc -i ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}.cat -t OBJECTS | 
           grep "Key name" | awk -F. '{print $NF}' | 
-          grep "_WORLD\|_IMAGE\|MAG_GAAP_\|MAG_LIM_\|BPZ_\|SeqNr\|MAGERR_\|FLUX_\|FLUXERR_\|ID"`
+          grep "_WORLD\|_IMAGE\|MAG_GAAP_\|MAG_LIM_\|BPZ_\|SeqNr\|MAGERR_\|FLUX_\|FLUXERR_\|ID" > /dev/null 2>&1`
     ${THELIPATH}/ldacdelkey -i ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}.cat\
              -k ${list} -o ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}_temp.cat \
              > ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}.log 2>&1
-    ${THELIPATH}/ldacfilter -i ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}_temp.cat \
+    ${PYTHON3BIN}/python3 ${RUNROOT}/${SCRIPTPATH}/ldacfilter.py \
+             -i ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}_temp.cat \
              -o ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}.cat \
     	       -t OBJECTS \
     	       -c "(${SHEARSUBSET}!=0);" \
@@ -214,9 +223,13 @@ mkdir -p ${RUNROOT}/${SCRIPTPATH}/CosmoFisherForecast
 cp -rf ${COSMOFISHER}/* ${RUNROOT}/${SCRIPTPATH}/CosmoFisherForecast/
 #}}}
 
+#Convert Survey area from arcmin to deg {{{
+SURVEYAREADEG="`awk -v s=${SURVEYAREA} 'BEGIN { printf "%.4f", s/3600.0 }'`"
+#}}}
+
 #Update the runtime scripts with the relevant paths & variables {{{
 echo -en "   >\033[0;34m Modify Runtime Scripts \033[0m" 
-cp ${PACKROOT}/scripts/run_COSMOLOGY_PIPELINE_raw.sh ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh
+cp -f ${PACKROOT}/scripts/run_COSMOLOGY_PIPELINE_raw.sh ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh
 for OPT in $OPTLIST
 do 
   ${P_SED_INPLACE} "s#\@${OPT}\@#${!OPT}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
