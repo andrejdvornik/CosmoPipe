@@ -162,8 +162,8 @@ class LDACCat(object):
 
             hdulist.append(table.hdu)
 
-        hdulist.writeto(file, clobber=clobber)
-        
+        hdulist.writeto(file, overwrite=clobber)
+
                 
 class LDACTable(object):
     """
