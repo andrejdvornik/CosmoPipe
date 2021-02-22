@@ -403,7 +403,7 @@ export PATH=${PYTHON3BIN}:${ORIGPATH}
 if [ ! -d ${RUNROOT}/INSTALL/CAMB ]
 then 
   echo -en "   >\033[0;34m Installing CAMB\033[0m" 
-  git clone --recursive git@github.com:cmbant/CAMB.git >> CAMB_install.log 2>&1
+  git clone --recursive https://github.com/cmbant/CAMB.git >> CAMB_install.log 2>&1
   cd ${RUNROOT}/INSTALL/CAMB
   ${RUNROOT}/INSTALL/miniconda3/bin/python3 setup.py build_cluster >> CAMB_install.log 2>&1
   ${RUNROOT}/INSTALL/miniconda3/bin/python3 setup.py install >> CAMB_install.log 2>&1
