@@ -434,7 +434,7 @@ export PATH=${PYTHON2PATH}:${PYTHON3PATH}:${ORIGPATH}
 export PYTHONPATH=${RUNROOT}/INSTALL/anaconda2/lib/
 cd ${RUNROOT}/INSTALL/class_public
 make clean > ${RUNROOT}/INSTALL/CLASS_install_progress.log 2>&1 
-make > ${RUNROOT}/INSTALL/CLASS_install_progress.log  2>&1
+PYTHON=${RUNROOT}/INSTALL/anaconda2/bin/python2 make > ${RUNROOT}/INSTALL/CLASS_install_progress.log  2>&1
 cd ${RUNROOT}/INSTALL/class_public/python
 ${RUNROOT}/INSTALL/anaconda2/bin/python2 setup.py build > python_class_install.log 2>&1
 cd ${RUNROOT}/INSTALL
