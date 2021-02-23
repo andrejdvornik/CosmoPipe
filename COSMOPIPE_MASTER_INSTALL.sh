@@ -395,6 +395,9 @@ EOF
 ${RUNROOT}/INSTALL/miniconda3/bin/conda install -c conda-forge liblapack >> python_packages.log 2>&1 <<EOF
 y
 EOF
+${RUNROOT}/INSTALL/miniconda3/bin/conda install -c conda-forge curl >> python_packages.log 2>&1 <<EOF
+y
+EOF
 echo -e "\033[0;31m - Done! \033[0m" 
 #}}}
 #Install CAMB {{{
