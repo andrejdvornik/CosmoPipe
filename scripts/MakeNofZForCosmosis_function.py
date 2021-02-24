@@ -31,7 +31,7 @@ def MakeNofz_fits(input_files,outputfileName,OneBin_nofzFileName,neff=[],single_
     print('I got '+str(nBins)+' files from input. Type is set to '+type)
     cols=[]
     for bin1 in range(nBins):
-        if [".fits" in input_files[bin1]] == True:
+        if (".fits" in input_files[bin1]) == False:
             file= open(input_files[bin1])
             nofZ=np.loadtxt(file,comments='#')
         else: 
