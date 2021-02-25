@@ -251,6 +251,10 @@ echo -e "###\033[0;34m Running Step 5/7: Prepare the data for MCMC:\033[0m ###"
 echo -e "###\033[0;34m Running Step 6/7: Run the MCMC\033[0m ###"
 #bash @RUNROOT@/@SCRIPTPATH@/run_MCMC.sh
 mkdir -p @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/
+if [ -d @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/cosebis/chain ]
+then
+  rm @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/cosebis/chain/*
+fi
 @PYTHON3BIN@/cosmosis @RUNROOT@/@SCRIPTPATH@/COSEBIs_chain.ini > @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/cosebis_chain_output.txt
 #}}}
 
