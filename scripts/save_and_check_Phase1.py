@@ -222,7 +222,7 @@ cosebis_filename = FolderNameInputs+'/MCMC/@SURVEY@_INPUT/@BLINDING@/cosebis_@SU
 nBins_source = @NTOMOBINS@
 nz={}
 for bin in range(@NTOMOBINS@):
-    nz['source'+str(bin+1)] = FolderNamePatches+'/@NZFILEID@'+str(bin+1)+'@NZFILESUFFIX@'
+    nz['source'+str(bin+1)] = FolderNameInputs+'/@NZFILEID@'+str(bin+1)+'@NZFILESUFFIX@'
 
 
 # number density of galaxies per arcmin^2
