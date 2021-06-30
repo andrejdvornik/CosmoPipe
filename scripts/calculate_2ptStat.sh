@@ -201,8 +201,8 @@ do
         $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.fits \
         $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str2}t${Z_B_high_str2}.fits \
         $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
-        "weighted" \
-        "e1_corr" "e2_corr" "e1_corr" "e2_corr" 
+        "true" \
+        "e1_corr" "e2_corr" "e1_corr" "e2_corr" \
         > $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.log 2>&1 
       #Duplicate file with simpler naming 
       ln -sf $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out \
