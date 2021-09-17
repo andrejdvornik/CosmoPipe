@@ -362,10 +362,10 @@ echo -e "\033[0;31m - Done! \033[0m"
 echo -en "   >\033[0;34m Installing Local Anaconda Python3 \033[0m" 
 if [ "`uname`" == "Darwin" ]
 then 
-  wget https://repo.continuum.io/archive/Miniconda3-latest-MacOSX-x86_64.sh > python_wget.log 2>&1
+  wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-MacOSX-x86_64.sh > python_wget.log 2>&1
   bash Miniconda3-latest-MacOSX-x86_64.sh -b -p ./miniconda3/ > Anaconda_install.log 2>&1
 else 
-  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh > python_wget.log 2>&1
+  wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh > python_wget.log 2>&1
   bash Miniconda3-latest-Linux-x86_64.sh -b -p ./miniconda3/ > Anaconda_install.log 2>&1
 fi 
 echo -e "\033[0;31m - Done! \033[0m" 
@@ -388,10 +388,10 @@ EOF
 #EOF
 echo -e "\033[0;31m - Done! \033[0m" 
 echo -en "   >\033[0;34m Installing Python3 Packages \033[0m" 
-${RUNROOT}/INSTALL/miniconda3/bin/conda install mpich-mpicc >> python_packages.log 2>&1 <<EOF
+${RUNROOT}/INSTALL/miniconda3/bin/conda install mpich-mpicc mpi4py >> python_packages.log 2>&1 <<EOF
 y
 EOF
-${RUNROOT}/INSTALL/miniconda3/bin/pip install mpi4py emcee numpy==1.20.0 scipy pyfits cython matplotlib \
+${RUNROOT}/INSTALL/miniconda3/bin/pip install emcee numpy==1.20.0 scipy pyfits cython matplotlib \
   palettable fitsio==1.1.1 astropy >> python_packages.log 2>&1 <<EOF
 y
 EOF
