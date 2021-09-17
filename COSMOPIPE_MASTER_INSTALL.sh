@@ -380,7 +380,13 @@ ${RUNROOT}/INSTALL/anaconda2/bin/pip install numpy scipy cython matplotlib \
   palettable fitsio==1.1.1 > python_packages.log 2>&1 <<EOF
 yes
 EOF
-${RUNROOT}/INSTALL/anaconda2/bin/pip install d2to1 stsci.distutils pyfits > python_packages.log 2>&1 <<EOF
+${RUNROOT}/INSTALL/anaconda2/bin/pip install d2to1 > python_packages.log 2>&1 <<EOF
+yes
+EOF
+${RUNROOT}/INSTALL/anaconda2/bin/pip install stsci.distutils > python_packages.log 2>&1 <<EOF
+yes
+EOF
+${RUNROOT}/INSTALL/anaconda2/bin/pip install pyfits > python_packages.log 2>&1 <<EOF
 yes
 EOF
 #${RUNROOT}/INSTALL/anaconda2/bin/conda install -c conda-forge openmp >> python_packages.log 2>&1 <<EOF
