@@ -373,8 +373,14 @@ echo -en "   >\033[0;34m Installing Python2 Packages \033[0m"
 export PYTHONPATH=${RUNROOT}/INSTALL/miniconda3/bin/python3:${RUNROOT}/INSTALL/miniconda3/lib/
 export PYTHONPATH=${PYTHONPATH}:${RUNROOT}/INSTALL/anaconda2/bin/python2:${RUNROOT}/INSTALL/anaconda2/lib/
 export PATH=${PYTHON3PATH}:${PYTHON2PATH}:${PATH}
-${RUNROOT}/INSTALL/anaconda2/bin/pip install numpy scipy pyfits cython matplotlib \
+${RUNROOT}/INSTALL/anaconda2/bin/pip install --upgrade pip > python_packages.log 2>&1 <<EOF
+yes
+EOF
+${RUNROOT}/INSTALL/anaconda2/bin/pip install numpy scipy cython matplotlib \
   palettable fitsio==1.1.1 > python_packages.log 2>&1 <<EOF
+yes
+EOF
+${RUNROOT}/INSTALL/anaconda2/bin/pip install d2to1 stsci.distutils pyfits > python_packages.log 2>&1 <<EOF
 yes
 EOF
 #${RUNROOT}/INSTALL/anaconda2/bin/conda install -c conda-forge openmp >> python_packages.log 2>&1 <<EOF
