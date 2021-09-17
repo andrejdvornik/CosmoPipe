@@ -377,7 +377,7 @@ ${RUNROOT}/INSTALL/anaconda2/bin/pip install --upgrade pip > python_packages.log
 yes
 EOF
 ${RUNROOT}/INSTALL/anaconda2/bin/pip install numpy scipy cython matplotlib \
-  palettable fitsio==1.1.1 > python_packages.log 2>&1 <<EOF
+  palettable fitsio==1.1.1 pytest-runner > python_packages.log 2>&1 <<EOF
 yes
 EOF
 ${RUNROOT}/INSTALL/anaconda2/bin/pip install d2to1 > python_packages.log 2>&1 <<EOF
