@@ -363,10 +363,10 @@ echo -en "   >\033[0;34m Installing Local Anaconda Python3 \033[0m"
 if [ "`uname`" == "Darwin" ]
 then 
   wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-MacOSX-x86_64.sh > python_wget.log 2>&1
-  bash Miniconda3-latest-MacOSX-x86_64.sh -b -p ./miniconda3/ > Anaconda_install.log 2>&1
+  bash Miniconda3-py38_4.10.3-MacOSX-x86_64.sh -b -p ./miniconda3/ > Anaconda_install.log 2>&1
 else 
   wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh > python_wget.log 2>&1
-  bash Miniconda3-latest-Linux-x86_64.sh -b -p ./miniconda3/ > Anaconda_install.log 2>&1
+  bash Miniconda3-py38_4.10.3-Linux-x86_64.sh -b -p ./miniconda3/ > Anaconda_install.log 2>&1
 fi 
 echo -e "\033[0;31m - Done! \033[0m" 
 echo -en "   >\033[0;34m Installing Python2 Packages \033[0m" 
