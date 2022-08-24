@@ -398,7 +398,7 @@ ${RUNROOT}/INSTALL/miniconda3/bin/conda install mpich-mpicc mpi4py >> python_pac
 y
 EOF
 ${RUNROOT}/INSTALL/miniconda3/bin/pip install emcee numpy==1.20.0 scipy pyfits cython matplotlib \
-  palettable fitsio==1.1.1 astropy >> python_packages.log 2>&1 <<EOF
+  palettable fitsio==1.1.1 astropy==4.2.1 >> python_packages.log 2>&1 <<EOF
 y
 EOF
 ${RUNROOT}/INSTALL/miniconda3/bin/conda install mpi future pyyaml pip>=20.0 >> python_packages.log 2>&1 <<EOF
@@ -458,7 +458,7 @@ echo -e "\033[0;31m - Done! \033[0m"
 #}}}
 #Install TreeCorr {{{
 echo -en "   >\033[0;34m Installing TreeCorr\033[0m" 
-${RUNROOT}/INSTALL/miniconda3/bin/pip3 install treecorr > ${RUNROOT}/INSTALL/TreeCorr_install.log 2>&1
+${RUNROOT}/INSTALL/miniconda3/bin/pip3 install treecorr==4.2.3 > ${RUNROOT}/INSTALL/TreeCorr_install.log 2>&1
 echo -e "\033[0;31m - Done! \033[0m" 
 #}}}
 #Install GetDist {{{
