@@ -401,6 +401,9 @@ ${RUNROOT}/INSTALL/miniconda3/bin/pip install emcee numpy==1.20.0 scipy pyfits c
   palettable fitsio==1.1.1 astropy==4.2.1 >> python_packages.log 2>&1 <<EOF
 y
 EOF
+${RUNROOT}/INSTALL/miniconda3/bin/pip install numpy --upgrade --ignore-installed >> python_packages.log 2>&1 <<EOF
+y
+EOF
 ${RUNROOT}/INSTALL/miniconda3/bin/conda install mpi future pyyaml pip>=20.0 >> python_packages.log 2>&1 <<EOF
 y
 EOF
