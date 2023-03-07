@@ -93,7 +93,7 @@ class LDACCat(object):
             # check whether a table with name exists already:
             exists = False
 
-            for i in xrange(len(self.ldactables)):
+            for i in range(len(self.ldactables)):
                 if self.ldactables[i].hdu.name == name:
                     self.ldactables[i] = table
                     exists = True
@@ -162,8 +162,8 @@ class LDACCat(object):
 
             hdulist.append(table.hdu)
 
-        hdulist.writeto(file, clobber=clobber)
-        
+        hdulist.writeto(file, overwrite=clobber)
+
                 
 class LDACTable(object):
     """

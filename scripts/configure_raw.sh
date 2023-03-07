@@ -22,29 +22,40 @@ set -e
 # If you need to edit any paths, do so here and rerun the configure script
 ##
 
+OPTLIST="ALLPATCH BLIND BLINDING CONFIGPATH DATE DZPRIORMU DZPRIORSD \
+  DZPRIORNSIG XPIX YPIX GAAPFLAG E1VAR E2VAR FILESUFFIX COSMOFISHER \
+  SHEARSUBSET LIKELIHOOD COSMOPIPELFNAME NZFILEID NZFILESUFFIX NZSTEP \
+  MASKFILE MBIASVALUES MBIASERRORS PATCHPATH PATCHLIST PYTHON2BIN \
+  FILEBODY PACKROOT RUNID RUNROOT RUNTIME SCRIPTPATH STORAGEPATH \
+  SURVEY SURVEYAREA THELIPATH TOMOLIMS USER WEIGHTNAME BINNING \
+  THETAMINCOV THETAMAXCOV NTHETABINCOV THETAMINXI THETAMAXXI \
+  NTHETABINXI XIPLUSLIMS XIMINUSLIMS WEIGHTNAME NMAXCOSEBIS \
+  NTOMOBINS PYTHON3BIN MBIASCORR SURVEYAREADEG NZCOVFILE \
+  SSCMATRIX SSCELLVEC"
+
 #Paths and variables for configuration
 #Designation for "all patches"
 ALLPATCH=@ALLPATCH@
 #Blind Character
-BLIND=UNBLINDED #A B C UNBLINDED
+BLIND=@BLIND@ #A B C 
 #Blind identifier
-BLINDING=${BLIND} #blind${BLIND} or ${BLIND}
+BLINDING=@BLINDING@ #blind${BLIND} or UNBLINDED
 #Path to pipeline config files 
 CONFIGPATH=@CONFIGPATH@
 #Date
-DATE=@DATE@
+DATE="@DATE@"
 #Prior values for the gaussian dz's (per tomo bin)
 DZPRIORMU="@DZPRIORMU@"
 DZPRIORSD="@DZPRIORSD@"
 DZPRIORNSIG="@DZPRIORNSIG@"
 #Pixel positions variables
-XPIX="Xpos_THELI"
-YPIX="Ypos_THELI"
+XPIX="Xpos"
+YPIX="Ypos"
 #Combined GAAP flag
-GAAPFLAG="GAAP_Flag_ugriZYJHKs"
+GAAPFLAG="FLAG_GAAP_ugriZYJHKs"
 #Shape mesurement variables 
-E1VAR=bias_corrected_e1
-E2VAR=bias_corrected_e2
+E1VAR=autocal_e1_C
+E2VAR=autocal_e2_C
 #Patch catalogue suffix 
 FILESUFFIX=@FILESUFFIX@
 #Path to the CosmoFisherForecast repository
@@ -54,9 +65,11 @@ SHEARSUBSET=@SHEARSUBSET@
 #Name of the likelihood function to use
 LIKELIHOOD=@LIKELIHOOD@
 #Name of the likelihood when in use (stops crosstalk between simulatneous runs)
-COSMOPIPECFNAME=@COSMOPIPECFNAME@
+COSMOPIPELFNAME=@COSMOPIPELFNAME@
 #Nz file name 
 NZFILEID=@NZFILEID@
+#File containing Nz Covariance Matrix 
+NZCOVFILE=@NZCOVFILE@
 #Nz file suffix
 NZFILESUFFIX=@NZFILESUFFIX@
 #Nz delta-z stepsize
@@ -66,13 +79,15 @@ MASKFILE=@MASKFILE@
 #List of m-bias values and errors 
 MBIASVALUES="-0.0128 -0.0104 -0.0114 +0.0072 +0.0061"
 MBIASERRORS="0.02 0.02 0.02 0.02 0.02"
+MBIASCORR=0.99
 #Path to Patchwise Catalogues
 PATCHPATH=@PATCHPATH@
 PATCHLIST=@PATCHLIST@
 #Path to python binary folder
-PYTHONBIN=@PYTHONBIN@
+PYTHON2BIN=@PYTHON2BIN@
+PYTHON3BIN=@PYTHON3BIN@
 #Format of the recal_weight estimation grid 
-RECALGRID=@RECALGRID@
+FILEBODY=@FILEBODY@
 #Root directory for pipeline scripts
 PACKROOT=@PACKROOT@
 #ID for various outputs 
@@ -97,10 +112,21 @@ TOMOLIMS=@TOMOLIMS@
 USER=@USER@
 #Name of the lensing weight variable  
 WEIGHTNAME=@WEIGHTNAME@
+#COSEBIs binning format; 'lin' or 'log'
+BINNING='log'
 #Theta limits for covariance 
 THETAMINCOV="@THETAMINCOV@"
 THETAMAXCOV="@THETAMAXCOV@"
 NTHETABINCOV="@NTHETABINCOV@"
+#Super Sample Covariance Matrix 
+SSCMATRIX=thps_cov_kids1000_apr5_cl_obs_source_matrix.dat
+SSCELLVEC=input_nonGaussian_ell_vec.ascii
+#Theta limits for xipm (can be highres for BP/COSEBIs)
+THETAMINXI="@THETAMINXI@"
+THETAMAXXI="@THETAMAXXI@"
+NTHETABINXI="@NTHETABINXI@"
+#Number of modes for COSEBIs
+NMAXCOSEBIS=5
 #Xi plus/minus limits 
 XIPLUSLIMS="@XIPLUSLIMS@"
 XIMINUSLIMS="@XIMINUSLIMS@"
@@ -111,10 +137,19 @@ WEIGHTNAME=@WEIGHTNAME@
 # Variables and paths should not be editted below here!
 ##
 
+#Define inplace sed command (different on OSX) {{{
+if [ "`uname`" == "Darwin" ]
+then
+  P_SED_INPLACE='sed -i "" '
+else 
+  P_SED_INPLACE='sed -i '
+fi
+#}}}
+
 # Set up the tomographic bin limit vectors (for MCMC configuration) {{{
 TOMOLIMSLOVEC=`echo $TOMOLIMS | awk '{$NF = ""; print $0}' | sed 's/ $//g' | sed 's/ /,/g'`
 TOMOLIMSHIVEC=`echo $TOMOLIMS | awk '{$1  = ""; print $0}' | sed 's/^ //g' | sed 's/ /,/g'`
-NTOMO=`echo $TOMOLIMS | awk '{print NF-1}'`
+NTOMOBINS=`echo $TOMOLIMS | awk '{print NF-1}'`
 #}}}
 
 #Construct the DZPRIOR python vectors (for modifying likelihood etc) {{{
@@ -163,11 +198,12 @@ then
     echo ""
     list=`${THELIPATH}/ldacdesc -i ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}.cat -t OBJECTS | 
           grep "Key name" | awk -F. '{print $NF}' | 
-          grep "_WORLD\|_IMAGE\|MAG_GAAP_\|MAG_LIM_\|BPZ_\|SeqNr\|MAGERR_\|FLUX_\|FLUXERR_\|ID"`
+          grep "_WORLD\|_IMAGE\|MAG_GAAP_\|MAG_LIM_\|BPZ_\|SeqNr\|MAGERR_\|FLUX_\|FLUXERR_\|ID" > /dev/null 2>&1`
     ${THELIPATH}/ldacdelkey -i ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}.cat\
              -k ${list} -o ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}_temp.cat \
              > ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}.log 2>&1
-    ${THELIPATH}/ldacfilter -i ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}_temp.cat \
+    ${PYTHON3BIN}/python3 ${RUNROOT}/${SCRIPTPATH}/ldacfilter.py \
+             -i ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}_temp.cat \
              -o ${PATCHPATH}/${SURVEY}_${PATCH}_${FILEBODY}${FILESUFFIX}_${SHEARSUBSET}.cat \
     	       -t OBJECTS \
     	       -c "(${SHEARSUBSET}!=0);" \
@@ -187,56 +223,17 @@ mkdir -p ${RUNROOT}/${SCRIPTPATH}/CosmoFisherForecast
 cp -rf ${COSMOFISHER}/* ${RUNROOT}/${SCRIPTPATH}/CosmoFisherForecast/
 #}}}
 
+#Convert Survey area from arcmin to deg {{{
+SURVEYAREADEG="`awk -v s=${SURVEYAREA} 'BEGIN { printf "%.4f", s/3600.0 }'`"
+#}}}
+
 #Update the runtime scripts with the relevant paths & variables {{{
 echo -en "   >\033[0;34m Modify Runtime Scripts \033[0m" 
-cp ${PACKROOT}/scripts/run_COSMOLOGY_PIPELINE_raw.sh ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh
-sed -i "s#\@ALLPATCH\@#${ALLPATCH}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@BLINDING\@#${BLINDING}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@BLIND\@#${BLIND}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@CONFIGPATH\@#${CONFIGPATH}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@DATE\@#`date +%Y-%m-%d`#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@DZPRIORMU\@#${DZPRIORMU}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@DZPRIORSD\@#${DZPRIORSD}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@DZPRIORMUVEC\@#${DZPRIORMUVEC}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@DZPRIORSDVEC\@#${DZPRIORSDVEC}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@DZPRIORNSIG\@#${DZPRIORNSIG}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@E1VAR\@#${E1VAR}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@E2VAR\@#${E2VAR}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@XPIX\@#${XPIX}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@YPIX\@#${YPIX}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@GAAPFLAG\@#${GAAPFLAG}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@FILESUFFIX\@#${FILESUFFIX}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@COSMOFISHER\@#${COSMOFISHER}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@LIKELIHOOD\@#${LIKELIHOOD}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@COSMOPIPECFNAME\@#${COSMOPIPECFNAME}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@NTOMO\@#${NTOMO}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@NZFILEID\@#${NZFILEID}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@NZFILESUFFIX\@#${NZFILESUFFIX}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@NZSTEP\@#${NZSTEP}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@MASKFILE\@#${MASKFILE}#g" ${RUNROOT}/${SCRIPTPATH}/*.*  ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh  ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@MBIASVALUES\@#${MBIASVALUES}#g" ${RUNROOT}/${SCRIPTPATH}/*.*  ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh  ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@MBIASERRORS\@#${MBIASERRORS}#g" ${RUNROOT}/${SCRIPTPATH}/*.*  ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh  ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@PATCHPATH\@#${PATCHPATH}#g" ${RUNROOT}/${SCRIPTPATH}/*.*  ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@PATCHLIST\@#${PATCHLIST}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@PYTHONBIN\@#${PYTHONBIN}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@RECALGRID\@#${RECALGRID}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@RUNROOT\@#${RUNROOT}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@RUNID\@#${RUNID}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@SCRIPTPATH\@#${SCRIPTPATH}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@STORAGEPATH\@#${STORAGEPATH}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@SURVEY\@#${SURVEY}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@SURVEYAREA\@#${SURVEYAREA}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@THELIPATH\@#${THELIPATH}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@TOMOLIMS\@#${TOMOLIMS}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@TOMOLIMSLOVEC\@#${TOMOLIMSLOVEC}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@TOMOLIMSHIVEC\@#${TOMOLIMSHIVEC}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@USER\@#${USER}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@WEIGHTNAME\@#${WEIGHTNAME}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh  ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@THETAMINCOV\@#${THETAMINCOV}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh  ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@THETAMAXCOV\@#${THETAMAXCOV}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh  ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@NTHETABINCOV\@#${NTHETABINCOV}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh  ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@XIPLUSLIMS\@#${XIPLUSLIMS}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh  ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
-sed -i "s#\@XIMINUSLIMS\@#${XIMINUSLIMS}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh  ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
+cp -f ${PACKROOT}/scripts/run_COSMOLOGY_PIPELINE_raw.sh ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh
+for OPT in $OPTLIST
+do 
+  ${P_SED_INPLACE} "s#\@${OPT}\@#${!OPT}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/run_COSMOLOGY_PIPELINE.sh ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*
+done 
 echo -e "\033[0;31m - Done! \033[0m" 
 #}}}
 

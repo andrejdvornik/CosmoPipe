@@ -28,7 +28,7 @@ def create_new_xis(path_to_xis, path_out, nzbins, ntheta=9):
     for index_zbin1 in xrange(nzbins):
         for index_zbin2 in xrange(index_zbin1, nzbins):
             
-            fname = path_to_xis + 'TC_@SURVEY@_@ALLPATCH@_reweight_@RECALGRID@@FILESUFFIX@_xi_e1cor_e2cor_A_tomo_{:}_{:}_logbin.dat'.format(index_zbin1 + 1, index_zbin2 + 1)
+            fname = path_to_xis + 'TC_@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@_xi_e1cor_e2cor_A_tomo_{:}_{:}_logbin.dat'.format(index_zbin1 + 1, index_zbin2 + 1)
             tmp_new = np.loadtxt(fname)
             
             # new thetas depend mildly on tomographic bin
@@ -52,7 +52,7 @@ def create_new_xis(path_to_xis, path_out, nzbins, ntheta=9):
     
     savedata = newdata
     #print savedata.shape
-    fname = path_out + '@SURVEY@_reweight_@RECALGRID@@FILESUFFIX@_xipm_mcor_{:}bin.dat'.format(nzbins)
+    fname = path_out + '@SURVEY@_@FILEBODY@@FILESUFFIX@_xipm_mcor_{:}bin.dat'.format(nzbins)
     # use same number of decimals as supplied in original data-file
     np.savetxt(fname, savedata, fmt='%.4e')
     print 'Data saved to: \n', fname

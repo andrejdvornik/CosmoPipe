@@ -65,7 +65,7 @@ run_ident=@RUNID@
 input_path=@RUNROOT@/@STORAGEPATH@/covariance/input/
 result_path=@RUNROOT@/@STORAGEPATH@/covariance/output/
 dens_eps_file=$input_path/@SURVEY@_neff_sigmae.txt
-angular_bin_file=TC_@SURVEY@_@ALLPATCH@_reweight_@RECALGRID@@FILESUFFIX@_xi_e1cor_e2cor_A_tomo_1_1_logbin.dat
+angular_bin_file=TC_@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@_xi_e1cor_e2cor_A_tomo_1_1_logbin.dat
 mask_file=@RUNROOT@/@STORAGEPATH@/@MASKFILE@
 
 # covariance settings
@@ -201,7 +201,7 @@ then
       for patch in @PATCHLIST@ 
       do
         awk '{ if ($1!="#" && $1!="##") print $11 }' \
-          ${input_path}/@SURVEY@_${patch}_reweight_@RECALGRID@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out > ${input_path}/tmp.dat
+          ${input_path}/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}_ggcorr.out > ${input_path}/tmp.dat
 	      paste ${input_path}/npair_tot_ZB${Z_B_low_str}t${Z_B_high_str}_ZB${Z_B_low_str2}t${Z_B_high_str2}.dat \
           ${input_path}/tmp.dat > ${input_path}/tmp2.dat
 	      mv ${input_path}/tmp2.dat \

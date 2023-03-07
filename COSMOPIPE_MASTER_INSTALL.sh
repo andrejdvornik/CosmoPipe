@@ -17,10 +17,11 @@ set -e
 
 #Full List of available options {{{ 
 OPTLIST="ALLPATCH CONFIGPATH DATE DZPRIORMU DZPRIORSD DZPRIORNSIG SHEARSUBSET \
-FILESUFFIX LIKELIHOOD COSMOPIPECFNAME NZFILEID NZFILESUFFIX NZSTEP MASKFILE \
-PACKROOT PATCHPATH COSMOFISHER PATCHLIST PYTHONBIN RECALGRID RUNROOT RUNID \
+FILESUFFIX LIKELIHOOD COSMOPIPELFNAME NZFILEID NZFILESUFFIX NZSTEP MASKFILE \
+PACKROOT PATCHPATH COSMOFISHER PATCHLIST PYTHON2BIN FILEBODY RUNROOT RUNID \
 RUNTIME SCRIPTPATH STORAGEPATH SURVEY SURVEYAREA THELIPATH TOMOLIMS USER \
-WEIGHTNAME THETAMINCOV THETAMAXCOV NTHETABINCOV XIPLUSLIMS XIMINUSLIMS"
+WEIGHTNAME THETAMINCOV THETAMAXCOV NTHETABINCOV THETAMINXI THETAMAXXI \
+NTHETABINXI XIPLUSLIMS XIMINUSLIMS PYTHON3BIN NZCOVFILE BLINDING BLIND"
 #}}}
 
 #Generate the list of possible command-line arguments {{{
@@ -30,6 +31,8 @@ COMMOPTS=`echo ${OPTLIST} | awk '{print "--" tolower($1)}'`
 #Set the default variables to determine the installation paths  {{{
 #Do we want to run the configure file? (1=NO, else YES)
 NOCONFIG=0
+#Date of creation 
+DATE="`date`"
 #Package directory (default: `pwd`)
 PACKROOT=`pwd`
 #Root directory for software & reduce folder storage (default: `pwd`)
@@ -41,38 +44,42 @@ RUNID=sci
 #Directory for runtime storage
 RUNTIME=RUNTIME
 #Survey ID  
-SURVEY=KV450 
+SURVEY=K1000
 #Survey Area in arcmin^2
 SURVEYAREA="1.22865e+06"
 #Nz File ID
 NZFILEID=Spec_Train_Adapt_DIR_TOMO
+#File containing Nz Covariance Matrix 
+NZCOVFILE=SOM_cov_multiplied.asc
 #Nz File suffix
 NZFILESUFFIX=_DIRsom_Nz.asc
 #Nz File binsize 
 NZSTEP=0.05
 #Survey Footprint Mask file
-MASKFILE=KiDS-NS_KV450_footprint_healpix.fits
+MASKFILE=KiDS_K1000_healpix.fits
 #Path to CosmoFischerForecast Repository
 COSMOFISHER=/path/to/CosmoFisherForecast/
 #Path to Patchwise Catalogues
-PATCHPATH=/path/to/KV450_CATALOGUES_PATCH_V0.5.9_v2/
+PATCHPATH=/path/to/K1000_CATALOGUES_PATCH_V1.0.0/
 #List of Patches 
-PATCHLIST="G9 G12 G15 G23 GS"
+PATCHLIST="'N S'"
 #Designator for "All patches"
-ALLPATCH="GALL"
-#ID for chosen blinding
+ALLPATCH="NS"
+#ID of chosen blind to analyse
+BLIND=C
+#Status of the blinding
 BLINDING=UNBLINDED
 #Patch catalogue suffix 
-FILESUFFIX=_v2_good
+FILESUFFIX=
 #Username (default: `whoami`) 
 USER=`whoami`
 #Do we want plots (1=yes, 0=no)
 #Name of shape weight variable
-WEIGHTNAME=recal_weight
+WEIGHTNAME=recal_weight_C
 #weight definition grid 
-RECALGRID=3x4x4
+FILEBODY=3x4x4
 #Limits of the tomographic bins
-TOMOLIMS="0.1 0.3 0.5 0.7 0.9 1.2"
+TOMOLIMS='"0.1 0.3 0.5 0.7 0.9 1.2"'
 #Path to results
 STORAGEPATH=work_${SURVEY}
 #Path to configuration files
@@ -84,12 +91,16 @@ DZPRIORMU="0.0 0.0 0.0 0.0 0.0"
 DZPRIORSD="0.039 0.023 0.026 0.012 0.011"
 DZPRIORNSIG=3.0
 #Name of the likelihood function to use
-LIKELIHOOD=kv450_cf_likelihood_public
+LIKELIHOOD=k1000_cf_likelihood_public
 #Name of the likelihood when in use (stops crosstalk between simulatneous runs)
-COSMOPIPECFNAME=COSMOPIPE_CF
+COSMOPIPELFNAME=COSMOPIPE_COSEBIs
 #Theta limits for covariance 
-THETAMINCOV=0.5
-THETAMAXCOV=300.0
+THETAMINXI="0.50"
+THETAMAXXI="300.00"
+NTHETABINXI="1000"
+#Theta limits for xipm
+THETAMINCOV=0.50
+THETAMAXCOV=300.00
 NTHETABINCOV=9
 #Xi plus/minus limits 
 XIPLUSLIMS="0.7 100"
@@ -119,10 +130,11 @@ do
     "--patchlist") shift; PATCHLIST=$1; shift;;
     "--allpatch") shift; ALLPATCH=$1; shift;;
     "--blinding") shift; BLINDING=$1; shift;;
+    "--blind") shift; BLIND=$1; shift;;
     "--filesuffix") shift; FILESUFFIX=$1; shift;;
     "--user") shift; USER=$1; shift;;
     "--weightname") shift; WEIGHTNAME=$1; shift;;
-    "--recalgrid") shift; RECALGRID=$1; shift;;
+    "--filebody") shift; FILEBODY=$1; shift;;
     "--tomolims") shift; TOMOLIMS=$1; shift;;
     "--storagepath") shift; STORAGEPATH=$1; shift;;
     "--configpath") shift; CONFIGPATH=$1; shift;;
@@ -131,11 +143,14 @@ do
     "--dzpriorsd") shift; DZPRIORSD=$1; shift;;
     "--dzpriornsig") shift; DZPRIORNSIG=$1; shift;;
     "--likelihood") shift; LIKELIHOOD=$1; shift;;
-    "--cosmopipecfname") shift; COSMOPIPECFNAME=$1; shift;;
+    "--cosmopipelfname") shift; COSMOPIPELFNAME=$1; shift;;
     "--xipluslims") shift; XIPLUSLIMS=$1; shift;;
     "--thetamaxcov") shift; THETAMAXCOV=$1; shift;;
     "--thetamincov") shift; THETAMinCOV=$1; shift;;
     "--nthetabincov") shift; NTHETABINCOV=$1; shift;;
+    "--thetamaxxi") shift; THETAMAXXI=$1; shift;;
+    "--thetaminxi") shift; THETAMinXI=$1; shift;;
+    "--nthetabinxi") shift; NTHETABINXI=$1; shift;;
     "--ximinuslims") shift; XIMINUSLIMS=$1; shift;;
     "--class_backuptar") shift; CLASS_BACKUPTAR=$1; shift;;
     *) echo "ERROR - unknown option $1!"; exit 1;;
@@ -162,7 +177,7 @@ echo -e "    ALLPATCH\033[0;34m=\033[0;31m$ALLPATCH \033[0m"
 echo -e "    FILESUFFIX\033[0;34m=\033[0;31m$FILESUFFIX \033[0m"
 echo -e "    USER\033[0;34m=\033[0;31m$USER \033[0m"
 echo -e "    WEIGHTNAME\033[0;34m=\033[0;31m$WEIGHTNAME \033[0m"
-echo -e "    RECALGRID\033[0;34m=\033[0;31m$RECALGRID \033[0m"
+echo -e "    FILEBODY\033[0;34m=\033[0;31m$FILEBODY \033[0m"
 echo -e "    TOMOLIMS\033[0;34m=\033[0;31m\"$TOMOLIMS\" \033[0m"
 echo -e "    SCRIPTPATH\033[0;34m=\033[0;31m$SCRIPTPATH \033[0m"
 echo -e "    STORAGEPATH\033[0;34m=\033[0;31m$STORAGEPATH \033[0m"
@@ -187,13 +202,28 @@ spinner()
   done
 }
 
-sleep 10 & spinner 
+sleep 1 & spinner 
 
 echo " OK!"
 sleep 1
 echo -e "\033[0;34mStarting Installation now. \033[0m  "
 sleep .5
 echo -e "\033[0;34m=======================================\033[0m"
+#}}}
+
+#Define inplace sed command (different on OSX) {{{
+if [ "`uname`" == "Darwin" ]
+then
+  P_SED_INPLACE='sed -i "" '
+else 
+  P_SED_INPLACE='sed -i '
+fi
+#}}}
+
+#Prepare some PATHs {{{
+PYTHON2BIN=${RUNROOT}/INSTALL/anaconda2/bin/
+PYTHON3BIN=${RUNROOT}/INSTALL/miniconda3/bin/
+ORIGPATH=${PATH}
 #}}}
 
 #Move into the install directory {{{
@@ -214,13 +244,13 @@ echo -e "\033[0;31m - Done! \033[0m"
 
 #Run the Script and Package Installations {{{
 #Clone the KiDS Likelihood repository {{{
-echo -en "   >\033[0;34m Cloning KiDS Likelihood Git repository\033[0m" 
-if [ -d ${RUNROOT}/INSTALL/kv450_cf_likelihood_public ] 
-then 
-  rm -fr kv450_cf_likelihood_public
-fi
-git clone https://github.com/fkoehlin/kv450_cf_likelihood_public.git > gitclone_output.log 2>&1
-echo -e "\033[0;31m - Done! \033[0m" 
+#echo -en "   >\033[0;34m Cloning KiDS Likelihood Git repository\033[0m" 
+#if [ -d ${RUNROOT}/INSTALL/kv450_cf_likelihood_public ] 
+#then 
+#  rm -fr kv450_cf_likelihood_public
+#fi
+#git clone https://github.com/fkoehlin/kv450_cf_likelihood_public.git > gitclone_output.log 2>&1
+#echo -e "\033[0;31m - Done! \033[0m" 
 #}}}
 #Clone CLASS {{{
 echo -en "   >\033[0;34m Cloning CLASS Git repository\033[0m" 
@@ -265,7 +295,7 @@ if [ -d ${RUNROOT}/INSTALL/montepython_public ]
 then 
   rm -fr montepython_public
 fi
-git clone https://github.com/brinckmann/montepython_public.git  >> gitclone_output.log 2>&1
+git clone https://github.com/BStoelzner/montepython_public.git -b gaussian_prior  >> gitclone_output.log 2>&1
 echo -e "\033[0;31m - Done! \033[0m" 
 #}}}
 #Clone PyMultiNest {{{
@@ -297,37 +327,138 @@ then
 fi
 git clone https://bitbucket.org/fkoehlin/post_process_mcmcs.git  >> gitclone_output.log 2>&1
 echo -e "\033[0;31m - Done! \033[0m" 
+#}}}
+#Clone KCAP {{{
+echo -en "   >\033[0;34m Cloning KCAP Git repository\033[0m" 
+#Clone the repository
+if [ -d ${RUNROOT}/INSTALL/kcap ] 
+then 
+  rm -fr kcap
+fi
+git clone https://github.com/KiDS-WL/kcap.git  >> gitclone_output.log 2>&1
+echo -e "\033[0;31m - Done! \033[0m" 
+#}}}
+#Clone tabeval {{{
+echo -en "   >\033[0;34m Cloning tabeval Git repository\033[0m" 
+#Clone the repository
+if [ -d ${RUNROOT}/INSTALL/tabeval ] 
+then 
+  rm -fr tabeval
+fi
+git clone https://github.com/jlvdb/tabeval.git  >> gitclone_output.log 2>&1
+echo -e "\033[0;31m - Done! \033[0m" 
+#}}}
+#Install Local Python 2&3 {{{
 echo -en "   >\033[0;34m Installing Local Anaconda Python2.7 \033[0m" 
-wget http://repo.continuum.io/archive/Anaconda2-4.3.0-Linux-x86_64.sh > python_wget.log 2>&1
-bash Anaconda2-4.3.0-Linux-x86_64.sh -b -p ./anaconda2/ > Anaconda_install.log 2>&1
-export PYTHONPATH=${RUNROOT}/INSTALL/anaconda2/bin/python2:${RUNROOT}/INSTALL/anaconda2/lib/
-export PATH=${RUNROOT}/INSTALL/anaconda2/bin/:${PATH}
-${RUNROOT}/INSTALL/anaconda2/bin/pip install numpy scipy pyfits cython matplotlib \
-  palettable fitsio==1.1.1 corner > python_packages.log 2>&1 <<EOF
+if [ "`uname`" == "Darwin" ]
+then 
+  wget http://repo.continuum.io/archive/Anaconda2-4.3.0-MacOSX-x86_64.sh > python_wget.log 2>&1
+  bash Anaconda2-4.3.0-MacOSX-x86_64.sh -b -p ./anaconda2/ > Anaconda_install.log 2>&1
+else 
+  wget http://repo.continuum.io/archive/Anaconda2-4.3.0-Linux-x86_64.sh > python_wget.log 2>&1
+  bash Anaconda2-4.3.0-Linux-x86_64.sh -b -p ./anaconda2/ > Anaconda_install.log 2>&1
+fi 
+echo -e "\033[0;31m - Done! \033[0m" 
+echo -en "   >\033[0;34m Installing Local Anaconda Python3 \033[0m" 
+if [ "`uname`" == "Darwin" ]
+then 
+  wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-MacOSX-x86_64.sh > python_wget.log 2>&1
+  bash Miniconda3-py38_4.10.3-MacOSX-x86_64.sh -b -p ./miniconda3/ > Anaconda_install.log 2>&1
+else 
+  wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh > python_wget.log 2>&1
+  bash Miniconda3-py38_4.10.3-Linux-x86_64.sh -b -p ./miniconda3/ > Anaconda_install.log 2>&1
+fi 
+echo -e "\033[0;31m - Done! \033[0m" 
+echo -en "   >\033[0;34m Installing Python2 Packages \033[0m" 
+export PYTHONPATH=${RUNROOT}/INSTALL/miniconda3/bin/python3:${RUNROOT}/INSTALL/miniconda3/lib/
+export PYTHONPATH=${PYTHONPATH}:${RUNROOT}/INSTALL/anaconda2/bin/python2:${RUNROOT}/INSTALL/anaconda2/lib/
+export PATH=${PYTHON3PATH}:${PYTHON2PATH}:${PATH}
+${RUNROOT}/INSTALL/anaconda2/bin/pip install --upgrade pip > python_packages.log 2>&1 <<EOF
 yes
 EOF
-${RUNROOT}/INSTALL/anaconda2/bin/conda install -c conda-forge openmp >> python_packages.log 2>&1 <<EOF
+${RUNROOT}/INSTALL/anaconda2/bin/pip install numpy scipy cython matplotlib \
+  palettable fitsio==1.1.1 pytest-runner > python_packages.log 2>&1 <<EOF
+yes
+EOF
+${RUNROOT}/INSTALL/anaconda2/bin/pip install d2to1 > python_packages.log 2>&1 <<EOF
+yes
+EOF
+${RUNROOT}/INSTALL/anaconda2/bin/pip install stsci.distutils > python_packages.log 2>&1 <<EOF
+yes
+EOF
+${RUNROOT}/INSTALL/anaconda2/bin/pip install pyfits > python_packages.log 2>&1 <<EOF
+yes
+EOF
+#${RUNROOT}/INSTALL/anaconda2/bin/conda install -c conda-forge openmp >> python_packages.log 2>&1 <<EOF
+#y
+#EOF
+echo -e "\033[0;31m - Done! \033[0m" 
+echo -en "   >\033[0;34m Installing Python3 Packages \033[0m" 
+${RUNROOT}/INSTALL/miniconda3/bin/conda install mpich-mpicc mpi4py >> python_packages.log 2>&1 <<EOF
+y
+EOF
+${RUNROOT}/INSTALL/miniconda3/bin/pip install emcee numpy==1.23.0 scipy pyfits cython matplotlib \
+  palettable fitsio==1.1.1 astropy >> python_packages.log 2>&1 <<EOF
+y
+EOF
+${RUNROOT}/INSTALL/miniconda3/bin/conda install mpi future pyyaml pip>=20.0 >> python_packages.log 2>&1 <<EOF
+y
+EOF
+${RUNROOT}/INSTALL/miniconda3/bin/conda install -c conda-forge liblapack >> python_packages.log 2>&1 <<EOF
+y
+EOF
+${RUNROOT}/INSTALL/miniconda3/bin/conda install -c conda-forge curl >> python_packages.log 2>&1 <<EOF
 y
 EOF
 echo -e "\033[0;31m - Done! \033[0m" 
 #}}}
+#Install CAMB {{{
+export PYTHONPATH=${RUNROOT}/INSTALL/miniconda3/lib/
+export PATH=${PYTHON3BIN}:${ORIGPATH}
+if [ ! -d ${RUNROOT}/INSTALL/CAMB ]
+then 
+  echo -en "   >\033[0;34m Installing CAMB\033[0m" 
+  git clone --recursive https://github.com/cmbant/CAMB.git >> CAMB_install.log 2>&1
+  cd ${RUNROOT}/INSTALL/CAMB
+  ${RUNROOT}/INSTALL/miniconda3/bin/python3 setup.py build_cluster >> CAMB_install.log 2>&1
+  ${RUNROOT}/INSTALL/miniconda3/bin/python3 setup.py install >> CAMB_install.log 2>&1
+  echo -e "\033[0;31m - Done! \033[0m" 
+fi 
+#}}}
+#Install KCAP {{{
+echo -en "   >\033[0;34m Installing KCAP\033[0m" 
+cd ${RUNROOT}/INSTALL/kcap
+${RUNROOT}/INSTALL/miniconda3/bin/pip install git+https://bitbucket.org/tilmantroester/cosmosis.git@kcap#egg=cosmosis-standalone >> KCAP_install.log 2>&1  
+${RUNROOT}/INSTALL/miniconda3/bin/python3 build.py >> KCAP_install.log 2>&1
+echo -e "\033[0;31m - Done! \033[0m" 
+#}}}
+#Install tabeval {{{
+echo -en "   >\033[0;34m Installing tabeval\033[0m" 
+cd ${RUNROOT}/INSTALL/tabeval
+${RUNROOT}/INSTALL/miniconda3/bin/python3 setup.py build >> tabeval_install.log 2>&1
+${RUNROOT}/INSTALL/miniconda3/bin/python3 setup.py install >> tabeval_install.log 2>&1
+echo -e "\033[0;31m - Done! \033[0m" 
+#}}}
 #Install montepython {{{
 echo -en "   >\033[0;34m Installing MontePython\033[0m" 
-export PATH=${RUNROOT}/INSTALL/montepython_public/:${PATH}
-sed -i "s@NS_auto_arguments = {@&\n    'base_dir': {'type': str},@g" ${RUNROOT}/INSTALL/montepython_public/montepython/MultiNest.py 
+export PATH=${RUNROOT}/INSTALL/montepython_public/:${ORIGPATH}
+${P_SED_INPLACE} "s@NS_auto_arguments = {@&\n    'base_dir': {'type': str},@g" ${RUNROOT}/INSTALL/montepython_public/montepython/MultiNest.py 
 echo -e "\033[0;31m - Done! \033[0m" 
 echo -en "   >\033[0;34m Installing CLASS\033[0m" 
+export PATH=${PYTHON2PATH}:${PYTHON3PATH}:${ORIGPATH}
+export PYTHONPATH=${RUNROOT}/INSTALL/anaconda2/lib/
 cd ${RUNROOT}/INSTALL/class_public
 make clean > ${RUNROOT}/INSTALL/CLASS_install_progress.log 2>&1 
-make > ${RUNROOT}/INSTALL/CLASS_install_progress.log  2>&1
+PYTHON=${RUNROOT}/INSTALL/anaconda2/bin/python2 make > ${RUNROOT}/INSTALL/CLASS_install_progress.log  2>&1
 cd ${RUNROOT}/INSTALL/class_public/python
 ${RUNROOT}/INSTALL/anaconda2/bin/python2 setup.py build > python_class_install.log 2>&1
 cd ${RUNROOT}/INSTALL
+export PATH=${PYTHON3PATH}:${PYTHON2PATH}:${ORIGPATH}
 echo -e "\033[0;31m - Done! \033[0m" 
 #}}}
 #Install TreeCorr {{{
 echo -en "   >\033[0;34m Installing TreeCorr\033[0m" 
-${RUNROOT}/INSTALL/anaconda2/bin/pip install treecorr > ${RUNROOT}/INSTALL/TreeCorr_install.log 2>&1
+${RUNROOT}/INSTALL/miniconda3/bin/pip3 install treecorr==4.2.3 > ${RUNROOT}/INSTALL/TreeCorr_install.log 2>&1
 echo -e "\033[0;31m - Done! \033[0m" 
 #}}}
 #Install GetDist {{{
@@ -372,60 +503,26 @@ echo -e "\033[0;31m - Done! \033[0m"
 #Add useful Functions to Python Lib {{{
 echo -en "   >\033[0;34m Adding usefull functions to python lib \033[0m" 
 cd ${RUNROOT}/INSTALL/anaconda2/lib/
-cp ${PACKROOT}/scripts/{fitting,ldac}.py . > ${RUNROOT}/INSTALL/LDAC_wget.log 2>&1
+cp ${PACKROOT}/scripts/{fitting,ldac,measure_cosebis}.py . > ${RUNROOT}/INSTALL/LDAC_wget.log 2>&1
+cd ${RUNROOT}/INSTALL/miniconda3/lib/
+cp ${PACKROOT}/scripts/{ldac,measure_cosebis}.py . > ${RUNROOT}/INSTALL/LDAC_wget.log 2>&1
 cd ${RUNROOT}/INSTALL
 echo -e "\033[0;31m - Done! \033[0m" 
 #}}}
 echo -e "\033[0;31m   ##Script Installations all done!##\033[0m" 
-cd ${RUNROOT}
 #}}}
+
+cd ${RUNROOT}
 
 #Update the Configure script for this run {{{
 echo -en "   >\033[0;34m Update the configure script \033[0m" 
 MACHINE=`uname`
 THELIPATH=`echo ${RUNROOT}/INSTALL/theli-1.6.1/bin/${MACHINE}*`
-PYTHONBIN=${RUNROOT}/INSTALL/anaconda2/bin/
 cp ${PACKROOT}/scripts/configure_raw.sh ${RUNROOT}/configure.sh 
 for OPT in $OPTLIST
 do 
-  sed -i "s#\@${OPT}\@#${!OPT}#g" ${RUNROOT}/configure.sh run_PhotoPipe.sh ${RUNROOT}/${SCRIPTPATH}/*.*
+    ${P_SED_INPLACE} "s#\@${OPT}\@#${!OPT}#g" ${RUNROOT}/configure.sh
 done 
-#sed -i "s#\@ALLPATCH\@#${ALLPATCH}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@CONFIGPATH\@#${CONFIGPATH}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@DATE\@#`date +%Y-%m-%d`#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@DZPRIORMU\@#${DZPRIORMU}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@DZPRIORSD\@#${DZPRIORSD}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@DZPRIORNSIG\@#${DZPRIORNSIG}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@SHEARSUBSET\@#${SHEARSUBSET}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@FILESUFFIX\@#${FILESUFFIX}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@LIKELIHOOD\@#${LIKELIHOOD}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@COSMOPIPECFNAME\@#${COSMOPIPECFNAME}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@NZFILEID\@#${NZFILEID}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@NZFILESUFFIX\@#${NZFILESUFFIX}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@NZSTEP\@#${NZSTEP}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@MASKFILE\@#${MASKFILE}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@PACKROOT\@#${PACKROOT}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@PATCHPATH\@#${PATCHPATH}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@COSMOFISHER\@#${COSMOFISHER}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@PATCHLIST\@#\"${PATCHLIST}\"#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@PYTHONBIN\@#${PYTHONBIN}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@RECALGRID\@#${RECALGRID}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@RUNROOT\@#${RUNROOT}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@RUNID\@#${RUNID}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@RUNTIME\@#${RUNTIME}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@SCRIPTPATH\@#${SCRIPTPATH}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@STORAGEPATH\@#${STORAGEPATH}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@SURVEY\@#${SURVEY}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@SURVEYAREA\@#${SURVEYAREA}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@THELIPATH\@#${THELIPATH}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@TOMOLIMS\@#\"${TOMOLIMS}\"#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@USER\@#${USER}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@WEIGHTNAME\@#${WEIGHTNAME}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@THETAMINCOV\@#${THETAMINCOV}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@THETAMAXCOV\@#${THETAMAXCOV}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@NTHETABINCOV\@#${NTHETABINCOV}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@XIPLUSLIMS\@#${XIPLUSLIMS}#g" ${RUNROOT}/configure.sh
-#sed -i "s#\@XIMINUSLIMS\@#${XIMINUSLIMS}#g" ${RUNROOT}/configure.sh
 echo -e "\033[0;31m - Done! \033[0m" 
 #}}}
 

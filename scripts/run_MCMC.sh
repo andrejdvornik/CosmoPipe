@@ -28,15 +28,15 @@ fi
 
 mkdir -p output/${scenario}_${blinding}/
 
-cp @RUNROOT@/INSTALL/montepython_public/montepython/likelihoods/@COSMOPIPECFNAME@/@COSMOPIPECFNAME@.data \
+cp @RUNROOT@/INSTALL/montepython_public/montepython/likelihoods/@COSMOPIPELFNAME@/@COSMOPIPELFNAME@.data \
    output/${scenario}_${blinding}/
 
-@PYTHONBIN@/python2 \
+@PYTHON2BIN@/python2 \
     @RUNROOT@/INSTALL/montepython_public/montepython/MontePython.py \
     run \
-    -p @RUNROOT@/@STORAGEPATH@/MCMC/@SURVEY@_INPUT/@COSMOPIPECFNAME@.param \
+    -p @RUNROOT@/@STORAGEPATH@/MCMC/@SURVEY@_INPUT/@COSMOPIPELFNAME@.param \
     -o output/${scenario}_$blinding \
-    --conf @RUNROOT@/@CONFIGPATH@/@COSMOPIPECFNAME@.conf \
+    --conf @RUNROOT@/@CONFIGPATH@/@COSMOPIPELFNAME@.conf \
     -m NS \
     --NS_max_iter 10000000 \
     --NS_importance_nested_sampling True \
@@ -46,7 +46,7 @@ cp @RUNROOT@/INSTALL/montepython_public/montepython/likelihoods/@COSMOPIPECFNAME
 
 #### For evidence calculations
 #
-#@PYTHONBIN@/python2 \
+#@PYTHON2BIN@/python2 \
 #    @RUNROOT@/INSTALL/montepython_public/montepython/MontePython.py \
 #    run \
 #    -p @RUNROOT@/@CONFIGPATH@/base_IA_bary.param \

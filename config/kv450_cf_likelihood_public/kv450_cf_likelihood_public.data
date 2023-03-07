@@ -3,83 +3,83 @@
 # function's likelihood (from Hildebrandt et al. 18XX.XXXXX) #
 ##############################################################
 
-@COSMOPIPECFNAME@.data_directory = '@RUNROOT@/@STORAGEPATH@/MCMC/@SURVEY@_INPUT/@BLINDING@/'
+@COSMOPIPELFNAME@.data_directory = '@RUNROOT@/@STORAGEPATH@/MCMC/@SURVEY@_INPUT/@BLINDING@/'
 
 # for loading of files:
-@COSMOPIPECFNAME@.z_bins_min = [@TOMOLIMSLOVEC@]
-@COSMOPIPECFNAME@.z_bins_max = [@TOMOLIMSHIVEC@]
+@COSMOPIPELFNAME@.z_bins_min = [@TOMOLIMSLOVEC@]
+@COSMOPIPELFNAME@.z_bins_max = [@TOMOLIMSHIVEC@]
 
 # number of angular bins in which xipm is measured
-@COSMOPIPECFNAME@.ntheta = 9
+@COSMOPIPELFNAME@.ntheta = 9
 
 # set this flag if you want to bin the theoretical xi_pm functions with a weight function
-@COSMOPIPECFNAME@.use_theory_binning = True
+@COSMOPIPELFNAME@.use_theory_binning = True
 # for new theta-binning supply the smallest and highest bin border values in arcmin:
-@COSMOPIPECFNAME@.theta_bin_min_val = 0.5
-@COSMOPIPECFNAME@.theta_bin_max_val = 300.
+@COSMOPIPELFNAME@.theta_bin_min_val = 0.5
+@COSMOPIPELFNAME@.theta_bin_max_val = 300.
 # if you want to read in (and interpolate) a weight function (expected as theta, weight):
-@COSMOPIPECFNAME@.read_weight_func_for_binning = False
+@COSMOPIPELFNAME@.read_weight_func_for_binning = False
 # supply path to weight-function file (ignored if flag above is False):
-@COSMOPIPECFNAME@.theory_weight_function_file = 'none'
+@COSMOPIPELFNAME@.theory_weight_function_file = 'none'
 # supply constant for weight = theta * const.
-@COSMOPIPECFNAME@.theory_binning_const = 1.
+@COSMOPIPELFNAME@.theory_binning_const = 1.
 # set here a number of theta nodes over which we integrate per theta_bin
-@COSMOPIPECFNAME@.theta_nodes_theory = 100
+@COSMOPIPELFNAME@.theta_nodes_theory = 100
 
 # Measurements (xi+, xi-) and covariance matrix
-@COSMOPIPECFNAME@.xipm_file = '@SURVEY@_reweight_@RECALGRID@@FILESUFFIX@_xipm_mcor_@NTOMO@bin.dat'
+@COSMOPIPELFNAME@.xipm_file = '@SURVEY@_reweight_@RECALGRID@@FILESUFFIX@_xipm_mcor_@NTOMOBINS@bin.dat'
 
-@COSMOPIPECFNAME@.covmat_file = 'cov_matrix_ana_mcorr_@RUNID@.dat'
+@COSMOPIPELFNAME@.covmat_file = 'cov_matrix_ana_mcorr_@RUNID@.dat'
 
 # write out the xi_p/m theory vector (including all calibrations) in the same 
 # data format and bins as the data vector as given in the xipm_file:
 # (you might want to increase the theta bins by supplying an adjusted 'mock'
 # data vector!)
-@COSMOPIPECFNAME@.write_out_theory = False 
+@COSMOPIPELFNAME@.write_out_theory = False 
 # supply a filename if flag is set to True (file will be saved to 
 # data_directory):
-@COSMOPIPECFNAME@.xipm_theory_filename = 'xi_pm_theory.dat'
+@COSMOPIPELFNAME@.xipm_theory_filename = 'xi_pm_theory.dat'
 
 # Details for dn/dz-file:
-@COSMOPIPECFNAME@.nz_method = 'USER'
+@COSMOPIPELFNAME@.nz_method = 'USER'
 # number of discrete z-values used for all integrations, can be set to arbitrary numbers now
-@COSMOPIPECFNAME@.nzmax = 120
+@COSMOPIPELFNAME@.nzmax = 120
 # you can choose here any of the scipy.interpolate.interp1d types of interpolation
 # (i.e. 'linear', 'nearest', 'zero', 'slinear', 'quadratic', 'cubic', 'previous',
 # 'next' in SciPy v1.1.0) for the n(z) interpolation ('linear' is recommended)
-@COSMOPIPECFNAME@.type_redshift_interp = 'linear'
+@COSMOPIPELFNAME@.type_redshift_interp = 'linear'
 
 # set to "True" if you want to marginalize over the uncertainty of the multiplicative shear calibration:
-#@COSMOPIPECFNAME@.marginalize_over_multiplicative_bias = False
+#@COSMOPIPELFNAME@.marginalize_over_multiplicative_bias = False
 # give error for m-corrections (assumed to be fully correlated for all z-bins):
-#@COSMOPIPECFNAME@.err_multiplicative_bias = 0.01
+#@COSMOPIPELFNAME@.err_multiplicative_bias = 0.01
 
 # Use angular mask (to cut non-linear scales)
-@COSMOPIPECFNAME@.use_cut_theta = True
+@COSMOPIPELFNAME@.use_cut_theta = True
 # if True, select a cut scheme:
-@COSMOPIPECFNAME@.cutvalues_file = 'cut_values_@NTOMO@bin.dat'
+@COSMOPIPELFNAME@.cutvalues_file = 'cut_values_@NTOMOBINS@bin.dat'
 
 # set flag if you want to marginalize over bootstrap errors of n(z)
-@COSMOPIPECFNAME@.bootstrap_photoz_errors = False
+@COSMOPIPELFNAME@.bootstrap_photoz_errors = False
 
 # if above flag is set to True, then specify lowest and highest index of bootstrap realizations
 # from which one bootstrap is drawn randomly per evaluation step
-@COSMOPIPECFNAME@.index_bootstrap_low = 1
-@COSMOPIPECFNAME@.index_bootstrap_high = 1000
+@COSMOPIPELFNAME@.index_bootstrap_low = 1
+@COSMOPIPELFNAME@.index_bootstrap_high = 1000
 
 # these settings set the precision of the Cl integration
 # maximum l for C_l
-@COSMOPIPECFNAME@.lmax = 60000
+@COSMOPIPELFNAME@.lmax = 60000
 # logarithmic l step for C_l
-#@COSMOPIPECFNAME@.dlnl = 0.4
+#@COSMOPIPELFNAME@.dlnl = 0.4
 # should be decreased to:
-@COSMOPIPECFNAME@.dlnl = 0.2
+@COSMOPIPELFNAME@.dlnl = 0.2
 
 # Method for integrating from Cl to xi_pm, options:
 # 1) 'cut_off' (method inherited from CFHTLenS likelihood, might be to coarse on large theta-scales)
 # 2) 'brute_force' (also based on above method, but with adjusted cut-off scales and precision settings)
 # 3) 'fftlog' (requires pycl2xi-package from "https://github.com/tilmantroester/pycl2xi")
-@COSMOPIPECFNAME@.integrate_Bessel_with = 'brute_force'
+@COSMOPIPELFNAME@.integrate_Bessel_with = 'brute_force'
 
 # Only relevant if you chose 1) or 2):
 # parameters controlling the precision of the integral
@@ -88,50 +88,50 @@
 # (this also controls the speed of the likelihood,
 # since this integral is the bottleneck)
 # ATTENTION those might have to be adjusted for large scales!
-@COSMOPIPECFNAME@.xmax = 50.
-@COSMOPIPECFNAME@.dx_below_threshold = 0.05
-@COSMOPIPECFNAME@.dx_above_threshold = 0.15
-@COSMOPIPECFNAME@.dx_threshold = 0.4
-@COSMOPIPECFNAME@.dlntheta = 0.25
+@COSMOPIPELFNAME@.xmax = 50.
+@COSMOPIPELFNAME@.dx_below_threshold = 0.05
+@COSMOPIPELFNAME@.dx_above_threshold = 0.15
+@COSMOPIPELFNAME@.dx_threshold = 0.4
+@COSMOPIPELFNAME@.dlntheta = 0.25
 
 # k_max in h/Mpc
 # (should be increased when using less conservative cut scheme)
-@COSMOPIPECFNAME@.k_max_h_by_Mpc = 100.0
+@COSMOPIPELFNAME@.k_max_h_by_Mpc = 100.0
 
 # Anderson-Hartlap factor
-@COSMOPIPECFNAME@.ah_factor = 1.0
+@COSMOPIPELFNAME@.ah_factor = 1.0
 
 # Uncomment this line to use the theoretical error nuisance parameter
-# @COSMOPIPECFNAME@.use_nuisance = ['epsilon']
+# @COSMOPIPELFNAME@.use_nuisance = ['epsilon']
 
 # Nonlinear corrections, any CLASS key word is possible but the default choices are
 # 'halofit' (including Takahashi's update) or 'hmcode' (Mead et al. 2015, 2016)
 # the choice between the two affects the choice of baryon feedback parameters below!
-#@COSMOPIPECFNAME@.method_non_linear_Pk = 'halofit'
-@COSMOPIPECFNAME@.method_non_linear_Pk = 'hmcode'
+#@COSMOPIPELFNAME@.method_non_linear_Pk = 'halofit'
+@COSMOPIPELFNAME@.method_non_linear_Pk = 'hmcode'
 
 # TODO: remove this?!
-@COSMOPIPECFNAME@.coefficient_f_nu = 0
-@COSMOPIPECFNAME@.theoretical_error = 0
+@COSMOPIPELFNAME@.coefficient_f_nu = 0
+@COSMOPIPELFNAME@.theoretical_error = 0
 # noise computation
-@COSMOPIPECFNAME@.rms_shear = 0.0
+@COSMOPIPELFNAME@.rms_shear = 0.0
 # number of galaxies per square arcminutes
-@COSMOPIPECFNAME@.gal_per_sqarcmn = 30
+@COSMOPIPELFNAME@.gal_per_sqarcmn = 30
 
 # nuisance parameter for marginalizing over the uncertainty of the multiplicative shear calibration:
 # it's the same dm value in all redshift bins combinations!
 # applied to THEORY vector:
 # xi_p = xi_p * (1. + dm) * (1. + dm)
-#@COSMOPIPECFNAME@.use_nuisance = ['dm']
+#@COSMOPIPELFNAME@.use_nuisance = ['dm']
 
 ### BARYON FEEDBACK ###
 ## HALOFIT: ##
 # the options below are only valid if 'method_non_linear_Pk' = 'halofit'!
 # choose a baryonic feedback model (from OWLS): 'REF', 'AGN', 'DBLIM'
-#@COSMOPIPECFNAME@.baryon_model = 'AGN'
+#@COSMOPIPELFNAME@.baryon_model = 'AGN'
 # this allows to marginalize over a free baryon feedback amplitude A_bary:
 # (i.e. it is simply modifying the amplitude set by the chosen model)
-#@COSMOPIPECFNAME@.use_nuisance = ['A_bary']
+#@COSMOPIPELFNAME@.use_nuisance = ['A_bary']
 
 ### HMCode: ###
 # the options below are only valid if 'method_non_linear_Pk' = 'hmcode'!
@@ -143,49 +143,49 @@
 
 # this allows to include IA:
 # if only 'amp_IA' is passed, 'exp_IA' = 0 (i.e. redshift-scaling is turned off!)
-#@COSMOPIPECFNAME@.use_nuisance = ['A_IA', 'exp_IA']
-#@COSMOPIPECFNAME@.use_nuisance = ['A_IA']
+#@COSMOPIPELFNAME@.use_nuisance = ['A_IA', 'exp_IA']
+#@COSMOPIPELFNAME@.use_nuisance = ['A_IA']
 # if this flag is set to True, the linear matter power spectrum will be used for 
 # the II term in the intrinsic alignment model and for the GI term the geometric
 # mean of the linear and non-linear matter power spectre will be used
 # if set to False, the non-linear matter power spectrum will be used for both
-# the II and GI term instead#@COSMOPIPECFNAME@.use_linear_pk_for_IA = True
-@COSMOPIPECFNAME@.use_linear_pk_for_IA = False
+# the II and GI term instead#@COSMOPIPELFNAME@.use_linear_pk_for_IA = True
+@COSMOPIPELFNAME@.use_linear_pk_for_IA = False
 
 # this allows to include nuisance parameters for the c-correction
 # (one per redshift bin):
 # flag for using a theta-dependent c-term function:
-@COSMOPIPECFNAME@.use_cterm_function = True
+@COSMOPIPELFNAME@.use_cterm_function = True
 # file from which to load theta-dependent signal:
-@COSMOPIPECFNAME@.cterm_function_file = '@SURVEY@_ALL_c12_treecorr.out'
+@COSMOPIPELFNAME@.cterm_function_file = '@SURVEY@_ALL_c12_treecorr.out'
 # amplitudes for theta-dependent signal:
 # enters currently like:
 # xi_p = xi_p + Ac_zi * Ac_zj * c_term_func(theta)
-#@COSMOPIPECFNAME@.use_nuisance = ['Ac_z1', 'Ac_z2', 'Ac_z3', 'Ac_z4']
-#@COSMOPIPECFNAME@.use_nuisance = ['Ac_z1', 'Ac_z2', 'Ac_z3', 'Ac_z4', 'Ac_z5', 'A_IA']
+#@COSMOPIPELFNAME@.use_nuisance = ['Ac_z1', 'Ac_z2', 'Ac_z3', 'Ac_z4']
+#@COSMOPIPELFNAME@.use_nuisance = ['Ac_z1', 'Ac_z2', 'Ac_z3', 'Ac_z4', 'Ac_z5', 'A_IA']
 # constant offset:
 # enters currently like (dc_zi's centred on 0!)
 # xi_p = xi_p + dc_zi * dc_zj
-#@COSMOPIPECFNAME@.use_nuisance = ['dc_z1', 'dc_z2', 'dc_z3', 'dc_z4']
+#@COSMOPIPELFNAME@.use_nuisance = ['dc_z1', 'dc_z2', 'dc_z3', 'dc_z4']
 
 # flag for using a patch/random correction
-@COSMOPIPECFNAME@.use_patchrandcorr_function = False
+@COSMOPIPELFNAME@.use_patchrandcorr_function = False
 # file from which to load theta-dependent signal:
-@COSMOPIPECFNAME@.patchrandcorr_file = '@SURVEY@_patchrandcorr_@NTOMO@bin.dat'
+@COSMOPIPELFNAME@.patchrandcorr_file = '@SURVEY@_patchrandcorr_@NTOMOBINS@bin.dat'
 
 # nuisance parameters for marginalizing over a constant shift of any of the n(z):
-@COSMOPIPECFNAME@.use_nuisance = ['A_IA', 'dc', 'Ac'] + ['D_z{:}'.format(i+1) for i in range(@NTOMO@)]
+@COSMOPIPELFNAME@.use_nuisance = ['A_IA', 'dc', 'Ac'] + ['D_z{:}'.format(i+1) for i in range(@NTOMOBINS@)]
 
 # if you want to enforce Gaussian priors on some/all NUISANCE parameters, set flag to True
 # if set to False lists below are ignored!
-@COSMOPIPECFNAME@.use_gaussian_prior_for_nuisance = True
+@COSMOPIPELFNAME@.use_gaussian_prior_for_nuisance = True
 # add here all NUISANCE parameters for which you would like to define Gaussian priors:
 # name must match exactly to the nusiances defined above!
-@COSMOPIPECFNAME@.gaussian_prior_name = ['dc', 'Ac'] + ['D_z{:}'.format(i+1) for i in range(@NTOMO@)]
+@COSMOPIPELFNAME@.gaussian_prior_name = ['dc', 'Ac'] + ['D_z{:}'.format(i+1) for i in range(@NTOMOBINS@)]
 # supply here the central values of the Gaussians (keep the order! no double checks!!!)
-@COSMOPIPECFNAME@.gaussian_prior_center = [0., 1.01] + [@DZPRIORMUVEC@]
+@COSMOPIPELFNAME@.gaussian_prior_center = [0., 1.01] + [@DZPRIORMUVEC@]
 # supply here the std wrt. the center (again keep the order!)
-@COSMOPIPECFNAME@.gaussian_prior_sigma = [0.0002, 0.13] + [@DZPRIORSDVEC@]
+@COSMOPIPELFNAME@.gaussian_prior_sigma = [0.0002, 0.13] + [@DZPRIORSDVEC@]
 
 #### Gaussian priors for nuisance parameters
 

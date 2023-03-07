@@ -1,6 +1,6 @@
 #------Experiments to test (separated with commas)-----
 
-data.experiments=['@COSMOPIPECFNAME@']
+data.experiments=['@COSMOPIPECLNAME@']
 
 #------ Settings for the over-sampling. The first element will always be set to
 # 1, for it is the sampling of the cosmological parameters. The other numbers
