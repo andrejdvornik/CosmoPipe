@@ -1,0 +1,175 @@
+##
+# 
+# KiDS COSMOLOGY PIPELINE Configuration Variables 
+# Written by A.H. Wright (2019-09-30) 
+# Created by @USER@ (@DATE@)
+#
+##
+
+##
+# If you need to edit any paths, do so here and rerun the configure script
+##
+
+#Paths and variables for configuration
+
+#Root directory for running pipeline
+RUNROOT=@RUNROOT@
+
+#Directory for runtime scripts 
+RUNTIME=@RUNTIME@
+
+#Path to pipeline config files 
+CONFIGPATH=@CONFIGPATH@
+
+#Path for modified scripts
+SCRIPTPATH=@SCRIPTPATH@
+
+#Path for manual files 
+MANUALPATH=@MANUALPATH@
+
+#Path for outputs
+STORAGEPATH=@STORAGEPATH@
+
+#Designation for "all patches"
+ALLPATCH=@ALLPATCH@
+
+#Blind identifier
+BLINDING=@BLINDING@ #blind${BLIND} or UNBLINDED
+
+#Blind Character
+BLIND=@BLIND@ #A B C 
+
+#Colours 
+RED='\033[0;31m' #Red 
+BLU='\033[0;34m' #Blue 
+DEF='\033[0m'    #Default
+
+#Date
+DATE="`date`"
+
+#Prior values for the gaussian dz's (per tomo bin)
+DZPRIORMU="@DZPRIORMU@"
+DZPRIORSD="@DZPRIORSD@"
+DZPRIORNSIG="@DZPRIORNSIG@"
+
+#Pixel positions variables
+XPIX="Xpos"
+YPIX="Ypos"
+
+#Combined GAAP flag
+GAAPFLAG="FLAG_GAAP_ugriZYJHKs"
+
+#Shape mesurement variables 
+E1VAR=autocal_e1_C
+E2VAR=autocal_e2_C
+
+#Patch catalogue suffix 
+FILESUFFIX=@FILESUFFIX@
+
+#Path to the CosmoFisherForecast repository
+COSMOFISHER=@COSMOFISHER@ 
+
+#Patch Subset Keyword
+SHEARSUBSET=@SHEARSUBSET@ 
+
+#Name of the likelihood function to use
+LIKELIHOOD=@LIKELIHOOD@
+
+#Name of the likelihood when in use (stops crosstalk between simulatneous runs)
+COSMOPIPELFNAME=@COSMOPIPELFNAME@
+
+#Nz file name 
+NZFILEID=@NZFILEID@
+
+#File containing Nz Covariance Matrix 
+NZCOVFILE=@NZCOVFILE@
+
+#Nz file suffix
+NZFILESUFFIX=@NZFILESUFFIX@
+
+#Nz delta-z stepsize
+NZSTEP=@NZSTEP@
+
+#Survey Footprint Mask file
+MASKFILE=@MASKFILE@
+
+#List of m-bias values and errors 
+MBIASVALUES="-0.0128 -0.0104 -0.0114 +0.0072 +0.0061"
+MBIASERRORS="0.02 0.02 0.02 0.02 0.02"
+MBIASCORR=0.99
+
+#Path to Patchwise Catalogues
+PATCHPATH=@PATCHPATH@
+PATCHLIST=@PATCHLIST@
+
+#Path 
+ORIGPATH=$PATH
+
+#Path to python binary folder
+PYTHON2BIN=@PYTHON2BIN@
+PYTHON3BIN=@PYTHON3BIN@
+
+#Define inplace sed command (different on OSX)
+#P_SED_INPLACE='sed -i "" ' #Darwin
+P_SED_INPLACE='sed -i ' #Linux 
+
+#Format of the recal_weight estimation grid 
+FILEBODY=@FILEBODY@
+
+#Root directory for pipeline scripts
+PACKROOT=@PACKROOT@
+
+#Pipeline that you wish to run
+PIPELINE=Fiducial
+
+#ID for various outputs 
+RUNID=@RUNID@
+
+#Survey ID  
+SURVEY=@SURVEY@
+
+#Survey Area in arcmin
+SURVEYAREA=@SURVEYAREA@
+
+#Path to THELI LDAC tools
+THELIPATH=@THELIPATH@
+
+#Limits of the tomographic bins
+TOMOLIMS=@TOMOLIMS@
+
+#Username 
+USER=`whoami`
+
+#Name of the lensing weight variable  
+WEIGHTNAME=@WEIGHTNAME@
+
+#COSEBIs binning format; 'lin' or 'log'
+BINNING='log'
+
+#Theta limits for covariance 
+THETAMINCOV="@THETAMINCOV@"
+THETAMAXCOV="@THETAMAXCOV@"
+NTHETABINCOV="@NTHETABINCOV@"
+
+#Super Sample Covariance Matrix 
+SSCMATRIX=thps_cov_kids1000_apr5_cl_obs_source_matrix.dat
+SSCELLVEC=input_nonGaussian_ell_vec.ascii
+
+#Theta limits for xipm (can be highres for BP/COSEBIs)
+THETAMINXI="@THETAMINXI@"
+THETAMAXXI="@THETAMAXXI@"
+NTHETABINXI="@NTHETABINXI@"
+
+#Number of modes for COSEBIs
+NMAXCOSEBIS=5
+
+#Xi plus/minus limits 
+XIPLUSLIMS="@XIPLUSLIMS@"
+XIMINUSLIMS="@XIMINUSLIMS@"
+
+#Verbose output? 
+VERBOSE=1
+
+#Name of the lensing weight variable  
+WEIGHTNAME=@WEIGHTNAME@
+
