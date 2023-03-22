@@ -1,0 +1,104 @@
+# ----------------------------------------------------------------
+# File Name:           correct_cterm.py
+# Author:              Angus H Wright (awright@astro.rub.de)
+# Author:              Catherine Heymans (heymans@roe.ac.uk)
+# Description:         short python script to apply a c-correction
+# ----------------------------------------------------------------
+import sys
+import ldac
+import numpy as np
+from astropy.io import fits
+from argparse import ArgumentParser
+
+parser = ArgumentParser(description='Take input information and correct c-term')
+parser.add_argument("-i", "--inputfile", dest="inputfile",
+    help="Full Input file name", metavar="inputFile",required=True)
+parser.add_argument("-o", "--outputfile", dest="outputfile",
+    help="Full Output file name", metavar="outputFile",required=True)
+
+args = parser.parse_args()
+    
+# Define the bootstrap error function to calculate the error on the c-terms
+def Bootstrap_Error(nboot, samples, weights):
+	N = len(samples)
+	bt_samples = np.zeros(nboot)		 		# Will store mean of nboot resamples
+	for i in range(nboot):
+		idx = np.random.randint(0,N,N)			# Picks N random indicies with replacement
+		bt_samples[i] = np.sum( weights[idx]*samples[idx] ) / np.sum( weights[idx])
+	return np.std(bt_samples)
+
+# Define the bootstrap error function to calculate the error on the c1^2 + c2^2 terms
+def Bootstrap_Error_csq(nboot, e1, e2, weights):
+    N = len(e1)
+    bt_e1 = np.zeros(nboot)		 		# Will store mean of nboot resamples
+    bt_e2 = np.zeros(nboot)
+    for i in range(nboot):
+        idx = np.random.randint(0,N,N)			# Picks N random indicies with replacement
+        bt_e1[i] = np.sum( weights[idx]*e1[idx] ) / np.sum( weights[idx])
+        bt_e2[i] = np.sum( weights[idx]*e2[idx] ) / np.sum( weights[idx])
+    c1=np.average(bt_e1)
+    c2=np.average(bt_e2)
+    return np.std(bt_e1),np.std(bt_e2), np.std(bt_e1*bt_e1 + bt_e2*bt_e2), np.std((bt_e1-c1)**2 + (bt_e2-c2)**2)
+
+#open the ldac catalogue using functions in ldac.py
+#tests have shown ldac.py is much faster than using astropy
+ldac_cat = ldac.LDACCat(args.inputfile)
+ldac_table = ldac_cat['OBJECTS']
+
+#Ellipticity names 
+e1colname='@E1NAME@'
+e2colname='@E2NAME@'
+#Weight name 
+wtcolname='@WEIGHTNAME@' 
+#PSF Ellipticity names 
+psfe1colname='@PSFE1NAME@'
+psfe2colname='@PSFE2NAME@'
+
+#Select required columns 
+e1=ldac_table[e1colname]
+e2=ldac_table[e2colname]
+weight=ldac_table[wtcolname]
+
+# Lets also pass through the PSF ellipticity for star-gal-xcorr 
+PSF_e1=ldac_table[psfe1colname]
+PSF_e2=ldac_table[psfe2colname]
+
+ra=ldac_table['@RANAME@']
+dec=ldac_table['@DECNAME@']
+
+#carry through the square of the weight for
+#Npair calculation hack with Treecorr
+wsq=weight*weight
+
+#Number of bootstrap realisations for uncertainty
+nboot = @NBOOT@
+
+# weighted mean   
+c1=np.average(e1,weights=w)
+c2=np.average(e2,weights=w)
+
+# Bootstrap error on the mean
+errc1=Bootstrap_Error(nboot, e1, w)
+errc2=Bootstrap_Error(nboot, e2, w)
+
+#Bootstrap error on c1^2 + c2^2
+errc1,errc2, errcsq, errdcsq= Bootstrap_Error_csq(nboot, e1, e2, w) 
+
+print("%5.1f %5.1f %10.3e %10.3e %10.3e %10.3e %10.3e %10.3e"  % (zmin, zmax, c1, errc1, c2, errc2, errcsq, errdcsq))
+
+#Apply correction
+e1_corr = e1 - c1
+e2_corr = e2 - c2
+
+#Write out to output file - crucial that RA/DEC (in degrees) are double precision
+#If you don't have that you round to a couple of arcsec for fields with ra > 100
+hdulist = fits.BinTableHDU.from_columns(
+    [fits.Column(name='@RANAME@', format='1D', unit='deg',array=ra),
+     fits.Column(name='@DECNAME@', format='1D', unit='deg',array=dec),
+     fits.Column(name='@E1NAME@', format='1E', array=e1_corr),
+     fits.Column(name='@E2NAME@', format='1E', array=e2_corr),
+     fits.Column(name='@PSFE1NAME@', format='1E', array=PSF_e1),
+     fits.Column(name='@PSFE2NAME@', format='1E', array=PSF_e2),
+     fits.Column(name='@WEIGHTNAME@', format='1E', array=w),
+     fits.Column(name='@WEIGHTNAME@_sq', format='1E', array=wsq)])
+hdulist.writeto(args.outputfile, overwrite=True)

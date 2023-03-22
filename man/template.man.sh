@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then 
-    echo -e "${BLU}=====================================================${DEF}"
-    echo -e "${BLU}== ${RED} Cosmology Pipeline Template Manual File ${BLU} ==${DEF}"
-    echo -e "${BLU}=====================================================${DEF}"
+    _message "${BLU}=====================================================${DEF}\n"
+    _message "${BLU}== ${RED} Cosmology Pipeline Template Manual File ${BLU} ==${DEF}\n"
+    _message "${BLU}=====================================================${DEF}\n"
   fi 
 }
 #}}}
@@ -20,7 +20,7 @@ function _description {
   echo "# A short description of what the mode does."
   echo "#"
   echo "# Function takes input data:"
-  echo "# `_inp_dat`"
+  echo "# `_inp_data`"
   echo "#"
 }
 #}}}
@@ -29,11 +29,11 @@ function _description {
 _abort()
 {
   #Message to print when script aborts 
-  echo -e "${RED} - !FAILED!" >&2
+  _message "${RED} - !FAILED!\n"
   #$0 is the script that was running when this error occurred
-  echo -e "${BLU} An error occured while running $0." >&2
-  echo -e "${DEF} Check the relevant logging file for this step." >&2
-  echo >&2
+  _message "${BLU} An error occured while running $0.\n"
+  _message "${DEF} Check the relevant logging file for this step.\n\n"
+  trap : 0
   exit 1
 }
 trap '_abort' 0

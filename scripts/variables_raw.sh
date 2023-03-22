@@ -12,22 +12,28 @@
 
 #Paths and variables for configuration
 
+#Machine type 
+MACHINE=Linux_64
+
 #Root directory for running pipeline
 RUNROOT=@RUNROOT@
 
-#Directory for runtime scripts 
+#Directory for runtime scripts (relative to RUNROOT)
 RUNTIME=@RUNTIME@
 
-#Path to pipeline config files 
+#Path to pipeline config files (relative to RUNTIME)
 CONFIGPATH=@CONFIGPATH@
 
-#Path for modified scripts
+#Path for modified scripts (relative to RUNTIME)
 SCRIPTPATH=@SCRIPTPATH@
 
-#Path for manual files 
+#Path for logfiles (relative to RUNTIME)
+LOGPATH=@LOGPATH@
+
+#Path for manual files (relative to RUNTIME)
 MANUALPATH=@MANUALPATH@
 
-#Path for outputs
+#Path for outputs (relative to RUNROOT)
 STORAGEPATH=@STORAGEPATH@
 
 #Designation for "all patches"
@@ -46,6 +52,9 @@ DEF='\033[0m'    #Default
 
 #Date
 DATE="`date`"
+
+#Datablock directory
+DATABLOCK=CosmoPipe_DataBlock
 
 #Prior values for the gaussian dz's (per tomo bin)
 DZPRIORMU="@DZPRIORMU@"
@@ -105,6 +114,9 @@ PATCHLIST=@PATCHLIST@
 #Path 
 ORIGPATH=$PATH
 
+#Path to Rscript binary 
+P_RSCRIPT=@P_RSCRIPT@
+
 #Path to python binary folder
 PYTHON2BIN=@PYTHON2BIN@
 PYTHON3BIN=@PYTHON3BIN@
@@ -120,10 +132,13 @@ FILEBODY=@FILEBODY@
 PACKROOT=@PACKROOT@
 
 #Pipeline that you wish to run
-PIPELINE=Fiducial
+PIPELINE=@PIPELINE@
 
 #ID for various outputs 
 RUNID=@RUNID@
+
+#Spectroscopic catalogue for SOM Nz Calibration 
+SPECZCAT=@SPECZCAT@
 
 #Survey ID  
 SURVEY=@SURVEY@

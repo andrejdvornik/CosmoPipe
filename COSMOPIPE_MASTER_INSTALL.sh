@@ -44,7 +44,7 @@ do
     exit 1
   fi 
   #Assign the variable 
-  declare $name=$value
+  declare $name="$value"
   #shift to the next option 
   shift; shift; 
 done
@@ -66,6 +66,70 @@ fi
 _message "   >${RED} Creating Initial Directory structure ${DEF}"
 mkdir -p ${RUNROOT}/INSTALL 
 cd ${RUNROOT}/INSTALL
+_message "${BLU} - Done! ${DEF}\n"
+#}}}
+
+#Run Conda installation {{{
+_message "   >${RED} Installing Conda tools ${DEF}"
+#If there is no conda installation, exit 
+if [ "`which conda`" == "" ] 
+then 
+  _message " - ${RED} ERROR!\n\n"
+  _message "There is no conda installation in the PATH. Install conda using the below commands:${DEF}\n"
+  if [ "`uname`" == "Darwin" ]
+  then 
+    _message "wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-MacOSX-x86_64.sh\n"
+    _message "bash Miniconda3-py38_4.10.3-MacOSX-x86_64.sh\n" 
+    _message "${RED}and then activate the installation with by sourcing your .bashrc:${DEF}\nsource ~/.bashrc\n" 
+  else 
+    _message "wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh\n"
+    _message "bash Miniconda3-py38_4.10.3-Linux-x86_64.sh\n"
+    _message "${RED}and then activate the installation with by sourcing your .bashrc:${DEF}\nsource ~/.bashrc\n" 
+  fi 
+  exit 1 
+fi 
+
+#Copy the environment & requirements files to the INSTALL directory
+cp ${PACKROOT}/environment.yml ${PACKROOT}/requirements.txt .
+#Install Conda
+conda env create --file environment.yml > conda_install_output.log 2>&1
+_message "${BLU} - Done! ${DEF}\n"
+#}}}
+
+#Install requisite R Packages {{{
+_message "   >${RED} Installing R Packages ${DEF}"
+conda run -n cosmopipe ${P_RSCRIPT} ${PACKROOT}/INSTALL_Rpack.R > R_install_output.log 2>&1
+_message "${BLU} - Done! ${DEF}\n"
+#}}}
+
+#Clone the SOM_DIR repository {{{
+_message "   >${RED} Cloning SOM_DIR Git repository${DEF}"
+#Clone the repository
+if [ -d ${RUNROOT}/INSTALL/SOM_DIR ] 
+then 
+  rm -fr SOM_DIR
+fi
+git clone https://github.com/AngusWright/SOM_DIR.git >> gitclone_output.log 2>&1
+_message "${BLU} - Done! ${DEF}\n"
+#}}}
+
+#Install THELI LDAC tools {{{
+_message "   >${RED} Installing THELI LDAC tools${DEF}"
+if [ -f ${RUNROOT}/../INSTALL/theli-1.6.1.tgz ]
+then 
+  ln -s ${RUNROOT}/../INSTALL/theli-1.6.1.tgz .
+else 
+  wget https://marvinweb.astro.uni-bonn.de/data_products/theli/theli-1.6.1.tgz > ${RUNROOT}/INSTALL/THELI_wget.log 2>&1
+fi 
+tar -xf theli-1.6.1.tgz >> THELI_install.log 2>&1
+rm -f theli-1.6.1.tgz  >> THELI_install.log 2>&1
+cd theli-1.6.1/pipesetup
+#Test if there is an existing pipe_env file, from a previous installation
+if [ -f pipe_env.bash.${MACHINE} ] 
+then 
+  rm -f pipe_env.bash.${MACHINE}
+fi 
+bash install.sh -m ALL >> THELI_install.log 2>&1
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
 
@@ -348,7 +412,7 @@ cp ${PACKROOT}/scripts/variables_raw.sh ${RUNROOT}/variables.sh
 cp ${PACKROOT}/config/pipeline.ini ${RUNROOT}/pipeline.ini 
 for OPT in $OPTLIST
 do 
-    ${P_SED_INPLACE} "s#\@${OPT}\@#${!OPT}#g" ${RUNROOT}/configure.sh ${RUNROOT}/variables.sh
+  ${P_SED_INPLACE} "s#\\@${OPT}\\@#${!OPT}#g" ${RUNROOT}/configure.sh ${RUNROOT}/variables.sh
 done 
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
