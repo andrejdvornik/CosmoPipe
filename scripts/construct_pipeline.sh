@@ -59,7 +59,7 @@ do
   #Strip out the version number 
   step=${step%=*}
   #If the step is not a HEAD change
-  if [ "${step:0:1}" != "@" ] && [ "${step:0:1}" != "!" ]
+  if [ "${step:0:1}" != "@" ] && [ "${step:0:1}" != "!" ] && [ "${step:0:1}" != "%" ]
   then 
     #If the step has no script 
     if [ ! -f @RUNROOT@/@SCRIPTPATH@/${step}.sh ] 
@@ -130,6 +130,14 @@ do
   then 
     #Modify the datablock with the current HEAD {{{
 		_write_datablock ${step:1} "`_read_datahead`"
+    #}}}
+  elif [ "${step:0:1}" == "%" ]
+  then 
+    #Modify the datablock with the current HEAD {{{
+    names=${step:1}
+    oldname=${names%%-*}
+    newname=${names##*-}
+		_rename_blockitem "${oldname}" "${newname}" TEST
     #}}}
   else 
     #Check for the manual file  {{{
@@ -248,6 +256,25 @@ do
 		_add_head_to_block ${step:1} 
     #Notify
 		_message "} - @RED@Done!\n"
+		#}}}
+
+		EOF
+    #}}}
+  elif [ "${step:0:1}" == "%" ]
+  then 
+    names=${step:1}
+    oldname=${names%%-*}
+    newname=${names##*-}
+    #If this is a datablock assignment: {{{
+    cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
+		
+		#Intermediate Step: rename block item ${oldname} to ${newname} {{{
+		#Notify
+		_message "@BLU@Renaming block item ${oldname} to ${newname}@DEF@"
+		#Rename block item
+		_rename_blockitem "${oldname}" "${newname}"
+    #Notify
+		_message " - @RED@Done!\n"
 		#}}}
 
 		EOF

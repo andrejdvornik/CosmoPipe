@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo DB:DATAHEAD PYTHON3BIN RUNROOT SCRIPTPATH
+  echo PYTHON3BIN RUNROOT SCRIPTPATH
 } 
 #}}}
 

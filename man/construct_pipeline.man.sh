@@ -55,10 +55,6 @@ function _outputs {
 function _read_pipe { 
   #Pipeline file location 
   _PIPELOC=${RUNROOT}/pipeline.ini
-  ##If there is a numbering suffix, remove it from the step name 
-  #_step=${1%%=*}
-  ##If there is a numbering suffix, store it and add a decimal (for substeps)
-  #_stepnum=${1##*=}
   #Step & step number 
   _step=${1}
   _stepnum=''
@@ -84,19 +80,46 @@ function _read_pipe {
     exit 1
   fi
   #Create the steps with numbering 
-  grep -v "^#" ${_PIPELOC} | grep --ignore-case "${1}:" | awk -F: '{print $2}' | \
-    awk -v S=${_stepnum} '{
-      count=0 
-      for(i=1; i<=NF; i++) 
-        if (substr($i,1,1) == "@" || substr($i,1,1) == "!") {
-          #Step has no number 
-          print $i "=_" 
+  grep -v "^#" ${_PIPELOC} | awk -v S='' -v pipe="${_step}:" -v seen="F" -v count=0 '{
+    if ($1 == "" ) next
+      if ($1 != pipe && seen == "F") {
+        next
+      } else if ($1 == pipe) {
+      seen="T"
+    }
+    #If we arrive at the next block, break
+    if (substr($1,length($1),1) == ":" && $1 != pipe) {
+      seen="F"
+      next
+    }
+    for(i=1; i<=NF; i++) {
+      if (i!=1 || substr($i,length($i),1)!=":") {
+        if (substr($i,1,1) == "@" || substr($i,1,1) == "!" || substr($i,1,1) == "%" ) {
+          #Step has no number
+          print $i "=_"
+        } else if (substr($i,1,1) == "#") {
+          next
         } else {
           #Add (sub)step number
           count+=1
           print $i "=" S count
         }
-      }' | xargs echo 
+      }
+    }
+  }' | xargs echo
+  #grep -v "^#" ${_PIPELOC} | grep --ignore-case "${1}:" | awk -F: '{print $2}' | \
+  #  awk -v S=${_stepnum} '{
+  #    count=0 
+  #    for(i=1; i<=NF; i++) 
+  #      if (substr($i,1,1) == "@" || substr($i,1,1) == "!") {
+  #        #Step has no number 
+  #        print $i "=_" 
+  #      } else {
+  #        #Add (sub)step number
+  #        count+=1
+  #        print $i "=" S count
+  #      }
+  #    }' | xargs echo 
 } 
 #}}}
 

@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo DATABLOCK DB:specz_calib_cats NZFILESUFFIX P_RSCRIPT RUNROOT SCRIPTPATH STORAGEPATH
+  echo DATABLOCK NZFILESUFFIX P_RSCRIPT RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 

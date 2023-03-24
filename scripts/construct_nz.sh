@@ -3,9 +3,15 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 22-03-2023
-# Last Modified : Wed 22 Mar 2023 05:50:16 PM CET
+# Last Modified : Wed 22 Mar 2023 06:34:53 PM CET
 #
 #=========================================
+
+#Construct the nz folder, if needed 
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz ]
+then 
+  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz
+fi 
 
 #For each of the specz_calib_cats files: 
 outlist=""

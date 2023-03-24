@@ -44,7 +44,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU DB:DATAHEAD DEF P_RSCRIPT RUNROOT SCRIPTPATH
+  echo BLU DEF P_RSCRIPT RUNROOT SCRIPTPATH
 } 
 #}}}
 

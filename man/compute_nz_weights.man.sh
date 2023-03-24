@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU DATABLOCK DB:main_tomo DB:specz_adapt_tomo DEF NTHREADS P_RSCRIPT RED RUNROOT STORAGEPATH WEIGHTNAME ZPHOTNAME ZSPECNAME
+  echo BLU DATABLOCK DEF NTHREADS P_RSCRIPT RED RUNROOT STORAGEPATH WEIGHTNAME ZPHOTNAME ZSPECNAME
 } 
 #}}}
 
@@ -57,7 +57,7 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo main_calib_cats specz_calib_cats NzHCoptim
+  echo main_calib_cats specz_calib_cats nz_hc_optim
 } 
 #}}}
 

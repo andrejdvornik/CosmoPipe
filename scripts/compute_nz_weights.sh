@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Wed 22 Mar 2023 04:35:40 PM CET
+# Last Modified : Thu 23 Mar 2023 11:18:39 AM CET
 #
 #=========================================
 
@@ -22,7 +22,7 @@ done
   -r @DB:main_all_tomo@ \
   -t @DB:specz_adapt_tomo@ \
   -ct "" -cr @WEIGHTNAME@ \
-  --old.som @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som/CosmoPipeSOM.Rdata \
+  --old.som @DB:som@ \
   --factor.nbins Inf --optimise --force \
   -sc @NTHREADS@ \
   --short.write \
@@ -57,22 +57,42 @@ fi
 mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/specz_calib_cats/*_refr_DIRsom* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_calib_cats/
 
 #Make the directory for the Optimisation Properties 
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/NzHCoptim/ ]
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_hc_optim/ ]
 then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/NzHCoptim/
+  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_hc_optim/
 fi 
-#Move the main catalogues 
-mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/specz_calib_cats/*_HCoptim* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/NzHCoptim/
+#Move the HCoptim catalogues 
+mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/specz_calib_cats/*_HCoptim* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_hc_optim/
+
 
 #Notify
 _message "@BLU@ } @RED@ - Done!@DEF@\n"
 
 #Add the new main files to the datablock 
-calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_calib_cats/*_refr_DIRsom*`
-_write_datablock main_calib_cats "${calibcats}"
+calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_calib_cats/*_refr_DIRsom.fits `
+filenames=''
+for file in $calibcats
+do 
+  filenames="$filenames ${file##*/}"
+done
+_write_datablock main_calib_cats "${filenames}"
 
 #Add the new specz files to the datablock 
-calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/specz_calib_cats/*_DIRsom*`
-_write_datablock specz_calib_cats "${calibcats}"
+calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/specz_calib_cats/*_DIRsom.fits`
+filenames=''
+for file in $calibcats
+do 
+  filenames="$filenames ${file##*/}"
+done
+_write_datablock specz_calib_cats "${filenames}"
+
+#Add the new hcoptim files to the datablock 
+calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_hc_optim/*_HCoptim* `
+filenames=''
+for file in $calibcats
+do 
+  filenames="$filenames ${file##*/}"
+done
+_write_datablock nz_hc_optim "${filenames}"
 
 

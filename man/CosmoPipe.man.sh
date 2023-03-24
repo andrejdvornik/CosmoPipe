@@ -191,6 +191,65 @@ function _write_datablock {
 }
 #}}}
 
+#Rename a datablock element {{{
+function _rename_blockitem { 
+  _head=`_read_datahead`
+  #Get the files in this data
+  _block=`_read_datablock`
+  _seen=0
+  for _file in ${_block} 
+  do 
+    #If the item isn't what we want to add/write
+    if [ "${_file%%=*}" == "${1%%=*}" ]
+    then 
+      _seen=1
+    fi 
+  done 
+  if [ "${_seen}" != 1 ]
+  then 
+    _message "@RED@ - ERROR! The requested data block to rename (${1}) does not exist in the data block!"
+    exit 1 
+  fi 
+  #Update the datablock txt file: HEAD
+  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  #Add HEAD items to file 
+  for _file in ${_head} 
+  do 
+    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  done 
+  #Update the BLOCK items 
+  echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  #For each block row:
+  for _file in ${_block} 
+  do 
+    #If the item isn't what we want to add/write
+    if [ "${_file%%=*}" == "${1%%=*}" ]
+    then 
+      #Write it the item with a new name 
+      _fileend=${_file##*=}
+      echo "${2%%=*}=${_fileend}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    else 
+      #Write it 
+      _file=`echo $_file`
+      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    fi
+  done
+  if [ "$3" == "" ]
+  then 
+    if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} ]
+    then 
+      if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*} ] 
+      then 
+        mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}
+      else 
+        mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}/* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}
+        rmdir  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}
+      fi 
+    fi 
+  fi 
+}
+#}}}
+
 #Read the datahead {{{
 function _read_datahead { 
   #Read the data head entries 
@@ -222,7 +281,7 @@ function _add_datahead {
   if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/ ] 
   then 
     _message "@RED@ - ERROR! The requested data block component ${1} does not have a folder in the data block?!"
-    exit -1 
+    exit 1 
   fi 
   #remove the existing data in the datahead
   if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD ]
@@ -235,7 +294,9 @@ function _add_datahead {
   #Copy the requested data to the datahead, if the directory contains anything  
   if [ "$(ls -A @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1})" ] 
   then 
+    _message " @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD"
     rsync -autv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/datahead_write.log
+    _message "@BLU@ - @RED@Done!@DEF@\n"
   fi 
   #Get the files in this data
   _files=`_read_datablock ${1}`
@@ -296,6 +357,20 @@ function _write_datahead {
   _block=`_read_datablock`
   #Current head 
   _head=`_read_datahead`
+  #Check if the requested item exists in the datablock
+  _found=0
+  for _file in ${_block} 
+  do 
+    if [ "${_file%%=*}" == "${1}" ]
+    then 
+      _found=1
+    fi 
+  done
+  if [ "${_found}" != "1" ]
+  then 
+    _message "@RED@ - ERROR! The requested data block component ${1} does not have a folder in the data block?!"
+    exit 1 
+  fi 
   #Update the datablock txt file 
   echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   for _file in ${_head} 
@@ -309,7 +384,6 @@ function _write_datahead {
   echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   for _file in ${_block} 
   do 
-    #_file=`echo ${_file}`
     echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   done
 }

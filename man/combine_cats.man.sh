@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo DB:DATAHEAD DB:DATAHEAD* MACHINE RUNROOT
+  echo MACHINE RUNROOT
 } 
 #}}}
 
