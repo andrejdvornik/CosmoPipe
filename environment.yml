@@ -1,0 +1,41 @@
+name: cosmopipe
+
+channels:
+  - conda-forge
+
+dependencies:
+  - gcc
+  - gxx
+  - openmp 
+  - mpich-mpicc 
+  - mpi4py 
+  - mpi
+  - liblapack
+  - curl
+  - pyyaml
+  - future 
+  - r=4.1
+  - r-remotes
+  - python=3.8
+  - pip>=20.0
+  - cosmosis
+  - camb
+  - cosmosis-build-standard-library
+  - openlibm
+  - pip:
+    - astropy
+    - numpy<1.24
+    - tabeval @ git+https://github.com/jlvdb/tabeval.git
+    - scipy 
+    - cython 
+    - matplotlib 
+    - palettable 
+    - fitsio==1.1.1 
+    - pytest-runner 
+    - d2to1 
+    - stsci.distutils 
+    - pyfits 
+    - emcee 
+    - treecorr==4.2.3
+    - pycamb
+
