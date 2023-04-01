@@ -50,55 +50,36 @@ e1colname='@E1NAME@'
 e2colname='@E2NAME@'
 #Weight name 
 wtcolname='@WEIGHTNAME@' 
-#PSF Ellipticity names 
-psfe1colname='@PSFE1NAME@'
-psfe2colname='@PSFE2NAME@'
+#Number of bootstrap realisations for uncertainty
+nboot=@NBOOT@
+
 
 #Select required columns 
 e1=ldac_table[e1colname]
 e2=ldac_table[e2colname]
 weight=ldac_table[wtcolname]
 
-# Lets also pass through the PSF ellipticity for star-gal-xcorr 
-PSF_e1=ldac_table[psfe1colname]
-PSF_e2=ldac_table[psfe2colname]
-
-ra=ldac_table['@RANAME@']
-dec=ldac_table['@DECNAME@']
-
-#carry through the square of the weight for
-#Npair calculation hack with Treecorr
-wsq=weight*weight
-
-#Number of bootstrap realisations for uncertainty
-nboot = @NBOOT@
-
 # weighted mean   
-c1=np.average(e1,weights=w)
-c2=np.average(e2,weights=w)
+c1=np.average(e1,weights=weight)
+c2=np.average(e2,weights=weight)
 
-# Bootstrap error on the mean
-errc1=Bootstrap_Error(nboot, e1, w)
-errc2=Bootstrap_Error(nboot, e2, w)
+## Bootstrap error on the mean
+#errc1=Bootstrap_Error(nboot, e1, weight)
+#errc2=Bootstrap_Error(nboot, e2, weight)
 
 #Bootstrap error on c1^2 + c2^2
-errc1,errc2, errcsq, errdcsq= Bootstrap_Error_csq(nboot, e1, e2, w) 
+errc1,errc2, errcsq, errdcsq= Bootstrap_Error_csq(nboot, e1, e2, weight) 
 
-print("%5.1f %5.1f %10.3e %10.3e %10.3e %10.3e %10.3e %10.3e"  % (zmin, zmax, c1, errc1, c2, errc2, errcsq, errdcsq))
+print("c1 errc1 c2 errc2 errcsq errdcsq")
+print("%10.3e %10.3e %10.3e %10.3e %10.3e %10.3e"  % (c1, errc1, c2, errc2, errcsq, errdcsq))
 
 #Apply correction
 e1_corr = e1 - c1
 e2_corr = e2 - c2
 
-#Write out to output file - crucial that RA/DEC (in degrees) are double precision
-#If you don't have that you round to a couple of arcsec for fields with ra > 100
-hdulist = fits.BinTableHDU.from_columns(
-    [fits.Column(name='@RANAME@', format='1D', unit='deg',array=ra),
-     fits.Column(name='@DECNAME@', format='1D', unit='deg',array=dec),
-     fits.Column(name='@E1NAME@', format='1E', array=e1_corr),
-     fits.Column(name='@E2NAME@', format='1E', array=e2_corr),
-     fits.Column(name='@PSFE1NAME@', format='1E', array=PSF_e1),
-     fits.Column(name='@PSFE2NAME@', format='1E', array=PSF_e2),
-     fits.Column(name='@WEIGHTNAME@', format='1E', array=w),
-     fits.Column(name='@WEIGHTNAME@_sq', format='1E', array=wsq)])
-hdulist.writeto(args.outputfile, overwrite=True)
+#Save the output to ldac columns 
+ldac_table[e1colname]=e1_corr
+ldac_table[e2colname]=e2_corr
+
+#Write out the ldac file 
+ldac_table.saveas(args.outputfile,clobber=False)

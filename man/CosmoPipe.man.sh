@@ -105,7 +105,8 @@ function _get_optlist {
 #Number of tomographic bins {{{
 function _ntomo { 
   #Number of Tomographic bins specified
-  echo '@TOMOLIMS@' | awk '{print NF-1}'
+  _tomo=`_read_datablock ntomo`
+  echo `_blockentry_to_filelist ${_tomo}`
 }
 #}}}
 
@@ -123,6 +124,7 @@ function _initialise_datablock {
     #Initialise the datablock txt file 
     echo "HEAD: " > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
     echo "BLOCK: " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    _write_datablock "ntomo" `echo @TOMOLIMS@ | awk '{print NF-1}'` 
   fi 
 }
 #}}}
@@ -156,6 +158,9 @@ function _read_datablock {
       _outblock="${_outblock} ${item}"
     fi 
   done < @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  #_message "#${_outblock}#"
+  _outblock=`echo ${_outblock} | sed 's/ /\n/g' | sort | uniq | xargs echo`
+  #_message "#${_outblock}#"
   echo ${_outblock}
 }
 #}}}
@@ -269,6 +274,9 @@ function _read_datahead {
     #Add the contents to the output block 
     _outhead="${_outhead} ${item} ${contents}"
   done < @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  #_message "#${_outhead}#"
+  _outhead=`echo ${_outhead} | sed 's/ /\n/g' | sort | uniq | xargs echo`
+  #_message "#${_outhead}#"
   echo ${_outhead}
 }
 #}}}
@@ -300,10 +308,7 @@ function _add_datahead {
   fi 
   #Get the files in this data
   _files=`_read_datablock ${1}`
-  _files=${_files##*=}
-  _files=${_files//\}/}
-  _files=${_files//\{/}
-  _files=${_files//,/ }
+  _files=`_blockentry_to_filelist ${_files}`
   #Update the datablock txt file 
   echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   for _file in ${_files} 
@@ -330,10 +335,10 @@ function _replace_datahead {
   for _file in ${_head} 
   do 
     #If this is the file we want to update 
-    if [ "${_file}" == "${1}" ] 
+    if [ "${_file}" == "${1##*/}" ] 
     then 
       #Replace this file in the datahead
-      echo "${2}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+      echo "${2##*/}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
       #Remove the old file 
       rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${_file}
     else 
@@ -444,7 +449,7 @@ function _add_head_to_block {
 function _inblock { 
   #Item to check 
   _data=$1
-  if [ "${_data}" == "DATAHEAD" ]
+  if [ "${_data}" == "DATAHEAD" ] || [ "${_data}" == "ALLHEAD" ]
   then 
     #Current datahead
     _head=`_read_datahead`
@@ -483,21 +488,31 @@ function _uses_datahead {
 }
 #}}}
 
+#Convert a block entry into a filelist
+function _blockentry_to_filelist { 
+  _term=${1##*=}
+  _term=${_term//\{/}
+  _term=${_term//\}/}
+  _term=${_term//,/ }
+  echo ${_term}
+}
+
 # incorporate the current datablock/head into a script {{{ 
 function _incorporate_datablock { 
   #Read the current datahead
   _head=`_read_datahead`
   #Read the current datablock 
   _block=`_read_datablock`
+  ext=${1##*.}
   #If needed, back up the original file 
-  if [ ! -f ${1//.sh/_noblock.sh} ]
+  if [ ! -f ${1//.${ext}/_noblock.${ext}} ]
   then 
-    cp ${1} ${1//.sh/_noblock.sh}
+    cp ${1} ${1//.${ext}/_noblock.${ext}}
   fi 
 
   #Reset the file to the pre-block state 
   #(for cases where someone runs the pipeline twice in a row)
-  cp ${1//.sh/_noblock.sh} ${1//.sh/_prehead.sh}
+  cp ${1//.${ext}/_noblock.${ext}} ${1//.${ext}/_prehead.${ext}}
 
   #Update the script to include the datablock {{{
   for item in ${_block}
@@ -513,25 +528,46 @@ function _incorporate_datablock {
     _itemlist=''
     for _file in ${item}
     do 
-      #Add full file paths 
-      _itemfile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${base}/${_file#*=}
-      _itemlist="${_itemlist} ${_itemfile}"
+      if [ "$base" == "ntomo" ] 
+      then 
+        #Return ntomo directly 
+        _itemlist=" ${_file#*=}"
+      else 
+        #Add full file paths 
+        _itemfile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${base}/${_file#*=}
+        _itemlist="${_itemlist} ${_itemfile}"
+      fi 
     done 
     #_itemlist=`echo ${_itemlist}`
-    @P_SED_INPLACE@ "s#\\@DB:${item%%=*}\\@#${_itemlist:1}#g" ${1//.sh/_prehead.sh}
+    @P_SED_INPLACE@ "s#\\@DB:${item%%=*}\\@#${_itemlist:1}#g" ${1//.${ext}/_prehead.${ext}}
   done 
   #}}}
 
-  #Insert the startup code {{{
-  cat > ${1} <<- EOF
-	
-	#Source the Script Documentation Functions {{{
-	source @RUNROOT@/@MANUALPATH@/CosmoPipe.man.sh
-	_initialise
-	#}}}
-	
-	EOF
+  #If we do not have a CosmoSIS file {{{
+  if [ "${ext}" != "ini" ] 
+  then 
+    #Insert the startup code {{{
+    cat > ${1} <<- EOF
+		
+		#Source the Script Documentation Functions {{{
+		source @RUNROOT@/@MANUALPATH@/CosmoPipe.man.sh
+		_initialise
+		#}}}
+		
+		EOF
+    #}}}
+  fi
   #}}}
+
+  ##Check that we have valid DATAHEAD use {{{
+  #if [ "${ext}" != "ini" ] && [ "$2" == "USES_DATAHEAD" ]
+  #then 
+  #  _message "- @RED@ERROR\n"
+  #  _message "Cannot use datahead with cosmosis input files\n"
+  #  _message "@DEF -->$1\n"
+  #  exit 1
+  #fi 
+  ##}}}
 
   #Generate main code block:  
   #Does the code work on DATAHEAD?
@@ -543,7 +579,7 @@ function _incorporate_datablock {
     do 
       echo '# ----' >> ${1}
       _itemfile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${item/=/\/}
-      sed "s#\\@DB:DATAHEAD\\@#${_itemfile}#g" ${1//.sh/_prehead.sh} >> ${1}
+      sed "s#\\@DB:DATAHEAD\\@#${_itemfile}#g" ${1//.${ext}/_prehead.${ext}} >> ${1}
       echo '# ----' >> ${1}
     done 
     #}}}
@@ -554,26 +590,32 @@ function _incorporate_datablock {
     for item in ${_head} 
     do 
       _itemfile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${item/=/\/}
-      _itemlist="${_itemlist} ${itemfile}"
+      _itemlist="${_itemlist} ${_itemfile}"
     done 
     #_itemlist=`echo ${_itemlist}`
-    sed "s#\\@DB:ALLHEAD\\@#${_itemlist}#g" ${1//.sh/_prehead.sh} >> ${1}
+    sed "s#\\@DB:ALLHEAD\\@#${_itemlist}#g" ${1//.${ext}/_prehead.${ext}} >> ${1}
     #}}}
   else 
     #The code doesn't work on DATAHEAD, so just run it: {{{
-    cat ${1//.sh/_prehead.sh} >> ${1}
+    cat ${1//.${ext}/_prehead.${ext}} >> ${1}
     #}}}
   fi 
 
-  #Insert the finalisation code {{{
-  cat >> ${1} <<- EOF
-	
-	#Finalise {{{
-	_finalise
-	#}}}
-	
-	EOF
+  #If we do not have a CosmoSIS file {{{
+  if [ "${ext}" != "ini" ] 
+  then 
+    #Insert the finalisation code {{{
+    cat >> ${1} <<- EOF
+		
+		#Finalise {{{
+		_finalise
+		#}}}
+		
+		EOF
+    #}}}
+  fi
   #}}}
+
 }
 #}}}
 

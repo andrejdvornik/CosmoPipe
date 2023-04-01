@@ -169,7 +169,7 @@ rm $wd/*_$$
 #       `echo echo @STORAGEPATH@/@SURVEY@_${PATCHLISTMAT}_c12_treecorr.out | bash` #ensures correct file order
 ##}}}
 #
-### Estimate corrrelation functions ###
+### Estimate corrrelation functions ### {{{
 echo "Estimating Correlation Functions:"
 for patch in @ALLPATCH@ @PATCHLIST@
 do
@@ -212,6 +212,7 @@ do
 	done
   echo "  }"
 done
+#}}}
 
 ### Combine patches ###
 for ZBIN1 in `seq @NTOMOBINS@`

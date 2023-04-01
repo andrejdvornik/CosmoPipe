@@ -71,7 +71,7 @@ _message "${BLU} - Done! ${DEF}\n"
 
 #Run Conda installation {{{
 _message "   >${RED} Installing Conda tools ${DEF}"
-#If there is no conda installation, exit 
+#If there is no conda installation, exit {{{
 if [ "`which conda`" == "" ] 
 then 
   _message " - ${RED} ERROR!\n\n"
@@ -88,11 +88,18 @@ then
   fi 
   exit 1 
 fi 
+#}}}
 
 #Copy the environment & requirements files to the INSTALL directory
 cp ${PACKROOT}/environment.yml ${PACKROOT}/requirements.txt .
 #Install Conda
 conda env create --file environment.yml > conda_install_output.log 2>&1
+_message "${BLU} - Done! ${DEF}\n"
+#}}}
+
+#Install cosmosis-standard-library {{{
+_message "   >${RED} Installing cosmosis-standard-library ${DEF}"
+conda run -n cosmopipe cosmosis-build-standard-library > CSL_install_output.log 2>&1
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
 

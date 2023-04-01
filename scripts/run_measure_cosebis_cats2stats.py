@@ -25,13 +25,13 @@ parser = ArgumentParser(description='Take input 2pcfs files and calculate COSEBI
 parser.add_argument("-i", "--inputfile", dest="inputfile",
     help="Full Input file name", metavar="inputFile",required=True)
 
-parser.add_argument('-t','--theta_col', dest="theta_col", type=int,default=0, nargs='?',
+parser.add_argument('-t','--theta_col', dest="theta_col", type=str,nargs='?',required=True,
          help='column for theta, default is 0')
 
-parser.add_argument('-p','--xip_col', dest="xip_col", type=int,default=1, nargs='?',
+parser.add_argument('-p','--xip_col', dest="xip_col", type=str,nargs='?',required=True,
          help='column for xi_plus, default is 1')
 
-parser.add_argument('-m','--xim_col', dest="xim_col", type=int,default=2, nargs='?',
+parser.add_argument('-m','--xim_col', dest="xim_col", type=str, nargs='?',required=True,
          help='column for xi_minus, default is 2')
 
 
@@ -88,10 +88,15 @@ print('input file is '+inputfile+', making COSEBIs for '+str(nModes)+' modes and
 
 # Load the input 2pt correlation function data
 file=open(inputfile)
+header=file.readline().split(" ")
 xipm_in=np.loadtxt(file,comments='#')
-theta=xipm_in[:,theta_col]
-xip=xipm_in[:,xip_col]
-xim=xipm_in[:,xim_col]
+xipm_data={}
+for i, col in enumerate(header):
+    xipm_data[col]=xipm_in[:,i]
+
+theta=xipm_data[theta_col]
+xip=xipm_data[xip_col]
+xim=xipm_data[xim_col]
 
 # Conversion from xi_pm to COSEBIS depends on linear or log binning in the 2pt output
 # Check that the data exactly spans the theta_min -theta_max range that has been defined
@@ -110,8 +115,9 @@ if(binning=='log'):
     #If asked to check, check if the mid points are close enough
     if(DontCheckBinEdges==False):
         if((abs(theta_mid/theta[good_args]-1)>(delta_theta/10.)).all()):
-            print("The input thetas of the 2pt correlation function data must exactly span the user defined theta_min/max.   This data is incompatible, exiting now ...")
-            exit()
+            print(theta_mid)
+            print(theta[good_args])
+            raise ValueError("The input thetas of the 2pt correlation function data must exactly span the user defined theta_min/max.   This data is incompatible, exiting now ...")
 #
 elif(binning=='lin'):
     good_args=np.squeeze(np.argwhere((theta>thetamin) & (theta<thetamax)))
@@ -122,18 +128,15 @@ elif(binning=='lin'):
     delta_theta[-1]=(theta[1]-theta[0])/2.
     theta_mid=np.linspace(thetamin+delta_theta[0],thetamax-delta_theta[-1],nbins_within_range)
 else:
-    print('Please choose either lin or log with the --binning option, exiting now ...')
-    exit()
+    raise ValueError('Please choose either lin or log with the --binning option, exiting now ...')
 
 #Lets check that the user has provided enough bins
 if(binning=='log'):
     if(nbins_within_range<100):
-        print("The low number of bins in the input 2pt correlation function data will result in low accuracy.  Provide finer log binned data with bins>100, exiting now ...")
-        exit()
+        raise ValueError("The low number of bins in the input 2pt correlation function data will result in low accuracy.  Provide finer log binned data with bins>100, exiting now ...")
 elif(binning=='lin'):
     if(nbins_within_range<1000):
-        print("The low number of bins in the input 2pt correlation function data will result in low accuracy.  Provide finer linear binned data with bins>100, exiting now ...")
-        exit()
+        raise ValueError("The low number of bins in the input 2pt correlation function data will result in low accuracy.  Provide finer linear binned data with bins>100, exiting now ...")
 
 #OK now we can perform the COSEBI integrals
 arcmin=180*60/np.pi

@@ -23,7 +23,7 @@ do
   #Define the string to append to the file names {{{
   ZB_lo_str=`echo $ZB_lo | sed 's/\./p/g'`
   ZB_hi_str=`echo $ZB_hi | sed 's/\./p/g'`
-  appendstr="ZB${ZB_lo_str}t${ZB_hi_str}"
+  appendstr="_ZB${ZB_lo_str}t${ZB_hi_str}"
   #}}}
   #Define the output file name {{{
   outputname=${inputfile//.${extn}/${appendstr}.${extn}}

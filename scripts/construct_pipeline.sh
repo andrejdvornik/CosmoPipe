@@ -62,7 +62,7 @@ do
   if [ "${step:0:1}" != "@" ] && [ "${step:0:1}" != "!" ] && [ "${step:0:1}" != "%" ]
   then 
     #If the step has no script 
-    if [ ! -f @RUNROOT@/@SCRIPTPATH@/${step}.sh ] 
+    if [ ! -f @RUNROOT@/@SCRIPTPATH@/${step}.sh ] && [ ! -f @RUNROOT@/@CONFIGPATH@/${step}.ini ]
     then 
       #Notify the user that it is missing 
       if [ ${_err} == "0" ]
@@ -109,6 +109,7 @@ then
     cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_block.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   fi 
   @P_SED_INPLACE@ "s/={.*/={_validitytest_}/" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt testest.txt
 else 
   _initialise_datablock
 fi
@@ -174,7 +175,7 @@ do
     #Save these outputs to the data block  {{{
     for out in $outputs
     do 
-      if [ "${out}" != "DATAHEAD" ]
+      if [ "${out}" != "DATAHEAD" ] && [ "${out}" != "ALLHEAD" ]
       then 
         _write_datablock $out "_validitytest_"
       fi 
@@ -283,6 +284,12 @@ do
     #If this is a bone-fide script method {{{
     #Source the documentation information 
     source @RUNROOT@/@MANUALPATH@/${step}.man.sh 
+    if [ -f @RUNROOT@/@SCRIPTPATH@/${step}.sh ] 
+    then 
+      basefile=@RUNROOT@/@SCRIPTPATH@/${step}.sh
+    else 
+      basefile=@RUNROOT@/@CONFIGPATH@/${step}.ini
+    fi
     #Write the step to the pipeline file {{{
     cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
 		
@@ -291,7 +298,7 @@ do
 		`_description`
 		#}}}
 		#Update script for datablock 
-		_incorporate_datablock @RUNROOT@/@SCRIPTPATH@/${step}.sh `_uses_datahead`
+		_incorporate_datablock ${basefile} `_uses_datahead`
 		#Run the mode 
 		`_runcommand` > @RUNROOT@/@LOGPATH@/step_${stepnum}_${step##*/}.log
 		#}}}

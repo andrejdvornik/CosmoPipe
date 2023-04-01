@@ -287,7 +287,7 @@ class LDACCat(object):
 
             hdulist.append(table.hdu)
 
-        hdulist.writeto(filename, clobber=clobber)
+        hdulist.writeto(filename, overwrite=clobber)
 
 
 class LDACTable(object):
@@ -494,7 +494,7 @@ class LDACTable(object):
         if self.update == 1:
             self._update()
 
-        self.hdu.writeto(filename, clobber=clobber)
+        self.hdu.writeto(filename, overwrite=clobber)
 
 
 def openObjects(hdulist, table='OBJECTS'):
