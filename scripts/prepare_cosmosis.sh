@@ -3,7 +3,7 @@
 # File Name : prepare_cosmosis.sh
 # Created By : awright
 # Creation Date : 31-03-2023
-# Last Modified : Fri 31 Mar 2023 09:27:17 PM CEST
+# Last Modified : Wed Apr  5 08:28:09 2023
 #
 #=========================================
 
@@ -23,7 +23,7 @@ for file in ${inputs}
 do 
   ext=${file##*.}
   neff_file=${file//\/nz\//\/neff\/}
-  neff_file=${neff_file//_Nz.${ext}/_refr_DIRsom_gold_neff.txt}
+  neff_file=`compgen -G ${neff_file//_Nz.${ext}/_*_neff.txt} || echo `
   if [ ! -f ${neff_file} ] 
   then 
     _message "@RED@ ERROR!\n@DEF@"
@@ -67,7 +67,7 @@ for file in ${inputs}
 do 
   ext=${file##*.}
   sigmae_file=${file//\/nz\//\/sigmae\/}
-  sigmae_file=${sigmae_file//_Nz.${ext}/_refr_DIRsom_gold_sigmae.txt}
+  sigmae_file=`compgen -G ${sigmae_file//_Nz.${ext}/_*_sigmae.txt} || echo `
   if [ ! -f ${sigmae_file} ] 
   then 
     _message "@RED@ ERROR!\n@DEF@"

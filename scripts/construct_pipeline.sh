@@ -125,7 +125,7 @@ do
   if [ "${step:0:1}" == "@" ]
   then 
     #Modify the HEAD to the request value {{{
-    _write_datahead ${step:1}
+    _write_datahead ${step:1} "_validitytest_"
     #}}}
   elif [ "${step:0:1}" == "!" ]
   then 
@@ -239,7 +239,7 @@ do
 		#Modify the current HEAD to requested block element
 		_add_datahead ${step:1}
     #Notify
-		_message "} - @RED@Done!\n"
+		_message "} - @RED@Done!@DEF@\n"
 		#}}}
 
 
@@ -256,7 +256,7 @@ do
 		#Modify the datablock with the current HEAD
 		_add_head_to_block ${step:1} 
     #Notify
-		_message "} - @RED@Done!\n"
+		_message "} - @RED@Done!@DEF@\n"
 		#}}}
 
 		EOF
@@ -275,7 +275,7 @@ do
 		#Rename block item
 		_rename_blockitem "${oldname}" "${newname}"
     #Notify
-		_message " - @RED@Done!\n"
+		_message " - @RED@Done!@DEF@\n"
 		#}}}
 
 		EOF

@@ -91,7 +91,8 @@ fi
 #}}}
 
 #Copy the environment & requirements files to the INSTALL directory
-cp ${PACKROOT}/environment.yml ${PACKROOT}/requirements.txt .
+#cp ${PACKROOT}/environment.yml ${PACKROOT}/requirements.txt .
+cp ${PACKROOT}/environment.yml .
 #Install Conda
 conda env create --file environment.yml > conda_install_output.log 2>&1
 _message "${BLU} - Done! ${DEF}\n"
@@ -120,11 +121,22 @@ git clone https://github.com/AngusWright/SOM_DIR.git >> gitclone_output.log 2>&1
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
 
+#Clone the CosmoPowerCosmosis repository {{{
+_message "   >${RED} Cloning CosmoPowerCosmosis Git repository${DEF}"
+#Clone the repository
+if [ -d ${RUNROOT}/INSTALL/CosmoPowerCosmosis ] 
+then 
+  rm -fr CosmoPowerCosmosis
+fi
+git clone https://github.com/KiDS_WL/CosmoPowerCosmosis.git >> gitclone_output.log 2>&1
+_message "${BLU} - Done! ${DEF}\n"
+#}}}
+
 #Install THELI LDAC tools {{{
 _message "   >${RED} Installing THELI LDAC tools${DEF}"
-if [ -f ${RUNROOT}/../INSTALL/theli-1.6.1.tgz ]
+if [ -f ${RUNROOT}/../theli-1.6.1.tgz ]
 then 
-  ln -s ${RUNROOT}/../INSTALL/theli-1.6.1.tgz .
+  ln -s ${RUNROOT}/../theli-1.6.1.tgz .
 else 
   wget https://marvinweb.astro.uni-bonn.de/data_products/theli/theli-1.6.1.tgz > ${RUNROOT}/INSTALL/THELI_wget.log 2>&1
 fi 
@@ -136,7 +148,23 @@ if [ -f pipe_env.bash.${MACHINE} ]
 then 
   rm -f pipe_env.bash.${MACHINE}
 fi 
-bash install.sh -m ALL >> THELI_install.log 2>&1
+conda run -n cosmopipe bash install.sh -m ALL >> THELI_install.log 2>&1
+cd ${RUNROOT}/INSTALL
+_message "${BLU} - Done! ${DEF}\n"
+#}}}
+
+#Install cosebis functions {{{
+_message "   >${RED} Installing COSEBIs tools${DEF}"
+rsync -autv ${PACKROOT}/kcap ${RUNROOT}/INSTALL/ > ${RUNROOT}/INSTALL/COSEBIs_rsync.log 2>&1
+cd ${RUNROOT}/INSTALL/kcap/cosebis/
+cosmosis_src=`conda run -n cosmopipe which cosmosis | sed 's@/bin/cosmosis@/lib/python3.8/site-packages/cosmosis/@'`
+cat > cosebis_make.sh <<-EOF
+source cosmosis-configure
+COSMOSIS_SRC_DIR=${cosmosis_src} make clean
+COSMOSIS_SRC_DIR=${cosmosis_src} make
+EOF
+conda run -n cosmopipe bash cosebis_make.sh > ${RUNROOT}/INSTALL/COSEBIs_install.log 2>&1
+cd ${RUNROOT}/INSTALL/
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
 
@@ -428,7 +456,7 @@ _message "${BLU} - Done! ${DEF}\n"
 if [ "${NOCONFIG}" != "1" ]
 then 
   _message "   >${RED} Running the configure script { ${DEF}\n"
-  bash ./configure.sh 
+  conda run -n cosmopipe bash ./configure.sh 
   _message "${BLU} } - Done! ${DEF}\n"
 fi 
 #}}}

@@ -83,7 +83,6 @@ if __name__ == '__main__':
         raise ValueError('\"%s\" is not an allowed option for binning' % binning)
 
     # prepare the catalogues
-    print(
     cat1 = treecorr.Catalog(fitscat1, ra_col='@RANAME@', dec_col='@DECNAME@', ra_units='deg', dec_units='deg', \
                                       g1_col=cat1e1name, g2_col=cat1e2name, w_col=cat1wname)
     cat2 = treecorr.Catalog(fitscat2, ra_col='@RANAME@', dec_col='@DECNAME@', ra_units='deg', dec_units='deg', \
@@ -140,10 +139,19 @@ if __name__ == '__main__':
         #Use treecorr to write out the output file updating the npairs column and praise-be for Jarvis and his well documented code
         #as sigma_xip = sigma_xim, I've replaced sigma_xim with the raw npairs so we can store it in case useful at any point
         
-        with treecorr.util.make_writer(outfile,precision=12) as writer:
-            writer.write(
-                ['r_nom','meanr','meanlogr','xip','xim','xip_pm','xim_im','sigma_xip', 'npairs', 'weight','npairs_weighted' ],
-                [ gg.rnom,gg.meanr, gg.meanlogr,gg.xip, gg.xim, gg.xip_im, gg.xim_im, np.sqrt(gg.varxip), gg.npairs, gg.weight, npairs_weighted])
+        try: 
+            #Try with the new treecorr syntax
+            with treecorr.util.make_writer(outfile,precision=12) as writer:
+                writer.write(
+                    ['r_nom','meanr','meanlogr','xip','xim','xip_pm','xim_im','sigma_xip', 'npairs', 'weight','npairs_weighted' ],
+                    [ gg.rnom,gg.meanr, gg.meanlogr,gg.xip, gg.xim, gg.xip_im, gg.xim_im, np.sqrt(gg.varxip), gg.npairs, gg.weight, npairs_weighted])
+        except: 
+            #Try with the old treecorr syntax 
+            treecorr.util.gen_write(outfile,
+                    ['r_nom','meanr','meanlogr','xip','xim','xip_pm','xim_im','sigma_xip', 'npairs', 'weight','npairs_weighted' ],
+                    [ gg.rnom,gg.meanr, gg.meanlogr,gg.xip, gg.xim, gg.xip_im, gg.xim_im, np.sqrt(gg.varxip), gg.npairs, 
+                    gg.weight, npairs_weighted], precision=12)
+
 
     else:
 

@@ -69,8 +69,31 @@ YPIX="Ypos"
 GAAPFLAG="FLAG_GAAP_ugriZYJHKs"
 
 #Shape mesurement variables 
-E1VAR=autocal_e1_C
-E2VAR=autocal_e2_C
+E1NAME=autocal_e1_C
+E2NAME=autocal_e2_C
+
+#PSF Shape mesurement variables
+PSFE1NAME=PSF_e1
+PSFE2NAME=PSF_e2
+
+#RADec names
+RANAME=ALPHA_J2000
+DECNAME=DELTA_J2000
+
+#Number of bootstrap realisations
+NBOOT=300
+
+#Values for the Nz bias in each tomographic bin
+NZBIAS="0.000 -0.002 -0.013 -0.011 0.006"
+
+#Specz column name
+ZSPECNAME='z_spec_B'
+
+#Photo-z column name
+ZPHOTNAME='Z_B'
+
+#Number of threads
+NTHREADS=32
 
 #Patch catalogue suffix 
 FILESUFFIX=@FILESUFFIX@
@@ -145,6 +168,7 @@ SURVEY=@SURVEY@
 
 #Survey Area in arcmin
 SURVEYAREA=@SURVEYAREA@
+SURVEYAREADEG=@SURVEYAREADEG@
 
 #Path to THELI LDAC tools
 THELIPATH=@THELIPATH@

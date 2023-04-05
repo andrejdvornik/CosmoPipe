@@ -9,7 +9,7 @@ dependencies:
   - openmp 
   - mpich-mpicc 
   - mpi4py 
-  - mpi
+  - mpi=4.1.5
   - liblapack
   - curl
   - pyyaml
@@ -37,5 +37,5 @@ dependencies:
     - pyfits 
     - emcee 
     - treecorr==4.2.3
-    - pycamb
+    - cosmopower
 

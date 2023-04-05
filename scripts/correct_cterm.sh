@@ -7,10 +7,12 @@ current=@DB:DATAHEAD@
 
 #Correct the constant shear term {{{
 appendstr="_ccorr"
+#Define the file name extension
+extn=${current##*.}
 #Define the output file name 
-outputname=${current//.cat/${appendstr}.cat}
+outputname=${current//.${extn}/${appendstr}.${extn}}
 #Construct the output catalogue filename 
-catname=${outputname//.cat/.txt}
+catname=${outputname//.${extn}/.txt}
 catname=${catname##*/}
 #Check if the outputname file exists 
 if [ -f ${outputname} ] 

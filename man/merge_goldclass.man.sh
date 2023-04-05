@@ -57,7 +57,7 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo main_gold_cats
+  echo main_all_tomo_gold
 } 
 #}}}
 

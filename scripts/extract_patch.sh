@@ -3,7 +3,7 @@
 # File Name : extract_patch.sh
 # Created By : awright
 # Creation Date : 28-03-2023
-# Last Modified : Tue 28 Mar 2023 02:04:51 PM CEST
+# Last Modified : Tue Apr  4 09:23:17 2023
 #
 #=========================================
 
@@ -40,7 +40,7 @@ do
            -i ${inputfile} \
   	       -o ${outputname} \
   	       -t OBJECTS \
-  	       -c "(PATCH==${patch});" 2>&1
+  	       -c "(PATCH=='${patch}');" 2>&1
   _message " @RED@- Done!@DEF@\n"
   #}}}
 done

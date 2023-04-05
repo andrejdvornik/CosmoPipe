@@ -57,8 +57,8 @@ wsq=weight*weight
 hdulist = fits.BinTableHDU.from_columns(
     [fits.Column(name=racolname, format='1D', unit='deg',array=ra),
      fits.Column(name=deccolname, format='1D', unit='deg',array=dec),
-     fits.Column(name=e1colname, format='1E', array=e1_corr),
-     fits.Column(name=e2colname, format='1E', array=e2_corr),
+     fits.Column(name=e1colname, format='1E', array=e1),
+     fits.Column(name=e2colname, format='1E', array=e2),
      fits.Column(name=psfe1colname, format='1E', array=PSF_e1),
      fits.Column(name=psfe2colname, format='1E', array=PSF_e2),
      fits.Column(name=wtcolname, format='1E', array=weight),

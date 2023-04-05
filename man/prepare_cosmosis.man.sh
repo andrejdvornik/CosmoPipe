@@ -57,7 +57,7 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo cosmosis_neff cosmosis_sigmae cosmosis_xipm
+  echo cosmosis_neff cosmosis_sigmae cosmosis_xipm cosmosis_inputs
 } 
 #}}}
 

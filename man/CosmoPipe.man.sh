@@ -41,6 +41,7 @@ function _varcheck {
   _varlist=`_inp_var`
   _err=0
   _missing=''
+  _undefined=''
   for var in $_varlist
   do 
     if [ "${var:0:3}" == "DB:" ]
@@ -51,31 +52,31 @@ function _varcheck {
     if [ "${!var}" == "" ] 
     then 
       _err=$((_err+1))
-      missing="$missing $var"
+      _missing="$_missing $var"
     elif [ "${!var}" == "@${var^^}@" ]
     then 
       _err=$((_err+1))
-      undefined="$undefined $var"
+      _undefined="$_undefined $var"
     fi 
   done  
   if [ "${_err}" == "1" ]
   then 
-    if [ "${undefined}" != "" ]
+    if [ "${_undefined}" != "" ]
     then 
-      echo "ERROR: Input variable$undefined, required by the mode ${1##*/}, is still set to a placeholder value!"
+      echo "ERROR: Input variable$_undefined, required by the mode ${1##*/}, is still set to a placeholder value!"
     else
-      echo "ERROR: Input variable$missing, required by the mode ${1##*/}, is missing entirely (not in the variables file)!"
+      echo "ERROR: Input variable$_missing, required by the mode ${1##*/}, is missing entirely (not in the variables file)!"
     fi 
     exit 1 
   elif [ "${_err}" != "0" ]
   then 
-    if [ "${undefined}" != "" ]
+    if [ "${_undefined}" != "" ]
     then 
-      echo "ERROR: Input variables$undefined, required by the mode ${1##*/}, are still set to their placeholder values!"
+      echo "ERROR: Input variables$_undefined, required by the mode ${1##*/}, are still set to their placeholder values!"
     fi
-    if [ "${missing}" != "" ]
+    if [ "${_missing}" != "" ]
     then
-      echo "ERROR: Input variables$missing, required by the mode ${1##*/}, are missing entirely (not in the variables file)!"
+      echo "ERROR: Input variables$_missing, required by the mode ${1##*/}, are missing entirely (not in the variables file)!"
     fi
     exit 1 
   fi 
@@ -282,7 +283,7 @@ function _read_datahead {
 #}}}
 
 #Write the datahead {{{
-#function _write_datahead { 
+#function _add_datahead { 
 function _add_datahead { 
   _block=`_read_datablock`
   #Copy the requested data to the datahead 
@@ -356,7 +357,7 @@ function _replace_datahead {
 #}}}
 
 #Add an item to the datahead {{{
-#function _add_datahead { 
+#function _write_datahead { 
 function _write_datahead { 
   #Current block
   _block=`_read_datablock`
@@ -435,11 +436,13 @@ function _add_head_to_block {
   _name=${1}
   #Get the current datahead 
   _head=`_read_datahead` 
+  _itemlist=""
   #Append the full path to head entries 
   for item in ${_head}
   do 
     _itemlist="${_itemlist} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${item}"
   done 
+  >&2 echo ${_itemlist}
   #Add the datahead entries to the block 
   _add_datablock ${1} "${_itemlist}"
 }
@@ -520,6 +523,7 @@ function _incorporate_datablock {
     #Extract the name of the item
     base=${item%%=*}
     #Remove leading and trailing braces
+    item=${item//\{,/}
     item=${item//\{/}
     item=${item//\}/}
     #Add spaces
@@ -574,7 +578,6 @@ function _incorporate_datablock {
   if [ "$2" == "USES_DATAHEAD" ] 
   then 
     #Add code for each file in DATAHEAD {{{
-    _itemlist=''
     for item in ${_head} 
     do 
       echo '# ----' >> ${1}

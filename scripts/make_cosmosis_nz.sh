@@ -3,7 +3,7 @@
 # File Name : make_cosmosis_nz.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Fri 31 Mar 2023 11:38:59 AM CEST
+# Last Modified : Wed Apr  5 08:33:51 2023
 #
 #=========================================
 
@@ -16,13 +16,14 @@ then
 fi 
 
 #Construct the output base
+file=${inputs##* }
 output_base=${file##*/}
 output_base=${output_base%%_ZB*}
 output_base="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz/${output_base}"
 
 if [ -f ${output_base}_comb_Nz.fits ]
 then 
-  _message " > @BLU@Removing previous COSMOSIS Nz file@DEF@ ${output_base##*/}_comb_Nz.fits"
+  _message " > @BLU@Removing previous COSMOSIS Nz file@DEF@ ${output_base##*/}_comb_Nz.fits@DEF@"
   rm ${output_base}_comb_Nz.fits
   _message " - @RED@Done!\n"
 fi 
@@ -32,7 +33,7 @@ _message " > @BLU@Constructing COSMOSIS Nz file@DEF@"
 #Construct the Nz combined fits file and put into covariance/input/
 @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/MakeNofZForCosmosis_function.py \
   --inputs @DB:nz@ \
-  --neffs @DB:cosmosis_neff@ \
+  --neff @DB:cosmosis_neff@ \
   --output_base ${output_base} 2>&1 
 _message " - @RED@Done!\n"
 
