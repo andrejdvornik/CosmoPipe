@@ -5,3 +5,4 @@ INSTALL*
 RUNTIME*
 data/KiDS*.fits 
 tmp*
+*.bak
