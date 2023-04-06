@@ -17,8 +17,8 @@ import os
 from argparse import ArgumentParser
 
 # set the path to scale_cuts here
-sys.path.append("@RUNROOT@/@SCRIPTPATH@/kcap/modules/scale_cuts/")
-sys.path.append("@RUNROOT@/@SCRIPTPATH@/kcap/modules/scale_cuts/")
+sys.path.append("@RUNROOT@/INSTALL/kcap/modules/scale_cuts/")
+sys.path.append("@RUNROOT@/@SCRIPTPATH@/")
 import wrapper_twopoint as wtp
 import wrapper_twopoint2 as wtp2
 
@@ -469,7 +469,7 @@ def unitaryTest(name1, name2):
 
 saveFitsCOSEBIs()
 
-FolderPlots="@RUNROOT@/@STORAGEPATH@/MCMC_prep/plots"
+FolderPlots="@RUNROOT@/@STORAGEPATH@/plots"
 mkdir_mine(FolderPlots)
 
 

@@ -3,7 +3,7 @@
 # File Name : make_cosmosis_nz.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Wed Apr  5 08:33:51 2023
+# Last Modified : Wed Apr  5 09:17:31 2023
 #
 #=========================================
 
@@ -25,7 +25,7 @@ if [ -f ${output_base}_comb_Nz.fits ]
 then 
   _message " > @BLU@Removing previous COSMOSIS Nz file@DEF@ ${output_base##*/}_comb_Nz.fits@DEF@"
   rm ${output_base}_comb_Nz.fits
-  _message " - @RED@Done!\n"
+  _message " - @RED@Done!@DEF@\n"
 fi 
 
 
@@ -35,10 +35,8 @@ _message " > @BLU@Constructing COSMOSIS Nz file@DEF@"
   --inputs @DB:nz@ \
   --neff @DB:cosmosis_neff@ \
   --output_base ${output_base} 2>&1 
-_message " - @RED@Done!\n"
+_message " - @RED@Done!@DEF@\n"
 
 #Update the datablock 
 _write_datablock cosmosis_nz "${output_base##*/}_comb_Nz.fits"
-_write_datablock cosmosis_neff "${output_base##*/}_comb_neff.txt"
-_write_datablock cosmosis_sigmae "${output_base##*/}_comb_sigmae.txt"
 

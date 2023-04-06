@@ -50,7 +50,7 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo cosmosis_neff cosmosis_nz cosmosis_sigmae cosmosis_mcov ntomo nzcov
+  echo cosmosis_neff cosmosis_nz cosmosis_sigmae cosmosis_mcov ntomo nzcov cosebis_cov
 } 
 #}}}
 

@@ -3,12 +3,18 @@
 # File Name : make_data_vector.sh
 # Created By : awright
 # Creation Date : 01-04-2023
-# Last Modified : Sat 01 Apr 2023 11:12:37 PM CEST
+# Last Modified : Wed Apr  5 09:18:08 2023
 #
 #=========================================
 
 mbias=`echo @DB:mbias@ | awk '{print $1}'`
 mbias="`cat ${mbias} | grep -v "^#"`"
+
+#If needed, create the output directory 
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_vec ]
+then 
+  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_vec/
+fi 
 
 #Construct the data vector for cosebis
 @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/make_data_vector.py \

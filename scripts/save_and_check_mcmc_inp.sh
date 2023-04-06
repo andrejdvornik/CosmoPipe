@@ -3,9 +3,15 @@
 # File Name : save_and_check_mcmc_inp.sh
 # Created By : awright
 # Creation Date : 01-04-2023
-# Last Modified : Sat 01 Apr 2023 11:42:21 PM CEST
+# Last Modified : Wed Apr  5 11:31:20 2023
 #
 #=========================================
+
+#If needed, create the output directory 
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp ]
+then 
+  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp/
+fi 
 
 #Covar name
 cov="@DB:cosebis_cov@"
@@ -17,6 +23,6 @@ cov=${cov//.ascii/.fits}
   --neff @DB:cosmosis_neff@ \
   --sigmae @DB:cosmosis_sigmae@ \
   --covariance @DB:cosebis_cov@ \
-  --outputfile @RUNROOT@/@STORAGEPATH@/mcmc_inp/MCMC_input_${cov}
+  --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp/MCMC_input_${cov}
 
 _write_datablock "mcmc_inp" "MCMC_input_${cov}"

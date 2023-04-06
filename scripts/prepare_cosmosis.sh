@@ -3,7 +3,7 @@
 # File Name : prepare_cosmosis.sh
 # Created By : awright
 # Creation Date : 31-03-2023
-# Last Modified : Wed Apr  5 08:28:09 2023
+# Last Modified : Thu Apr  6 08:14:09 2023
 #
 #=========================================
 
@@ -183,9 +183,11 @@ echo "[nofz_shifts]" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SUR
 #Add the uncorrelated tomographic bin shifts 
 for tomo in `seq @DB:ntomo@`
 do 
-  echo "uncorr_bias_${tomo} = gaussian 0.0 1.0 " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+  tomoval=`echo ${tomoval_all} | awk -v n=${tomo} '{print $n}'`
+  echo "uncorr_bias_${tomo} = gaussian ${tomoval} 1.0 " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
 done
 
+_write_datablock "cosmosis_inputs" "@SURVEY@_values.ini @SURVEY@_priors.ini"
 #}}}
 
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebi_cov ]
