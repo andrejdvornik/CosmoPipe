@@ -394,14 +394,14 @@ EOF
 #EOF
 echo -e "\033[0;31m - Done! \033[0m" 
 echo -en "   >\033[0;34m Installing Python3 Packages \033[0m" 
-${RUNROOT}/INSTALL/miniconda3/bin/pip install numpy==1.23.1 >> python_packages.log 2>&1 <<EOF
+${RUNROOT}/INSTALL/miniconda3/bin/pip install numpy==1.23.1 fitsio==1.1.1 >> python_packages.log 2>&1 <<EOF
 y
 EOF
 ${RUNROOT}/INSTALL/miniconda3/bin/conda install mpich-mpicc mpi4py >> python_packages.log 2>&1 <<EOF
 y
 EOF
-${RUNROOT}/INSTALL/miniconda3/bin/pip install emcee numpy==1.23.1 scipy pyfits cython matplotlib \
-  palettable fitsio==1.1.1 astropy >> python_packages.log 2>&1 <<EOF
+${RUNROOT}/INSTALL/miniconda3/bin/pip install emcee scipy pyfits cython matplotlib \
+  palettable astropy >> python_packages.log 2>&1 <<EOF
 y
 EOF
 ${RUNROOT}/INSTALL/miniconda3/bin/conda install mpi future pyyaml pip>=20.0 >> python_packages.log 2>&1 <<EOF
