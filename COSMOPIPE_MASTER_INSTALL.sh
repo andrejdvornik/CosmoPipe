@@ -394,6 +394,7 @@ EOF
 #EOF
 echo -e "\033[0;31m - Done! \033[0m" 
 echo -en "   >\033[0;34m Installing Python3 Packages \033[0m" 
+${RUNROOT}/INSTALL/miniconda3/bin/pip install numpy==1.23.1
 ${RUNROOT}/INSTALL/miniconda3/bin/conda install mpich-mpicc mpi4py >> python_packages.log 2>&1 <<EOF
 y
 EOF
