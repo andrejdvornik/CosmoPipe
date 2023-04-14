@@ -3,7 +3,7 @@
 # File Name : specz_som.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Mon 27 Mar 2023 08:29:15 AM CEST
+# Last Modified : Thu 13 Apr 2023 09:32:57 PM CEST
 #
 #=========================================
 
@@ -14,7 +14,8 @@ _message "@BLU@ > Constructing the SOM {@DEF@\n"
 @P_RSCRIPT@ @RUNROOT@/INSTALL/SOM_DIR/R/SOM_DIR.R \
   -r none -t @DB:DATAHEAD@ \
   --toroidal --topo hexagonal --som.dim 101 101 -np -fn Inf \
-  -sc @NTHREADS@ --only.som \
+  --data.threshold 0 40 --data.missing -99 \
+  -sc @NTHREADS@ --som.iter 1000 --only.som \
   -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som/ -of CosmoPipeSOM.Rdata \
   --zr.label @ZPHOTNAME@ --zt.label @ZSPECNAME@ \
   -k MAG_GAAP_u-MAG_GAAP_g \

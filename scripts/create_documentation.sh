@@ -198,7 +198,7 @@ fi
 
 if [ "$runcommand" == "cosmosis" ] 
 then 
-  runcommand="@PYTHON3BIN@/cosmosis @RUNROOT@/@CONFIGPATH@/${script//.${ext}/.ini}"
+  runcommand="mpirun -n @NTHREADS@ --env MKL_NUM_THREADS 1 --env NUMEXPR_NUM_THREADS 1 --env OMP_NUM_THREADS 1 @PYTHON3BIN@/cosmosis --mpi @RUNROOT@/@CONFIGPATH@/${script//.${ext}/.ini}"
 fi 
 
 cat >> $docu << EOF 

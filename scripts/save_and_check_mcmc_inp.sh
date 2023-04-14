@@ -3,7 +3,7 @@
 # File Name : save_and_check_mcmc_inp.sh
 # Created By : awright
 # Creation Date : 01-04-2023
-# Last Modified : Wed Apr  5 11:31:20 2023
+# Last Modified : Thu 13 Apr 2023 08:38:42 PM CEST
 #
 #=========================================
 
@@ -23,6 +23,7 @@ cov=${cov//.ascii/.fits}
   --neff @DB:cosmosis_neff@ \
   --sigmae @DB:cosmosis_sigmae@ \
   --covariance @DB:cosebis_cov@ \
-  --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp/MCMC_input_${cov}
+  --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp/MCMC_input_${cov} \
+  --plotfolder @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp/plots/
 
 _write_datablock "mcmc_inp" "MCMC_input_${cov}"

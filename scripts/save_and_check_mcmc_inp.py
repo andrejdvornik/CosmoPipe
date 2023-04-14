@@ -221,6 +221,8 @@ parser.add_argument("--covariance", dest="covarianceFile",
     help="Covariance file",required=True)
 parser.add_argument("-o", "--outputfile", dest="outputFile",
     help="Full Output file name", metavar="outputFile",required=True)
+parser.add_argument("-p", "--plotfolder", dest="plotdir",
+    help="Path for output figures", metavar="plotdir",required=True)
 
 args = parser.parse_args()
 
@@ -469,7 +471,7 @@ def unitaryTest(name1, name2):
 
 saveFitsCOSEBIs()
 
-FolderPlots="@RUNROOT@/@STORAGEPATH@/plots"
+FolderPlots=args.plotdir
 mkdir_mine(FolderPlots)
 
 

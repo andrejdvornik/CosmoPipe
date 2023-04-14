@@ -1,5 +1,5 @@
 #
-# run_chain_cosebis.ini Documentation & Housekeeping functions
+# prepare_covariance.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -8,7 +8,7 @@ function _prompt {
   if [ "$1" != "0" ] 
   then
     _message "@BLU@==========================================@DEF@\n"
-    _message "@BLU@== @RED@ Running run_chain_cosebis.ini Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@== @RED@ Running prepare_covariance.sh Mode @BLU@ ==@DEF@\n"
     _message "@BLU@==========================================@DEF@\n"
   fi 
 }
@@ -17,8 +17,8 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Run the cosmology chain using the cosebi data '
-  echo '# vector'
+  echo '# Create needed output directories for the '
+  echo '# covariance construction'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,28 +43,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLIND BLINDING CONFIGPATH NUSECOSEBIS RUNROOT SCRIPTPATH STORAGEPATH SURVEY THETAMAXCOV THETAMINCOV
+  echo DATABLOCK RUNROOT STORAGEPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo cosmosis_inputs mcmc_inp nzcov
+  echo 
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo ""
+  echo cosebis_cov
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo mpirun -n @NTHREADS@ --env MKL_NUM_THREADS 1 --env NUMEXPR_NUM_THREADS 1 --env OMP_NUM_THREADS 1 @PYTHON3BIN@/cosmosis --mpi @RUNROOT@/@CONFIGPATH@/run_chain_cosebis.ini
+  echo bash @RUNROOT@/@SCRIPTPATH@/prepare_covariance.sh
 } 
 #}}}
 
