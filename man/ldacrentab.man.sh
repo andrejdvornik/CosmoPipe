@@ -30,10 +30,10 @@ function _description {
 _abort()
 {
   #Message to print when script aborts 
-  _message "\{RED} - !FAILED!" >&2
+  _message "@RED@ - !FAILED!" >&2
   #$0 is the script that was running when this error occurred
-  _message "${BLU} An error occured while running $0." >&2
-  _message "${DEF} Check the relevant logging file for this step." >&2
+  _message "@BLU@ An error occured while running $0." >&2
+  _message "@DEF@ Check the relevant logging file for this step." >&2
   echo >&2
   exit 1
 }

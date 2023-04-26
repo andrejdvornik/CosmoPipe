@@ -46,10 +46,15 @@ function _varcheck {
   do 
     if [ "${var:0:3}" == "DB:" ]
     then 
-      #Skip data block variables 
-      continue
-    fi 
-    if [ "${!var}" == "" ] 
+      #Check that block variables are defined 
+      _res=`_check_blockvar ${var:3}`
+      if [ "${_res}" == "0" ] 
+      then 
+        #If not, add to missing
+        _err=$((_err+1))
+        _missing="$_missing $var"
+      fi 
+    elif [ "${!var}" == "" ] 
     then 
       _err=$((_err+1))
       _missing="$_missing $var"
@@ -113,6 +118,30 @@ function _ntomo {
 
 #Datablock Functions {{{ 
 
+# Add Default Variables {{{ 
+function _add_default_vars { 
+  #Loop through the input functions to the script 
+  _undefined=''
+  source @RUNROOT@/defaults.sh
+  while read line 
+  do 
+    if [ "${line}" == "" ] || [ "${line:0:1}" == "#" ]
+    then 
+      continue
+    fi 
+    varbase=${line%%=*}
+    varval=${line#*=}
+    varval=${varval//\"/}
+    varval=${varval//\'/}
+    if [ "${varval^^}" != "@${varbase^^}@" ]
+    then 
+      #_write_blockvars ${varbase^^} "${varval}"
+      _write_blockvars ${varbase^^} "${!varbase}"
+    fi 
+  done < @RUNROOT@/defaults.sh
+} 
+#}}}
+
 #Initialise the datablock {{{
 function _initialise_datablock { 
   #Make the datablock directory, if needed
@@ -125,7 +154,9 @@ function _initialise_datablock {
     #Initialise the datablock txt file 
     echo "HEAD: " > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
     echo "BLOCK: " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-    _write_datablock "ntomo" `echo @TOMOLIMS@ | awk '{print NF-1}'` 
+    echo "VARS: " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    _write_blockvars "NTOMO" `echo @TOMOLIMS@ | awk '{print NF-1}'` 
+    _add_default_vars 
   fi 
 }
 #}}}
@@ -144,6 +175,11 @@ function _read_datablock {
       head=0
       continue
     fi 
+    if [ "$item" == "VARS:" ] 
+    then 
+      head=1
+      continue
+    fi 
     #If we're still in the HEAD, go to the next line 
     if [ "${head}" == 1 ]
     then 
@@ -160,7 +196,8 @@ function _read_datablock {
     fi 
   done < @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   #_message "#${_outblock}#"
-  _outblock=`echo ${_outblock} | sed 's/ /\n/g' | sort | uniq | xargs echo`
+  #_outblock=`echo ${_outblock} | sed 's/ /\n/g' | sort | uniq | xargs echo`
+  _outblock=`echo ${_outblock} | sed 's/ /\n/g' | xargs echo`
   #_message "#${_outblock}#"
   echo ${_outblock}
 }
@@ -171,6 +208,8 @@ function _write_datablock {
   _head=`_read_datahead`
   #Get the files in this data
   _block=`_read_datablock`
+  #Get the variables 
+  _vars=`_read_blockvars`
   #Update the datablock txt file: HEAD
   echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   #Add HEAD items to file 
@@ -194,6 +233,13 @@ function _write_datablock {
       echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
     fi
   done
+  #Update the datablock txt file: VARS
+  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  #Add HEAD items to file 
+  for _file in ${_vars} 
+  do 
+    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  done 
 }
 #}}}
 
@@ -202,6 +248,8 @@ function _rename_blockitem {
   _head=`_read_datahead`
   #Get the files in this data
   _block=`_read_datablock`
+  #Get the variables
+  _vars=`_read_blockvars`
   _seen=0
   for _file in ${_block} 
   do 
@@ -253,6 +301,13 @@ function _rename_blockitem {
       fi 
     fi 
   fi 
+  #Update the datablock txt file: VARS
+  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  #Add HEAD items to file 
+  for _file in ${_vars} 
+  do 
+    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  done 
 }
 #}}}
 
@@ -276,7 +331,8 @@ function _read_datahead {
     _outhead="${_outhead} ${item} ${contents}"
   done < @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   #_message "#${_outhead}#"
-  _outhead=`echo ${_outhead} | sed 's/ /\n/g' | sort | uniq | xargs echo`
+  #_outhead=`echo ${_outhead} | sed 's/ /\n/g' | sort | uniq | xargs echo`
+  _outhead=`echo ${_outhead} | sed 's/ /\n/g' | xargs echo`
   #_message "#${_outhead}#"
   echo ${_outhead}
 }
@@ -286,12 +342,20 @@ function _read_datahead {
 #function _add_datahead { 
 function _add_datahead { 
   _block=`_read_datablock`
+  _vars=`_read_blockvars`
   #Copy the requested data to the datahead 
   if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/ ] 
   then 
     _message "@RED@ - ERROR! The requested data block component ${1} does not have a folder in the data block?!"
     exit 1 
   fi 
+  #If the directory is empty {{{
+  if [ ! "$(ls -A @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1})" ]
+  then 
+    _message "@RED@ - ERROR! The requested data block component ${1} is empty?!"
+    exit 1 
+  fi 
+  #}}}
   #remove the existing data in the datahead
   if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD ]
   then 
@@ -322,6 +386,12 @@ function _add_datahead {
     #_file=`echo $_file`
     echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   done
+  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  for _file in ${_vars} 
+  do 
+    #_file=`echo $_file`
+    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  done
 }
 #}}}
 
@@ -329,6 +399,8 @@ function _add_datahead {
 function _replace_datahead { 
   #Current block
   _block=`_read_datablock`
+  #Current vars
+  _vars=`_read_blockvars`
   #Current head 
   _head=`_read_datahead`
   #Update the datablock txt file 
@@ -339,6 +411,7 @@ function _replace_datahead {
     if [ "${_file}" == "${1##*/}" ] 
     then 
       #Replace this file in the datahead
+      >&2 echo "replace ${1##*/} -> ${2##*/}"
       echo "${2##*/}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
       #Remove the old file 
       rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${_file}
@@ -353,14 +426,21 @@ function _replace_datahead {
     #_file=`echo $_file`
     echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   done
+  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  for _file in ${_vars} 
+  do 
+    #_file=`echo $_file`
+    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  done
 }
 #}}}
 
 #Add an item to the datahead {{{
-#function _write_datahead { 
 function _write_datahead { 
   #Current block
   _block=`_read_datablock`
+  #Current vars
+  _vars=`_read_blockvars`
   #Current head 
   _head=`_read_datahead`
   #Check if the requested item exists in the datablock
@@ -389,6 +469,39 @@ function _write_datahead {
   #Write out the block 
   echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   for _file in ${_block} 
+  do 
+    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  done
+  #Write out the vars 
+  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  for _file in ${_vars} 
+  do 
+    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  done
+}
+#}}}
+
+#Add an item to the datahead {{{
+function _writelist_datahead { 
+  _head="${1}"
+  _block=`_read_datablock`
+  _vars=`_read_blockvars`
+  #Update the datablock txt file 
+  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  for _file in ${_head} 
+  do 
+    #Print the existing datahead items 
+    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  done 
+  #Write out the block 
+  echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  for _file in ${_block} 
+  do 
+    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  done
+  #Write out the vars 
+  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  for _file in ${_vars} 
   do 
     echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   done
@@ -442,9 +555,93 @@ function _add_head_to_block {
   do 
     _itemlist="${_itemlist} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${item}"
   done 
-  >&2 echo ${_itemlist}
+  #>&2 echo ${_itemlist}
   #Add the datahead entries to the block 
   _add_datablock ${1} "${_itemlist}"
+}
+#}}}
+
+#Read the blockvars {{{
+function _read_blockvars { 
+  #Read the data block variables
+  vars=0
+  _req=${1}
+  _outvars=''
+  while read item
+  do 
+    #Check if we have reached the VARS yet
+    if [ "$item" == "VARS:" ] 
+    then 
+      vars=1
+      continue
+    fi 
+    #If we're still in the HEAD or BLOCK, go to the next line 
+    if [ "${vars}" == 0 ]
+    then 
+      continue 
+    fi 
+    if [ "${_req}" == "" ] 
+    then 
+      #Add the contents to the output 
+      _outvars="${_outvars} ${item}"
+    elif [ "${item%%=*}" == "${_req}" ]
+    then 
+      #Add the contents to the output 
+      _outvars="${_outvars} ${item}"
+    fi 
+  done < @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  echo ${_outvars}
+}
+#}}}
+
+#Write the blockvars {{{
+function _write_blockvars { 
+  _head=`_read_datahead`
+  #Get the files in this data
+  _block=`_read_datablock`
+  #Get the variables 
+  _vars=`_read_blockvars`
+  #Update the datablock txt file: HEAD
+  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  #Add HEAD items to file 
+  for _file in ${_head} 
+  do 
+    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  done 
+  #Update the datablock txt file: BLOCK
+  echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  #Add BLOCK items to file 
+  for _file in ${_block} 
+  do 
+    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  done 
+  #Update the VARS items 
+  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  #Add what we want to write
+  _filelist="{${2// /,}}"
+  echo "${1}=${_filelist}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  #For each var row:
+  for _file in ${_vars} 
+  do 
+    #If the item isn't what we want to add/write
+    if [ "${_file%%=*}" != "${1%%=*}" ]
+    then 
+      #Write it 
+      _file=`echo $_file`
+      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    fi
+  done
+}
+#}}}
+
+# Check whether item 1 is in the blockvars {{{
+function _check_blockvar { 
+  #Item to check 
+  _data=$1
+  #Blockvars
+  _block=`_read_blockvars`
+  #Check whether the requested data object is in the datablock 
+  echo " ${_block} " | grep -c " ${_data}=" | xargs echo || echo 
 }
 #}}}
 
@@ -467,7 +664,7 @@ function _inblock {
     #Current datablock 
     _block=`_read_datablock`
     #Check whether the requested data object is in the datablock 
-    echo " ${_block} " | grep -c " ${_data}=" | xargs echo
+    echo " ${_block} " | grep -c " ${_data}=" | xargs echo || echo 
   fi 
 }
 #}}}
@@ -491,7 +688,7 @@ function _uses_datahead {
 }
 #}}}
 
-#Convert a block entry into a filelist
+#Convert a block entry into a filelist {{{
 function _blockentry_to_filelist { 
   _term=${1##*=}
   _term=${_term//\{/}
@@ -499,6 +696,7 @@ function _blockentry_to_filelist {
   _term=${_term//,/ }
   echo ${_term}
 }
+#}}}
 
 # incorporate the current datablock/head into a script {{{ 
 function _incorporate_datablock { 
@@ -506,6 +704,8 @@ function _incorporate_datablock {
   _head=`_read_datahead`
   #Read the current datablock 
   _block=`_read_datablock`
+  #Read the current blockvars
+  _vars=`_read_blockvars`
   ext=${1##*.}
   #If needed, back up the original file 
   if [ ! -f ${1//.${ext}/_noblock.${ext}} ]
@@ -532,15 +732,33 @@ function _incorporate_datablock {
     _itemlist=''
     for _file in ${item}
     do 
-      if [ "$base" == "ntomo" ] 
-      then 
-        #Return ntomo directly 
-        _itemlist=" ${_file#*=}"
-      else 
-        #Add full file paths 
-        _itemfile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${base}/${_file#*=}
-        _itemlist="${_itemlist} ${_itemfile}"
-      fi 
+      #Add full file paths 
+      _itemfile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${base}/${_file#*=}
+      _itemlist="${_itemlist} ${_itemfile}"
+    done 
+    #_itemlist=`echo ${_itemlist}`
+    @P_SED_INPLACE@ "s#\\@DB:${item%%=*}\\@#${_itemlist:1}#g" ${1//.${ext}/_prehead.${ext}}
+  done 
+  #}}}
+
+  #Update the script to include the blockvars {{{
+  for item in ${_vars}
+  do 
+    #Extract the name of the item
+    base=${item%%=*}
+    #Remove leading and trailing braces
+    item=${item//\{,/}
+    item=${item//\{/}
+    item=${item//\}/}
+    #Add spaces
+    item=${item//,/ }
+    #Loop through entries 
+    _itemlist=''
+    for _file in ${item}
+    do 
+      #Return variable 
+      _itemfile="${_file#*=}"
+      _itemlist="${_itemlist} ${_itemfile}"
     done 
     #_itemlist=`echo ${_itemlist}`
     @P_SED_INPLACE@ "s#\\@DB:${item%%=*}\\@#${_itemlist:1}#g" ${1//.${ext}/_prehead.${ext}}

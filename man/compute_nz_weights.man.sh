@@ -50,14 +50,14 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo specz_adapt_tomo main_all_tomo
+  echo som_weight_reference som_weight_training som 
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo main_calib_cats specz_calib_cats nz_hc_optim
+  echo som_weight_calib_cats som_weight_refr_cats nz_hc_optim
 } 
 #}}}
 

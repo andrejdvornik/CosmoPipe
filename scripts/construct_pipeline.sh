@@ -58,8 +58,9 @@ for step in ${pipeline_steps}
 do 
   #Strip out the version number 
   step=${step%=*}
-  #If the step is not a HEAD change
-  if [ "${step:0:1}" != "@" ] && [ "${step:0:1}" != "!" ] && [ "${step:0:1}" != "%" ]
+  #If the step is not a HEAD or VARS change
+  if [ "${step:0:1}" != "@" ] && [ "${step:0:1}" != "!" ] \
+    && [ "${step:0:1}" != "%" ] && [ "${step:0:1}" != "+" ] && [ "${step:0:1}" != "-" ]
   then 
     #If the step has no script 
     if [ ! -f @RUNROOT@/@SCRIPTPATH@/${step}.sh ] && [ ! -f @RUNROOT@/@CONFIGPATH@/${step}.ini ]
@@ -140,6 +141,11 @@ do
     newname=${names##*-}
 		_rename_blockitem "${oldname}" "${newname}" TEST
     #}}}
+  elif [ "${step:0:1}" == "+" ]
+  then 
+    #Add the new variable to the datablock {{{
+    _write_blockvars ${step:1} "_validitytest_"
+    #}}}
   else 
     #Check for the manual file  {{{
     if [ ! -f @RUNROOT@/@MANUALPATH@/${step}.man.sh ]
@@ -150,13 +156,16 @@ do
       exit 1
     fi
     #}}}
-    #Source the step documentation 
+    #Source the step documentation {{{
     source @RUNROOT@/@MANUALPATH@/${step}.man.sh 
-    #Perform the variable check 
+    #}}}
+    #Perform the variable check {{{
     _varcheck $step.sh
-    #Check inputs and outputs 
+    #}}}
+    #Check inputs and outputs {{{
     inputs=`_inp_data`
     outputs=`_outputs`
+    #}}}
     #Check the data block for these inputs {{{
     for inp in $inputs
     do 
@@ -188,25 +197,29 @@ done
 VERBOSE=0 _initialise
 #Remove the test block 
 rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-#Remove empty datablock directories 
+#Remove empty datablock directories {{{
 for item in `ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/`
 do 
   #If the item is a directory 
   if [ -d ${item} ]
   then 
-    #If the directory is empty
+    #If the directory is empty {{{
     if [ ! "$(ls -A ${item})" ]
     then 
-      #Remove the directory 
+      #Remove the directory {{{
       rmdir ${item}
+      #}}}
     fi 
+    #}}}
   fi 
 done 
-#Replace the initial block, if present
+#}}}
+#Replace the initial block, if present {{{
 if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_block.txt ]
 then 
   mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_block.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
 fi 
+#}}}
 #}}}
 
 #Pipeline is valid: construct pipeline commands {{{
@@ -238,7 +251,7 @@ do
 		_message "@BLU@Copying requested elements of ${step:1} to DATAHEAD @DEF@ {\n"
 		#Modify the current HEAD to requested block element
 		_add_datahead ${step:1}
-    #Notify
+		#Notify
 		_message "} - @RED@Done!@DEF@\n"
 		#}}}
 
@@ -255,7 +268,7 @@ do
 		_message "@BLU@Copying current DATAHEAD items to ${step:1}@DEF@ {\n"
 		#Modify the datablock with the current HEAD
 		_add_head_to_block ${step:1} 
-    #Notify
+		#Notify
 		_message "} - @RED@Done!@DEF@\n"
 		#}}}
 
@@ -266,7 +279,7 @@ do
     names=${step:1}
     oldname=${names%%-*}
     newname=${names##*-}
-    #If this is a datablock assignment: {{{
+    #If this is a datablock rename: {{{
     cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
 		
 		#Intermediate Step: rename block item ${oldname} to ${newname} {{{
@@ -274,9 +287,30 @@ do
 		_message "@BLU@Renaming block item ${oldname} to ${newname}@DEF@"
 		#Rename block item
 		_rename_blockitem "${oldname}" "${newname}"
-    #Notify
+		#Notify
 		_message " - @RED@Done!@DEF@\n"
 		#}}}
+
+		EOF
+    #}}}
+  elif [ "${step:0:1}" == "+" ]
+  then 
+    #If this is a blockvariable assignment: {{{
+    _var=${step:1}
+    _varval=${_var#*=}
+    _var=${_var%%=*}
+    cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
+		
+		#Modify the block variable to the request value
+		#Intermediate Step: write block variable ${_var} to requested value {{{
+		#Notify
+		_message "@BLU@Assigning variable @RED@${_var^^}@BLU@ to @DEF@${_varval}"
+		#Modify the VARS to include requested block element
+		_write_blockvars ${_var^^} "${_varval}"
+		#Notify
+		_message " @BLU@- @RED@Done!@DEF@\n"
+		#}}}
+
 
 		EOF
     #}}}

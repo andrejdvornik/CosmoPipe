@@ -14,6 +14,7 @@ extn=${inputfile##*.}
 _message "@BLU@Constructing Tomographic bins for catalogue:@DEF@ ${inputfile##*/}\n"
 
 #Construct the tomographic bin catalogues {{{
+outputlist=""
 for i in `seq $NTOMO`
 do
   #Define the Z_B limits from the TOMOLIMS {{{
