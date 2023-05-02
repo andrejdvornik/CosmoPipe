@@ -15,7 +15,7 @@ fi
 
 outputlist=''
 filelist="@DB:ALLHEAD@"
-for inp in `seq @DB:ntomo@` 
+for inp in `seq @DB:NTOMO@` 
 do 
   file=`echo ${filelist} | awk -v n=$inp '{print $n}'`
   neff=`echo @NEFFLIST@ | awk -v n=$inp '{print $n}'`
