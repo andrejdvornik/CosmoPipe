@@ -13,5 +13,5 @@ then
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_cov/
 fi 
 
-_write_datablock "cosebis_cov" "Covariance_blind@BLIND@_nMaximum_@NMAXCOSEBIS@_@THETAMINXI@_@THETAMAXXI@_nBins@DB:ntomo@.ascii"
+_write_datablock "cosebis_cov" "Covariance_blind@BLIND@_nMaximum_@NMAXCOSEBIS@_@THETAMINXI@_@THETAMAXXI@_nBins@DB:NTOMO@.ascii"
 
