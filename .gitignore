@@ -1,8 +1,8 @@
 *.o
 *~
 *.pyc
-INSTALL*
-RUNTIME*
+INSTALL
+RUNTIME
 data/KiDS*.fits 
 tmp*
 *.bak
