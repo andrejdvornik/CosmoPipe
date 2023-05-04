@@ -3,7 +3,7 @@
 # File Name : save_and_check_mcmc_inp.sh
 # Created By : awright
 # Creation Date : 01-04-2023
-# Last Modified : Thu 13 Apr 2023 08:38:42 PM CEST
+# Last Modified : Thu 04 May 2023 10:03:53 PM CEST
 #
 #=========================================
 
@@ -11,6 +11,10 @@
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp ]
 then 
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp/
+fi 
+if [ ! -d @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@DB:BOLTZMAN@/@DB:STATISTIC@/plots ]
+then 
+  mkdir -p @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@DB:BOLTZMAN@/@DB:STATISTIC@/plots/
 fi 
 
 #Covar name
@@ -24,6 +28,6 @@ cov=${cov//.ascii/.fits}
   --sigmae @DB:cosmosis_sigmae@ \
   --covariance @DB:cosebis_cov@ \
   --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp/MCMC_input_${cov} \
-  --plotfolder @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp/plots/
+  --plotfolder @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@DB:BOLTZMAN@/@DB:STATISTIC@/plots/
 
 _write_datablock "mcmc_inp" "MCMC_input_${cov}"

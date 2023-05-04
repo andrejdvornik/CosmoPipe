@@ -15,7 +15,7 @@ source @RUNROOT@/variables.sh
 #}}}
 
 #Do the variable check {{{
-_varcheck $0
+blockneeds=`_varcheck $0`
 #}}}
 
 #Read the pipeline description file {{{
@@ -110,13 +110,18 @@ then
     cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_block.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   fi 
   @P_SED_INPLACE@ "s/={.*/={_validitytest_}/" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt testest.txt
 else 
   _initialise_datablock
 fi
 #}}}
 
 #Check the validity of the pipeline {{{
+#Add default variables (if they exist) {{{
+if [ -f @PIPELINE_defaults.sh ]
+then 
+  _add_default_vars
+fi 
+#}}}
 #For each step in the pipeline: 
 for step in ${pipeline_steps}
 do 
@@ -160,7 +165,14 @@ do
     source @RUNROOT@/@MANUALPATH@/${step}.man.sh 
     #}}}
     #Perform the variable check {{{
-    _varcheck $step.sh
+    blockneeds=`_varcheck $step.sh`
+    if [ "${blockneeds}" != "" ]
+    then 
+      for var in ${blockneeds}
+      do 
+        echo ${var}=@${var}@ >> @PIPELINE@_defaults.sh 
+      done 
+    fi 
     #}}}
     #Check inputs and outputs {{{
     inputs=`_inp_data`
@@ -229,6 +241,9 @@ cat @RUNROOT@/@SCRIPTPATH@/pipeline_base.sh > @RUNROOT@/@PIPELINE@_pipeline.sh
 #Add the opening prompt {{{
 cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
 `_openingprompt`
+
+#Add the default variables to the datablock 
+_add_default_vars 
 EOF
 #}}}
 

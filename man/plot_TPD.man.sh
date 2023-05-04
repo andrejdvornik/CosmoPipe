@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLINDING P_RSCRIPT RUNROOT SCRIPTPATH STORAGEPATH SURVEY
+  echo BLINDING P_RSCRIPT RUNROOT SCRIPTPATH STORAGEPATH SURVEY DB:LIST_INPUT_SAMPLER
 } 
 #}}}
 

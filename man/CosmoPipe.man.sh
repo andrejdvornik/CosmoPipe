@@ -40,7 +40,9 @@ function _varcheck {
   #Loop through the input functions to the script 
   _varlist=`_inp_var`
   _err=0
+  _runerr=0
   _missing=''
+  _runmissing=''
   _undefined=''
   for var in $_varlist
   do 
@@ -51,8 +53,8 @@ function _varcheck {
       if [ "${_res}" == "0" ] 
       then 
         #If not, add to missing
-        _err=$((_err+1))
-        _missing="$_missing $var"
+        _runerr=$((_err+1))
+        _runmissing="$_runmissing ${var:3}"
       fi 
     elif [ "${!var}" == "" ] 
     then 
@@ -68,22 +70,26 @@ function _varcheck {
   then 
     if [ "${_undefined}" != "" ]
     then 
-      echo "ERROR: Input variable$_undefined, required by the mode ${1##*/}, is still set to a placeholder value!"
+      >&2 echo "ERROR: Input variable$_undefined, required by the mode ${1##*/}, is still set to a placeholder value!"
     else
-      echo "ERROR: Input variable$_missing, required by the mode ${1##*/}, is missing entirely (not in the variables file)!"
+      >&2 echo "ERROR: Input variable$_missing, required by the mode ${1##*/}, is missing entirely (not in the variables file)!"
     fi 
     exit 1 
   elif [ "${_err}" != "0" ]
   then 
     if [ "${_undefined}" != "" ]
     then 
-      echo "ERROR: Input variables$_undefined, required by the mode ${1##*/}, are still set to their placeholder values!"
+      >&2 echo "ERROR: Input variables$_undefined, required by the mode ${1##*/}, are still set to their placeholder values!"
     fi
     if [ "${_missing}" != "" ]
     then
-      echo "ERROR: Input variables$_missing, required by the mode ${1##*/}, are missing entirely (not in the variables file)!"
+      >&2 echo "ERROR: Input variables$_missing, required by the mode ${1##*/}, are missing entirely (not in the variables file)!"
     fi
     exit 1 
+  fi 
+  if [ "${_runerr}" != "0" ]
+  then 
+    echo ${_runmissing}
   fi 
 } 
 #}}}
@@ -122,7 +128,7 @@ function _ntomo {
 function _add_default_vars { 
   #Loop through the input functions to the script 
   _undefined=''
-  source @RUNROOT@/defaults.sh
+  source @RUNROOT@/@PIPELINE@_defaults.sh
   while read line 
   do 
     if [ "${line}" == "" ] || [ "${line:0:1}" == "#" ]
@@ -138,7 +144,7 @@ function _add_default_vars {
       #_write_blockvars ${varbase^^} "${varval}"
       _write_blockvars ${varbase^^} "${!varbase}"
     fi 
-  done < @RUNROOT@/defaults.sh
+  done < @RUNROOT@/@PIPELINE@_defaults.sh
 } 
 #}}}
 

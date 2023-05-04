@@ -3,7 +3,7 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Wed 19 Apr 2023 08:52:51 AM CEST
+# Last Modified : Thu 04 May 2023 11:14:49 PM CEST
 #
 #=========================================
 
@@ -219,6 +219,8 @@ then
 	filename = %(OUTPUT_FOLDER)s/output_${list_input}_%(blind)s.txt 
 	
 	EOF
+  @P_SED_INPLACE@ "s@filename = %(OUTPUT_FOLDER)s/output_%(RUN_NAME)s.txt@filename = %(OUTPUT_FOLDER)s/output_list_%(RUN_NAME)s.txt@g" \
+  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini
 
 #}}}
 elif [ "${SAMPLER^^}" == "EMCEE" ] #{{{
