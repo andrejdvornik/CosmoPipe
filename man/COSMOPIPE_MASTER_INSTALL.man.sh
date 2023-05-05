@@ -37,7 +37,7 @@ function _prompt {
     sleep .2
     _message "${BLU}You have 10 sec to decide... ${DEF}"
     
-    sleep 1 & _spinner 
+    sleep 10 & _spinner 
     
     echo " OK!"
     sleep 1

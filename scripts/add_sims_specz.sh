@@ -11,7 +11,18 @@ fi
 #Check that the specz catalogue exists
 if [ -d @DB:SIMSPECZCAT@ ]
 then 
-  filelist=`ls @DB:SIMSPECZCAT@`
+  inputlist=`ls @DB:SIMSPECZCAT@`
+  filelist=""
+  #This just makes sure that the files are added correctly
+  for file in ${inputlist} 
+  do 
+    #Construct the output name {{{
+    outname=${file##*/}
+    #}}}
+    #Save the output file to the list {{{
+    filelist="$filelist @DB:SIMSPECZCAT@/$outname"
+    #}}}
+  done 
 elif [ -f @DB:SIMSPECZCAT@ ]
 then 
   filelist=@DB:SIMSPECZCAT@
@@ -20,18 +31,6 @@ else
   exit -1 
 fi 
 
-outlist=""
-#This just makes sure that the files are added correctly
-for file in ${filelist} 
-do 
-  #Construct the output name {{{
-  outname=${file##*/}
-  #}}}
-  #Save the output file to the list {{{
-  outlist="$outlist @DB:SIMSPECZCAT@/$outname"
-  #}}}
-done 
-
 #Update the datablock contents file 
-_add_datablock sims_specz "$outlist"
+_add_datablock sims_specz "$filelist"
 

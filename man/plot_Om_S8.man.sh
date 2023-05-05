@@ -1,5 +1,5 @@
 #
-# plot_TPD.sh Documentation & Housekeeping functions
+# plot_Om_S8.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@================================@DEF@\n"
-    _message "@BLU@== @RED@ Running plot_TPD.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@================================@DEF@\n"
+    _message "@BLU@==================================@DEF@\n"
+    _message "@BLU@== @RED@ Running plot_Om_S8.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@==================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,8 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# plot the TPDs for a data vector after running the '
-  echo '# LIST sampler'
+  echo '# Plot an Omega_m vs S8 contour from the chain '
+  echo '# outputs'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,14 +43,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLINDING P_RSCRIPT RUNROOT SCRIPTPATH STORAGEPATH SURVEY DB:LIST_INPUT_SAMPLER
+  echo BLINDING P_RSCRIPT RUNROOT SCRIPTPATH STORAGEPATH SURVEY DB:BLIND DB:BOLTZMAN DB:REFCHAIN DB:SAMPLER DB:STATISTIC
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo cosebis_vec
+  echo 
 } 
 #}}}
 
@@ -64,7 +64,7 @@ function _outputs {
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/plot_TPD.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/plot_Om_S8.sh
 } 
 #}}}
 

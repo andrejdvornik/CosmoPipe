@@ -258,7 +258,6 @@ def saveFitsCOSEBIs():
 
     covName   = args.covarianceFile
     
-    #saveName  = FolderNameInputs+'/MCMC/@SURVEY@_INPUT/@BLINDING@/cosebis_@SURVEY@_@ALLPATCH@_combined_'+cat_version+'@FILESUFFIX@_filt_blind'+blind+'_nbins@NMAXCOSEBIS@_theta_@THETAMINCOV@_@THETAMAXCOV@_cosmosis.fits'
     saveName  = args.outputFile
     
     saveFitsTwoPoint(
