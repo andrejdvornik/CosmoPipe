@@ -46,7 +46,7 @@ function _varcheck {
   _undefined=''
   for var in $_varlist
   do 
-    if [ "${var:0:3}" == "DB:" ]
+    if [ "${var:0:3}" == "BV:" ]
     then 
       #Check that block variables are defined 
       _res=`_check_blockvar ${var:3}`
@@ -821,7 +821,7 @@ function _incorporate_datablock {
       _itemlist="${_itemlist} ${_itemfile}"
     done 
     #_itemlist=`echo ${_itemlist}`
-    @P_SED_INPLACE@ "s#\\@DB:${item%%=*}\\@#${_itemlist:1}#g" ${1//.${ext}/_prehead.${ext}}
+    @P_SED_INPLACE@ "s#\\@BV:${item%%=*}\\@#${_itemlist:1}#g" ${1//.${ext}/_prehead.${ext}}
   done 
   #}}}
 
