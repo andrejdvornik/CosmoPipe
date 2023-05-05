@@ -3,7 +3,7 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Thu 04 May 2023 11:14:49 PM CEST
+# Last Modified : Fri 05 May 2023 10:49:58 AM CEST
 #
 #=========================================
 
@@ -14,17 +14,17 @@ cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_con
 [DEFAULT]
 MY_PATH      = @RUNROOT@/
 
-stats_name    = @DB:STATISTIC@
+stats_name    = @BV:STATISTIC@
 CSL_PATH      = %(MY_PATH)s/INSTALL/cosmosis-standard-library/
 KCAP_PATH     = %(MY_PATH)s/INSTALL/kcap/
 
-OUTPUT_FOLDER =  %(MY_PATH)s/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@DB:BOLTZMAN@/%(stats_name)s/chain/
+OUTPUT_FOLDER =  %(MY_PATH)s/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/%(stats_name)s/chain/
 CONFIG_FOLDER = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/
 
-blind         = @DB:BLIND@
+blind         = @BV:BLIND@
 redshift_name = source
 
-SAMPLER_NAME = @DB:SAMPLER@
+SAMPLER_NAME = @BV:SAMPLER@
 RUN_NAME = %(SAMPLER_NAME)s_%(blind)s
 
 data_file = @DB:mcmc_inp@
@@ -46,12 +46,12 @@ EOF
 #}}}
 
 #Requested statistic {{{
-STATISTIC="@DB:STATISTIC@"
+STATISTIC="@BV:STATISTIC@"
 if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 then 
   #Scalecuts {{{
-  lo=`echo @DB:NMINCOSEBIS@ | awk '{print $1-0.5}'`
-  hi=`echo @DB:NMAXCOSEBIS@ | awk '{print $1+0.5}'`
+  lo=`echo @BV:NMINCOSEBIS@ | awk '{print $1-0.5}'`
+  hi=`echo @BV:NMAXCOSEBIS@ | awk '{print $1+0.5}'`
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 use_stats = En
 keep_ang_En   = ${lo} ${hi} 
@@ -65,9 +65,9 @@ EOF
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 ;COSEBIs settings
 COSEBIS_PATH = %(MY_PATH)s/INSTALL/kcap/cosebis/
-tmin_cosebis = @THETAMINCOV@
-tmax_cosebis = @THETAMAXCOV@
-nmax_cosebis = @DB:NMAXCOSEBIS@
+tmin_cosebis = @BV:THETAMINCOV@
+tmax_cosebis = @BV:THETAMAXCOV@
+nmax_cosebis = @BV:NMAXCOSEBIS@
 WnLogPath = @RUNROOT@/@CONFIGPATH@/cosebis/WnLog/
 
 EOF
@@ -137,7 +137,7 @@ fi
 #}}}
 
 #Requested sampler {{{
-SAMPLER="@DB:SAMPLER@"
+SAMPLER="@BV:SAMPLER@"
 VALUES=values
 PRIORS=priors
 listparam=''
@@ -239,9 +239,9 @@ then
 #}}}
 elif [ "${SAMPLER^^}" == "LIST" ] #{{{
 then 
-  ndof="@DB:DVLENGTH@"
+  ndof="@BV:DVLENGTH@"
   listparam="scale_cuts_output/theory#${ndof}"
-  list_input="@DB:LIST_INPUT_SAMPLER@"
+  list_input="@BV:LIST_INPUT_SAMPLER@"
 
 	cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini <<- EOF
 	[list]
@@ -270,7 +270,7 @@ fi
 extraparams="cosmological_parameters/S_8 cosmological_parameters/sigma_8 cosmological_parameters/A_s cosmological_parameters/omega_m cosmological_parameters/omega_nu cosmological_parameters/omega_lambda cosmological_parameters/cosmomc_theta"
 #Add nz shift values to outputs {{{
 shifts=""
-NTOMO=@DB:NTOMO@
+NTOMO=@BV:NTOMO@
 for i in `seq ${NTOMO}`
 do 
    shifts="${shifts} nofz_shifts/bias_${i}"
@@ -279,7 +279,7 @@ done
 #Add the values information #{{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
 [pipeline]
-modules = @DB:COSMOSIS_PIPELINE@
+modules = @BV:COSMOSIS_PIPELINE@
 values  = %(CONFIG_FOLDER)s/@SURVEY@_${VALUES}.ini
 EOF
 #}}}
@@ -311,7 +311,7 @@ EOF
 #}}}
 
 #Requested boltzman {{{
-BOLTZMAN="@DB:BOLTZMAN@"
+BOLTZMAN="@BV:BOLTZMAN@"
 if [ "${BOLTZMAN^^}" == "CAMB_HM2015" ] #{{{
 then 
 
@@ -433,7 +433,7 @@ fi
 
 #Additional Modules {{{
 echo > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini
-for module in @DB:COSMOSIS_PIPELINE@
+for module in @BV:COSMOSIS_PIPELINE@
 do 
   case ${module} in 
     "sample_S8") #{{{

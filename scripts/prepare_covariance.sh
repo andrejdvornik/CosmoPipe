@@ -3,7 +3,7 @@
 # File Name : prepare_covariance.sh
 # Created By : awright
 # Creation Date : 05-04-2023
-# Last Modified : Wed Apr  5 11:27:44 2023
+# Last Modified : Fri 05 May 2023 10:46:52 AM CEST
 #
 #=========================================
 
@@ -13,5 +13,5 @@ then
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_cov/
 fi 
 
-_write_datablock "cosebis_cov" "Covariance_blind@BLIND@_nMaximum_@NMAXCOSEBIS@_@THETAMINXI@_@THETAMAXXI@_nBins@DB:NTOMO@.ascii"
+_write_datablock "cosebis_cov" "Covariance_blind@BV:BLIND@_nMaximum_@BV:NMAXCOSEBIS@_@BV:THETAMINXI@_@BV:THETAMAXXI@_nBins@BV:NTOMO@.ascii"
 

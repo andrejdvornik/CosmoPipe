@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Wed 26 Apr 2023 08:52:11 AM CEST
+# Last Modified : Fri 05 May 2023 10:19:48 AM CEST
 #
 #=========================================
 
@@ -21,13 +21,13 @@ done
 @P_RSCRIPT@ @RUNROOT@/INSTALL/SOM_DIR/R/SOM_DIR.R \
   -r @DB:som_weight_reference@ \
   -t @DB:som_weight_training@ \
-  -ct "" -cr @DB:WEIGHTNAME@ \
+  -ct "" -cr @BV:WEIGHTNAME@ \
   --old.som @DB:som@ \
   --factor.nbins Inf --optimise --force \
-  -sc @DB:NTHREADS@ \
+  -sc @BV:NTHREADS@ \
   --short.write \
   -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ -of ${output_files} \
-  --zr.label @DB:ZPHOTNAME@ --zt.label @DB:ZSPECNAME@ \
+  --zr.label @BV:ZPHOTNAME@ --zt.label @BV:ZSPECNAME@ \
   -k MAG_GAAP_u-MAG_GAAP_g \
   MAG_GAAP_u-MAG_GAAP_r MAG_GAAP_g-MAG_GAAP_r \
   MAG_GAAP_u-MAG_GAAP_i1 MAG_GAAP_g-MAG_GAAP_i1 \

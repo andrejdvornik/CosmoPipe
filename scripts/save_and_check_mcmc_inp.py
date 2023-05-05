@@ -213,6 +213,8 @@ parser.add_argument("--datavector", dest="DataVector",
     help="Full Input file names", metavar="DataVector",required=True)
 parser.add_argument("--nz", dest="NzList",nargs='+',type=str,
     help="list of Nz per tomographic bin",required=True)
+parser.add_argument("--nmaxcosebis", dest="nmaxcosebis",nargs='1',type=int,
+    help="maximum n for cosebis")
 parser.add_argument("--neff", dest="NeffFile",
     help="Neff values file",required=True)
 parser.add_argument("--sigmae", dest="SigmaeFile",
@@ -262,7 +264,7 @@ def saveFitsCOSEBIs():
     
     saveFitsTwoPoint(
         nbTomoN=0, nbTomoG=len(nOfZNameList),
-        nbModes=@NMAXCOSEBIS@,
+        nbModes=args.nmaxcosebis,
         prefix_Flinc=None,
         prefix_CosmoSIS=None,
         scDict=scDict,

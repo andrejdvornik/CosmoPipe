@@ -9,9 +9,9 @@ then
 fi 
 
 #Check that the specz catalogue exists
-if [ -d @DB:SIMSPECZCAT@ ]
+if [ -d @BV:SIMSPECZCAT@ ]
 then 
-  inputlist=`ls @DB:SIMSPECZCAT@`
+  inputlist=`ls @BV:SIMSPECZCAT@`
   filelist=""
   #This just makes sure that the files are added correctly
   for file in ${inputlist} 
@@ -20,14 +20,14 @@ then
     outname=${file##*/}
     #}}}
     #Save the output file to the list {{{
-    filelist="$filelist @DB:SIMSPECZCAT@/$outname"
+    filelist="$filelist @BV:SIMSPECZCAT@/$outname"
     #}}}
   done 
-elif [ -f @DB:SIMSPECZCAT@ ]
+elif [ -f @BV:SIMSPECZCAT@ ]
 then 
-  filelist=@DB:SIMSPECZCAT@
+  filelist=@BV:SIMSPECZCAT@
 else 
-  _message "${RED} - ERROR: simulated specz catalogue @DB:SIMSPECZCAT@ does not exist!"
+  _message "${RED} - ERROR: simulated specz catalogue @BV:SIMSPECZCAT@ does not exist!"
   exit -1 
 fi 
 

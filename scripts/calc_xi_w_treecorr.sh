@@ -3,7 +3,7 @@
 # File Name : calc_xi_w_treecorr.sh
 # Created By : awright
 # Creation Date : 27-03-2023
-# Last Modified : Tue 25 Apr 2023 11:55:29 PM CEST
+# Last Modified : Fri 05 May 2023 10:53:16 AM CEST
 #
 #=========================================
 
@@ -85,9 +85,9 @@ do
       fi 
 
       _message "    -> @BLU@Bin $ZBIN1 ($ZB_lo < Z_B <= $ZB_hi) x Bin $ZBIN2 ($ZB_lo2 < Z_B <= $ZB_hi2)@DEF@"
-      MKL_NUM_THREADS=@DB:NTHREADS@  NUMEXPR_NUM_THREADS=@DB:NTHREADS@ OMP_NUM_THREADS=@DB:NTHREADS@ \
+      MKL_NUM_THREADS=@BV:NTHREADS@  NUMEXPR_NUM_THREADS=@BV:NTHREADS@ OMP_NUM_THREADS=@BV:NTHREADS@ \
         @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_xi_w_treecorr.py \
-        --nbins @NTHETABINXI@ --theta_min @THETAMINXI@ --theta_max @THETAMAXXI@ --binning @BINNING@ \
+        --nbins @BV:NTHETABINXI@ --theta_min @BV:THETAMINXI@ --theta_max @BV:THETAMAXXI@ --binning @BINNING@ \
         --fileone ${file_one} \
         --filetwo ${file_two} \
         --output @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipm/${outname} \

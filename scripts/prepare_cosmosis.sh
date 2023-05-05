@@ -3,7 +3,7 @@
 # File Name : prepare_cosmosis.sh
 # Created By : awright
 # Creation Date : 31-03-2023
-# Last Modified : Thu Apr  6 08:14:09 2023
+# Last Modified : Fri 05 May 2023 10:22:40 AM CEST
 #
 #=========================================
 
@@ -106,7 +106,7 @@ then
     mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/
   fi 
   _message "Copying XIpm catalogues from datahead into cosmosis_xipm {\n"
-  ntomo="@DB:NTOMO@"
+  ntomo="@BV:NTOMO@"
   #Loop over tomographic bins in this patch 
   for ZBIN1 in `seq ${ntomo}`
   do
@@ -174,7 +174,7 @@ cp @RUNROOT@/@CONFIGPATH@/values.ini @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosi
 echo "[nofz_shifts]" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini 
 #Add the uncorrelated tomographic bin shifts 
 tomoval_all=`cat @DB:nzbias_uncorr@`
-for tomo in `seq @DB:NTOMO@`
+for tomo in `seq @BV:NTOMO@`
 do 
   tomoval=`echo ${tomoval_all} | awk -v n=${tomo} '{print $n}'`
   echo "uncorr_bias_${tomo} = -5.0 ${tomoval} 5.0 " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
@@ -184,7 +184,7 @@ echo > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
 #Update the values with the uncorrelated Dz priors
 echo "[nofz_shifts]" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini 
 #Add the uncorrelated tomographic bin shifts 
-for tomo in `seq @DB:NTOMO@`
+for tomo in `seq @BV:NTOMO@`
 do 
   tomoval=`echo ${tomoval_all} | awk -v n=${tomo} '{print $n}'`
   echo "uncorr_bias_${tomo} = gaussian ${tomoval} 1.0 " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini

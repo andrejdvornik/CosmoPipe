@@ -3,14 +3,14 @@
 # File Name : replicate_ntomo.sh
 # Created By : awright
 # Creation Date : 25-04-2023
-# Last Modified : Tue 25 Apr 2023 07:36:02 PM CEST
+# Last Modified : Fri 05 May 2023 10:23:04 AM CEST
 #
 #=========================================
 
 for file in @DB:ALLHEAD@ 
 do 
   file=${file##*/}
-  for i in `seq @DB:NTOMO@` 
+  for i in `seq @BV:NTOMO@` 
   do 
     outlist="$outlist $file"
   done 

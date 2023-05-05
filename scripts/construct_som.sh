@@ -3,7 +3,7 @@
 # File Name : specz_som.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Tue 25 Apr 2023 11:55:38 PM CEST
+# Last Modified : Fri 05 May 2023 10:20:16 AM CEST
 #
 #=========================================
 
@@ -18,9 +18,9 @@ outext=${outname##*.}
   -r none -t @DB:DATAHEAD@ \
   --toroidal --topo hexagonal --som.dim 101 101 -np -fn Inf \
   --data.threshold 0 40 --data.missing -99 \
-  -sc @DB:NTHREADS@ --som.iter 1000 --only.som \
+  -sc @BV:NTHREADS@ --som.iter 1000 --only.som \
   -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ -of ${outname} \
-  --zr.label @DB:ZPHOTNAME@ --zt.label @DB:ZSPECNAME@ \
+  --zr.label @BV:ZPHOTNAME@ --zt.label @BV:ZSPECNAME@ \
   -k MAG_GAAP_u-MAG_GAAP_g \
   MAG_GAAP_u-MAG_GAAP_r MAG_GAAP_g-MAG_GAAP_r \
   MAG_GAAP_u-MAG_GAAP_i1 MAG_GAAP_g-MAG_GAAP_i1 \
