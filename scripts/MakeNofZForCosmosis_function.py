@@ -5,7 +5,7 @@ import os
 import numpy as np
 import pylab as plt
 from   matplotlib.ticker import ScalarFormatter
-import pyfits
+import astropy.io.fits as pyfits
 from argparse import ArgumentParser
 
 def MakeNofz_fits(input_files,outputfileName,OneBin_nofzFileName,neff=[],single_bin=True,type='lowerEdge',suffix='SAMPLE'):

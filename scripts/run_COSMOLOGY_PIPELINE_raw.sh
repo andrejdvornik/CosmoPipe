@@ -152,7 +152,7 @@ do
     fi 
     echo -n "Constructing catalogue for tomographic bin ${i} ($Z_B_low < Z_B <= $Z_B_high)"
     #Create the tomographic bin catalogues
-    @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
+    @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
              -i @PATCHPATH@/@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@.cat \
     	       -o @PATCHPATH@/@SURVEY@_@ALLPATCH@_@FILEBODY@@FILESUFFIX@_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
     	       -t OBJECTS \
@@ -230,11 +230,11 @@ echo -e "###\033[0;34m Running Step 5/7: Prepare the data for MCMC:\033[0m ###"
   #}}}
 
   #> 5a: prepare the 2pt statistic:{{{
-  @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/MakeDataVector.py 
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/MakeDataVector.py 
   #}}}
 
   #> 5a: prepare the combined fits file:{{{
-  @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/save_and_check_Phase1.py 
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/save_and_check_Phase1.py 
   #}}}
 
   ##Construct the cut values file {{{

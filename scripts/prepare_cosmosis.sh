@@ -98,65 +98,68 @@ _write_datablock "cosmosis_sigmae" "${sigmae_file}"
 #}}}
 
 #Xipm {{{
-#Create the xipm directory
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm ]
+if [ "${headfiles}" != "" ]
 then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/
-fi 
-_message "Copying XIpm catalogues from datahead into cosmosis_xipm {\n"
-ntomo="@DB:NTOMO@"
-#Loop over tomographic bins in this patch 
-for ZBIN1 in `seq ${ntomo}`
-do
-  #Define the Z_B limits from the TOMOLIMS {{{
-  ZB_lo=`echo @TOMOLIMS@ | awk -v n=$ZBIN1 '{print $n}'`
-  ZB_hi=`echo @TOMOLIMS@ | awk -v n=$ZBIN1 '{print $(n+1)}'`
-  #}}}
-  #Define the string to append to the file names {{{
-  ZB_lo_str=`echo $ZB_lo | sed 's/\./p/g'`
-  ZB_hi_str=`echo $ZB_hi | sed 's/\./p/g'`
-  appendstr="_ZB${ZB_lo_str}t${ZB_hi_str}"
-  #}}}
-  
-  for ZBIN2 in `seq $ZBIN1 ${ntomo}`
+  #Create the xipm directory
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm ]
+  then 
+    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/
+  fi 
+  _message "Copying XIpm catalogues from datahead into cosmosis_xipm {\n"
+  ntomo="@DB:NTOMO@"
+  #Loop over tomographic bins in this patch 
+  for ZBIN1 in `seq ${ntomo}`
   do
-    ZB_lo2=`echo @TOMOLIMS@ | awk -v n=$ZBIN2 '{print $n}'`
-    ZB_hi2=`echo @TOMOLIMS@ | awk -v n=$ZBIN2 '{print $(n+1)}'`
-    ZB_lo_str2=`echo $ZB_lo2 | sed 's/\./p/g'`
-    ZB_hi_str2=`echo $ZB_hi2 | sed 's/\./p/g'`
-    appendstr2="_ZB${ZB_lo_str2}t${ZB_hi_str2}"
-
-    #Define the input file id 
-    filestr="${appendstr}${appendstr2}_ggcorr.txt"
-
-    #Get the file list {{{
-    filelist=''
-    for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
-    do 
-      file=`echo ${headfiles} | sed 's/ /\n/g' | grep "_${patch}_" | grep ${filestr} || echo `
-      #Check if the output file exists 
-      if [ "${file}" == "" ] 
-      then 
-        continue
-      fi 
-      _message " > @BLU@ Patch @DEF@${patch}@BLU@ ZBIN @DEF@${ZBIN1}@BLU@x@DEF@${ZBIN2}"
-      cp ${file} \
-        @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/XI_@SURVEY@_${patch}_nBins_${ntomo}_Bin${ZBIN1}_Bin${ZBIN2}.ascii
-      _message " - @RED@ Done!@DEF@\n"
-      outlist="${outlist} XI_@SURVEY@_${patch}_nBins_${ntomo}_Bin${ZBIN1}_Bin${ZBIN2}.ascii"
-    done 
+    #Define the Z_B limits from the TOMOLIMS {{{
+    ZB_lo=`echo @TOMOLIMS@ | awk -v n=$ZBIN1 '{print $n}'`
+    ZB_hi=`echo @TOMOLIMS@ | awk -v n=$ZBIN1 '{print $(n+1)}'`
     #}}}
+    #Define the string to append to the file names {{{
+    ZB_lo_str=`echo $ZB_lo | sed 's/\./p/g'`
+    ZB_hi_str=`echo $ZB_hi | sed 's/\./p/g'`
+    appendstr="_ZB${ZB_lo_str}t${ZB_hi_str}"
+    #}}}
+    
+    for ZBIN2 in `seq $ZBIN1 ${ntomo}`
+    do
+      ZB_lo2=`echo @TOMOLIMS@ | awk -v n=$ZBIN2 '{print $n}'`
+      ZB_hi2=`echo @TOMOLIMS@ | awk -v n=$ZBIN2 '{print $(n+1)}'`
+      ZB_lo_str2=`echo $ZB_lo2 | sed 's/\./p/g'`
+      ZB_hi_str2=`echo $ZB_hi2 | sed 's/\./p/g'`
+      appendstr2="_ZB${ZB_lo_str2}t${ZB_hi_str2}"
+  
+      #Define the input file id 
+      filestr="${appendstr}${appendstr2}_ggcorr.txt"
+  
+      #Get the file list {{{
+      filelist=''
+      for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+      do 
+        file=`echo ${headfiles} | sed 's/ /\n/g' | grep "_${patch}_" | grep ${filestr} || echo `
+        #Check if the output file exists 
+        if [ "${file}" == "" ] 
+        then 
+          continue
+        fi 
+        _message " > @BLU@ Patch @DEF@${patch}@BLU@ ZBIN @DEF@${ZBIN1}@BLU@x@DEF@${ZBIN2}"
+        cp ${file} \
+          @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/XI_@SURVEY@_${patch}_nBins_${ntomo}_Bin${ZBIN1}_Bin${ZBIN2}.ascii
+        _message " - @RED@ Done!@DEF@\n"
+        outlist="${outlist} XI_@SURVEY@_${patch}_nBins_${ntomo}_Bin${ZBIN1}_Bin${ZBIN2}.ascii"
+      done 
+      #}}}
+    done
   done
-done
-if [ "${outlist}" == "" ] 
-then 
-  _message " - @RED@ERROR!@DEF@\n"
-  _message "@RED@There were no catalogues added to the cosmosis xipm folder?!@DEF@"
-  _message "@BLU@You probably didn't load the xipm files into the datahead?!@DEF@"
-  exit 1
+  if [ "${outlist}" == "" ] 
+  then 
+    _message " - @RED@ERROR!@DEF@\n"
+    _message "@RED@There were no catalogues added to the cosmosis xipm folder?!@DEF@"
+    _message "@BLU@You probably didn't load the xipm files into the datahead?!@DEF@"
+    exit 1
+  fi 
+  _write_datablock "cosmosis_xipm" "${outlist}"
+  _message "}\n"
 fi 
-_write_datablock "cosmosis_xipm" "${outlist}"
-_message "}\n"
 #}}}
 
 #Values and prior files {{{

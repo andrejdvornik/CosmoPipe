@@ -17,7 +17,7 @@ then
 fi 
 
 #Construct the data vector for cosebis
-@PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/make_data_vector.py \
+@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/make_data_vector.py \
   --inputfiles @DB:cosebis@   \
   --mbias   ${mbias}      \
   --tomobins @TOMOLIMS@  \

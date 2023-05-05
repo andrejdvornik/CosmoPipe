@@ -33,7 +33,7 @@ catbase=${catname%.*}
 
 _message "> @BLU@Computing sigma_e and n_effective for catalogue:@DEF@ ${catname}" 
 #Prepare the neff & ellipticity dispersion file
-@PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/neff_sigmae.py \
+@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/neff_sigmae.py \
   @DB:DATAHEAD@ \
   ${SurveyArea} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cov_input/${catbase}_neff_sigmae.txt 
 _message " - @RED@Done!@DEF@\n"

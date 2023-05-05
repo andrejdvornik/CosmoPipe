@@ -128,7 +128,7 @@ if [ -d ${RUNROOT}/INSTALL/CosmoPowerCosmosis ]
 then 
   rm -fr CosmoPowerCosmosis
 fi
-git clone https://github.com/KiDS_WL/CosmoPowerCosmosis.git >> gitclone_output.log 2>&1
+git clone https://github.com/KiDS-WL/CosmoPowerCosmosis.git >> gitclone_output.log 2>&1
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
 

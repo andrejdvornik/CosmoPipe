@@ -138,6 +138,8 @@ fi
 
 #Requested sampler {{{
 SAMPLER="@DB:SAMPLER@"
+VALUES=values
+PRIORS=priors
 listparam=''
 if [ "${SAMPLER^^}" == "TEST" ] #{{{
 then 
@@ -208,6 +210,33 @@ nsample=500000
 EOF
 
 #}}}
+elif [ "${SAMPLER^^}" == "GRID" ] #{{{
+then 
+  #Set up the fixed values file {{{
+  VALUES=values_fixed
+  PRIORS=
+  echo > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values_fixed.ini
+  while read line 
+  do
+    var=`echo ${line} | awk '{print $1}'`
+    #if [ "${var}" == "s_8_input" ] || [ "${var}" == "omch2" ] || [ "${var}" == "ombh2" ] || [ "${var:0:1}" == "[" ] || [ "${var}" == "" ] 
+    if [ "${var}" == "s_8_input" ] || [ "${var}" == "omch2" ] || [ "${var:0:1}" == "[" ] || [ "${var}" == "" ] 
+    then 
+      #we have a variable we want, or a block definition, or an empty line: Reproduce the line 
+      echo ${line} >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values_fixed.ini
+    else 
+      #we have a variable we don't want: Print the variable with the expectation value only 
+      expect=`echo ${line} | awk -F= '{print $2}' | awk -F\; '{print $1}' | awk '{ if (NF>1) { print $2 } else { print $1 } }'`
+      echo ${var} = ${expect} >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values_fixed.ini
+    fi 
+  done <  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+  #}}}
+  cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini <<- EOF
+	[grid]
+	nsample_dimension=35
+	EOF
+
+#}}}
 elif [ "${SAMPLER^^}" == "LIST" ] #{{{
 then 
   ndof="@DB:DVLENGTH@"
@@ -237,18 +266,31 @@ fi
 
 #Prepare the pipeline section {{{ 
 extraparams="cosmological_parameters/S_8 cosmological_parameters/sigma_8 cosmological_parameters/A_s cosmological_parameters/omega_m cosmological_parameters/omega_nu cosmological_parameters/omega_lambda cosmological_parameters/cosmomc_theta"
+#Add nz shift values to outputs {{{
 shifts=""
 NTOMO=@DB:NTOMO@
 for i in `seq ${NTOMO}`
 do 
    shifts="${shifts} nofz_shifts/bias_${i}"
 done
-
+#}}}
+#Add the values information #{{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
 [pipeline]
 modules = @DB:COSMOSIS_PIPELINE@
-values  = %(CONFIG_FOLDER)s/@SURVEY@_values.ini
-priors  = %(CONFIG_FOLDER)s/@SURVEY@_priors.ini
+values  = %(CONFIG_FOLDER)s/@SURVEY@_${VALUES}.ini
+EOF
+#}}}
+#If needed, add the priors information #{{{
+if [ "${PRIORS}" != "" ] 
+then 
+  cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
+	priors  = %(CONFIG_FOLDER)s/@SURVEY@_priors.ini
+	EOF
+fi 
+#}}}
+#Add the other information #{{{
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
 likelihoods  = loglike
 extra_output = ${extraparams} ${shifts} ${listparam}
 quiet = F
@@ -262,8 +304,8 @@ sampler = %(SAMPLER_NAME)s
 filename = %(OUTPUT_FOLDER)s/output_%(RUN_NAME)s.txt
 format = text
 
-
 EOF
+#}}}
 #}}}
 
 #Requested boltzman {{{

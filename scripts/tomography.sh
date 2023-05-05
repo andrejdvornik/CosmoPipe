@@ -43,7 +43,7 @@ do
   #}}}
   #Construct the output tomographic bin {{{
   _message "   > @BLU@Constructing catalogue for tomographic bin ${i}@DEF@ ($ZB_lo < ZB <= $ZB_hi)"
-  @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
            -i ${inputfile} \
   	       -o ${outputname} \
   	       -t OBJECTS \

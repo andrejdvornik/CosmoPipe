@@ -36,7 +36,7 @@ fi
 _message " > @BLU@Constructing treecorr input catalogue for @RED@${current##*/}@DEF@"
 logfile=${outputname##*/}
 logfile=${logfile//.fits/.log}
-@PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/prepare_treecorr.py \
+@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/prepare_treecorr.py \
   -i ${current} \
   -o ${outputname} > @RUNROOT@/@LOGPATH@/${logfile} 2>&1
 _message " - @RED@Done!@DEF@\n"

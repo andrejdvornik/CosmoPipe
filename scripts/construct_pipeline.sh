@@ -20,6 +20,7 @@ _varcheck $0
 
 #Read the pipeline description file {{{
 pipeline_steps=`_read_pipe @PIPELINE@`
+#>&2 echo ${pipeline_steps}
 count=0
 #If there are any substeps 
 while [[ " ${pipeline_steps} " =~ " ." ]]
@@ -126,7 +127,7 @@ do
   if [ "${step:0:1}" == "@" ]
   then 
     #Modify the HEAD to the request value {{{
-    _write_datahead ${step:1} "_validitytest_"
+    _write_datahead "${step:1}" "_validitytest_"
     #}}}
   elif [ "${step:0:1}" == "!" ]
   then 
@@ -170,14 +171,20 @@ do
     for inp in $inputs
     do 
       #If not in the data block 
-      if [ "$(_inblock $inp)" == "0" ]
+      if [ "$(_inblock $inp)" == "0" ] 
       then 
-        #Error 
-        _message " - ERROR!\n\n"
-        _message "   ${RED}ERROR: ${BLU}Input ${DEF}${inp}${BLU} does not exist in the data-block when needed for step ${DEF}${step}${BLU}!${DEF}\n" 
-        _message "                ${BLU}`_read_datablock`\n"
-        _message "   ${RED}       Pipeline is invalid!${DEF}\n" 
-        exit 1 
+        if [ "${inp}" == "ALLHEAD" ]
+        then 
+          #Error 
+          _message "${RED}(WARNING)${DEF} "
+        else 
+          #Error 
+          _message " - ERROR!\n\n"
+          _message "   ${RED}ERROR: ${BLU}Input ${DEF}${inp}${BLU} does not exist in the data-block when needed for step ${DEF}${step}${BLU}!${DEF}\n" 
+          _message "                ${BLU}`_read_datablock`\n"
+          _message "   ${RED}       Pipeline is invalid!${DEF}\n" 
+          exit 1 
+        fi 
       fi 
     done 
     #}}}
@@ -242,22 +249,42 @@ do
   #Write each step of the pipeline 
   if [ "${step:0:1}" == "@" ]
   then 
-    #If this is a datahead assignment: {{{
-    cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
-		
-		#Modify the HEAD to the request value
-		#Intermediate Step: write block item ${step:1} to current DATAHEAD {{{
-		#Notify
-		_message "@BLU@Copying requested elements of ${step:1} to DATAHEAD @DEF@ {\n"
-		#Modify the current HEAD to requested block element
-		_add_datahead ${step:1}
-		#Notify
-		_message "} - @RED@Done!@DEF@\n"
-		#}}}
+    if [ "${step:1}" == "" ] 
+    then 
+    	#If this is a datahead clearing: {{{
+    	cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
+			
+			#Clear the datahead 
+			#Intermediate Step: clear the DATAHEAD {{{
+			#Notify
+			_message "@BLU@Clearing the current DATAHEAD @DEF@ {\n"
+			#Erase the datahead by doing a NULL assignment 
+			_write_datahead "${step:1}"
+			#Notify
+			_message "} - @RED@Done!@DEF@\n"
+			#}}}
 
 
-		EOF
-    #}}}
+			EOF
+    	#}}}
+    else 
+    	#If this is a datahead assignment: {{{
+    	cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
+			
+			#Modify the HEAD to the request value
+			#Intermediate Step: write block item ${step:1} to current DATAHEAD {{{
+			#Notify
+			_message "@BLU@Copying requested elements of ${step:1} to DATAHEAD @DEF@ {\n"
+			#Modify the current HEAD to requested block element
+			_add_datahead "${step:1}"
+			#Notify
+			_message "} - @RED@Done!@DEF@\n"
+			#}}}
+
+
+			EOF
+    	#}}}
+    fi
   elif [ "${step:0:1}" == "!" ]
   then 
     #If this is a datablock assignment: {{{
@@ -295,6 +322,7 @@ do
     #}}}
   elif [ "${step:0:1}" == "+" ]
   then 
+    #>&2 echo "ASSIGNMENT TIME: ${step}"
     #If this is a blockvariable assignment: {{{
     _var=${step:1}
     _varval=${_var#*=}

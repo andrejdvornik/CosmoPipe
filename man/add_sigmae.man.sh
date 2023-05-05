@@ -1,5 +1,5 @@
 #
-# run_chain.sh Documentation & Housekeeping functions
+# add_sigmae.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@=================================@DEF@\n"
-    _message "@BLU@== @RED@ Running run_chain.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@=================================@DEF@\n"
+    _message "@BLU@==================================@DEF@\n"
+    _message "@BLU@== @RED@ Running add_sigmae.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@==================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,7 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Run Cosmosis using a CosmoPipe .ini file'
+  echo '# Add sigmae values to the datablock'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -42,28 +42,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo DATABLOCK NTHREADS PYTHON3BIN RUNROOT STORAGEPATH SURVEY
+  echo DATABLOCK RUNROOT SIGMAELIST STORAGEPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo cosmosis_inputs mcmc_inp
+  echo ALLHEAD
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo 
+  echo sigmae
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/run_chain.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/add_sigmae.sh
 } 
 #}}}
 

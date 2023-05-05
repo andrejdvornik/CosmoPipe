@@ -66,6 +66,7 @@ function _read_pipe {
   fi 
   #Check for the number of pipelines with this name, and continue if 0
   _npipe=`grep -v "^#" ${_PIPELOC} | grep -Fc --ignore-case "${_step}:" | xargs echo `
+  #>&2 echo "Number of pipelines: ${_npipe}"
   if [ "${_npipe}" == "0" ]
   then 
     _message "${RED} - ERROR${DEF}\n\n"
@@ -92,17 +93,37 @@ function _read_pipe {
       seen="F"
       next
     }
+    inquote="F"
     for(i=1; i<=NF; i++) {
-      if (i!=1 || substr($i,length($i),1)!=":") {
-        if (substr($i,1,1) == "@" || substr($i,1,1) == "!" || substr($i,1,1) == "%" ) {
-          #Step has no number
-          print $i "=_"
-        } else if (substr($i,1,1) == "#") {
-          next
-        } else {
-          #Add (sub)step number
-          count+=1
-          print $i "=" S count
+      if (inquote=="T") { 
+        res=match($i,"\"")
+        if (res==0) { 
+          quotestring=quotestring "," $i 
+        } else { 
+          print quotestring "," $i "=_"
+          inquote="F"
+        }
+      } else { 
+        if (i!=1 || substr($i,length($i),1)!=":") {
+          if (substr($i,1,1) == "@" || substr($i,1,1) == "!" || substr($i,1,1) == "%" ) {
+            #Step has no number
+            print $i "=_"
+          } else if (substr($i,1,1) == "+") {
+            #Step is a variable assignment 
+            match($i,"=")
+            if (substr($i,RSTART+1,1)=="\"") { 
+              inquote="T"
+              quotestring=$i
+            } else { 
+              print $i "=_"
+            }
+          } else if (substr($i,1,1) == "#") {
+            next
+          } else {
+            #Add (sub)step number
+            count+=1
+            print $i "=" S count
+          }
         }
       }
     }

@@ -17,7 +17,7 @@ fi
 cov="@DB:cosebis_cov@"
 cov=${cov##*/}
 cov=${cov//.ascii/.fits}
-@PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp.py \
+@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp.py \
   --datavector @DB:cosebis_vec@ \
   --nz @DB:nz@ \
   --neff @DB:cosmosis_neff@ \

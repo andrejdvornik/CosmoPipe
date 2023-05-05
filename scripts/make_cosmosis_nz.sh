@@ -31,7 +31,7 @@ fi
 
 _message " > @BLU@Constructing COSMOSIS Nz file@DEF@"
 #Construct the Nz combined fits file and put into covariance/input/
-@PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/MakeNofZForCosmosis_function.py \
+@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/MakeNofZForCosmosis_function.py \
   --inputs @DB:nz@ \
   --neff @DB:cosmosis_neff@ \
   --output_base ${output_base} 2>&1 

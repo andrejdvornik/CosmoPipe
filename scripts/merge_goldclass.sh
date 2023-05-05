@@ -56,7 +56,7 @@ do
   #}}}
   #Construct the output tomographic bin {{{
   _message "   > @BLU@Removing non-gold sources for ${i}@DEF@${input##*/}"
-  @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
            -i @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_all_tomo_gold/${outname}_tmp \
   	       -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_all_tomo_gold/${outname} \
   	       -t OBJECTS \

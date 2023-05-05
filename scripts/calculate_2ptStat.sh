@@ -39,7 +39,7 @@ do
   fi 
   echo -n "Creating Filtered (i.e. good phot) catalogue for patch ${patch}"
   #Select only sources with good 9-band photometry
-  @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
     -i @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@.cat \
     -t OBJECTS \
     -c "(@GAAPFLAG@==0);" \
@@ -75,7 +75,7 @@ do
     fi 
 
     echo -n "Creating Tomographic Bin ${ZBIN} ($Z_B_low < Z_B <= $Z_B_high) catalogue for filtered patch ${patch}"
-    @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
+    @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
       -i @PATCHPATH@/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt.cat \
       -o $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}_tmp.cat_$$ \
       -t OBJECTS \
@@ -95,7 +95,7 @@ do
 
 
     echo -n "Converting LDAC Catalogue to simple FITS"
-    @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/prepare_treecorr_fits.py \
+    @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/prepare_treecorr_fits.py \
       $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.cat \
       $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.fits
     echo -e " - Done!"
@@ -196,7 +196,7 @@ do
       fi 
 
       echo -n "    -> Bin $ZBIN1 ($Z_B_low < Z_B <= $Z_B_high) x Bin $ZBIN2 ($Z_B_low2 < Z_B <= $Z_B_high2)"
-      @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/calc_xi_w_treecorr.py \
+      @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_xi_w_treecorr.py \
         @NTHETABINXI@ @THETAMINXI@ @THETAMAXXI@ @BINNING@ \
         $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str}t${Z_B_high_str}.fits \
         $wd/@SURVEY@_${patch}_@FILEBODY@@FILESUFFIX@_filt_ZB${Z_B_low_str2}t${Z_B_high_str2}.fits \

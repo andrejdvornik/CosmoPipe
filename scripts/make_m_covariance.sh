@@ -21,7 +21,7 @@ then
 fi 
 
 #Create the m-covariance matrix [NTOMOxNTOMO] 
-@PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/make_m_covariance.py \
+@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/make_m_covariance.py \
   --mbias ${mbias} \
   --mcorr ${mcorr} \
   --output "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov/m_corr_r" 2>&1

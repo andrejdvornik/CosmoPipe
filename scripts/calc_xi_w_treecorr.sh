@@ -86,7 +86,7 @@ do
 
       _message "    -> @BLU@Bin $ZBIN1 ($ZB_lo < Z_B <= $ZB_hi) x Bin $ZBIN2 ($ZB_lo2 < Z_B <= $ZB_hi2)@DEF@"
       MKL_NUM_THREADS=@DB:NTHREADS@  NUMEXPR_NUM_THREADS=@DB:NTHREADS@ OMP_NUM_THREADS=@DB:NTHREADS@ \
-        @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/calc_xi_w_treecorr.py \
+        @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_xi_w_treecorr.py \
         --nbins @NTHETABINXI@ --theta_min @THETAMINXI@ --theta_max @THETAMAXXI@ --binning @BINNING@ \
         --fileone ${file_one} \
         --filetwo ${file_two} \

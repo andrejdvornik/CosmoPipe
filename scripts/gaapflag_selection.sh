@@ -13,7 +13,7 @@ do
   logfile=${input##*/}
   logfile=${logfile//.cat/_filt.log}
   #Select only sources with good 9-band photometry
-  @PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
     -i ${input} \
     -t OBJECTS \
     -c "(@GAAPFLAG@==0);" \

@@ -29,7 +29,7 @@ then
 fi 
 #Construct the output tomographic bin 
 _message " > @BLU@Constructing c-corrected catalogue for @RED@${current##*/}@DEF@"
-@PYTHON3BIN@/python3 @RUNROOT@/@SCRIPTPATH@/correct_cterm.py \
+@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/correct_cterm.py \
   -i ${current} \
   -o ${outputname} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cterm/${catname}
 _message " - @RED@Done!@DEF@\n"
