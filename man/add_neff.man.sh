@@ -42,14 +42,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo DATABLOCK NEFFLIST RUNROOT STORAGEPATH DB:NTOMO
+  echo BV:NTOMO DATABLOCK NEFFLIST RUNROOT STORAGEPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo ALLHEAD 
+  echo ALLHEAD
 } 
 #}}}
 

@@ -1,5 +1,5 @@
 #
-# run_chain.sh Documentation & Housekeeping functions
+# run_chain_cosebis_cp20_poly.ini Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@=================================@DEF@\n"
-    _message "@BLU@== @RED@ Running run_chain.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@=================================@DEF@\n"
+    _message "@BLU@====================================================@DEF@\n"
+    _message "@BLU@== @RED@ Running run_chain_cosebis_cp20_poly.ini Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@====================================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,7 +17,8 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Run Cosmosis using a CosmoPipe .ini file'
+  echo '# Run a COSEBIs chain with cosmopower, hmcode2020, '
+  echo '# and polychord'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -39,31 +40,29 @@ trap '_abort' 0
 set -e 
 #}}}
 
-# Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BV:NTHREADS DATABLOCK PYTHON3BIN RUNROOT STORAGEPATH SURVEY
+  echo BLIND BLINDING CONFIGPATH DATABLOCK NUSECOSEBIS RUNROOT STORAGEPATH SURVEY THETAMAXCOV THETAMINCOV
 } 
 #}}}
 
-# Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo 
+  echo mcmc_inp nzcov
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo 
+  echo ""
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/run_chain.sh
+  echo mpirun -n @NTHREADS@ --env MKL_NUM_THREADS 1 --env NUMEXPR_NUM_THREADS 1 --env OMP_NUM_THREADS 1 @PYTHON3BIN@/cosmosis --mpi @RUNROOT@/@CONFIGPATH@/run_chain_cosebis_cp20_poly.ini
 } 
 #}}}
 

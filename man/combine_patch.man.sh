@@ -44,7 +44,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo 
+  echo ALLPATCH BLU DATABLOCK DEF MACHINE PATCHLIST RED RUNROOT STORAGEPATH
 } 
 #}}}
 

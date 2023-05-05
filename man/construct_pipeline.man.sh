@@ -30,15 +30,15 @@ set -e
 
 # Input data {{{ 
 function _inp_data { 
-  #Data inputs: NONE
+  #Data inputs (leave blank if none)
   echo 
 } 
 #}}}
 
 # Input variables {{{ 
 function _inp_var { 
-  #Variable inputs 
-  echo RUNROOT SCRIPTPATH PIPELINE
+  #Variable inputs (leave blank if none)
+  echo 
 } 
 #}}}
 

@@ -42,7 +42,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo DATABLOCK RUNROOT DB:SIMSPECZCAT STORAGEPATH
+  echo BV:SIMSPECZCAT DATABLOCK RUNROOT STORAGEPATH
 } 
 #}}}
 

@@ -44,14 +44,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLIND CONFIGPATH FILEBODY FILESUFFIX MBIASCORR NMAXCOSEBIS NTOMOBINS NZCOVFILE NZFILEID PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH SURVEY SURVEYAREADEG THETAMAXCOV THETAMINCOV
+  echo CONFIGPATH PYTHON3BIN RUNROOT
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo nzcov mcov cosmosis_nz cosmosis_neff cosmosis_sigmae cosebis
+  echo 
 } 
 #}}}
 

@@ -44,7 +44,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo NTHREADS P_RSCRIPT ZPHOTNAME ZSPECNAME DATABLOCK
+  echo BLU BV:NTHREADS BV:ZPHOTNAME BV:ZSPECNAME DATABLOCK DEF P_RSCRIPT RED RUNROOT STORAGEPATH
 } 
 #}}}
 

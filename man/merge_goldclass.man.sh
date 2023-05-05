@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU DATABLOCK DEF MACHINE PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  echo BLU DATABLOCK DEF LOGPATH MACHINE PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 

@@ -43,14 +43,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLINDING NMAXCOSEBIS PYTHON3BIN RUNROOT SCRIPTPATH SURVEY THETAMAXCOV THETAMINCOV
+  echo BLINDING BV:BOLTZMAN BV:STATISTIC DATABLOCK PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH SURVEY
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo cosebis_cov cosebis_vec cosmosis_neff nz cosmosis_sigmae
+  echo cosebis_cov cosebis_vec cosmosis_neff cosmosis_sigmae nz
 } 
 #}}}
 

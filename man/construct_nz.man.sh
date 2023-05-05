@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo DATABLOCK NZFILESUFFIX P_RSCRIPT RUNROOT SCRIPTPATH STORAGEPATH
+  echo BV:ZSPECNAME DATABLOCK NZFILESUFFIX P_RSCRIPT RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 

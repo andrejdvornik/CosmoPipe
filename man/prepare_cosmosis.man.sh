@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU DATABLOCK DEF RED RUNROOT STORAGEPATH SURVEY 
+  echo ALLPATCH BLU BV:NTOMO CONFIGPATH DATABLOCK DEF PATCHLIST RED RUNROOT STORAGEPATH SURVEY TOMOLIMS
 } 
 #}}}
 

@@ -43,14 +43,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo DATABLOCK NMAXCOSEBIS PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH THETAMAXCOV THETAMINCOV TOMOLIMS
+  echo DATABLOCK PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH TOMOLIMS
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo cosebis mbias ntomo
+  echo cosebis mbias
 } 
 #}}}
 

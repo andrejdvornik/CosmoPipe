@@ -43,14 +43,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLINDING P_RSCRIPT RUNROOT SCRIPTPATH STORAGEPATH SURVEY DB:LIST_INPUT_SAMPLER
+  echo BLINDING BV:BLIND BV:BOLTZMAN BV:LIST_INPUT_SAMPLER BV:NTOMO BV:STATISTIC P_RSCRIPT RUNROOT SCRIPTPATH STORAGEPATH SURVEY
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo cosebis_vec
+  echo bandpower_cov bandpower_vec cosebis_cov cosebis_vec xipm_cov xipm_vec
 } 
 #}}}
 

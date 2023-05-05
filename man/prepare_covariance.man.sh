@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo DATABLOCK RUNROOT STORAGEPATH
+  echo BV:BLIND BV:NMAXCOSEBIS BV:NTOMO BV:THETAMAXXI BV:THETAMINXI DATABLOCK RUNROOT STORAGEPATH
 } 
 #}}}
 

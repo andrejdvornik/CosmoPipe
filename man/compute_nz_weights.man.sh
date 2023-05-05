@@ -43,14 +43,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU DATABLOCK DEF NTHREADS P_RSCRIPT RED RUNROOT STORAGEPATH WEIGHTNAME ZPHOTNAME ZSPECNAME
+  echo BLU BV:NTHREADS BV:WEIGHTNAME BV:ZPHOTNAME BV:ZSPECNAME DATABLOCK DEF P_RSCRIPT RED RUNROOT STORAGEPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo som_weight_reference som_weight_training som 
+  echo som som_weight_reference som_weight_training
 } 
 #}}}
 

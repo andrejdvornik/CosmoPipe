@@ -42,14 +42,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo DATABLOCK RUNROOT STORAGEPATH NZPATH
+  echo DATABLOCK NZPATH RUNROOT STORAGEPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo ""
+  echo 
 } 
 #}}}
 
