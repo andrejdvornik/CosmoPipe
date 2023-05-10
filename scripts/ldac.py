@@ -399,8 +399,11 @@ class LDACTable(object):
                     if numpy.issubdtype(val.dtype, float) == True:
                         colformat = "1E"
 
+                    if np.issubdtype(val.dtype, np.float64) == True:
+                        colformat = "1D"
+
                     if numpy.issubdtype(val.dtype, int) == True:
-                        colformat = "1I"
+                        colformat = "1J"
 
                     # now create the new column and create a 'new' table
                     # with the old plus the new column (I did not find a
