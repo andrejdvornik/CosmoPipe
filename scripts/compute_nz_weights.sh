@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Fri 05 May 2023 10:19:48 AM CEST
+# Last Modified : Mon 15 May 2023 09:04:48 AM CEST
 #
 #=========================================
 
@@ -73,7 +73,7 @@ fi
 mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_HCoptim* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_hc_optim/
 
 #Notify
-_message "@BLU@ } @RED@ - Done!@DEF@\n"
+_message "@BLU@ } @RED@ - Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 #Add the new main files to the datablock 
 calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_cats/*_refr_DIRsom*.fits `

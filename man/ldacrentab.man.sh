@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@================================================@DEF@\n"
+    _message "@BLU@==================================@DEF@\n"
     _message "@BLU@== @RED@ Running ldacrentab.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@================================================@DEF@\n"
+    _message "@BLU@==================================@DEF@\n"
   fi 
 }
 #}}}

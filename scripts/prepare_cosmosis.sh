@@ -3,7 +3,7 @@
 # File Name : prepare_cosmosis.sh
 # Created By : awright
 # Creation Date : 31-03-2023
-# Last Modified : Fri 05 May 2023 10:22:40 AM CEST
+# Last Modified : Mon 15 May 2023 09:06:14 AM CEST
 #
 #=========================================
 
@@ -45,7 +45,7 @@ if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_neff/${neff_file} ]
 then 
   _message " > @BLU@Removing previous cosmosis neff file@DEF@"
   rm @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_neff/${neff_file}
-  _message " - @RED@Done!@DEF@\n"
+  _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 fi 
 
 #Construct the output file, maintaining order 
@@ -88,7 +88,7 @@ if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae/${sigmae_file} ]
 then 
   _message " > @BLU@Removing previous cosmosis sigmae file@DEF@"
   rm @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae/${sigmae_file}
-  _message " - @RED@Done!@DEF@\n"
+  _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 fi 
 #Construct the output file, maintaining order 
 paste ${sigmae_list} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae/${sigmae_file}
@@ -144,7 +144,7 @@ then
         _message " > @BLU@ Patch @DEF@${patch}@BLU@ ZBIN @DEF@${ZBIN1}@BLU@x@DEF@${ZBIN2}"
         cp ${file} \
           @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/XI_@SURVEY@_${patch}_nBins_${ntomo}_Bin${ZBIN1}_Bin${ZBIN2}.ascii
-        _message " - @RED@ Done!@DEF@\n"
+        _message " - @RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
         outlist="${outlist} XI_@SURVEY@_${patch}_nBins_${ntomo}_Bin${ZBIN1}_Bin${ZBIN2}.ascii"
       done 
       #}}}

@@ -3,7 +3,7 @@
 # File Name : combine_xi_patches.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Fri 31 Mar 2023 01:33:51 PM CEST
+# Last Modified : Mon 15 May 2023 09:04:40 AM CEST
 #
 #=========================================
 
@@ -63,7 +63,7 @@ do
       -o ${outname} \
       -i ${filelist} \
       > @RUNROOT@/@LOGPATH@/${logfile//.txt/.log} 2>&1 
-    _message " - @RED@Done!@DEF@\n"
+    _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
     #Add the new file to the datahead 
     count=0
     for file in ${filelist} 

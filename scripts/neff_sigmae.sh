@@ -3,7 +3,7 @@
 # File Name : neff_sigmae.sh
 # Created By : awright
 # Creation Date : 28-03-2023
-# Last Modified : Fri 31 Mar 2023 11:44:15 AM CEST
+# Last Modified : Mon 15 May 2023 09:06:03 AM CEST
 #
 #=========================================
 
@@ -36,7 +36,7 @@ _message "> @BLU@Computing sigma_e and n_effective for catalogue:@DEF@ ${catname
 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/neff_sigmae.py \
   @DB:DATAHEAD@ \
   ${SurveyArea} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cov_input/${catbase}_neff_sigmae.txt 
-_message " - @RED@Done!@DEF@\n"
+_message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 ntomo=`_ntomo`
 

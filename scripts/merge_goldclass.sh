@@ -3,7 +3,7 @@
 # File Name : merge_goldclass.sh
 # Created By : awright
 # Creation Date : 27-03-2023
-# Last Modified : Tue Apr  4 10:30:00 2023
+# Last Modified : Mon 15 May 2023 09:06:00 AM CEST
 #
 #=========================================
 
@@ -52,7 +52,7 @@ do
     -p ${input} \
     -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_all_tomo_gold/${outname}_tmp \
     -k SOMweight -t OBJECTS > @RUNROOT@/@LOGPATH@/${outname//.${outext}/.log} 2>&1
-  _message " -@RED@ Done!@DEF@\n"
+  _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
   #}}}
   #Construct the output tomographic bin {{{
   _message "   > @BLU@Removing non-gold sources for ${i}@DEF@${input##*/}"
@@ -61,7 +61,7 @@ do
   	       -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_all_tomo_gold/${outname} \
   	       -t OBJECTS \
   	       -c "(SOMweight>0);" >>@RUNROOT@/@LOGPATH@/${outname//.${outext}/.log} 2>&1 
-  _message " -@RED@ Done!@DEF@\n"
+  _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
   #}}}
   #Remove the temporary file {{{
   rm @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_all_tomo_gold/${outname}_tmp

@@ -20,7 +20,7 @@ then
   #If it exists, remove it 
   _message " > @BLU@Removing previous catalogue c-corrected catalogue for @RED@${current##*/}@DEF@"
   rm -f ${outputname}
-  _message " - @RED@Done!@DEF@\n"
+  _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 fi 
 #Construct the catalogue directory 
 if [ ! -d  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cterm ] 
@@ -32,7 +32,7 @@ _message " > @BLU@Constructing c-corrected catalogue for @RED@${current##*/}@DEF
 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/correct_cterm.py \
   -i ${current} \
   -o ${outputname} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cterm/${catname}
-_message " - @RED@Done!@DEF@\n"
+_message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 #}}}
 
 #Update the datahead {{{

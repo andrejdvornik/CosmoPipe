@@ -61,7 +61,7 @@ _message "    -> @BLU@Computing COSEBIs for file @RED@${input##*/}@DEF@"
   -o ${output} -b @BINNING@ -n @BV:NMAXCOSEBIS@ -s @BV:THETAMINCOV@ \
   -l @BV:THETAMAXCOV@ --tfoldername ${SRCLOC}/Tplus_minus \
   --norm ${normfile} --root ${rootfile} 2>&1 
-_message " - @RED@Done!@DEF@\n"
+_message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 #Add the files to the datablock 
 Enfile="En_${output}.asc"
