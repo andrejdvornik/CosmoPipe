@@ -17,7 +17,7 @@ fi
 #For each catalogue in the output folder of compute_nz_weights 
 mainlist=`_read_datablock main_all_tomo`
 outlist=""
-for input in @DB:main_calib_cats@
+for input in @DB:som_weight_refr_cats@
 do
   #Construct the output name {{{
   outname=${input##*/}

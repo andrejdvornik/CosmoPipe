@@ -43,14 +43,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLIND CONFIGPATH NMAXCOSEBIS RUNROOT SCRIPTPATH STORAGEPATH SURVEYAREADEG SURVEY THETAMAXCOV THETAMINCOV
+  echo ALLPATCH BLIND CONFIGPATH NMAXCOSEBIS RUNROOT SCRIPTPATH STORAGEPATH SURVEYAREADEG SURVEY THETAMAXCOV THETAMINCOV BV:NTOMO
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo cosmosis_neff cosmosis_nz cosmosis_sigmae cosmosis_mcov ntomo nzcov cosebis_cov
+  echo cosmosis_neff cosmosis_nz cosmosis_sigmae cosmosis_mcov nzcov cosebis_cov
 } 
 #}}}
 

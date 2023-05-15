@@ -50,7 +50,7 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo main_calib_cats
+  echo som_weight_refr_cats
 } 
 #}}}
 

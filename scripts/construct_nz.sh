@@ -15,7 +15,7 @@ fi
 
 #For each of the specz_calib_cats files: 
 outlist=""
-for input in @DB:specz_calib_cats@ 
+for input in @DB:som_weight_calib_cats@ 
 do 
   #Define the output filename 
   output=${input%%_DIRsom*}@NZFILESUFFIX@

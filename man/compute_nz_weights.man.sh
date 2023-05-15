@@ -50,7 +50,7 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo som som_weight_reference som_weight_training
+  echo DATAHEAD som_weight_reference som_weight_training
 } 
 #}}}
 

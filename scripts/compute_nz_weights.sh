@@ -22,7 +22,7 @@ done
   -r @DB:som_weight_reference@ \
   -t @DB:som_weight_training@ \
   -ct "" -cr @BV:WEIGHTNAME@ \
-  --old.som @DB:som@ \
+  --old.som @DB:DATAHEAD@ \
   --factor.nbins Inf --optimise --force \
   -sc @BV:NTHREADS@ \
   --short.write \
