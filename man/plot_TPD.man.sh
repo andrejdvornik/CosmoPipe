@@ -50,7 +50,7 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo bandpower_cov bandpower_vec cosebis_cov cosebis_vec xipm_cov xipm_vec
+  echo 
 } 
 #}}}
 

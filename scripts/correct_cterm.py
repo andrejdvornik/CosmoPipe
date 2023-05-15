@@ -46,10 +46,10 @@ ldac_cat = ldac.LDACCat(args.inputfile)
 ldac_table = ldac_cat['OBJECTS']
 
 #Ellipticity names 
-e1colname='@E1NAME@'
-e2colname='@E2NAME@'
+e1colname='@BV:E1NAME@'
+e2colname='@BV:E2NAME@'
 #Weight name 
-wtcolname='@WEIGHTNAME@' 
+wtcolname='@BV:WEIGHTNAME@' 
 #Number of bootstrap realisations for uncertainty
 nboot=@NBOOT@
 

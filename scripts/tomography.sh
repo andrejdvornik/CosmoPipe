@@ -3,7 +3,7 @@
 #
 
 #Get the number of tomographic bins 
-NTOMO=`_ntomo`
+NTOMO="@BV:NTOMO@"
 
 #Input Filename & Extension {{{
 inputfile=@DB:DATAHEAD@
@@ -18,8 +18,8 @@ outputlist=""
 for i in `seq $NTOMO`
 do
   #Define the Z_B limits from the TOMOLIMS {{{
-  ZB_lo=`echo @TOMOLIMS@ | awk -v n=$i '{print $n}'`
-  ZB_hi=`echo @TOMOLIMS@ | awk -v n=$i '{print $(n+1)}'`
+  ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $n}'`
+  ZB_hi=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $(n+1)}'`
   #}}}
   #Define the string to append to the file names {{{
   ZB_lo_str=`echo $ZB_lo | sed 's/\./p/g'`

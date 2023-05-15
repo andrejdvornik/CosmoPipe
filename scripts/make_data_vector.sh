@@ -20,7 +20,7 @@ fi
 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/make_data_vector.py \
   --inputfiles @DB:cosebis@   \
   --mbias   ${mbias}      \
-  --tomobins @TOMOLIMS@  \
+  --tomobins @BV:TOMOLIMS@  \
   --outputfile  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_vec/combined_vector.txt 
 
 _write_datablock "cosebis_vec" "combined_vector.txt"

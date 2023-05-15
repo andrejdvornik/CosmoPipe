@@ -24,16 +24,16 @@ ldac_cat = ldac.LDACCat(args.inputfile)
 ldac_table = ldac_cat['OBJECTS']
 
 #Ellipticity names 
-e1colname='@E1NAME@'
-e2colname='@E2NAME@'
+e1colname='@BV:E1NAME@'
+e2colname='@BV:E2NAME@'
 #Weight name 
-wtcolname='@WEIGHTNAME@' 
+wtcolname='@BV:WEIGHTNAME@' 
 #PSF Ellipticity names 
-psfe1colname='@PSFE1NAME@'
-psfe2colname='@PSFE2NAME@'
+psfe1colname='@BV:PSFE1NAME@'
+psfe2colname='@BV:PSFE2NAME@'
 #RADec Names 
-racolname='@RANAME@'
-deccolname='@DECNAME@'
+racolname='@BV:RANAME@'
+deccolname='@BV:DECNAME@'
 
 #Select required columns 
 e1=ldac_table[e1colname]

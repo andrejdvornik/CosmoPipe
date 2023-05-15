@@ -111,8 +111,8 @@ then
   for ZBIN1 in `seq ${ntomo}`
   do
     #Define the Z_B limits from the TOMOLIMS {{{
-    ZB_lo=`echo @TOMOLIMS@ | awk -v n=$ZBIN1 '{print $n}'`
-    ZB_hi=`echo @TOMOLIMS@ | awk -v n=$ZBIN1 '{print $(n+1)}'`
+    ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN1 '{print $n}'`
+    ZB_hi=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN1 '{print $(n+1)}'`
     #}}}
     #Define the string to append to the file names {{{
     ZB_lo_str=`echo $ZB_lo | sed 's/\./p/g'`
@@ -122,8 +122,8 @@ then
     
     for ZBIN2 in `seq $ZBIN1 ${ntomo}`
     do
-      ZB_lo2=`echo @TOMOLIMS@ | awk -v n=$ZBIN2 '{print $n}'`
-      ZB_hi2=`echo @TOMOLIMS@ | awk -v n=$ZBIN2 '{print $(n+1)}'`
+      ZB_lo2=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN2 '{print $n}'`
+      ZB_hi2=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN2 '{print $(n+1)}'`
       ZB_lo_str2=`echo $ZB_lo2 | sed 's/\./p/g'`
       ZB_hi_str2=`echo $ZB_hi2 | sed 's/\./p/g'`
       appendstr2="_ZB${ZB_lo_str2}t${ZB_hi_str2}"

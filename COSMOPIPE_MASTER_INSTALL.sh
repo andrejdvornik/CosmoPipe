@@ -148,7 +148,8 @@ if [ -f pipe_env.bash.${MACHINE} ]
 then 
   rm -f pipe_env.bash.${MACHINE}
 fi 
-conda run -n cosmopipe bash install.sh -m ALL >> THELI_install.log 2>&1
+#conda run -n cosmopipe bash install.sh -m ALL >> THELI_install.log 2>&1
+conda run -n cosmopipe make ldactools.make >> THELI_install.log 2>&1
 cd ${RUNROOT}/INSTALL
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
