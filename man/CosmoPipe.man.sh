@@ -30,7 +30,7 @@ function _unset_functions {
 function _message { 
   if [ "$VERBOSE" != "0" ] 
   then 
-    >&2 echo -en "$1" 
+    >&2 echo -en "$1"
   fi 
 } 
 #}}}
@@ -440,54 +440,54 @@ function _replace_datahead {
   done
 }
 #}}}
-
-#Add an item to the datahead {{{
-function _write_datahead { 
-  #Current block
-  _block=`_read_datablock`
-  #Current vars
-  _vars=`_read_blockvars`
-  #Current head 
-  _head=`_read_datahead`
-  #Check if the requested item exists in the datablock
-  _found=0
-  for _file in ${_block} 
-  do 
-    if [ "${_file%%=*}" == "${1}" ]
-    then 
-      _found=1
-    fi 
-  done
-  if [ "${_found}" != "1" ]
-  then 
-    _message "@RED@ - ERROR! The requested data block component ${1} does not have a folder in the data block?!"
-    exit 1 
-  fi 
-  #Update the datablock txt file 
-  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  for _file in ${_head} 
-  do 
-    #Print the existing datahead items 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done 
-  #Add the new item 
-  echo "${2}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  #Write out the block 
-  echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  for _file in ${_block} 
-  do 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done
-  #Write out the vars 
-  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  for _file in ${_vars} 
-  do 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done
-}
-#}}}
-
-#Add an item to the datahead {{{
+#
+##Write item to the datahead {{{
+#function _write_datahead { 
+#  #Current block
+#  _block=`_read_datablock`
+#  #Current vars
+#  _vars=`_read_blockvars`
+#  #Current head 
+#  _head=`_read_datahead`
+#  #Check if the requested item exists in the datablock
+#  _found=0
+#  for _file in ${_block} 
+#  do 
+#    if [ "${_file%%=*}" == "${1}" ]
+#    then 
+#      _found=1
+#    fi 
+#  done
+#  if [ "${_found}" != "1" ]
+#  then 
+#    _message "@RED@ - ERROR! The requested data block component ${1} does not have a folder in the data block?!"
+#    exit 1 
+#  fi 
+#  #Update the datablock txt file 
+#  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+#  for _file in ${_head} 
+#  do 
+#    #Print the existing datahead items 
+#    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+#  done 
+#  #Add the new item 
+#  echo "${2}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+#  #Write out the block 
+#  echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+#  for _file in ${_block} 
+#  do 
+#    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+#  done
+#  #Write out the vars 
+#  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+#  for _file in ${_vars} 
+#  do 
+#    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+#  done
+#}
+##}}}
+#
+#Write an item (including NULL/clear) to the datahead {{{
 function _write_datahead { 
   #Current block
   _block=`_read_datablock`
@@ -541,7 +541,7 @@ function _write_datahead {
 }
 #}}}
 
-#Add an item to the datahead {{{
+#Write a list of items to the datahead {{{
 function _writelist_datahead { 
   _head="${1}"
   _block=`_read_datablock`

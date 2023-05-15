@@ -3,7 +3,7 @@
 # File Name : extract_patch.sh
 # Created By : awright
 # Creation Date : 28-03-2023
-# Last Modified : Tue Apr  4 09:23:17 2023
+# Last Modified : Mon 15 May 2023 09:05:48 AM CEST
 #
 #=========================================
 
@@ -31,7 +31,7 @@ do
     #If it exists, remove it 
     _message "  > @BLU@Removing previous catalogue for patch ${patch}@DEF@ "
     rm -f ${outputname}
-    _message " @RED@- Done!@DEF@\n"
+    _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
   fi 
   #}}}
   #Construct the output tomographic bin {{{
@@ -41,7 +41,7 @@ do
   	       -o ${outputname} \
   	       -t OBJECTS \
   	       -c "(PATCH=='${patch}');" 2>&1
-  _message " @RED@- Done!@DEF@\n"
+  _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
   #}}}
 done
 #}}}

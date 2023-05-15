@@ -1,5 +1,5 @@
 #
-# ldacrentab.sh Documentation & Housekeeping functions
+# compute_m_surface.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@==================================@DEF@\n"
-    _message "@BLU@== @RED@ Running ldacrentab.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@==================================@DEF@\n"
+    _message "@BLU@=========================================@DEF@\n"
+    _message "@BLU@== @RED@ Running compute_m_surface.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@=========================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,8 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Rename an LDAC catalogue table extension name to '
-  echo '# OBJECTS'
+  echo '# Compute the m calibration surface for all '
+  echo '# catalogues in the DATAHEAD'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -30,11 +30,10 @@ function _description {
 _abort()
 {
   #Message to print when script aborts 
-  _message "@RED@ - !FAILED!" >&2
   #$0 is the script that was running when this error occurred
-  _message "@BLU@ An error occured while running $0." >&2
-  _message "@DEF@ Check the relevant logging file for this step." >&2
-  echo >&2
+  _message "@BLU@ An error occured while running:\n@DEF@$0.\n" >&2
+  _message "@BLU@ Check the logging file for this step in:\n" >&2
+  _message "@DEF@@RUNROOT@/@LOGPATH@/\n" >&2
   exit 1
 }
 trap '_abort' 0
@@ -44,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo MACHINE RUNROOT STORAGEPATH
+  echo BLU BV:E1NAME BV:E2NAME BV:G1NAME BV:G2NAME BV:NBINR BV:NBINSNR BV:RNAME BV:SIMLABEL BV:SNRNAME BV:WEIGHTNAME DEF LOGPATH PYTHON3BIN RED RUNROOT SCRIPTPATH
 } 
 #}}}
 
@@ -65,7 +64,7 @@ function _outputs {
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/ldacrentab.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/compute_m_surface.sh
 } 
 #}}}
 

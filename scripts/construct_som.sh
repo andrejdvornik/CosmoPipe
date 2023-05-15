@@ -3,7 +3,7 @@
 # File Name : specz_som.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Fri 05 May 2023 10:20:16 AM CEST
+# Last Modified : Mon 15 May 2023 09:05:35 AM CEST
 #
 #=========================================
 
@@ -42,7 +42,7 @@ outext=${outname##*.}
   MAG_GAAP_H-MAG_GAAP_Ks MAG_AUTO 2>&1 
 
 #Notify
-_message "@BLU@ } @RED@ - Done!@DEF@\n"
+_message "@BLU@ } @RED@ - Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 #Add the new file to the datablock 
 #_add_datablock som CosmoPipeSOM_SOMdata.Rdata

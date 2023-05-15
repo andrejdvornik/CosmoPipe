@@ -3,7 +3,7 @@
 # File Name : calc_xi_w_treecorr.sh
 # Created By : awright
 # Creation Date : 27-03-2023
-# Last Modified : Fri 05 May 2023 10:53:16 AM CEST
+# Last Modified : Mon 15 May 2023 09:04:21 AM CEST
 #
 #=========================================
 
@@ -35,8 +35,8 @@ do
 	for ZBIN1 in `seq ${ntomo}`
 	do
     #Define the Z_B limits from the TOMOLIMS {{{
-    ZB_lo=`echo @TOMOLIMS@ | awk -v n=$ZBIN1 '{print $n}'`
-    ZB_hi=`echo @TOMOLIMS@ | awk -v n=$ZBIN1 '{print $(n+1)}'`
+    ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN1 '{print $n}'`
+    ZB_hi=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN1 '{print $(n+1)}'`
     #}}}
     #Define the string to append to the file names {{{
     ZB_lo_str=`echo $ZB_lo | sed 's/\./p/g'`
@@ -55,8 +55,8 @@ do
 	  
 	  for ZBIN2 in `seq $ZBIN1 ${ntomo}`
 	  do
-      ZB_lo2=`echo @TOMOLIMS@ | awk -v n=$ZBIN2 '{print $n}'`
-      ZB_hi2=`echo @TOMOLIMS@ | awk -v n=$ZBIN2 '{print $(n+1)}'`
+      ZB_lo2=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN2 '{print $n}'`
+      ZB_hi2=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN2 '{print $(n+1)}'`
       ZB_lo_str2=`echo $ZB_lo2 | sed 's/\./p/g'`
       ZB_hi_str2=`echo $ZB_hi2 | sed 's/\./p/g'`
       appendstr2="_ZB${ZB_lo_str2}t${ZB_hi_str2}"
@@ -81,7 +81,7 @@ do
       then 
         _message "    -> @BLU@Removing previous @RED@Bin $ZBIN1@BLU@ x @REDBin $ZBIN2@BLU@ correlation function@DEF@"
         rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipm/${outname}
-        _message " - @RED@Done!@DEF@\n"
+        _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       fi 
 
       _message "    -> @BLU@Bin $ZBIN1 ($ZB_lo < Z_B <= $ZB_hi) x Bin $ZBIN2 ($ZB_lo2 < Z_B <= $ZB_hi2)@DEF@"
@@ -92,10 +92,10 @@ do
         --filetwo ${file_two} \
         --output @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipm/${outname} \
         --weighted True \
-        --file1e1 "@E1NAME@" --file1e2 "@E2NAME@" --file1w "@WEIGHTNAME@" \
-        --file2e1 "@E1NAME@" --file2e2 "@E2NAME@" --file2w "@WEIGHTNAME@" \
+        --file1e1 "@BV:E1NAME@" --file1e2 "@BV:E2NAME@" --file1w "@BV:WEIGHTNAME@" \
+        --file2e1 "@BV:E1NAME@" --file2e2 "@BV:E2NAME@" --file2w "@BV:WEIGHTNAME@" \
         > @RUNROOT@/@LOGPATH@/${outname//.txt/.log} 2>&1 
-      _message " - @RED@Done!@DEF@\n"
+      _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       #Add the correlation function to the datablock 
       xipmblock=`_read_datablock xipm`
       _write_datablock xipm "`_blockentry_to_filelist ${xipmblock}` ${outname}"

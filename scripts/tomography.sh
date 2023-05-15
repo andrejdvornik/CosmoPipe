@@ -38,7 +38,7 @@ do
     #If it exists, remove it 
     _message "  > @BLU@Removing previous catalogue for tomographic bin ${i}@DEF@ ($ZB_lo < ZB <= $ZB_hi)"
     rm -f ${outputname}
-    _message " @RED@- Done!@DEF@\n"
+    _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
   fi 
   #}}}
   #Construct the output tomographic bin {{{
@@ -48,7 +48,7 @@ do
   	       -o ${outputname} \
   	       -t OBJECTS \
   	       -c "(Z_B>${ZB_lo})AND(Z_B<=${ZB_hi});" 2>&1
-  _message " @RED@- Done!@DEF@\n"
+  _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
   #}}}
 done
 #}}}

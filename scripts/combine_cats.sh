@@ -3,27 +3,59 @@
 # File Name : combine_cats.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Mon 20 Mar 2023 02:44:17 PM CET
+# Last Modified : Mon 15 May 2023 09:04:31 AM CEST
 #
 #=========================================
 
 
 #Get the DATAHEAD filelist 
-filelist="@DB:ALLHEAD@" 
+input="@DB:ALLHEAD@" 
 
-#Strip out the final catalogue name. This is the output 
-outname=${filelist##* }
-filelist=${filelist% *}
+#Remove leading space
+if [ "${input:0:1}" == " " ]
+then
+  input=${input:1}
+fi
+#Get the output name 
+#First & last file names 
+output=${input##* }
+output2=${input%% *}
+output=${output##*/}
+output2=${output2##*/}
+#First file extension 
+ext=${output##*.}
+for i in `seq ${#output}`
+do
+  #Check for the first part of the filenames that is different
+  if [ "${output:0:${i}}" != "${output2:0:${i}}" ]
+  then
+    break
+  fi
+done
 
-#Output name 
-outname=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/combined_cats.cat 
+#Check if the last character is an underscore
+if [ ${i} -gt 2 ]
+then 
+  ((i-=2))
+  if [ "${output:${i}:1}" != "_" ]
+  then
+    ((i+=1))
+  fi
+fi 
+
+#Construct the output name 
+outname=${output:0:${i}}_comb.${ext}
 
 #Combine the DATAHEAD catalogues into one 
-@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacpaste -i ${filelist} -o ${outname}
+_message "   > @BLU@Constructing combined catalogue @DEF@${outname}@DEF@ "
+@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacpaste -i ${input} -o ${outname} -t OBJECTS
+_message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 #Update datahead 
-for _file in ${filelist}
+for _file in ${input}
 do 
-  _replace_datahead ${_file##*/} ""
+  #Replace the first file with the output name, then clear the rest
+  _replace_datahead ${_file##*/} "${outname}"
+  outname=""
 done 
 
