@@ -875,12 +875,18 @@ function _incorporate_datablock {
   #Check if we are stoelzner {{{
   if [ `whoami` == 'stoelzner' ]
   then 
-    if [ $(( ( RANDOM % 10 )  + 1 )) -gt 80 ] 
+    if [ $(( ( RANDOM % 100 )  + 1 )) -gt 80 ] 
     then 
       echo '# Check if benjamin has had his coffee ----' >> ${1}
-      echo '_message "\n\n@RED@~~~~~~~~~~~~~~~@DEF@\n\n@BLU@HEY! LISTEN!!!!\n\n@RED@Have you had your coffee?!!\n"' >> ${1}
+      echo '_message "\n\n@RED@~~~~~~~~~~~~~~~~~~~~~~~~~~~@DEF@\n"' >> ${1}
+      echo '_message "@RED@~~   @BLU@ HEY! LISTEN!!!! @RED@   ~~\n"' >> ${1}
+      echo '_message "@RED@~~~~~~~~~~~~~~~~~~~~~~~~~~~@DEF@\n\n"' >>${1}
+      echo 'sleep 5' >> ${1}
+      echo '_message "@RED@Have you had your coffee?!!\n\n"' >> ${1}
+      echo 'sleep 5' >> ${1}
+      echo '_message "@BLU@  If not: @DEF@GO GET IT NOW! \n"' >> ${1}
       echo 'sleep 30' >> ${1}
-      echo '_message "@DEF@Good. Now we can continue!\n@DEF@"' >> ${1}
+      echo '_message "@BLU@ Good. Now we can continue...\n@DEF@"' >> ${1}
       echo "# ----" >> ${1}
     fi 
   fi 
