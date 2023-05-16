@@ -375,7 +375,7 @@ function _add_datahead {
   then 
     _message " @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD"
     rsync -autv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/datahead_write.log
-    _message "@BLU@ - @RED@Done!@DEF@\n"
+    _message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
   fi 
   #Get the files in this data
   _files=`_read_datablock ${1}`
@@ -593,7 +593,7 @@ function _add_datablock {
       then 
         _message " @BLU@>@DEF@ ${_file##*/} @BLU@-->@DEF@ ${1}"
         rsync -autv $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${_file##*/} >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/datablock_add.log
-        _message "@BLU@ - @RED@Done!@DEF@\n"
+        _message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       fi 
     done 
   fi 
@@ -778,51 +778,71 @@ function _incorporate_datablock {
   cp ${1//.${ext}/_noblock.${ext}} ${1//.${ext}/_prehead.${ext}}
 
   #Update the script to include the datablock {{{
-  for item in ${_block}
+  nloop=0
+  while [ "`grep -c @DB: ${1//.${ext}/_prehead.${ext}} || echo`" != "0" ]
   do 
-    #Extract the name of the item
-    base=${item%%=*}
-    #Remove leading and trailing braces
-    item=${item//\{,/}
-    item=${item//\{/}
-    item=${item//\}/}
-    #Add spaces
-    item=${item//,/ }
-    #Loop through entries 
-    _itemlist=''
-    for _file in ${item}
+    for item in ${_block}
     do 
-      #Add full file paths 
-      _itemfile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${base}/${_file#*=}
-      _itemlist="${_itemlist} ${_itemfile}"
+      #Extract the name of the item
+      base=${item%%=*}
+      #Remove leading and trailing braces
+      item=${item//\{,/}
+      item=${item//\{/}
+      item=${item//\}/}
+      #Add spaces
+      item=${item//,/ }
+      #Loop through entries 
+      _itemlist=''
+      for _file in ${item}
+      do 
+        #Add full file paths 
+        _itemfile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${base}/${_file#*=}
+        _itemlist="${_itemlist} ${_itemfile}"
+      done 
+      #_itemlist=`echo ${_itemlist}`
+      @P_SED_INPLACE@ "s#\\@DB:${item%%=*}\\@#${_itemlist:1}#g" ${1//.${ext}/_prehead.${ext}}
     done 
-    #_itemlist=`echo ${_itemlist}`
-    @P_SED_INPLACE@ "s#\\@DB:${item%%=*}\\@#${_itemlist:1}#g" ${1//.${ext}/_prehead.${ext}}
+    ((nloop+=1))
+    if [ ${nloop} -gt 100 ]
+    then 
+      _message "@RED@ - ERROR! Infinite loop in block incorporation! A @DB:*@ variable is recursive?!@DEF@\n"
+      exit 1 
+    fi 
   done 
   #}}}
 
   #Update the script to include the blockvars {{{
-  for item in ${_vars}
+  nloop=0
+  while [ "`grep -c @BV: ${1//.${ext}/_prehead.${ext}} || echo`" != "0" ]
   do 
-    #Extract the name of the item
-    base=${item%%=*}
-    #Remove leading and trailing braces
-    item=${item//\{,/}
-    item=${item//\{/}
-    item=${item//\}/}
-    #Add spaces
-    item=${item//,/ }
-    #Loop through entries 
-    _itemlist=''
-    for _file in ${item}
+    for item in ${_vars}
     do 
-      #Return variable 
-      _itemfile="${_file#*=}"
-      _itemlist="${_itemlist} ${_itemfile}"
+      #Extract the name of the item
+      base=${item%%=*}
+      #Remove leading and trailing braces
+      item=${item//\{,/}
+      item=${item//\{/}
+      item=${item//\}/}
+      #Add spaces
+      item=${item//,/ }
+      #Loop through entries 
+      _itemlist=''
+      for _file in ${item}
+      do 
+        #Return variable 
+        _itemfile="${_file#*=}"
+        _itemlist="${_itemlist} ${_itemfile}"
+      done 
+      #_itemlist=`echo ${_itemlist}`
+      @P_SED_INPLACE@ "s#\\@BV:${item%%=*}\\@#${_itemlist:1}#g" ${1//.${ext}/_prehead.${ext}}
     done 
-    #_itemlist=`echo ${_itemlist}`
-    @P_SED_INPLACE@ "s#\\@BV:${item%%=*}\\@#${_itemlist:1}#g" ${1//.${ext}/_prehead.${ext}}
-  done 
+    ((nloop+=1))
+    if [ ${nloop} -gt 100 ]
+    then 
+      _message "@RED@ - ERROR! Infinite loop in block variable incorporation! A @BV:*@ variable is recursive?!@DEF@\n"
+      exit 1 
+    fi 
+  done
   #}}}
 
   #If we do not have a CosmoSIS file {{{

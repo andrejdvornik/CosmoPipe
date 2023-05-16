@@ -101,24 +101,29 @@ fi
 #Initialise datablock {{{ 
 if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt ] 
 then 
+  #echo -en "\nBLOCK EXISTS:"
   #Check if block is a testing block 
-  ntest=`grep -c "_validitytest_" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt`
+  ntest=`grep -c "_validitytest_" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt || echo `
   #Save the current block status
   if [ ! -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_block.txt ] && [ "${ntest}" == "0" ]
   then 
-    #run_block will only exist if a recent pipeline construction attempt failed... don't overwrite it!
+    #echo -en " COPY BLOCK TO RUNBLOCK\n"
+    #run_block will already exist if a recent pipeline construction attempt failed... don't overwrite it!
     cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_block.txt
   elif [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_block.txt ] 
   then 
+    #echo -en " COPY RUNBLOCK TO BLOCK\n"
     #reset the block 
     cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_block.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   elif [ "${ntest}" != "0"  ]
   then 
+    #echo -en " REMOVE BLOCK & START NEW (${ntest})\n"
     rm  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
     _initialise_datablock
   fi 
   @P_SED_INPLACE@ "s/={.*/={_validitytest_}/" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
 else 
+  echo -en " NO BLOCK : START NEW\n"
   _initialise_datablock
 fi
 #}}}
