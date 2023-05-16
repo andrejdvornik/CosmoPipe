@@ -3,7 +3,7 @@
 # File Name : cleanfits.R
 # Created By : awright
 # Creation Date : 09-05-2023
-# Last Modified : Tue 16 May 2023 02:32:41 PM CEST
+# Last Modified : Tue 16 May 2023 02:31:49 PM CEST
 #
 #=========================================
 
@@ -17,7 +17,7 @@ cat<-Rfits::Rfits_read_table(input,verbose=T,nrow=1e3)
 classes<-unlist(lapply(cat,class))
 include_fields=TRUE
 if (any(classes=="integer64")) {
-  cat<-Rfits::Rfits_read_table(input,verbose=T)
+  cat<-Rfits::Rfits_read_table(input,verbose=T,nrow=1e5)
   for (i in names(classes)[which(classes=='integer64')]) {
     cat[[i]]<-as.integer(cat[[i]])
   }
