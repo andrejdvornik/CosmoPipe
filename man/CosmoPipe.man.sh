@@ -831,6 +831,7 @@ function _incorporate_datablock {
       do 
         #Return variable 
         _itemfile="${_file#*=}"
+        _itemfile="${_itemfile//&/\\&}"
         _itemlist="${_itemlist} ${_itemfile}"
       done 
       #_itemlist=`echo ${_itemlist}`
@@ -870,6 +871,20 @@ function _incorporate_datablock {
   #  exit 1
   #fi 
   ##}}}
+
+  #Check if we are stoelzner {{{
+  if [ `whoami` == 'stoelzner' ]
+  then 
+    if [ $(( ( RANDOM % 10 )  + 1 )) -gt 80 ] 
+    then 
+      echo '# Check if benjamin has had his coffee ----' >> ${1}
+      echo '_message "\n\n@RED@~~~~~~~~~~~~~~~@DEF@\n\n@BLU@HEY! LISTEN!!!!\n\n@RED@Have you had your coffee?!!\n"' >> ${1}
+      echo 'sleep 30' >> ${1}
+      echo '_message "@DEF@Good. Now we can continue!\n@DEF@"' >> ${1}
+      echo "# ----" >> ${1}
+    fi 
+  fi 
+  #}}}
 
   #Generate main code block:  
   #Does the code work on DATAHEAD?
