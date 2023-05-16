@@ -778,9 +778,9 @@ function _incorporate_datablock {
   cp ${1//.${ext}/_noblock.${ext}} ${1//.${ext}/_prehead.${ext}}
 
   #Update the script to include the datablock {{{
-  nloop=0
-  while [ "`grep -c @DB: ${1//.${ext}/_prehead.${ext}} || echo`" != "0" ]
-  do 
+  #nloop=0
+  #while [ "`grep -c @DB: ${1//.${ext}/_prehead.${ext}} || echo`" != "0" ]
+  #do 
     for item in ${_block}
     do 
       #Extract the name of the item
@@ -802,13 +802,13 @@ function _incorporate_datablock {
       #_itemlist=`echo ${_itemlist}`
       @P_SED_INPLACE@ "s#\\@DB:${item%%=*}\\@#${_itemlist:1}#g" ${1//.${ext}/_prehead.${ext}}
     done 
-    ((nloop+=1))
-    if [ ${nloop} -gt 100 ]
-    then 
-      _message "@RED@ - ERROR! Infinite loop in block incorporation! A @DB:*@ variable is recursive?!@DEF@\n"
-      exit 1 
-    fi 
-  done 
+    #((nloop+=1))
+    #if [ ${nloop} -gt 100 ]
+    #then 
+    #  _message "@RED@ - ERROR! Infinite loop in block incorporation! A @DB:*@ variable is recursive?!@DEF@\n"
+    #  exit 1 
+    #fi 
+  #done 
   #}}}
 
   #Update the script to include the blockvars {{{
@@ -839,7 +839,7 @@ function _incorporate_datablock {
     ((nloop+=1))
     if [ ${nloop} -gt 100 ]
     then 
-      _message "@RED@ - ERROR! Infinite loop in block variable incorporation! A @BV:*@ variable is recursive?!@DEF@\n"
+      _message "@RED@ ERROR! Infinite loop in block variable incorporation for script @DEF@${1//.${ext}}@RED@!\nA @BV:*@ variable must be missing or recursive?!@DEF@\n"
       exit 1 
     fi 
   done

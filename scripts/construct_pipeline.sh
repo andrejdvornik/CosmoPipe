@@ -185,6 +185,8 @@ do
       do 
         echo ${var}=@${var}@ >> @PIPELINE@_defaults.sh 
       done 
+      sort @PIPELINE@_defaults.sh | uniq > @PIPELINE@_defaults_uniq.sh
+      mv @PIPELINE@_defaults_uniq.sh @PIPELINE@_defaults.sh
     fi 
     #}}}
     #Check inputs and outputs {{{
