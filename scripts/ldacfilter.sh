@@ -3,7 +3,7 @@
 # File Name : ldacfilter.sh
 # Created By : awright
 # Creation Date : 16-05-2023
-# Last Modified : Tue 16 May 2023 03:09:34 PM CEST
+# Last Modified : Wed 17 May 2023 06:38:49 AM CEST
 #
 #=========================================
 
@@ -21,6 +21,6 @@ _message "@BLU@Creating Filtered catalogue for @DEF@${input##*/}@DEF@"
   -c "(@BV:FILTERCOND@);" \
   -o ${input//.${ext}/_filt.${ext}} 2>&1 
 _message " @BLU@- @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
-output=${input//.cat/_filt.cat}
+output=${input//.${ext}/_filt.${ext}}
 _replace_datahead ${input##*/} ${output##*/}
 
