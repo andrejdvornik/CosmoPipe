@@ -3,7 +3,7 @@
 # File Name : cleanfits.R
 # Created By : awright
 # Creation Date : 09-05-2023
-# Last Modified : Tue 16 May 2023 02:32:41 PM CEST
+# Last Modified : Wed 17 May 2023 06:51:31 AM CEST
 #
 #=========================================
 
@@ -44,7 +44,7 @@ if (any(classes=="integer64")) {
   if (all(extn!="OBJECTS",na.rm=T)) { 
     Rfits::Rfits_write_key(file=input,"EXTNAME","OBJECTS","",ext=length(extn))
   } 
-  Rfits::Rfits_write_table(file=input,fields,verbose=T,extname="FIELDS",ext=length(extn)+1,
+  Rfits::Rfits_write_table(file=input,fields,extname="FIELDS",ext=length(extn)+1,
                            overwrite_file=FALSE,create_file=FALSE,verbose=TRUE)
 }
 
