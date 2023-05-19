@@ -31,7 +31,11 @@ fi
 _message " > @BLU@Constructing c-corrected catalogue for @RED@${current##*/}@DEF@"
 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/correct_cterm.py \
   -i ${current} \
-  -o ${outputname} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cterm/${catname}
+  -o ${outputname} \
+  --nboot @BV:NBOOT@ \
+  --e1name @BV:E1NAME@ \
+  --e2name @BV:E2NAME@ \
+  --weightname @BV:WEIGHTNAME@ 2>&1 
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 #}}}
 

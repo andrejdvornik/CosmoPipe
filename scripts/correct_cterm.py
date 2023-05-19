@@ -21,8 +21,6 @@ parser.add_argument("-e2", "--e2name", dest="e2colname",
     help="Column name for the e2 variable", required=True)
 parser.add_argument("-w", "--weightname", dest="wtcolname",
     help="Column name for the weight variable", required=True)
-parser.add_argument("-o", "--outputfile", dest="outputfile",
-    help="Full Output file name", metavar="outputFile",required=True)
 parser.add_argument("-nb", "--nboot", dest="nboot",
     help="Number of bootstrap realisations for uncertainty estimation", default=200)
 
