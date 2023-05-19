@@ -3,18 +3,6 @@ import sys
 import ldac
 import astropy.io.fits as pyfits
 
-  catalogue=pyfits.open(sys.argv[1])[1].data
-  e1=catalogue.field('@BV:E1NAME@')
-  e2=catalogue.field('@BV:E2NAME@')
-  weight=catalogue.field('@BV:WEIGHTNAME@')
-except Exception:
-  ldac_cat = ldac.LDACCat(sys.argv[1])
-  catalogue = ldac_cat['OBJECTS']
-  e1=catalogue['@BV:E1NAME@']
-  e2=catalogue['@BV:E2NAME@']
-  weight=catalogue['@BV:WEIGHTNAME@']
-
-area=float(sys.argv[2])
 parser = ArgumentParser(description='Compute neff and sigmae from user inputs')
 parser.add_argument('-i','--input', dest="input", type=str,required=True,
          help='file for input catalogue')
