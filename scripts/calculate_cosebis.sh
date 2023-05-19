@@ -54,7 +54,7 @@ fi
 # --root = TLogsRootsAndNorms/Root_${tmin}-${tmax}.table
 
 _message "    -> @BLU@Computing COSEBIs for file @RED@${input##*/}@DEF@"
-@PYTHON3BIN@/python @RUNROOT@/@SCRIPTPATH@/run_measure_cosebis_cats2stats.py \
+@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/run_measure_cosebis_cats2stats.py \
   -i ${input} \
   -t "meanr" -p "xip" -m "xim" \
   --cfoldername ${outfold} \
