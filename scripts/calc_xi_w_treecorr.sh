@@ -3,7 +3,7 @@
 # File Name : calc_xi_w_treecorr.sh
 # Created By : awright
 # Creation Date : 27-03-2023
-# Last Modified : Mon 15 May 2023 09:04:21 AM CEST
+# Last Modified : Fri 19 May 2023 11:09:14 AM CEST
 #
 #=========================================
 
@@ -92,9 +92,8 @@ do
         --filetwo ${file_two} \
         --output @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipm/${outname} \
         --weighted True \
-        --file1e1 "@BV:E1NAME@" --file1e2 "@BV:E2NAME@" --file1w "@BV:WEIGHTNAME@" \
-        --file2e1 "@BV:E1NAME@" --file2e2 "@BV:E2NAME@" --file2w "@BV:WEIGHTNAME@" \
-        > @RUNROOT@/@LOGPATH@/${outname//.txt/.log} 2>&1 
+        --file1e1 "@BV:E1NAME@" --file1e2 "@BV:E2NAME@" --file1w "@BV:WEIGHTNAME@" --file1ra "@BV:RANAME@" --file1dec "@BV:DECNAME@" \
+        --file2e1 "@BV:E1NAME@" --file2e2 "@BV:E2NAME@" --file2w "@BV:WEIGHTNAME@" --file2ra "@BV:RANAME@" --file2dec "@BV:DECNAME@" 2>&1 
       _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       #Add the correlation function to the datablock 
       xipmblock=`_read_datablock xipm`

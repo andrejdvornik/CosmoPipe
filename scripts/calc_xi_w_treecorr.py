@@ -54,6 +54,14 @@ if __name__ == '__main__':
              help='Name of the weight in the first catalogue')
     parser.add_argument('--file2w', dest="cat2wname", type=str,default='weight',
              help='Name of the weight in the second catalogue')
+    parser.add_argument('--file1ra', dest="cat1raname", type=str,default='ALPHA_J2000',
+             help='Name of the RA column in the first catalogue')
+    parser.add_argument('--file2ra', dest="cat2raname", type=str,default='ALPHA_J2000',
+             help='Name of the RA column in the second catalogue')
+    parser.add_argument('--file1dec', dest="cat1decname", type=str,default='DELTA_J2000',
+             help='Name of the Dec column in the first catalogue')
+    parser.add_argument('--file2dec', dest="cat2decname", type=str,default='DELTA_J2000',
+             help='Name of the Dec column in the second catalogue')
     
     args = parser.parse_args()
     
@@ -68,9 +76,13 @@ if __name__ == '__main__':
     cat1e1name = args.cat1e1name
     cat1e2name = args.cat1e2name
     cat1wname = args.cat1wname
+    cat1raname = args.cat1raname
+    cat1decname = args.cat1decname
     cat2e1name = args.cat2e1name
     cat2e2name = args.cat2e2name
     cat2wname = args.cat2wname
+    cat2raname = args.cat2raname
+    cat2decname = args.cat2decname
 
     #Convert weighted to logical 
     weighted=weighted.lower() in ["true","t","1","y","yes"]
@@ -83,9 +95,9 @@ if __name__ == '__main__':
         raise ValueError('\"%s\" is not an allowed option for binning' % binning)
 
     # prepare the catalogues
-    cat1 = treecorr.Catalog(fitscat1, ra_col='@BV:RANAME@', dec_col='@BV:DECNAME@', ra_units='deg', dec_units='deg', \
+    cat1 = treecorr.Catalog(fitscat1, ra_col=cat1raname, dec_col=cat1decname, ra_units='deg', dec_units='deg', \
                                       g1_col=cat1e1name, g2_col=cat1e2name, w_col=cat1wname)
-    cat2 = treecorr.Catalog(fitscat2, ra_col='@BV:RANAME@', dec_col='@BV:DECNAME@', ra_units='deg', dec_units='deg', \
+    cat2 = treecorr.Catalog(fitscat2, ra_col=cat2raname, dec_col=cat2decname, ra_units='deg', dec_units='deg', \
                                       g1_col=cat2e1name, g2_col=cat2e2name, w_col=cat2wname)
 
     if nbins > 100: ## Fine-binning
@@ -113,9 +125,9 @@ if __name__ == '__main__':
         print("Performing a WEIGHTED treecor measurement (requires double run)") 
         # prepare the weighted_square catalogues - hack so that Treecorr returns the correct Npairs for a weighted sample
 
-        cat1_wsq = treecorr.Catalog(fitscat1, ra_col='@BV:RANAME@', dec_col='@BV:DECNAME@', ra_units='deg', dec_units='deg', \
+        cat1_wsq = treecorr.Catalog(fitscat1, ra_col=cat1raname, dec_col=cat1decname, ra_units='deg', dec_units='deg', \
                                       g1_col=cat1e1name, g2_col=cat1e2name, w_col=cat1wname+'_sq')
-        cat2_wsq = treecorr.Catalog(fitscat2, ra_col='@BV:RANAME@', dec_col='@BV:DECNAME@', ra_units='deg', dec_units='deg', \
+        cat2_wsq = treecorr.Catalog(fitscat2, ra_col=cat2raname, dec_col=cat2decname, ra_units='deg', dec_units='deg', \
                                       g1_col=cat2e1name, g2_col=cat2e2name, w_col=cat2wname+'_sq')
 
         # Define the binning based on command line input
