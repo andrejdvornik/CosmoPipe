@@ -37,7 +37,8 @@ do
   #Get the main catalogue name for this file {{{
   maincat=${input##*/}
   maincat=${maincat%%_refr_DIRsom*}
-  maincat=`_blockentry_to_filelist ${mainlist} | sed 's/ /\n/g' | grep ${maincat}`
+  _message "${maincat}\n"
+  maincat=`_blockentry_to_filelist ${mainlist} | sed 's/ /\n/g' | grep ${maincat} || echo` 
   if [ "${maincat}" == "" ] 
   then 
     _message "@RED@ ERROR!\n"
