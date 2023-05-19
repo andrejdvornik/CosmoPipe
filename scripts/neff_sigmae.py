@@ -2,6 +2,7 @@ import numpy as np
 import sys
 import ldac
 import astropy.io.fits as pyfits
+from argparse import ArgumentParser
 
 parser = ArgumentParser(description='Compute neff and sigmae from user inputs')
 parser.add_argument('-i','--input', dest="input", type=str,required=True,
