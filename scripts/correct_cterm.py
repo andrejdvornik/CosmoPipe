@@ -15,6 +15,16 @@ parser.add_argument("-i", "--inputfile", dest="inputfile",
     help="Full Input file name", metavar="inputFile",required=True)
 parser.add_argument("-o", "--outputfile", dest="outputfile",
     help="Full Output file name", metavar="outputFile",required=True)
+parser.add_argument("-e1", "--e1name", dest="e1colname",
+    help="Column name for the e1 variable", required=True)
+parser.add_argument("-e2", "--e2name", dest="e2colname",
+    help="Column name for the e2 variable", required=True)
+parser.add_argument("-w", "--weightname", dest="wtcolname",
+    help="Column name for the weight variable", required=True)
+parser.add_argument("-o", "--outputfile", dest="outputfile",
+    help="Full Output file name", metavar="outputFile",required=True)
+parser.add_argument("-nb", "--nboot", dest="nboot",
+    help="Number of bootstrap realisations for uncertainty estimation", default=200)
 
 args = parser.parse_args()
     
@@ -45,19 +55,11 @@ def Bootstrap_Error_csq(nboot, e1, e2, weights):
 ldac_cat = ldac.LDACCat(args.inputfile)
 ldac_table = ldac_cat['OBJECTS']
 
-#Ellipticity names 
-e1colname='@BV:E1NAME@'
-e2colname='@BV:E2NAME@'
-#Weight name 
-wtcolname='@BV:WEIGHTNAME@' 
-#Number of bootstrap realisations for uncertainty
-nboot=@NBOOT@
-
 
 #Select required columns 
-e1=ldac_table[e1colname]
-e2=ldac_table[e2colname]
-weight=ldac_table[wtcolname]
+e1=ldac_table[args.e1colname]
+e2=ldac_table[args.e2colname]
+weight=ldac_table[args.wtcolname]
 
 # weighted mean   
 c1=np.average(e1,weights=weight)
@@ -68,7 +70,7 @@ c2=np.average(e2,weights=weight)
 #errc2=Bootstrap_Error(nboot, e2, weight)
 
 #Bootstrap error on c1^2 + c2^2
-errc1,errc2, errcsq, errdcsq= Bootstrap_Error_csq(nboot, e1, e2, weight) 
+errc1,errc2, errcsq, errdcsq= Bootstrap_Error_csq(args.nboot, e1, e2, weight) 
 
 print("c1 errc1 c2 errc2 errcsq errdcsq")
 print("%10.3e %10.3e %10.3e %10.3e %10.3e %10.3e"  % (c1, errc1, c2, errc2, errcsq, errdcsq))
@@ -78,8 +80,8 @@ e1_corr = e1 - c1
 e2_corr = e2 - c2
 
 #Save the output to ldac columns 
-ldac_table[e1colname]=e1_corr
-ldac_table[e2colname]=e2_corr
+ldac_table[args.e1colname]=e1_corr
+ldac_table[args.e2colname]=e2_corr
 
 #Write out the ldac file 
 ldac_table.saveas(args.outputfile,clobber=False)
