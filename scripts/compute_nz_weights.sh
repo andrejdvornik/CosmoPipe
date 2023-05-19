@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Mon 15 May 2023 09:04:48 AM CEST
+# Last Modified : Fri 19 May 2023 08:55:01 AM CEST
 #
 #=========================================
 
@@ -53,53 +53,54 @@ if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_cats ]
 then 
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_cats
 fi 
+#Add the new main files to the datablock 
+calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_refr_DIRsom*.fits `
+filenames=''
+for file in $calibcats
+do 
+  filenames="$filenames ${file##*/}"
+done
 #Move the main catalogues 
 mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_refr_DIRsom* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_cats/
+#Add data block element
+_write_datablock som_weight_refr_cats "${filenames}"
+
+
 
 #Make the directory for the calib catalogues 
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_calib_cats ]
 then 
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_calib_cats
 fi 
+calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_DIRsom*.fits `
+filenames=''
+for file in $calibcats
+do 
+  filenames="$filenames ${file##*/}"
+done
 #Move the main catalogues 
 mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_DIRsom* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_calib_cats/
+#Add data block element
+_write_datablock som_weight_calib_cats "${filenames}"
 
 #Make the directory for the Optimisation Properties 
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_hc_optim/ ]
 then 
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_hc_optim/
 fi 
-#Move the HCoptim catalogues 
-mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_HCoptim* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_hc_optim/
-
-#Notify
-_message "@BLU@ } @RED@ - Done! (`date +'%a %H:%M'`)@DEF@\n"
-
-#Add the new main files to the datablock 
-calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_cats/*_refr_DIRsom*.fits `
-filenames=''
-for file in $calibcats
-do 
-  filenames="$filenames ${file##*/}"
-done
-_write_datablock som_weight_refr_cats "${filenames}"
-
-#Add the new specz files to the datablock 
-calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_calib_cats/*_DIRsom*.fits`
-filenames=''
-for file in $calibcats
-do 
-  filenames="$filenames ${file##*/}"
-done
-_write_datablock som_weight_calib_cats "${filenames}"
-
 #Add the new hcoptim files to the datablock 
-calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_hc_optim/*_HCoptim* `
+calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_HCoptim* `
 filenames=''
 for file in $calibcats
 do 
   filenames="$filenames ${file##*/}"
 done
 _write_datablock nz_hc_optim "${filenames}"
+
+#Move the HCoptim catalogues 
+mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_HCoptim* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_hc_optim/
+
+#Notify
+_message "@BLU@ } @RED@ - Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 
