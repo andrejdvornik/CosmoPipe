@@ -3,12 +3,12 @@
 # File Name : cut_bin_n.sh
 # Created By : awright
 # Creation Date : 31-03-2023
-# Last Modified : Fri 31 Mar 2023 10:45:44 AM CEST
+# Last Modified : Fri 19 May 2023 02:05:46 PM CEST
 #
 #=========================================
 
 #Number of tomographic bins 
-ntomo=`_ntomo`
+ntomo="@BV:NTOMO@"
 
 #For dropping each bin
 for bindrop in `seq ${ntomo}`

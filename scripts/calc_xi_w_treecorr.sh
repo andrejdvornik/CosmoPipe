@@ -3,7 +3,7 @@
 # File Name : calc_xi_w_treecorr.sh
 # Created By : awright
 # Creation Date : 27-03-2023
-# Last Modified : Fri 19 May 2023 11:09:14 AM CEST
+# Last Modified : Fri 19 May 2023 02:05:00 PM CEST
 #
 #=========================================
 
@@ -30,7 +30,7 @@ do
     continue
   fi
 
-  ntomo=`_ntomo`
+  ntomo="@BV:NTOMO@"
   #Loop over tomographic bins in this patch 
 	for ZBIN1 in `seq ${ntomo}`
 	do

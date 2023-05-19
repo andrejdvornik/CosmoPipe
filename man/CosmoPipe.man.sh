@@ -114,14 +114,6 @@ function _get_optlist {
 }
 #}}}
 
-#Number of tomographic bins {{{
-function _ntomo { 
-  #Number of Tomographic bins specified
-  _tomo=`_read_datablock ntomo`
-  echo `_blockentry_to_filelist ${_tomo}`
-}
-#}}}
-
 #Datablock Functions {{{ 
 
 # Add Default Variables {{{ 

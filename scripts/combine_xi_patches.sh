@@ -3,7 +3,7 @@
 # File Name : combine_xi_patches.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Mon 15 May 2023 09:04:40 AM CEST
+# Last Modified : Fri 19 May 2023 02:05:21 PM CEST
 #
 #=========================================
 
@@ -11,7 +11,7 @@
 _message "Combining Correlation Functions by patch\n"
 headfiles="@DB:ALLHEAD@"
 
-ntomo=`_ntomo`
+ntomo="@BV:NTOMO@"
 #Loop over tomographic bins in this patch 
 for ZBIN1 in `seq ${ntomo}`
 do
