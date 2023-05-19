@@ -41,7 +41,7 @@ ldac_table = ldac_cat['OBJECTS']
 e1colname=args.e1name
 e2colname=args.e2name
 #Weight name 
-wtcolname=args.weightname
+wtcolname=args.wname
 #PSF Ellipticity names 
 psfe1colname=args.psfe1name
 psfe2colname=args.psfe2name
