@@ -3,7 +3,7 @@
 # File Name : neff_sigmae.sh
 # Created By : awright
 # Creation Date : 28-03-2023
-# Last Modified : Mon 15 May 2023 09:06:03 AM CEST
+# Last Modified : Fri 19 May 2023 11:19:54 AM CEST
 #
 #=========================================
 
@@ -34,11 +34,14 @@ catbase=${catname%.*}
 _message "> @BLU@Computing sigma_e and n_effective for catalogue:@DEF@ ${catname}" 
 #Prepare the neff & ellipticity dispersion file
 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/neff_sigmae.py \
-  @DB:DATAHEAD@ \
-  ${SurveyArea} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cov_input/${catbase}_neff_sigmae.txt 
+  -i @DB:DATAHEAD@ \
+  --e1name @BV:E1NAME@ \
+  --e2name @BV:E2NAME@ \
+  --wname @BV:WEIGHTNAME@ \
+  --area ${SurveyArea} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cov_input/${catbase}_neff_sigmae.txt 
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
-ntomo=`_ntomo`
+ntomo="@BV:NTOMO@"
 
 tail -n +2 @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cov_input/${catbase}_neff_sigmae.txt \
   | head -n ${ntomo} | awk '{ printf $2" " }' >  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/neff/${catbase}_neff.txt 

@@ -3,7 +3,6 @@ import sys
 import ldac
 import astropy.io.fits as pyfits
 
-try:
   catalogue=pyfits.open(sys.argv[1])[1].data
   e1=catalogue.field('@BV:E1NAME@')
   e2=catalogue.field('@BV:E2NAME@')
@@ -16,6 +15,32 @@ except Exception:
   weight=catalogue['@BV:WEIGHTNAME@']
 
 area=float(sys.argv[2])
+parser = ArgumentParser(description='Compute neff and sigmae from user inputs')
+parser.add_argument('-i','--input', dest="input", type=str,required=True,
+         help='file for input catalogue')
+parser.add_argument('--e1name', dest="e1name", type=str,default='e1',
+         help='Name of the e1 component in the catalogue')
+parser.add_argument('--e2name', dest="e2name", type=str,default='e2',
+         help='Name of the e2 component in the catalogue')
+parser.add_argument('--wname', dest="wname", type=str,default='weight',
+         help='Name of the weight in the catalogue')
+parser.add_argument('--area', dest="area", type=float,required=True,
+         help='Area of the survey in square arcmin')
+
+args = parser.parse_args()
+try:
+  catalogue=pyfits.open(args.input)[1].data
+  e1=catalogue.field(args.e1name)
+  e2=catalogue.field(args.e2name)
+  weight=catalogue.field(args.wname)
+except Exception:
+  ldac_cat = ldac.LDACCat(args.input)
+  catalogue = ldac_cat['OBJECTS']
+  e1=catalogue[args.e1name]
+  e2=catalogue[args.e2name]
+  weight=catalogue[args.weightname]
+
+area=args.area
 
 # NOTE: currently the m-bias is not used in the calculation
 ##m-bias values per tomographic bin
