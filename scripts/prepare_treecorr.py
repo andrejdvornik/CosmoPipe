@@ -15,6 +15,20 @@ parser.add_argument("-i", "--inputfile", dest="inputfile",
     help="Full Input file name", metavar="inputFile",required=True)
 parser.add_argument("-o", "--outputfile", dest="outputfile",
     help="Full Output file name", metavar="outputFile",required=True)
+parser.add_argument('--e1name', dest="e1name", type=str,default='e1',
+         help='Name of the e1 component in the catalogue')
+parser.add_argument('--e2name', dest="e2name", type=str,default='e2',
+         help='Name of the e2 component in the catalogue')
+parser.add_argument('--psfe1name', dest="psfe1name", type=str,default='PSF_e1',
+         help='Name of the PSF e1 component in the catalogue')
+parser.add_argument('--psfe2name', dest="psfe2name", type=str,default='PSF_e2',
+         help='Name of the PSF e2 component in the catalogue')
+parser.add_argument('--wname', dest="wname", type=str,default='weight',
+         help='Name of the weight in the catalogue')
+parser.add_argument('--raname', dest="raname", type=str,default='ALPHA_J2000',
+         help='Name of the RA column in the catalogue')
+parser.add_argument('--decname', dest="decname", type=str,default='DELTA_J2000',
+         help='Name of the Dec column in the catalogue')
 
 args = parser.parse_args()
     
@@ -24,16 +38,16 @@ ldac_cat = ldac.LDACCat(args.inputfile)
 ldac_table = ldac_cat['OBJECTS']
 
 #Ellipticity names 
-e1colname='@BV:E1NAME@'
-e2colname='@BV:E2NAME@'
+e1colname=args.e1name
+e2colname=args.e2name
 #Weight name 
-wtcolname='@BV:WEIGHTNAME@' 
+wtcolname=args.weightname
 #PSF Ellipticity names 
-psfe1colname='@BV:PSFE1NAME@'
-psfe2colname='@BV:PSFE2NAME@'
+psfe1colname=args.psfe1name
+psfe2colname=args.psfe2name
 #RADec Names 
-racolname='@BV:RANAME@'
-deccolname='@BV:DECNAME@'
+racolname=args.raname
+deccolname=args.decname
 
 #Select required columns 
 e1=ldac_table[e1colname]

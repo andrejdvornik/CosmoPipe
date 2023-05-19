@@ -3,7 +3,7 @@
 # File Name : prepare_treecorr.sh
 # Created By : awright
 # Creation Date : 28-03-2023
-# Last Modified : Tue 28 Mar 2023 07:44:02 PM CEST
+# Last Modified : Fri 19 May 2023 11:31:13 AM CEST
 #
 #=========================================
 
@@ -38,7 +38,14 @@ logfile=${outputname##*/}
 logfile=${logfile//.fits/.log}
 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/prepare_treecorr.py \
   -i ${current} \
-  -o ${outputname} > @RUNROOT@/@LOGPATH@/${logfile} 2>&1
+  -o ${outputname} \
+  --e1name @BV:E1NAME@ \
+  --e2name @BV:E2NAME@ \
+  --psfe1name @BV:PSFE1NAME@ \
+  --psfe2name @BV:PSFE2NAME@ \
+  --wname @BV:WEIGHTNAME@ \
+  --raname @BV:RANAME@ \
+  --decname @BV:DECNAME@ 2>&1 
 _message " - @RED@Done!@DEF@\n"
 #}}}
 
