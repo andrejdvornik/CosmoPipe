@@ -3,7 +3,7 @@
 # File Name : extract_patch.sh
 # Created By : awright
 # Creation Date : 28-03-2023
-# Last Modified : Mon 15 May 2023 09:05:48 AM CEST
+# Last Modified : Fri 19 May 2023 12:42:13 PM CEST
 #
 #=========================================
 
@@ -17,6 +17,7 @@ extn=${inputfile##*.}
 _message "@BLU@Constructing Patch-wise catalogue from:@DEF@ ${inputfile##*/}\n"
 
 #Construct the tomographic bin catalogues {{{
+outputlist=''
 for patch in @PATCHLIST@ 
 do
   #Define the output file name {{{
