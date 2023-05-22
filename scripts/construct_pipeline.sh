@@ -195,7 +195,7 @@ do
           if [ -f defaults.sh ]
           then 
             #If so, check whether this variable is in the global defaults 
-            exists=`grep -c "@${var}@" defaults.sh || echo`
+            exists=`grep -c "${var}=" defaults.sh || echo`
             if [ "${exists}" != "0" ]
             then 
               #If so, use the global default 
