@@ -179,12 +179,12 @@ do
     #}}}
     #Perform the variable check {{{
     blockneeds=`_varcheck $step.sh`
+    if [ ! -f  @PIPELINE@_defaults.sh ] 
+    then 
+      touch  @PIPELINE@_defaults.sh
+    fi 
     if [ "${blockneeds}" != "" ]
     then 
-      if [ ! -f  @PIPELINE@_defaults.sh ] 
-      then 
-        touch  @PIPELINE@_defaults.sh
-      fi 
       for var in ${blockneeds}
       do 
         exists=`grep -c "@${var}@" @PIPELINE@_defaults.sh || echo`
