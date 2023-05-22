@@ -64,7 +64,7 @@ function _outputs {
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo @PYTHON3BIN@/cosmosis @RUNROOT@/@CONFIGPATH@/run_covariance_cosebis.ini
+  echo cosmosis @RUNROOT@/@CONFIGPATH@/run_covariance_cosebis.ini
 } 
 #}}}
 

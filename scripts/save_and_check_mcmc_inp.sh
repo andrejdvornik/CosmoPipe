@@ -24,6 +24,7 @@ cov=${cov//.ascii/.fits}
 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp.py \
   --datavector @DB:cosebis_vec@ \
   --nz @DB:nz@ \
+  --nmaxcosebis @BV:NMAXCOSEBIS@ \
   --neff @DB:cosmosis_neff@ \
   --sigmae @DB:cosmosis_sigmae@ \
   --covariance @DB:cosebis_cov@ \
