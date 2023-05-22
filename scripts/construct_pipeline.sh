@@ -130,7 +130,7 @@ fi
 
 #Check the validity of the pipeline {{{
 #Add default variables (if they exist) {{{
-if [ -f @PIPELINE_defaults.sh ]
+if [ -f @PIPELINE@_defaults.sh ]
 then 
   _add_default_vars
 fi 
@@ -181,11 +181,19 @@ do
     blockneeds=`_varcheck $step.sh`
     if [ "${blockneeds}" != "" ]
     then 
+      if [ ! -f  @PIPELINE@_defaults.sh ] 
+      then 
+        touch  @PIPELINE@_defaults.sh
+      fi 
       for var in ${blockneeds}
       do 
-        echo ${var}=@${var}@ >> @PIPELINE@_defaults.sh 
+        exists=`grep -c "@${var}@" @PIPELINE@_defaults.sh || echo`
+        if [ "${exists}" == "0" ]
+        then 
+          echo ${var}=@${var}@ >> @PIPELINE@_defaults.sh 
+        fi 
       done 
-      sort @PIPELINE@_defaults.sh | uniq > @PIPELINE@_defaults_uniq.sh
+      #sort @PIPELINE@_defaults.sh | uniq > @PIPELINE@_defaults_uniq.sh
       mv @PIPELINE@_defaults_uniq.sh @PIPELINE@_defaults.sh
     fi 
     #}}}
