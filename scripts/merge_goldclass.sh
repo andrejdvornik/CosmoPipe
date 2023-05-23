@@ -9,13 +9,13 @@
 
 
 #If needed, make the gold catalogue folder 
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_all_tomo_gold/ ]
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_gold/ ]
 then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_all_tomo_gold
+  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_gold
 fi 
 
 #For each catalogue in the output folder of compute_nz_weights 
-mainlist=`_read_datablock main_all_tomo`
+mainlist=`_read_datablock som_weight_reference`
 outlist=""
 for input in @DB:som_weight_refr_cats@
 do
@@ -49,23 +49,23 @@ do
   #Merge the goldclass column {{{
   _message "   > @BLU@Merging goldclass column for ${i}@DEF@${input##*/}"
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacjoinkey \
-    -i @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_all_tomo/${maincat} \
+    -i @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_reference/${maincat} \
     -p ${input} \
-    -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_all_tomo_gold/${outname}_tmp \
+    -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_gold/${outname}_tmp \
     -k SOMweight -t OBJECTS > @RUNROOT@/@LOGPATH@/${outname//.${outext}/.log} 2>&1
   _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
   #}}}
   #Construct the output tomographic bin {{{
   _message "   > @BLU@Removing non-gold sources for ${i}@DEF@${input##*/}"
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
-           -i @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_all_tomo_gold/${outname}_tmp \
-  	       -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_all_tomo_gold/${outname} \
+           -i @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_gold/${outname}_tmp \
+  	       -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_gold/${outname} \
   	       -t OBJECTS \
   	       -c "(SOMweight>0);" >>@RUNROOT@/@LOGPATH@/${outname//.${outext}/.log} 2>&1 
   _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
   #}}}
   #Remove the temporary file {{{
-  rm @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_all_tomo_gold/${outname}_tmp
+  rm @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_gold/${outname}_tmp
   #}}}
   #Save the output file to the list {{{
   outlist="$outlist $outname"
@@ -73,5 +73,5 @@ do
 done 
 
 #Add the new file to the datablock 
-_add_datablock main_all_tomo_gold "`echo ${outlist}`"
+_add_datablock som_weight_refr_gold "`echo ${outlist}`"
 
