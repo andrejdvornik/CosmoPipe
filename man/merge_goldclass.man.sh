@@ -50,14 +50,14 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo som_weight_refr_cats
+  echo som_weight_refr_cats som_weight_reference
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo main_all_tomo_gold
+  echo som_weight_refr_gold
 } 
 #}}}
 

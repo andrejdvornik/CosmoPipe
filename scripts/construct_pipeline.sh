@@ -188,24 +188,26 @@ do
       for var in ${blockneeds}
       do 
         #Check whether the variable is already in the pipeline defaults 
-        exists=`grep -c "@${var}@" @PIPELINE@_defaults.sh || echo`
+        exists=`grep -c "^${var}=" @PIPELINE@_defaults.sh || echo`
         if [ "${exists}" == "0" ]
         then 
           #If not, check whether the global defaults file exists 
           if [ -f defaults.sh ]
           then 
             #If so, check whether this variable is in the global defaults 
-            exists=`grep -c "@${var}@" defaults.sh || echo`
+            exists=`grep -c "^${var}=" defaults.sh || echo`
             if [ "${exists}" != "0" ]
             then 
               #If so, use the global default 
-              grep -B 1 "${var}=" defaults.sh >> @PIPELINE@_defaults.sh 
+              grep -m 1 -B 1 "${var}=" defaults.sh >> @PIPELINE@_defaults.sh 
             else 
               #Otherwise, insert a blank entry 
+              echo "#INSERT DEFAULT VALUE HERE:" >> @PIPELINE@_defaults.sh 
               echo ${var}=@${var}@ >> @PIPELINE@_defaults.sh 
             fi
           else 
             #If there is no global defaults, insert a blank entry 
+            echo "#INSERT DEFAULT VALUE HERE:" >> @PIPELINE@_defaults.sh 
             echo ${var}=@${var}@ >> @PIPELINE@_defaults.sh 
           fi 
         fi 
