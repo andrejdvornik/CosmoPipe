@@ -3,7 +3,7 @@
 # File Name : make_cosmosis_nz.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Tue 23 May 2023 04:56:11 PM CEST
+# Last Modified : Tue 23 May 2023 05:03:27 PM CEST
 #
 #=========================================
 
@@ -15,12 +15,12 @@ then
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz/
 fi 
 
-#Get the file list {{{
 outputlist=''
 for patch in @PATCHLIST@ @ALLPATCH@ 
 do 
   filelist=''
-  for ZBIN1 in `seq ${ntomo}`
+  #Get the file list {{{
+  for ZBIN1 in `seq @BV:NTOMO@`
   do
     #Define the Z_B limits from the TOMOLIMS {{{
     ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN1 '{print $n}'`
@@ -32,30 +32,37 @@ do
     appendstr="_ZB${ZB_lo_str}t${ZB_hi_str}"
     #}}}
     file=`echo ${inputs} | sed 's/ /\n/g' | grep "_${patch}_" | grep ${appendstr} || echo `
-    #Check if the output file exists 
+    #Check if the output file exists {{{
     if [ "${file}" == "" ] 
     then 
+      #If not, loop
       continue
     fi 
+    #}}}
     filelist="${filelist} ${file}"
   done 
+  #}}}
+  #If filelist is empty, skip {{{
   if [ "${filelist}" == "" ] 
   then 
     continue
   fi 
-  #Construct the output base
+  #}}}
+  #Construct the output base {{{
   file=${filelist##* }
   output_base=${file##*/}
   output_base=${output_base%%_ZB*}
   output_base="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz/${output_base}"
-  
+  #}}}
+  #Remove existing files {{{
   if [ -f ${output_base}_comb_Nz.fits ]
   then 
     _message " > @BLU@Removing previous COSMOSIS Nz file@DEF@ ${output_base##*/}_comb_Nz.fits@DEF@"
     rm ${output_base}_comb_Nz.fits
     _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
   fi 
-  
+  #}}}
+  #Construct the redshift file {{{
   _message " > @BLU@Constructing COSMOSIS Nz file @RED@${output_base}_comb_Nz.fits@DEF@"
   #Construct the Nz combined fits file and put into covariance/input/
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/MakeNofZForCosmosis_function.py \
@@ -63,9 +70,10 @@ do
     --neff @DB:cosmosis_neff@ \
     --output_base ${output_base} 2>&1 
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
-
-  #Save output to the outputlist 
+  #}}}
+  #Save output to the outputlist {{{
   outputlist="${outputlist} ${output_base##*/}_comb_Nz.fits"
+  #}}}
 done 
 
 #Update the datablock 
