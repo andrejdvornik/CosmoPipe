@@ -3,7 +3,7 @@
 # File Name : prepare_cosmosis.sh
 # Created By : awright
 # Creation Date : 31-03-2023
-# Last Modified : Mon 15 May 2023 09:06:14 AM CEST
+# Last Modified : Tue 23 May 2023 04:16:18 PM CEST
 #
 #=========================================
 
@@ -193,7 +193,8 @@ done
 _write_datablock "cosmosis_inputs" "@SURVEY@_values.ini @SURVEY@_priors.ini"
 #}}}
 
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebi_cov ]
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_cov ]
 then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebi_cov/
+  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_cov/
 fi 
+
