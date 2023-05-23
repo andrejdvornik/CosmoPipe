@@ -869,7 +869,7 @@ function _incorporate_datablock {
   #Check if we are stoelzner {{{
   if [ `whoami` == 'stoelzner' ]
   then 
-    if [ $(( ( RANDOM % 100 )  + 1 )) -gt 80 ] 
+    if [ "${ext}" != "ini" ] && [ $(( ( RANDOM % 100 )  + 1 )) -gt 92 ] 
     then 
       echo '# Check if benjamin has had his coffee ----' >> ${1}
       echo '_message "\n\n@RED@~~~~~~~~~~~~~~~~~~~~~~~~~~~@DEF@\n"' >> ${1}
