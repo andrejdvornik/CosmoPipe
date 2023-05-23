@@ -88,7 +88,7 @@ print('input file is '+inputfile+', making COSEBIs for '+str(nModes)+' modes and
 
 # Load the input 2pt correlation function data
 file=open(inputfile)
-header=file.readline().split(" ")
+header=file.readline().strip('#').split()
 xipm_in=np.loadtxt(file,comments='#')
 xipm_data={}
 for i, col in enumerate(header):
