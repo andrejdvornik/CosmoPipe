@@ -3,17 +3,12 @@
 # File Name : make_cosmosis_nz.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Tue 23 May 2023 05:03:27 PM CEST
+# Last Modified : Wed 24 May 2023 09:27:45 AM CEST
 #
 #=========================================
 
 
 inputs="@DB:nz@"
-
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz ]
-then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz/
-fi 
 
 outputlist=''
 for patch in @PATCHLIST@ @ALLPATCH@ 
@@ -48,11 +43,17 @@ do
     continue
   fi 
   #}}}
+  #Construct the output directory {{{
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz_${patch} ]
+  then 
+    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz_${patch}/
+  fi 
+  #}}}
   #Construct the output base {{{
   file=${filelist##* }
   output_base=${file##*/}
   output_base=${output_base%%_ZB*}
-  output_base="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz/${output_base}"
+  output_base="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz_${patch}/${output_base}"
   #}}}
   #Remove existing files {{{
   if [ -f ${output_base}_comb_Nz.fits ]
@@ -71,11 +72,8 @@ do
     --output_base ${output_base} 2>&1 
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
   #}}}
-  #Save output to the outputlist {{{
-  outputlist="${outputlist} ${output_base##*/}_comb_Nz.fits"
-  #}}}
+  
+  #Update the datablock 
+  _write_datablock cosmosis_nz_${patch} "${output_base}_comb_Nz.fits"
 done 
-
-#Update the datablock 
-_write_datablock cosmosis_nz "${outputlist}"
 
