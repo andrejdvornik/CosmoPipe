@@ -57,7 +57,12 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo cosmosis_nz_{patch}
+  outlist=''
+  for patch in @PATCHLIST@ @ALLPATCH@ 
+  do 
+    outlist="${outlist} cosmosis_nz_${patch}"
+  done 
+  echo ${outlist}
 } 
 #}}}
 
