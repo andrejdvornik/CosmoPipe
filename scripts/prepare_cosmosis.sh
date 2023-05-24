@@ -3,7 +3,7 @@
 # File Name : prepare_cosmosis.sh
 # Created By : awright
 # Creation Date : 31-03-2023
-# Last Modified : Wed 24 May 2023 05:00:27 PM CEST
+# Last Modified : Wed 24 May 2023 05:46:54 PM CEST
 #
 #=========================================
 
@@ -12,91 +12,147 @@ inputs="@DB:nz@"
 headfiles="@DB:ALLHEAD@"
 
 #N_effective {{{
-#Create the neff directory
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_neff ]
-then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_neff/
-fi 
-
-#Prepare the n_effective file for CosmoSIS 
-for file in ${inputs} 
+outlist=''
+for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
 do 
-  ext=${file##*.}
-  neff_file=${file//\/nz\//\/neff\/}
-  neff_file=`compgen -G ${neff_file//_Nz.${ext}/_*_neff.txt} || echo `
-  if [ ! -f ${neff_file} ] 
+  #Get all the files in this patch {{{
+  patchinputs=''
+  for file in ${inputs}
+  do 
+    if [[ "$file" =~ .*"_${patch}_".* ]]
+    then 
+      patchinputs="${patchinputs} ${file}"
+    fi 
+  done 
+  #}}}
+  #If there are no files in this patch, skip {{{
+  if [ "${patchinputs}" == "" ] 
   then 
-    _message "@RED@ ERROR!\n@DEF@"
-    _message "@RED@ There is no n_effective file:\n@DEF@"
-    _message "${neff_file}\n"
-    _message "@BLU@ ==> You probably need to run the @DEF@neff_sigmae@BLU@ mode when these catalogues are in the DATAHEAD!\n"
-    _message "@BLU@ ==> Or you didn't merge the goldclasses with the main catalogue?!\n"
-    exit 1
+    continue
   fi 
-  neff_list="${neff_list} ${neff_file}"
+  #}}}
+  #Create the neff directory {{{
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_neff_${patch} ]
+  then 
+    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_neff_${patch}/
+  fi 
+  #}}}
+  #Get all the neff files for this patch {{{
+  for file in ${patchinputs} 
+  do 
+    #Get the file extension and names {{{
+    ext=${file##*.}
+    neff_file=${file//\/nz\//\/neff\/}
+    #}}}
+    #Find the matching file {{{
+    neff_file=`compgen -G ${neff_file//_Nz.${ext}/_*_neff.txt} || echo `
+    if [ ! -f ${neff_file} ] 
+    then 
+      _message "@RED@ ERROR!\n@DEF@"
+      _message "@RED@ There is no neffe file:\n@DEF@"
+      _message "${neff_file}\n"
+      _message "@BLU@ ==> You probably need to run the @DEF@neff_sigmae@BLU@ mode when these catalogues are in the DATAHEAD!\n"
+      _message "@BLU@ ==> Or you didn't merge the goldclasses with the main catalogue?!\n"
+      exit 1
+    fi 
+    #}}}
+    #Add file to the neff list {{{
+    neff_list="${neff_list} ${neff_file}"
+    #}}}
+  done 
+  #}}}
+  #Define the output neffe file {{{
+  neff_file=${neff_file##*/}
+  neff_file=${neff_file%_ZB*}_neff.txt 
+  #}}}
+  #Remove preexisting files {{{
+  if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_neff_${patch}/${neff_file} ]
+  then 
+    _message " > @BLU@Removing previous cosmosis neff file@DEF@"
+    rm @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_neff_${patch}/${neff_file}
+    _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
+  fi 
+  #}}}
+  #Construct the output file, maintaining order {{{
+  paste ${neff_list} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_neff_${patch}/${neff_file}
+  #}}}
+  #Add the neffe file to the datablock {{{
+  _write_datablock "cosmosis_neff_${patch}" "${neff_file}"
+  #}}}
 done 
-
-#Define the output n_effective file 
-neff_file=${neff_file##*/}
-neff_file=${neff_file%_ZB*}_neff.txt 
-
-#Remove existing data 
-if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_neff/${neff_file} ]
-then 
-  _message " > @BLU@Removing previous cosmosis neff file@DEF@"
-  rm @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_neff/${neff_file}
-  _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
-fi 
-
-#Construct the output file, maintaining order 
-paste ${neff_list} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_neff/${neff_file}
-
-#Add the n_eff file to the datablock 
-_write_datablock "cosmosis_neff" "${neff_file}"
 #}}}
 
 #Sigma_e {{{
-
-#Create the sigmae directory
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae ]
-then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae/
-fi 
-#Prepare the sigma_e file for CosmoSIS
-for file in ${inputs} 
+outlist=''
+for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
 do 
-  ext=${file##*.}
-  sigmae_file=${file//\/nz\//\/sigmae\/}
-  sigmae_file=`compgen -G ${sigmae_file//_Nz.${ext}/_*_sigmae.txt} || echo `
-  if [ ! -f ${sigmae_file} ] 
+  #Get all the files in this patch {{{
+  patchinputs=''
+  for file in ${inputs}
+  do 
+    if [[ "$file" =~ .*"_${patch}_".* ]]
+    then 
+      patchinputs="${patchinputs} ${file}"
+    fi 
+  done 
+  #}}}
+  #If there are no files in this patch, skip {{{
+  if [ "${patchinputs}" == "" ] 
   then 
-    _message "@RED@ ERROR!\n@DEF@"
-    _message "@RED@ There is no sigma_e file:\n@DEF@"
-    _message "${sigmae_file}\n"
-    _message "@BLU@ ==> You probably need to run the @DEF@neff_sigmae@BLU@ mode when these catalogues are in the DATAHEAD!\n"
-    _message "@BLU@ ==> Or you didn't merge the goldclasses with the main catalogue?!\n"
-    exit 1
+    continue
   fi 
-  sigmae_list="${sigmae_list} ${sigmae_file}"
+  #}}}
+  #Create the sigmae directory {{{
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae_${patch} ]
+  then 
+    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae_${patch}/
+  fi 
+  #}}}
+  #Get all the sigmae files for this patch {{{
+  for file in ${patchinputs} 
+  do 
+    #Get the file extension and names {{{
+    ext=${file##*.}
+    sigmae_file=${file//\/nz\//\/sigmae\/}
+    #}}}
+    #Find the matching file {{{
+    sigmae_file=`compgen -G ${sigmae_file//_Nz.${ext}/_*_sigmae.txt} || echo `
+    if [ ! -f ${sigmae_file} ] 
+    then 
+      _message "@RED@ ERROR!\n@DEF@"
+      _message "@RED@ There is no sigma_e file:\n@DEF@"
+      _message "${sigmae_file}\n"
+      _message "@BLU@ ==> You probably need to run the @DEF@neff_sigmae@BLU@ mode when these catalogues are in the DATAHEAD!\n"
+      _message "@BLU@ ==> Or you didn't merge the goldclasses with the main catalogue?!\n"
+      exit 1
+    fi 
+    #}}}
+    #Add file to the sigmae list {{{
+    sigmae_list="${sigmae_list} ${sigmae_file}"
+    #}}}
+  done 
+  #}}}
+  #Define the output sigma_e file {{{
+  sigmae_file=${sigmae_file##*/}
+  sigmae_file=${sigmae_file%_ZB*}_sigmae.txt 
+  #}}}
+  #Remove preexisting files {{{
+  if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae_${patch}/${sigmae_file} ]
+  then 
+    _message " > @BLU@Removing previous cosmosis sigmae file@DEF@"
+    rm @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae_${patch}/${sigmae_file}
+    _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
+  fi 
+  #}}}
+  #Construct the output file, maintaining order {{{
+  paste ${sigmae_list} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae_${patch}/${sigmae_file}
+  #}}}
+  #Add the sigma_e file to the datablock {{{
+  _write_datablock "cosmosis_sigmae_${patch}" "${sigmae_file}"
+  #}}}
 done 
-
-#Define the output sigma_e file 
-sigmae_file=${sigmae_file##*/}
-sigmae_file=${sigmae_file%_ZB*}_sigmae.txt 
-
-if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae/${sigmae_file} ]
-then 
-  _message " > @BLU@Removing previous cosmosis sigmae file@DEF@"
-  rm @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae/${sigmae_file}
-  _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
-fi 
-#Construct the output file, maintaining order 
-paste ${sigmae_list} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae/${sigmae_file}
-
-#Add the sigma_e file to the datablock 
-_write_datablock "cosmosis_sigmae" "${sigmae_file}"
 #}}}
-
+  
 #Xipm {{{
 if [ "${headfiles}" != "" ]
 then 
