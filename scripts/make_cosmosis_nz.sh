@@ -3,7 +3,7 @@
 # File Name : make_cosmosis_nz.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Wed 24 May 2023 09:27:45 AM CEST
+# Last Modified : Wed 24 May 2023 04:10:13 PM CEST
 #
 #=========================================
 
@@ -74,6 +74,6 @@ do
   #}}}
   
   #Update the datablock 
-  _write_datablock cosmosis_nz_${patch} "${output_base}_comb_Nz.fits"
+  _write_datablock cosmosis_nz_${patch} "${output_base##*/}_comb_Nz.fits"
 done 
 
