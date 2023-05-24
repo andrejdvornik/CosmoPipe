@@ -3,7 +3,7 @@
 # File Name : prepare_cosmosis.sh
 # Created By : awright
 # Creation Date : 31-03-2023
-# Last Modified : Wed 24 May 2023 05:57:39 PM CEST
+# Last Modified : Wed 24 May 2023 06:08:24 PM CEST
 #
 #=========================================
 
@@ -158,18 +158,13 @@ done
 #Xipm {{{
 if [ "${headfiles}" != "" ]
 then 
-  #Create the xipm directory {{{
-  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm ]
-  then 
-    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/
-  fi 
-  #}}}
   _message "Copying XIpm catalogues from datahead into cosmosis_xipm {\n"
   #Loop over patches {{{
   ntomo="@BV:NTOMO@"
-  outlist=''
+  outall=''
   for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
   do 
+    outlist=''
     #Loop over tomographic bins in this patch {{{
     for ZBIN1 in `seq ${ntomo}`
     do
@@ -206,10 +201,16 @@ then
           continue
         fi 
         #}}}
+        #Create the xipm directory {{{
+        if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm_${patch} ]
+        then 
+          mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm_${patch}/
+        fi 
+        #}}}
         #Copy the file {{{
         _message " > @BLU@ Patch @DEF@${patch}@BLU@ ZBIN @DEF@${ZBIN1}@BLU@x@DEF@${ZBIN2}"
         cp ${file} \
-          @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/XI_@SURVEY@_${patch}_nBins_${ntomo}_Bin${ZBIN1}_Bin${ZBIN2}.ascii
+          @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm_${patch}/XI_@SURVEY@_${patch}_nBins_${ntomo}_Bin${ZBIN1}_Bin${ZBIN2}.ascii
         _message " - @RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
         #}}}
         #Save the file to the output list {{{
@@ -218,11 +219,15 @@ then
       done 
       #}}}
     done
+    #Update the datablock {{{
+    _write_datablock "cosmosis_xipm_${patch}" "${outlist}"
+    outall="${outall} ${outlist}"
+    #}}}
     #}}}
   done
   #}}}
   #Were there any files in any of the patches? {{{
-  if [ "${outlist}" == "" ] 
+  if [ "${outall}" == "" ] 
   then 
     #If not, error 
     _message " - @RED@ERROR!@DEF@\n"
@@ -230,9 +235,6 @@ then
     _message "@BLU@You probably didn't load the xipm files into the datahead?!@DEF@"
     exit 1
   fi 
-  #}}}
-  #Update the datablock {{{
-  _write_datablock "cosmosis_xipm" "${outlist}"
   #}}}
   _message "}\n"
 fi 
