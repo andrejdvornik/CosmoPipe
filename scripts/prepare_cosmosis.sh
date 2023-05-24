@@ -3,7 +3,7 @@
 # File Name : prepare_cosmosis.sh
 # Created By : awright
 # Creation Date : 31-03-2023
-# Last Modified : Wed 24 May 2023 05:46:54 PM CEST
+# Last Modified : Wed 24 May 2023 05:57:39 PM CEST
 #
 #=========================================
 
@@ -38,6 +38,7 @@ do
   fi 
   #}}}
   #Get all the neff files for this patch {{{
+  neff_list=''
   for file in ${patchinputs} 
   do 
     #Get the file extension and names {{{
@@ -109,6 +110,7 @@ do
   fi 
   #}}}
   #Get all the sigmae files for this patch {{{
+  sigmae_list=''
   for file in ${patchinputs} 
   do 
     #Get the file extension and names {{{
