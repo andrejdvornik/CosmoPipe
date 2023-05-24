@@ -368,7 +368,7 @@ function _add_datahead {
   if [ "$(ls -A @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1})" ] 
   then 
     _message " @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD"
-    rsync -autv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/datahead_write.log
+    rsync -autv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ >> @RUNROOT@/@LOGPATH@/datahead_write.log
     _message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
   fi 
   #Get the files in this data
@@ -586,7 +586,7 @@ function _add_datablock {
       if [ -e "$_file" ]
       then 
         _message " @BLU@>@DEF@ ${_file##*/} @BLU@-->@DEF@ ${1}"
-        rsync -autv $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${_file##*/} >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/datablock_add.log
+        rsync -autv $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${_file##*/} >> @RUNROOT@/@LOGPATH@/datablock_add.log
         _message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       fi 
     done 
