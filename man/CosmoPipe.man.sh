@@ -867,7 +867,7 @@ function _incorporate_datablock {
   ##}}}
 
   #Check if we are stoelzner {{{
-  if [ `whoami` == 'stoelzner' ]
+  if [ `whoami` == 'awright' ] || [ `whoami` == 'stoelzner' ]
   then 
     if [ "${ext}" != "ini" ] && [ $(( ( RANDOM % 100 )  + 1 )) -gt 92 ] 
     then 
@@ -884,31 +884,32 @@ function _incorporate_datablock {
       echo "# ----" >> ${1}
     elif [ "${ext}" != "ini" ] && [ $(( ( RANDOM % 100 )  + 1 )) -gt 92 ] 
     then 
-      echo '# Ensure that Benjamin is taken care of <3 ----' >> ${1}
-      echo '_message "\n\n@RED@###############################################@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@###############################################@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##                                           ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @DEF@ IT\'S  DANGEROUS  TO  GO @RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @DEF@    ALONE!  TAKE  THIS.  @RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##                                           ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @BLU@           {             @RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @BLU@        {   }{   }       @RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @BLU@         } {  } {        @RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @BLU@      .-{`}`}{``}-.      @RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @BLU@     (   } {   {   )     @RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @BLU@     |`-.._____..-\'|     @RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @BLU@     |             ;--.  @RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @BLU@     |            (__  \ @RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @BLU@     |             | )  )@RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @BLU@     |             |/  / @RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @BLU@     |             /  /  @RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @BLU@     |            (  /   @RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @BLU@     \             y\'    @RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##    @BLU@      `-.._____..-\'      @RED@              ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##                                           ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@##                                           ##@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@###############################################@DEF@\n"' >> ${1}
-      echo '_message "\n\n@RED@###############################################@DEF@\n"' >> ${1}
+      echo "# Ensure that Benjamin is taken care of <3 ----" >> ${1}
+      echo "_message \"\n\n@RED@#####################################@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@#####################################@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##                                 ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##    @DEF@ IT'S  DANGEROUS  TO  GO @RED@    ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##    @DEF@    ALONE!  TAKE  THIS.  @RED@    ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##                                 ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##   @BLU@           {             @RED@     ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##   @BLU@        {   }{   }       @RED@     ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##   @BLU@         } {  } {        @RED@     ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##   @BLU@      .-{\\\`}\\\`}{\\\`\\\`}-.       @RED@    ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##   @BLU@     (   } {   {   )     @RED@     ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##   @BLU@     |\\\`-.._____..-'|     @RED@     ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##   @BLU@     |             ;--.  @RED@     ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##   @BLU@     |            (__  \\ @RED@     ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##   @BLU@     |             | )  )@RED@     ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##   @BLU@     |             |/  / @RED@     ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##   @BLU@     |             /  /  @RED@     ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##   @BLU@     |            (  /   @RED@     ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##   @BLU@     \\             y'    @RED@     ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##   @BLU@      \\\`-.._____..-'      @RED@     ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##                                 ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@##                                 ##@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@#####################################@DEF@\n\"" >> ${1}
+      echo "_message \"@RED@#####################################@DEF@\n\"" >> ${1}
+      echo 'sleep 30' >> ${1}
       echo "# ----" >> ${1}
     fi 
   fi 
