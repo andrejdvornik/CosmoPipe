@@ -323,10 +323,16 @@ class LDACTable(object):
 
         # 'self.hdu.data' leads to an exception for an empty catalogue.
         # Hence we check for this first:
-        if self.hdu.size() == 0:
-            return 0
-        else:
-            return len(self.hdu.data)
+        try:
+            if self.hdu.size() == 0:
+                return 0
+            else:
+                return len(self.hdu.data)
+        except:
+            if self.hdu.size == 0:
+                return 0
+            else:
+                return len(self.hdu.data)
 
     def __getitem__(self, key):
         """
