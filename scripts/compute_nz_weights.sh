@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Fri 19 May 2023 08:55:01 AM CEST
+# Last Modified : Fri 26 May 2023 02:20:43 PM CEST
 #
 #=========================================
 
@@ -25,7 +25,7 @@ done
   --old.som @DB:DATAHEAD@ \
   --factor.nbins Inf --optimise --force \
   -sc @BV:NTHREADS@ \
-  --short.write \
+  --short.write --refr.flag \
   -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ -of ${output_files} \
   --zr.label @BV:ZPHOTNAME@ --zt.label @BV:ZSPECNAME@ \
   -k MAG_GAAP_u-MAG_GAAP_g \
