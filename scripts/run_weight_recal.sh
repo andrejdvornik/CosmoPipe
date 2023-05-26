@@ -3,10 +3,12 @@
 # File Name : run_weight_recal.sh
 # Created By : awright
 # Creation Date : 26-05-2023
-# Last Modified : Fri 26 May 2023 04:15:21 PM CEST
+# Last Modified : Fri 26 May 2023 04:19:37 PM CEST
 #
 #=========================================
 
+#Catalogue(s) from DATAHEAD 
+current=@DB:DATAHEAD@ 
 
 #Construct file names for shape recalibration {{{
 appendstr="_A1"
