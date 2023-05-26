@@ -17,8 +17,8 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Combine the catalogues in main_cats to a single '
-  echo '# catalogue, which is placed in the main_all section'
+  echo '# Combine the catalogues in DATAHEAD to a single '
+  echo '# catalogue, which is placed in the DATAHEAD section'
   echo '#  of the datablock'
   echo "#"
   echo "# Function takes input data:"
@@ -51,14 +51,14 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo main_cats
+  echo ALLHEAD
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo main_all
+  echo DATAHEAD
 } 
 #}}}
 
