@@ -3,7 +3,7 @@
 # File Name : compute_m_surface.sh
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Mon 15 May 2023 09:04:46 AM CEST
+# Last Modified : Thu 25 May 2023 06:52:14 PM CEST
 #
 #=========================================
 
@@ -29,6 +29,7 @@ fi
 _message " > @BLU@Constructing m-calibration surface for @RED@${current##*/}@DEF@"
 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/compute_m_surface.py \
   --input ${current} \
+  --etype @BV:ETYPE@ \
   --e12name @BV:E1NAME@ @BV:E2NAME@ \
   --g12name @BV:G1NAME@ @BV:G2NAME@ \
   --weightname @BV:WEIGHTNAME@ \

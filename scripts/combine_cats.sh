@@ -3,7 +3,7 @@
 # File Name : combine_cats.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Mon 15 May 2023 09:04:31 AM CEST
+# Last Modified : Fri 19 May 2023 04:10:49 PM CEST
 #
 #=========================================
 
@@ -48,7 +48,9 @@ outname=${output:0:${i}}_comb.${ext}
 
 #Combine the DATAHEAD catalogues into one 
 _message "   > @BLU@Constructing combined catalogue @DEF@${outname}@DEF@ "
-@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacpaste -i ${input} -o ${outname} -t OBJECTS
+@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacpaste \
+  -i ${input} \
+  -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${outname} 2>&1 
 _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 #Update datahead 
