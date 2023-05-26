@@ -79,7 +79,7 @@ do
       #Check if the output file exists 
       if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipm/${outname} ]
       then 
-        _message "    -> @BLU@Removing previous @RED@Bin $ZBIN1@BLU@ x @REDBin $ZBIN2@BLU@ correlation function@DEF@"
+        _message "    -> @BLU@Removing previous @RED@Bin $ZBIN1@BLU@ x @RED@Bin $ZBIN2@BLU@ correlation function@DEF@"
         rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipm/${outname}
         _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       fi 
