@@ -3,7 +3,7 @@
 # File Name : mcal_functions.py
 # Created By : awright
 # Creation Date : 25-05-2023
-# Last Modified : Thu 25 May 2023 11:20:49 PM CEST
+# Last Modified : Fri 26 May 2023 01:45:05 PM CEST
 #
 #=========================================
 
@@ -33,16 +33,20 @@ def flexible_read(filepath):
         #Read LDAC with ldac tools
         ldac_cat = ldac.LDACCat(filepath)
         cata = ldac_cat['OBJECTS']
+        cata=pd.DataFrame(cata.hdu.data)
     elif file_extension == 'fits':
         #If FITS, try ldac first 
         try:
             #Read LDAC with ldac tools
             ldac_cat = ldac.LDACCat(filepath)
             cata = ldac_cat['OBJECTS']
+            cata=pd.DataFrame(cata.hdu.data)
         except Exception:
             #If that fails, read with fits 
             with fits.open(filepath) as hdul:
                 cata = hdul[1].data
+                #Convert the catalogue to a pandas data frame 
+                cata=pd.DataFrame(cata,columns=cata.columns)
     else:
         #Error if not supported 
         raise Exception(f'Not supported input file type! {filepath}\nMust be one of csv/fits/cat/feather.')
@@ -320,7 +324,7 @@ def mCalFunc_from_surface(cata, surface,col_SNR, col_R, col_weight, col_m1, col_
                          'binSNR_id': -999, 'binR_id': -999})
 
     # used columns from surface of doom
-    surface = pd.DataFrame('binSNR_id': np.array(surface['binSNR_id']).astype(int),
+    surface = pd.DataFrame({'binSNR_id': np.array(surface['binSNR_id']).astype(int),
                         'binR_id': np.array(surface['binR_id']).astype(int),
                         'binSNR_min': np.array(surface['binSNR_min']).astype(float),
                         'binSNR_max': np.array(surface['binSNR_max']).astype(float),
