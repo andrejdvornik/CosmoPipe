@@ -10,17 +10,39 @@
 mbias=`echo @DB:mbias@ | awk '{print $1}'`
 mbias="`cat ${mbias} | grep -v "^#"`"
 
-#If needed, create the output directory 
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_vec ]
-then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_vec/
-fi 
+inputs="@DB:cosebis@"
 
-#Construct the data vector for cosebis
-@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/make_data_vector.py \
-  --inputfiles @DB:cosebis@   \
-  --mbias   ${mbias}      \
-  --tomobins @BV:TOMOLIMS@  \
-  --outputfile  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_vec/combined_vector.txt 
+for patch in @PATCHLIST@ @ALLPATCH@
+do 
+  filelist=''
 
-_write_datablock "cosebis_vec" "combined_vector.txt"
+  file=`echo ${inputs} | sed 's/ /\n/g' | grep "_${patch}_" || echo `
+  #Check if the output file exists {{{
+  if [ "${file}" == "" ] 
+  then 
+    #If not, loop
+    continue
+  fi 
+  #}}}
+  filelist="${filelist} ${file}"
+  #If filelist is empty, skip {{{
+  if [ "${filelist}" == "" ] 
+  then 
+    continue
+  fi 
+
+  #If needed, create the output directory 
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_vec_${patch} ]
+  then 
+    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_vec_${patch}/
+  fi 
+
+  #Construct the data vector for cosebis
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/make_data_vector.py \
+    --inputfiles ${filelist}   \
+    --mbias   ${mbias}      \
+    --tomobins @BV:TOMOLIMS@  \
+    --outputfile  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_vec_${patch}/combined_vector.txt 
+
+  _write_datablock "cosebis_vec_${patch}" "combined_vector.txt"
+done
