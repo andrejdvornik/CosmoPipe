@@ -3,7 +3,7 @@
 # File Name : mcal_functions.py
 # Created By : awright
 # Creation Date : 25-05-2023
-# Last Modified : Tue 30 May 2023 01:03:16 PM CEST
+# Last Modified : Tue 30 May 2023 01:25:45 PM CEST
 #
 #=========================================
 
@@ -321,19 +321,19 @@ def minmax_to_bins(cat,var,index=None): #{{{
 
 def binby_SNR_R(surface,cata,SNRname,Rname): #{{{
     # define the SNR bin edges 
-    SNR_edges = minmax_to_bins(surface,'bin'+SNRname)
+    SNR_edges = minmax_to_bins(surface,'bin_'+SNRname)
     # bin the catalogue 
-    cata.loc[:, 'bin'+SNRname+'_id'] = pd.cut(cata.loc[:, SNRname].values, SNR_edges, 
+    cata.loc[:, 'bin_'+SNRname+'_id'] = pd.cut(cata.loc[:, SNRname].values, SNR_edges, 
                                 right=True, labels=False)
     #Loop over SNR bins 
     for i_SNR in range(len(SNR_edges)-1):
         #Define the R bin edges, in this bin of SNR
-        R_edges = minmax_to_bins(surface,'bin'+Rname,index=(surface['bin'+SNRname+'_id']==i_SNR))
+        R_edges = minmax_to_bins(surface,'bin_'+Rname,index=(surface['bin_'+SNRname+'_id']==i_SNR))
 
         # Get the sources in this SNR bin 
-        mask_binSNR = (cata['bin'+SNRname+'_id'].values == i_SNR)
+        mask_binSNR = (cata['bin_'+SNRname+'_id'].values == i_SNR)
         #Bin by R
-        cata.loc[mask_binSNR, 'bin'+Rname+'_id'] = pd.cut(
+        cata.loc[mask_binSNR, 'bin_'+Rname+'_id'] = pd.cut(
                                     cata.loc[mask_binSNR, Rname].values, 
                                     R_edges, 
                                     right=True, labels=False)
