@@ -405,7 +405,7 @@ class LDACTable(object):
                     if numpy.issubdtype(val.dtype, float) == True:
                         colformat = "1E"
 
-                    if np.issubdtype(val.dtype, np.float64) == True:
+                    if numpy.issubdtype(val.dtype, numpy.float64) == True:
                         colformat = "1D"
 
                     if numpy.issubdtype(val.dtype, int) == True:
