@@ -3,7 +3,7 @@
 # File Name : compute_m_surface.py
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Fri 26 May 2023 02:13:18 PM CEST
+# Last Modified : Tue 30 May 2023 10:46:13 AM CEST
 #
 #=========================================
 
@@ -40,7 +40,7 @@ args = parser.parse_args()
 
 # >>>>>>>>>>>>>>>> workhorse
 # load data catalogue
-cata_data = mcf.flexible_read(args.input_data)
+cata_data, ldac_data = mcf.flexible_read(args.input_data)
 print('Number of sources in the data', len(cata_data))
 
 ### select weight
@@ -51,7 +51,7 @@ cata_data.reset_index(drop=True, inplace=True)
 print('selected objects (weight>0)', len(cata_data))
 
 # load m calibraiton surface 
-cata_surface = mcf.flexible_read(args.input_surface)
+cata_surface, ldac_surface = mcf.flexible_read(args.input_surface)
 
 # calculate m
 m_res = pd.DataFrame(-999., index=np.arange(1),
