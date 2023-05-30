@@ -1,5 +1,5 @@
 #
-# combine_patch.sh Documentation & Housekeeping functions
+# run_weight_recal.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@=====================================@DEF@\n"
-    _message "@BLU@== @RED@ Running combine_patch.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@=====================================@DEF@\n"
+    _message "@BLU@========================================@DEF@\n"
+    _message "@BLU@== @RED@ Running run_weight_recal.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@========================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,9 +17,8 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Combine the catalogues in DATAHEAD to a single '
-  echo '# catalogue, which is placed in the DATAHEAD section'
-  echo '#  of the datablock'
+  echo '# Perform weight recalibration to remove PSF '
+  echo '# leakage'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -44,14 +43,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLU DATABLOCK DEF MACHINE PATCHLIST RED RUNROOT STORAGEPATH
+  echo BLU BV:E1NAME BV:E2NAME BV:NBINR BV:NBINSNR BV:PSFE1NAME BV:PSFE2NAME BV:RAWE1NAME BV:RAWE2NAME BV:SHAPEVARNAME BV:SNRNAME BV:WEIGHTNAME DEF PYTHON3BIN RED RUNROOT SCRIPTPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo ALLHEAD
+  echo DATAHEAD
 } 
 #}}}
 
@@ -65,7 +64,7 @@ function _outputs {
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/combine_patch.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/run_weight_recal.sh
 } 
 #}}}
 

@@ -965,5 +965,105 @@ function _incorporate_datablock {
 }
 #}}}
 
+#Split a block element by patch {{{
+function _splitpatch_blockitem { 
+  _head=`_read_datahead`
+  #Get the files in this data
+  _block=`_read_datablock`
+  #Get the variables
+  _vars=`_read_blockvars`
+  _seen=0
+  for _file in ${_block} 
+  do 
+    #If the item isn't what we want to add/write
+    if [ "${_file%%=*}" == "${1}" ]
+    then 
+      _seen=1
+    fi 
+  done 
+  if [ "${_seen}" != 1 ]
+  then 
+    _message "@RED@ - ERROR! The requested data block to rename (${1}) does not exist in the data block!"
+    exit 1 
+  fi 
+  #Update the datablock txt file: HEAD
+  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  #Add HEAD items to file 
+  for _file in ${_head} 
+  do 
+    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  done 
+  #Update the BLOCK items 
+  echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  #For each block row:
+  for _file in ${_block} 
+  do 
+    #If the item is what we want to split
+    if [ "${_file%%=*}" == "${1}" ]
+    then 
+      #Get the item list 
+      _files=`_blockentry_to_filelist ${_files}`
+      #Loop over patches 
+      for _patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+      do 
+        #Loop over files 
+        outputlist=''
+        outputpaths=''
+        for input in ${_files} 
+        do 
+          #If the input file matches the patch 
+          if  [[ "$input" =~ .*"_${_patch}_".* ]] 
+          then 
+            #Add the file to the output list 
+            outputlist="${outputlist},${input}"
+            outputpaths="${outputpaths} @RUNROOT@/@STORAGEDIR@/@DATABLOCK@/${1}/${input}"
+          fi 
+        done 
+        #If there are matches 
+        if [ "${outputlist}" != "" ] 
+        then 
+          >&2 echo "@BLU@ Splitting catalogues into @DEF@${1}_${_patch} "
+          #Check the directory exists 
+          if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}_${_patch} ]
+          then 
+            mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}_${_patch}
+          fi 
+          #Move the files 
+          mv ${outputpaths} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}_${_patch}/
+          #Write the new entry to the datablock (without the leading comma)
+          echo "${1}_${_patch}={${outputlist:1}}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+          >&2 echo "@RED@- Done!@DEF@\n"
+        fi 
+      done 
+    else 
+      #Write it 
+      _file=`echo $_file`
+      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    fi
+  done
+  if [ "$3" == "" ]
+  then 
+    if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} ]
+    then 
+      if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*} ] 
+      then 
+        mv -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}
+      else 
+        rm -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/*
+        mv -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}/* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/
+        rmdir  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}
+      fi 
+    fi 
+  fi 
+  #Update the datablock txt file: VARS
+  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  #Add HEAD items to file 
+  for _file in ${_vars} 
+  do 
+    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  done 
+}
+#}}}
+
 #}}}
 

@@ -3,7 +3,7 @@
 # File Name : compute_m_bias.sh
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Thu 25 May 2023 11:45:58 PM CEST
+# Last Modified : Fri 26 May 2023 09:29:09 AM CEST
 #
 #=========================================
 
@@ -31,7 +31,7 @@ then
 fi 
 #}}}
 
-for i in `seq ${nmsurf}` 
+for i in `seq ${nsurf}` 
 do 
   #Select the relevant files {{{
   surf_current=`echo ${allsurf} | awk -v n=$i '{print $n}'`

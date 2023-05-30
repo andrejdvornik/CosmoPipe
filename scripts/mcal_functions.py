@@ -3,7 +3,7 @@
 # File Name : mcal_functions.py
 # Created By : awright
 # Creation Date : 25-05-2023
-# Last Modified : Thu 25 May 2023 11:20:49 PM CEST
+# Last Modified : Tue 30 May 2023 01:25:45 PM CEST
 #
 #=========================================
 
@@ -14,40 +14,99 @@ import statsmodels.api as sm
 from astropy.io import fits
 from astropy.table import Table
 import ldac 
+import os
+import astropandas as apd
 
 #Functions used for m-calibration pipeline 
 #Flexible file read {{{
-def flexible_read(filepath): 
+def flexible_read(filepath,as_df=True): 
     #Get the file extension 
     file_extension=filepath.split(".")[-1]
     if file_extension == 'csv':
         #Read CSV with pandas 
+        ldac_cat=None
         cata = pd.read_csv(filepath)
     elif file_extension == 'asc':
         #Read ASCII with pandas 
+        ldac_cat=None
         cata = pd.read_csv(filepath)
     elif file_extension == 'feather':
         #Read feather with pandas 
+        ldac_cat=None
         cata = pd.read_feather(filepath)
     elif file_extension == 'cat':
         #Read LDAC with ldac tools
         ldac_cat = ldac.LDACCat(filepath)
         cata = ldac_cat['OBJECTS']
+        if as_df: 
+            #Convert the catalogue to a pandas data frame 
+            cata=pd.DataFrame(cata.hdu.data)
     elif file_extension == 'fits':
         #If FITS, try ldac first 
         try:
             #Read LDAC with ldac tools
             ldac_cat = ldac.LDACCat(filepath)
             cata = ldac_cat['OBJECTS']
+            if as_df: 
+                #Convert the catalogue to a pandas data frame 
+                cata=pd.DataFrame(cata.hdu.data)
         except Exception:
             #If that fails, read with fits 
+            ldac_cat=None
             with fits.open(filepath) as hdul:
                 cata = hdul[1].data
+                if as_df: 
+                    #Convert the catalogue to a pandas data frame 
+                    cata=pd.DataFrame(cata,columns=cata.columns)
     else:
         #Error if not supported 
         raise Exception(f'Not supported input file type! {filepath}\nMust be one of csv/fits/cat/feather.')
     #Return the catalogue 
-    return cata
+    return cata, ldac_cat
+#}}}
+
+#Flexible file write {{{
+def flexible_write(cata,filepath,ldac_cat=None): 
+    #Get the file extension 
+    file_extension=filepath.split(".")[-1]
+    if file_extension == 'csv':
+        #Write CSV with pandas 
+        cata.to_csv(filepath)
+    elif file_extension == 'asc':
+        #Write ASCII with pandas 
+        cata.to_csv(filepath)
+    elif file_extension == 'feather':
+        #Write feather with pandas 
+        cata = pd.to_feather(filepath)
+    elif file_extension == 'cat':
+        #Write LDAC with ldac tools
+        if ldac_cat is None: 
+            ValueError("Cannot write to LDAC without input ldac_cat!")
+        ldac_cat['OBJECTS'].hdu.data=cata
+        ldac_cat.update = 1 
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        ldac_cat.saveas(filepath)
+    elif file_extension == 'fits':
+        #If FITS, try ldac first 
+        if not ldac_cat is None:
+            print("Writing .fits file as LDAC")
+            #Write LDAC with ldac tools
+            ldac_cat['OBJECTS']=cata
+            ldac_cat.update = 1 
+            if os.path.exists(filepath):
+                print("Deleting old LDAC file")
+                os.remove(filepath)
+            ldac_cat.saveas(filepath)
+        else:
+            print("Writing .fits file as FITS")
+            #If that fails, write with fits 
+            apd.to_fits(cata, filepath)
+    else:
+        #Error if not supported 
+        raise Exception(f'Not supported input file type! {filepath}\nMust be one of csv/fits/cat/feather.')
+    #Return nothing 
+    return 
 #}}}
 
 def _WgQuantile1DFunc_SNR_R(values, weights, Nbin): #{{{
@@ -262,19 +321,19 @@ def minmax_to_bins(cat,var,index=None): #{{{
 
 def binby_SNR_R(surface,cata,SNRname,Rname): #{{{
     # define the SNR bin edges 
-    SNR_edges = minmax_to_bins(surface,'bin'+SNRname)
+    SNR_edges = minmax_to_bins(surface,'bin_'+SNRname)
     # bin the catalogue 
-    cata.loc[:, 'bin'+SNRname+'_id'] = pd.cut(cata.loc[:, SNRname].values, SNR_edges, 
+    cata.loc[:, 'bin_'+SNRname+'_id'] = pd.cut(cata.loc[:, SNRname].values, SNR_edges, 
                                 right=True, labels=False)
     #Loop over SNR bins 
     for i_SNR in range(len(SNR_edges)-1):
         #Define the R bin edges, in this bin of SNR
-        R_edges = minmax_to_bins(surface,'bin'+Rname,index=(surface['bin'+SNRname+'_id']==i_SNR))
+        R_edges = minmax_to_bins(surface,'bin_'+Rname,index=(surface['bin_'+SNRname+'_id']==i_SNR))
 
         # Get the sources in this SNR bin 
-        mask_binSNR = (cata['bin'+SNRname+'_id'].values == i_SNR)
+        mask_binSNR = (cata['bin_'+SNRname+'_id'].values == i_SNR)
         #Bin by R
-        cata.loc[mask_binSNR, 'bin'+Rname+'_id'] = pd.cut(
+        cata.loc[mask_binSNR, 'bin_'+Rname+'_id'] = pd.cut(
                                     cata.loc[mask_binSNR, Rname].values, 
                                     R_edges, 
                                     right=True, labels=False)
@@ -320,7 +379,7 @@ def mCalFunc_from_surface(cata, surface,col_SNR, col_R, col_weight, col_m1, col_
                          'binSNR_id': -999, 'binR_id': -999})
 
     # used columns from surface of doom
-    surface = pd.DataFrame('binSNR_id': np.array(surface['binSNR_id']).astype(int),
+    surface = pd.DataFrame({'binSNR_id': np.array(surface['binSNR_id']).astype(int),
                         'binR_id': np.array(surface['binR_id']).astype(int),
                         'binSNR_min': np.array(surface['binSNR_min']).astype(float),
                         'binSNR_max': np.array(surface['binSNR_max']).astype(float),

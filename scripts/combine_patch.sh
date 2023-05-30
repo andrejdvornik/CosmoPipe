@@ -3,20 +3,20 @@
 # File Name : combine_patch.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Mon 15 May 2023 09:04:36 AM CEST
+# Last Modified : Fri 26 May 2023 03:18:17 PM CEST
 #
 #=========================================
 
 
 #Get the combined catalogue name 
-inputcats="@DB:main_cats@"
+inputcats="@DB:ALLHEAD@"
 patches=`echo @PATCHLIST@`
 
 #Select one of the patches
 patch=${patches##* }
 #Replace the patch variable with the ALLPATCH variable 
 match=0
-for _file in @DB:main_cats@
+for _file in ${inputcats}
 do 
   match=`echo ${_file##*/} | grep -c "_${patch}_" || echo`
   if [ "${match}" != "0" ] 
@@ -34,13 +34,8 @@ then
   exit 1
 fi 
 
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_all ]
-then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_all
-fi 
-
 #Add a patch label to each catalogue (for subsequent patch extraction, if needed)
-for cata in @DB:main_cats@
+for cata in ${inputcats}
 do 
   for patch in ${patches}
   do 
@@ -73,10 +68,18 @@ done
 
 #Combine the main_cats catalogues into one 
 _message "   > @BLU@Constructing patch-combined catalogue @DEF@${outname}@DEF@ "
-@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacpaste -i @DB:main_cats@ -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/main_all/${outname} 2>&1 
+@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacpaste \
+  -i ${inputcats} \
+  -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${outname} 2>&1 
 _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 #Add the new file to the datablock 
-_write_datablock main_all ${outname##*/}
+#Update datahead 
+for _file in ${inputcats}
+do 
+  #Replace the first file with the output name, then clear the rest
+  _replace_datahead ${_file##*/} "${outname}"
+  outname=""
+done 
 
 

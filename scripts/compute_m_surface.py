@@ -3,7 +3,7 @@
 # File Name : compute_m_surface.py
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Thu 25 May 2023 11:05:01 PM CEST
+# Last Modified : Tue 30 May 2023 10:49:50 AM CEST
 #
 #=========================================
 
@@ -46,7 +46,7 @@ parser.add_argument("--nbinSNR", dest="N_SNR",default=20,type=int,
 args = parser.parse_args()
 
 # load simulation catalogue
-cata_sim = mcf.flexible_read(args.inputpath)
+cata_sim, ldac_sim = mcf.flexible_read(args.inputpath)
 try: 
     ncat=len(cata_sim['SeqNr'])
 except: 
@@ -141,7 +141,7 @@ mc_surface.to_csv(args.outputpath, index=False, float_format='%.6f')
 print(f'edge values saved to {args.outputpath}')
 
 #Read the m surface 
-mc_surface = mcf.flexible_read(args.outputpath)
+mc_surface, ldac_surface = mcf.flexible_read(args.outputpath)
 ## bin galaxies
 cata_used.loc[:, 'binSNR_id'] = -999
 cata_used.loc[:, 'binR_id'] = -999
