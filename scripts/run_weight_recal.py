@@ -17,6 +17,7 @@ import numpy as np
 import ldac 
 
 import statsmodels.api as sm
+import mcal_functions as mcf 
 
 # +++++++++++++++++++++++++++++ parser for command-line interfaces
 parser = argparse.ArgumentParser(
@@ -73,7 +74,6 @@ else:
     raise Exception('either cols_e12_corr or cols_e12_raw has to be provided!')
 
 col_psf_e1, col_psf_e2 = args.cols_psf_e12
-del args
 
 # +++++++++++++++++++++++++++++ workhorse
 # >>>>>>>>>>>>>>>>>>> values for variance to weight
@@ -90,7 +90,7 @@ maxweight = 2*(maxmoment-tintervalsq)/(tintervalsq*maxmoment + priormoment*(maxm
 minweight = 0
 
 # >>>>>>>>>>>>>>>>>>> load info
-obj_cat=mcf.flexible_read(args.inpath)
+obj_cat, ldac_cat = mcf.flexible_read(args.inpath)
 
 print('number total', len(obj_cat))
 # all float32 to float64
@@ -115,8 +115,6 @@ obj_cat['AlphaRecal_index'] = np.arange(len(obj_cat))
 print(obj_cat['AlphaRecal_index'])
 
 # >>>>>>>>>>>>>>>>>>>> binning
-
-# quantile bin in SNR and R
 
 print('Computing R bins')
 
@@ -235,9 +233,5 @@ obj_cat['AlphaRecalC_weight'][pd_cat_corr['AlphaRecal_index']] = pd_cat_corr['Al
 obj_cat['AlphaRecalC_weight'][obj_cat[col_weight]<maxweight/1000.] = 0
 
 # save
-ldac_cat['OBJECTS']=obj_cat
-if os.path.exists(args.outpath):
-    os.remove(args.outpath)
-ldac_cat.saveas(args.outpath)
-#pd_cat_corr.to_csv('pandas_out.csv')
+mcf.flexible_write(obj_cat,args.outpath,ldac_cat)
 print('final results saved to', args.outpath)
