@@ -398,6 +398,22 @@ do
 
 		EOF
     #}}}
+  elif [ "${step:0:1}" == "~" ]
+  then 
+    #If this is a datablock split: {{{
+    cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
+		
+		#Intermediate Step: split the requested block item by patch: ${step:1} {{{
+		#Notify
+		_message "@BLU@Splitting block element ${step:1} into patchwise block elements@DEF@ {\n"
+		#Modify the datablock with the current HEAD
+		_splitpatch_blockitem ${step:1} 
+		#Notify
+		_message "} - @RED@Done!@DEF@\n"
+		#}}}
+
+		EOF
+    #}}}
   else 
     #If this is a bone-fide script method {{{
     #Source the documentation information 
