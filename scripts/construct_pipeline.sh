@@ -60,7 +60,7 @@ do
   #Strip out the version number 
   step=${step%=*}
   #If the step is not a HEAD or VARS change
-  if [ "${step:0:1}" != "@" ] && [ "${step:0:1}" != "!" ] \
+  if [ "${step:0:1}" != "@" ] && [ "${step:0:1}" != "!" ] && [ "${step:0:1}" != "~" ] \
     && [ "${step:0:1}" != "%" ] && [ "${step:0:1}" != "+" ] && [ "${step:0:1}" != "-" ]
   then 
     #If the step has no script 
@@ -158,6 +158,14 @@ do
     oldname=${names%%-*}
     newname=${names##*-}
 		_rename_blockitem "${oldname}" "${newname}" TEST
+    #}}}
+  elif [ "${step:0:1}" == "~" ]
+  then 
+    #Modify the HEAD to the request value {{{
+    for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+    do 
+		  _write_datablock ${step:1}_${patch} "`_read_datahead ${step:1}`"
+    done 
     #}}}
   elif [ "${step:0:1}" == "+" ]
   then 
