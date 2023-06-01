@@ -3,17 +3,19 @@
 # File Name : make_m_covariance.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Fri 31 Mar 2023 09:20:55 PM CEST
+# Last Modified : Thu 01 Jun 2023 05:10:06 PM CEST
 #
 #=========================================
 
 #m-bias files 
 inputs="@DB:mbias@"
 
-#m-biases
-mbias=${inputs%% *}
-#m-correlations
-mcorr=${inputs##* }
+#m-biases file
+mbias=`echo ${inputs} | awk '{print $1}'`
+#m-sigmas file
+msigm=`echo ${inputs} | awk '{print $2}'`
+#m-correlation files
+mcorr=`echo ${inputs} | awk '{print $3}'`
 
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov ]
 then 
@@ -22,7 +24,7 @@ fi
 
 #Create the m-covariance matrix [NTOMOxNTOMO] 
 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/make_m_covariance.py \
-  --mbias ${mbias} \
+  --msigm ${msigm} \
   --mcorr ${mcorr} \
   --output "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov/m_corr_r" 2>&1
 

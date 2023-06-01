@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 # m = np.asarray("@MBIASVALUES@".split())
 
 parser = ArgumentParser(description='Construct the Nz file needed by cosmosis')
-parser.add_argument('--mbias', dest='sigma_m_file', type=str, required=True, help="sigma values file")
+parser.add_argument('--msigm', dest='sigma_m_file', type=str, required=True, help="sigma values file")
 parser.add_argument('--mcorr', dest='sigma_corr_file', type=str, required=True, help="sigma correlation file")
 parser.add_argument('--output', dest='output_base', type=str, required=True, help="output file base")
 

@@ -3,11 +3,13 @@
 # File Name : make_data_vector.sh
 # Created By : awright
 # Creation Date : 01-04-2023
-# Last Modified : Wed Apr  5 09:18:08 2023
+# Last Modified : Thu 01 Jun 2023 03:48:15 PM CEST
 #
 #=========================================
 
+#Select the first file (contains the mbias values)
 mbias=`echo @DB:mbias@ | awk '{print $1}'`
+#Get the actual m values from the file (ignore any header)
 mbias="`cat ${mbias} | grep -v "^#"`"
 
 #If needed, create the output directory 
