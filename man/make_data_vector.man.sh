@@ -57,7 +57,12 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo cosebis_vec
+  outlist=''
+  for patch in @PATCHLIST@ @ALLPATCH@ 
+  do 
+    outlist="${outlist} cosebis_vec_${patch}"
+  done 
+  echo ${outlist}
 } 
 #}}}
 
