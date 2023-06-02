@@ -1,9 +1,9 @@
 #=========================================
 #
-# File Name : cleanfits.sh
+# File Name : convert_to_ldac.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Mon 15 May 2023 10:45:49 AM CEST
+# Last Modified : Fri 02 Jun 2023 01:20:51 PM CEST
 #
 #=========================================
 
@@ -17,7 +17,6 @@ _message "   > @BLU@Cleaning FITS catalogue for use as LDAC: @DEF@${input##*/}@D
 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/fits_str_col_fix.py ${input} ${input} 2>&1
 
 #Convert the catalogue int64 columns to int32
-#@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/cleanfits.R ${input} @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacdesc "@P_SED_INPLACE@" 2>&1
-@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/cleanfits.R ${input} 2>&1
+@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/convert_to_ldac.R ${input} 2>&1
 
 _message " @BLU@- @RED@Done! (`date +'%a %H:%M'`)\n@DEF@"

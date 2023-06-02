@@ -1,9 +1,9 @@
 #=========================================
 #
-# File Name : cleanfits.R
+# File Name : convert_to_ldac.R
 # Created By : awright
 # Creation Date : 09-05-2023
-# Last Modified : Fri 19 May 2023 08:14:40 PM CEST
+# Last Modified : Fri 02 Jun 2023 01:21:14 PM CEST
 #
 #=========================================
 
