@@ -3,9 +3,17 @@
 #
 
 #Input script name 
-for base in scripts 
+for base in "scripts"
 do 
-	for script in `ls ../${base}/`
+  #Do one or all scripts 
+  if [ "$1" == "" ] 
+  then 
+    scriptlist=`ls ../${base}/`
+  else 
+    scriptlist="$1"
+  fi 
+
+	for script in $scriptlist 
 	do 
 	
 		scriptfull=../${base}/${script}
@@ -80,7 +88,7 @@ do
 	  mv tmp.man.sh ${docu}
 	  #}}}
 	
-	  mv $docu ../man/
+	  echo "mv $docu ../man/"
 	done
 done 
 
