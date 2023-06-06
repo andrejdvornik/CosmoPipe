@@ -22,9 +22,13 @@ do
 		#Documentation name 
 		docu=${script//.${ext}/.man.sh}
 	
-	  if [ ! -f ../man/${docu} ]
+    if [ "${ext}" == "R" ] || [ "${ext}" == "py" ]
+    then 
+	    echo "skipping ${scriptfull}; it's an R/py file"
+	    continue
+	  elif [ ! -f ../man/${docu} ]
 	  then 
-	    echo "skipping ${scriptfull}"
+	    echo "skipping ${scriptfull}; no file ../man/${docu}"
 	    continue
 	  else 
 	    echo "Running ${scriptfull}"
@@ -87,8 +91,30 @@ do
 	  grep -A 10000 "function _inp_data" ${docu} | tail -n +5 >> tmp.man.sh
 	  mv tmp.man.sh ${docu}
 	  #}}}
+
+    ndiff=`diff ../man/${docu} ${docu} | wc -l`
+    if [ ${ndiff} -gt 0 ] 
+    then 
+      diff ../man/${docu} ${docu} 
+    else 
+      echo "No changes to file ${docu}"
+      rm ${docu}
+      continue
+    fi 
 	
-	  echo "mv $docu ../man/"
+    read -p "Are you happy with the changes? [Y/n] " status 
+    if [ "$status" == "" ] 
+    then 
+      status='Y'
+    fi 
+    if [ ${status} == "Y" ] 
+    then 
+	    echo "moving $docu ../man/"
+	    mv $docu ../man/
+    else 
+	    echo "not moving $docu"
+    fi 
+
 	done
 done 
 
