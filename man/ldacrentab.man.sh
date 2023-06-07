@@ -44,7 +44,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo MACHINE RUNROOT STORAGEPATH
+  echo BLU DEF MACHINE RED RUNROOT STORAGEPATH
 } 
 #}}}
 

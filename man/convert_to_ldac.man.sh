@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo RUNROOT SCRIPTPATH
+  echo BLU DEF P_RSCRIPT PYTHON3BIN RED RUNROOT SCRIPTPATH
 } 
 #}}}
 
