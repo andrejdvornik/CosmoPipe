@@ -3,7 +3,7 @@
 # File Name : run_weight_recal.sh
 # Created By : awright
 # Creation Date : 26-05-2023
-# Last Modified : Fri 26 May 2023 04:19:37 PM CEST
+# Last Modified : Fri 02 Jun 2023 10:46:13 PM CEST
 #
 #=========================================
 
@@ -23,7 +23,7 @@ catname=${catname##*/}
 if [ -f ${outputname} ] 
 then 
   #If it exists, remove it 
-  _message " > @BLU@Removing previous alpha-correction (shape) catalogue for @RED@${current##*/}@DEF@"
+  _message " > @BLU@Removing previous alpha-corrected (weight) catalogue for @RED@${current##*/}@DEF@"
   rm -f ${outputname}
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 fi 

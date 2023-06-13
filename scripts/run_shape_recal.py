@@ -21,25 +21,28 @@ import numpy as np
 import pandas as pd 
 import numpy.linalg as la
 import statsmodels.api as sm 
+import mcal_functions as mcf
 
+tzero = time.time()
 # +++++++++++++++++++++++++++++ parser for command-line interfaces
 parser = argparse.ArgumentParser(
     description=f"step2_methodD.py: correct alpha in e1,2 with method D.",
     formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument(
     "--inpath", type=str,
-    help="the in path for the catalogue.\n\
-    supported formats: ldac")
+    help="the in path for the catalogue.")
 parser.add_argument(
-    "--outDir", type=str, 
-    help="directory for the final catalogue.\n\
-    outpath name will be inpath_name + _A2 or _A2_goldclasses")
-parser.add_argument(
-    "--col_goldFlag", type=str,
-    help="columns to the redshift gold class in the catalogue.")
+    "--outpath", type=str, 
+    help="filename for the output catalogue.") 
 parser.add_argument(
     "--col_weight", type=str,
     help="columns to the weight in the catalogue.")
+parser.add_argument(
+    "--nbins_R", type=int,
+    help="number of R bins.")
+parser.add_argument(
+    "--nbins_SNR", type=int,
+    help="number of SNR bins.")
 parser.add_argument(
     "--col_snr", type=str,
     help="columns to the SNR in the catalogue.")
@@ -59,13 +62,7 @@ parser.add_argument(
 ## arg parser
 args = parser.parse_args()
 inpath = args.inpath
-outDir = args.outDir
-
-col_goldFlag = args.col_goldFlag
-if col_goldFlag is not None:
-    outpath = os.path.join(outDir, os.path.basename(inpath).replace('.cat', '_A2_goldclasses.cat'))
-else:
-    outpath = os.path.join(outDir, os.path.basename(inpath).replace('.cat', '_A2.cat'))
+outpath = args.outpath
 
 col_weight = args.col_weight
 col_snr = args.col_snr
@@ -73,19 +70,17 @@ col_ZB = args.col_ZB
 col_e1, col_e2 = args.cols_e12
 col_psf_e1, col_psf_e2 = args.cols_psf_e12
 Z_B_edges = np.array(args.Z_B_edges)
-del args
 
 # >>>>>>>>>>>>>>>>>>>>> workhorse
 
+print("starting: "+str(time.time()-tzero))
+
 # ++++++ 0. load catalogue
-ldac_cat = ldac.LDACCat(inpath)
-obj_cat = ldac_cat['OBJECTS']
+obj_cat,ldac_cat = mcf.flexible_read(inpath,as_df=False)
+
+print("timer: "+str(time.time()-tzero))
 
 print('number original', len(obj_cat))
-## only gold class
-if col_goldFlag is not None:
-    obj_cat = obj_cat.filter(obj_cat[col_goldFlag]>0)
-    print('number after gold selection', len(obj_cat))
 ## only preserve weight > 0
 obj_cat = obj_cat.filter((obj_cat[col_weight]>0))
 print('number after weight selection', len(obj_cat))
@@ -93,12 +88,14 @@ print('number after weight selection', len(obj_cat))
 obj_cat = obj_cat.filter((obj_cat[col_ZB]>Z_B_edges[0]) & (obj_cat[col_ZB]<=Z_B_edges[-1]))
 print('number after Z_B selection', len(obj_cat))
 
+print("timer: "+str(time.time()-tzero))
+
 # ++++++ 1. get alpha map 
 start_time = time.time()
 
 ## number of bins
-N_R = 20
-N_SNR = 20
+N_R = args.nbins_R
+N_SNR = args.nbins_SNR
 
 ## start with R bin
 obj_cat['bin_R'] = pd.qcut(obj_cat['R'], N_R, labels=False, retbins=False)
@@ -115,6 +112,8 @@ for ibin_R in range(N_R):
                                                 labels=False, retbins=False)
 
 
+
+print("timer: "+str(time.time()-tzero))
 ## construct a temporary pandas df 
 obj_df = pd.DataFrame({"bin_R":obj_cat['bin_R'].astype(np.int32),
                        "bin_snr":obj_cat["bin_snr"].astype(np.float64),
@@ -128,9 +127,13 @@ obj_df = pd.DataFrame({"bin_R":obj_cat['bin_R'].astype(np.int32),
 
 print(obj_df)
 
+
+print("timer: "+str(time.time()-tzero))
 ## group based on binning
 cata_grouped = obj_df.groupby(by=['bin_R', 'bin_snr'])
 
+
+print("timer: "+str(time.time()-tzero))
 ## get the 2D alpha map
 cata_alpha = cata_grouped.sum()
 cata_alpha = cata_alpha[[col_weight]].copy()
@@ -168,6 +171,8 @@ for name, group in cata_grouped:
 del cata_grouped
 print('alpha map produced in', time.time() - start_time, 's')
 
+print("timer: "+str(time.time()-tzero))
+
 # ++++++ 2. step1: fitting in whole and removing general trend
 start_time = time.time()
 
@@ -190,6 +195,8 @@ A = np.vstack([fitting_weight * 1,
                 fitting_weight * cata_alpha['R_mean_wei'].values * np.power(cata_alpha['SNR_mean_wei'].values, -2)]).T
 poly2 = la.lstsq(A, fitting_weight * cata_alpha['alpha2'].values, rcond=None)[0] # poly coefficients
 del fitting_weight, A, cata_alpha
+
+print("timer: "+str(time.time()-tzero))
 
 ## remove the general trend
 # e1
@@ -219,6 +226,8 @@ obj_cat = obj_cat.filter(mask_tmp)
 del mask_tmp
 
 print('D1 finished in', time.time() - start_time, 's')
+
+print("timer: "+str(time.time()-tzero))
 
 # ++++++ 3. step2: direct correction for residual alpha
 start_time = time.time()
@@ -318,6 +327,7 @@ obj_cat['AlphaRecalD2_e1'][cata_corr['AlphaRecal_index']] = cata_corr['AlphaReca
 obj_cat['AlphaRecalD2_e2'][cata_corr['AlphaRecal_index']] = cata_corr['AlphaRecalD2_e2'] 
 del cata_corr
 print('D2 finished in', time.time() - start_time, 's')
+print("timer: "+str(time.time()-tzero))
 
 # save
 ldac_cat['OBJECTS']=obj_cat
@@ -326,3 +336,4 @@ if os.path.exists(outpath):
 ldac_cat.saveas(outpath)
 print('number in final cata', len(obj_cat))
 print('final results saved to', outpath)
+print("timer: "+str(time.time()-tzero))

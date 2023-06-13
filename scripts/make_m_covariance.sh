@@ -3,39 +3,75 @@
 # File Name : make_m_covariance.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Thu 01 Jun 2023 05:10:06 PM CEST
+# Last Modified : Tue 13 Jun 2023 09:57:23 AM CEST
 #
 #=========================================
 
 #m-bias files 
-inputs="@DB:mbias@"
+mfiles="@DB:mbias@"
 
-#m-biases file
-mbias=`echo ${inputs} | awk '{print $1}'`
-#m-sigmas file
-msigm=`echo ${inputs} | awk '{print $2}'`
-#m-correlation files
-mcorr=`echo ${inputs} | awk '{print $3}'`
-
+#Make the mcov directory if needed
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov ]
 then 
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov
 fi 
 
-#Create the m-covariance matrix [NTOMOxNTOMO] 
-@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/make_m_covariance.py \
-  --msigm ${msigm} \
-  --mcorr ${mcorr} \
-  --output "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov/m_corr_r" 2>&1
+#Loop over the patch list
+outputlist=''
+for patch in @PATCHLIST@ @ALLPATCH@
+do 
 
-#Add the new files to the block
-_write_datablock mcov "m_corr_r.ascii m_corr_r_0p02.ascii m_corr_r_correl.ascii m_corr_r_uncorrelated_inflated.ascii m_corr_r_uncorrelated_inflated_0p02.ascii"
+  #Check if the full covariance was constructed from simulation realisations 
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov_${patch}/ ]
+  then 
+    #Construct a new covariance 
+    #Get the m-bias files for this patch (there should be one, with NTOMO entries)
+    mbias=`echo ${mfiles} | sed 's/ /\n/g' | grep "_${patch}_" | grep "_biases" || echo `
+    msigm=`echo ${mfiles} | sed 's/ /\n/g' | grep "_${patch}_" | grep "_uncertainty" || echo `
+    mcorr=`echo ${mfiles} | sed 's/ /\n/g' | grep "_${patch}_" | grep "_correlation" || echo `
 
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_mcov ]
+    #If there is no information for this patch, skip it 
+    if [ "${mbias}" == "" ] 
+    then 
+      continue
+    fi 
+
+    #Create the m-covariance matrix [NTOMOxNTOMO] 
+    @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/make_m_covariance.py \
+      --msigm ${msigm} \
+      --mcorr ${mcorr} \
+      --output "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov/m_corr_r" 2>&1
+    
+    outputlist="${outputlist} m_corr_${patch}_r.ascii m_corr_${patch}_r_0p02.ascii m_corr_${patch}_r_correl.ascii m_corr_${patch}_r_uncorrelated_inflated.ascii m_corr_${patch}_r_uncorrelated_inflated_0p02.ascii"
+
+    #Make the cosmosis mcov directory (split per patch) 
+    if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_mcov_${patch} ]
+    then 
+      mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_mcov_${patch}
+    fi 
+
+    cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov/m_corr_${patch}_r.ascii @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_mcov_${patch}/m_corr_${patch}_r.ascii
+    _write_datablock cosmosis_mcov_${patch} "m_corr_${patch}_r.ascii" 
+
+  else 
+    #Use the existing covariance 
+    #Make the cosmosis mcov directory (split per patch) 
+    if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_mcov_${patch} ]
+    then 
+      mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_mcov_${patch}
+    fi 
+    #Existing covariance file 
+    file=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov_${patch}/`
+    #Duplicate it 
+    cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov_${patch}/${file} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_mcov_${patch}/m_corr_${patch}_r.ascii
+    _write_datablock cosmosis_mcov_${patch} "m_corr_${patch}_r.ascii" 
+  fi 
+  
+done
+
+if [ "${outputlist}" != "" ] 
 then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_mcov
+  #Add the new files to the block
+  _write_datablock mcov "${outputlist}"
 fi 
-
-cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov/m_corr_r.ascii @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_mcov/m_corr_r.ascii
-_write_datablock cosmosis_mcov "m_corr_r.ascii" 
 

@@ -119,7 +119,7 @@ print(obj_cat['AlphaRecal_index'])
 print('Computing R bins')
 
 # start with R bin
-obj_cat['bin_R'] = pd.qcut(obj_cat['R'], args.nbins_R, 
+obj_cat['bin_R'] = pd.qcut(obj_cat['R'], args.nbins_R,duplicates='drop',
                                     labels=False, retbins=False)
 
 print('Computing SNR bins')
@@ -135,7 +135,7 @@ for ibin_R in range(args.nbins_R):
 
     # bin in R
     obj_cat['bin_snr'][mask_binR] = pd.qcut(obj_cat[col_snr][mask_binR], args.nbins_SNR, 
-                                                labels=False, retbins=False)
+                                                duplicates='drop',labels=False, retbins=False)
 
 print('Constructing Data Frame')
 

@@ -3,7 +3,7 @@
 # File Name : mcal_functions.py
 # Created By : awright
 # Creation Date : 25-05-2023
-# Last Modified : Tue 30 May 2023 01:25:45 PM CEST
+# Last Modified : Fri 02 Jun 2023 10:33:40 PM CEST
 #
 #=========================================
 
@@ -34,14 +34,7 @@ def flexible_read(filepath,as_df=True):
         #Read feather with pandas 
         ldac_cat=None
         cata = pd.read_feather(filepath)
-    elif file_extension == 'cat':
-        #Read LDAC with ldac tools
-        ldac_cat = ldac.LDACCat(filepath)
-        cata = ldac_cat['OBJECTS']
-        if as_df: 
-            #Convert the catalogue to a pandas data frame 
-            cata=pd.DataFrame(cata.hdu.data)
-    elif file_extension == 'fits':
+    elif file_extension == 'fits' or file_extension == 'cat':
         #If FITS, try ldac first 
         try:
             #Read LDAC with ldac tools
@@ -53,14 +46,14 @@ def flexible_read(filepath,as_df=True):
         except Exception:
             #If that fails, read with fits 
             ldac_cat=None
-            with fits.open(filepath) as hdul:
-                cata = hdul[1].data
-                if as_df: 
-                    #Convert the catalogue to a pandas data frame 
-                    cata=pd.DataFrame(cata,columns=cata.columns)
+            cata = apd.read_fits(filepath)
     else:
         #Error if not supported 
         raise Exception(f'Not supported input file type! {filepath}\nMust be one of csv/fits/cat/feather.')
+    #Convert 32 bit cols to 64bit 
+    if isinstance(cata, pd.DataFrame):
+        if any(cata.dtypes)=="float32": 
+            cata_data.loc[:,cata_data.dtypes=="float32"]=cata_data.loc[:,cata_data.dtypes=="float32"].astype(float)
     #Return the catalogue 
     return cata, ldac_cat
 #}}}
@@ -78,12 +71,14 @@ def flexible_write(cata,filepath,ldac_cat=None):
     elif file_extension == 'feather':
         #Write feather with pandas 
         cata = pd.to_feather(filepath)
-    elif file_extension == 'cat':
+    elif file_extension == 'cat' and not ldac_cat is None:
         #Write LDAC with ldac tools
-        if ldac_cat is None: 
-            ValueError("Cannot write to LDAC without input ldac_cat!")
-        ldac_cat['OBJECTS'].hdu.data=cata
-        ldac_cat.update = 1 
+        try: 
+            ldac_cat['OBJECTS'].hdu.data=cata
+            ldac_cat['OBJECTS'][1]=ldac_cat['OBJECTS'][1]
+        except: 
+            ldac_cat['OBJECTS']=cata
+            ldac_cat['OBJECTS'][1]=ldac_cat['OBJECTS'][1]
         if os.path.exists(filepath):
             os.remove(filepath)
         ldac_cat.saveas(filepath)
@@ -233,8 +228,8 @@ def mCalFunc_tile_based(cataSim, psf_frame=False): #{{{
                      sm.add_constant(cataSim['g1_in'].values,has_constant='add'),
                      weights=cataSim['shape_weight'].values)
     res_wls = mod_wls.fit() 
-    print(res_wls.summary())
-    print(res_wls.params)
+    #print(res_wls.summary())
+    print("m1params: ",res_wls.params)
     m1 = res_wls.params[1] - 1
     c1 = res_wls.params[0]
     m1_err = (res_wls.cov_params()[1, 1])**0.5
@@ -244,7 +239,7 @@ def mCalFunc_tile_based(cataSim, psf_frame=False): #{{{
                         sm.add_constant(cataSim['g2_in'].values,has_constant='add'), 
                         weights=cataSim['shape_weight'].values)
     res_wls = mod_wls.fit()
-    print(res_wls.summary())
+    print("m2params: ",res_wls.params)
     m2 = res_wls.params[1] - 1
     c2 = res_wls.params[0]
     m2_err = (res_wls.cov_params()[1, 1])**0.5
@@ -314,32 +309,48 @@ def mCalFunc_pair_based(cataSim): #{{{
 def minmax_to_bins(cat,var,index=None): #{{{
     #Takes column name "var" and constructs bin limits from the unique entries of "var_min" and "var_max"
     if index is None: 
-        return np.unique(cat.loc[:,var+'_min']).tolist()+[np.max(cat.loc[:,var+'_max'])]
+        limits=np.unique(cat.loc[:,var+'_min']).tolist()+[np.max(cat.loc[:,var+'_max'])]
     else: 
-        return np.unique(cat.loc[index,var+'_min']).tolist()+[np.max(cat.loc[index,var+'_max'])]
+        limits=np.unique(cat.loc[index,var+'_min']).tolist()+[np.max(cat.loc[index,var+'_max'])]
+    print(limits)
+    return limits
+
 #}}}
 
 def binby_SNR_R(surface,cata,SNRname,Rname): #{{{
     # define the SNR bin edges 
-    SNR_edges = minmax_to_bins(surface,'bin_'+SNRname)
+    SNR_edges = minmax_to_bins(surface,'bin_SNR')
     # bin the catalogue 
-    cata.loc[:, 'bin_'+SNRname+'_id'] = pd.cut(cata.loc[:, SNRname].values, SNR_edges, 
+    cata.loc[:, 'bin_SNR_id'] = pd.cut(cata.loc[:, SNRname].values, SNR_edges, 
                                 right=True, labels=False)
     #Loop over SNR bins 
     for i_SNR in range(len(SNR_edges)-1):
         #Define the R bin edges, in this bin of SNR
-        R_edges = minmax_to_bins(surface,'bin_'+Rname,index=(surface['bin_'+SNRname+'_id']==i_SNR))
+        R_edges = minmax_to_bins(surface,'bin_R',index=(surface['bin_SNR_id']==i_SNR))
 
         # Get the sources in this SNR bin 
-        mask_binSNR = (cata['bin_'+SNRname+'_id'].values == i_SNR)
+        mask_bin_SNR = (cata['bin_SNR_id'].values == i_SNR)
         #Bin by R
-        cata.loc[mask_binSNR, 'bin_'+Rname+'_id'] = pd.cut(
-                                    cata.loc[mask_binSNR, Rname].values, 
+        cata.loc[mask_bin_SNR, 'bin_R_id'] = pd.cut(
+                                    cata.loc[mask_bin_SNR, Rname].values, 
                                     R_edges, 
                                     right=True, labels=False)
-        del mask_binSNR
-        #Return the catalogue 
-        return cata 
+        del mask_bin_SNR
+
+    if any(np.isinf(cata['bin_SNR_id'])): 
+        print(f"WARNING: there is/are {len(np.where(np.isinf(cata['bin_SNR_id'])))} infinite SNR index/s")
+        cata.loc[np.isinf(cata['bin_SNR_id']),'bin_SNR_id']=-999
+    if any(np.isinf(cata['bin_R_id'])): 
+        print(f"WARNING: there is/are {len(np.where(np.isinf(cata['bin_R_id'])))} infinite R index/s")
+        cata.loc[np.isinf(cata['bin_R_id']),'bin_R_id']=-999
+    if any(np.isnan(cata['bin_SNR_id'])): 
+        print(f"WARNING: there is/are {len(np.where(np.isnan(cata['bin_SNR_id'])))} NaN SNR index/s")
+        cata.loc[np.isnan(cata['bin_SNR_id']),'bin_SNR_id']=-999
+    if any(np.isnan(cata['bin_SNR_id'])): 
+        print(f"WARNING: there is/are {len(np.where(np.isnan(cata['bin_R_id'])))} NaN R index/s")
+        cata.loc[np.isnan(cata['bin_R_id']),'bin_R_id']=-999
+    #Return the catalogue 
+    return cata 
 
 #}}}
 
@@ -376,15 +387,15 @@ def mCalFunc_from_surface(cata, surface,col_SNR, col_R, col_weight, col_m1, col_
     cata = pd.DataFrame({'SNR': np.array(cata[col_SNR]).astype(float),
                          'R': np.array(cata[col_R]).astype(float),
                          'weight': np.array(cata[col_weight]).astype(float),
-                         'binSNR_id': -999, 'binR_id': -999})
+                         'bin_SNR_id': -999, 'bin_R_id': -999})
 
     # used columns from surface of doom
-    surface = pd.DataFrame({'binSNR_id': np.array(surface['binSNR_id']).astype(int),
-                        'binR_id': np.array(surface['binR_id']).astype(int),
-                        'binSNR_min': np.array(surface['binSNR_min']).astype(float),
-                        'binSNR_max': np.array(surface['binSNR_max']).astype(float),
-                        'binR_min': np.array(surface['binR_min']).astype(float),
-                        'binR_max': np.array(surface['binR_max']).astype(float),
+    surface = pd.DataFrame({'bin_SNR_id': np.array(surface['bin_SNR_id']).astype(int),
+                        'bin_R_id': np.array(surface['bin_R_id']).astype(int),
+                        'bin_SNR_min': np.array(surface['bin_SNR_min']).astype(float),
+                        'bin_SNR_max': np.array(surface['bin_SNR_max']).astype(float),
+                        'bin_R_min': np.array(surface['bin_R_min']).astype(float),
+                        'bin_R_max': np.array(surface['bin_R_max']).astype(float),
                         'm1': np.array(surface[col_m1]).astype(float),
                         'm1_err': np.array(surface[f'{col_m1}_err']).astype(float),
                         'm2': np.array(surface[col_m2]).astype(float),
@@ -394,11 +405,16 @@ def mCalFunc_from_surface(cata, surface,col_SNR, col_R, col_weight, col_m1, col_
     # bin galaxies
     cata = binby_SNR_R(surface,cata,col_SNR,col_R)
 
+    # the indexes of sources with good binning 
+    #print(cata['bin_SNR_id'].values)
+    #print(cata['bin_SNR_id'].values!=-999)
+    good_id = (cata['bin_SNR_id'].values!=-999) & (cata['bin_R_id'].values!=-999) 
+
     # group
     ## sort to speed up
-    cata = cata.astype({'binSNR_id': int, 'binR_id': int})
-    cata.sort_values(by=['binSNR_id', 'binR_id'], inplace=True)
-    cata = cata.groupby(by=['binSNR_id', 'binR_id'])
+    cata = cata.astype({'bin_SNR_id': int, 'bin_R_id': int})
+    cata.sort_values(by=['bin_SNR_id', 'bin_R_id'], inplace=True)
+    cata = cata.groupby(by=['bin_SNR_id', 'bin_R_id'])
 
     # loop over groups to get mean m
     m1_final = 0 
@@ -407,25 +423,31 @@ def mCalFunc_from_surface(cata, surface,col_SNR, col_R, col_weight, col_m1, col_
     m2_err_final = 0
     wgRealSum = 0 
     for name, group in cata:
-        binSNR_id, binR_id = name
+        bin_SNR_id, bin_R_id = name
 
         # total weights in each bin
         wgRealBin = np.sum(group['weight'].values)
         wgRealSum += wgRealBin
 
-        # m from surface of doom
-        mask_doom = (surface['binSNR_id']==binSNR_id)\
-                   &(surface['binR_id']==binR_id)
-        m1_final += (wgRealBin * surface.loc[mask_doom, 'm1'].values[0])
-        m2_final += (wgRealBin * surface.loc[mask_doom, 'm2'].values[0])
-        m1_err_final += (wgRealBin * surface.loc[mask_doom, 'm1_err'].values[0])**2
-        m2_err_final += (wgRealBin * surface.loc[mask_doom, 'm2_err'].values[0])**2
+        # m from surface 
+        mask_surf = (surface['bin_SNR_id']==bin_SNR_id)\
+                   &(surface['bin_R_id']==bin_R_id)
+        if len(surface.loc[mask_surf, 'm1'])==0:
+            print(f"THERE IS NO SURFACE ELEMENT FOR SNR_BIN {bin_SNR_id} AND R_BIN {bin_R_id}?!")
+            continue 
+
+        #print(mask_surf)
+        #print(surface.loc[mask_surf, 'm1'])
+        m1_final += (wgRealBin * surface.loc[mask_surf, 'm1'].values[0])
+        m2_final += (wgRealBin * surface.loc[mask_surf, 'm2'].values[0])
+        m1_err_final += (wgRealBin * surface.loc[mask_surf, 'm1_err'].values[0])**2
+        m2_err_final += (wgRealBin * surface.loc[mask_surf, 'm2_err'].values[0])**2
 
     # take the mean
     m1_final = m1_final / wgRealSum
     m2_final = m2_final / wgRealSum
     m1_err_final = m1_err_final**0.5 / wgRealSum
     m2_err_final = m2_err_final**0.5 / wgRealSum
-    return (m1_final, m2_final, m1_err_final, m2_err_final)
+    return (m1_final, m2_final, m1_err_final, m2_err_final, good_id, wgRealSum)
 #}}}
 
