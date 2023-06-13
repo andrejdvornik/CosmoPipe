@@ -23,8 +23,8 @@ import wrapper_twopoint as wtp
 import wrapper_twopoint2 as wtp2
 
 ###############################################################################
-## Main function
-
+## Main functions
+#{{{
 def saveFitsTwoPoint(
         nbTomoN=2, nbTomoG=5,
         N_theta=9, theta_min=0.5, theta_max=300,
@@ -204,50 +204,6 @@ def mkdir_mine(dirName):
     except FileExistsError:
         print("Directory " , dirName ,  " already exists")
 
-
-##################################################################################
-### Making fits files for Phase-1 real data
-
-parser = ArgumentParser(description='Construct a cosmosis mcmc input file')
-parser.add_argument("--datavector", dest="DataVector",
-    help="Full Input file names", metavar="DataVector",required=True)
-parser.add_argument("--nz", dest="NzList",nargs='+',type=str,
-    help="list of Nz per tomographic bin",required=True)
-parser.add_argument("--nmaxcosebis", dest="nmaxcosebis",type=int,
-    help="maximum n for cosebis")
-parser.add_argument("--neff", dest="NeffFile",
-    help="Neff values file",required=True)
-parser.add_argument("--sigmae", dest="SigmaeFile",
-    help="sigmae values file",required=True)
-parser.add_argument("--covariance", dest="covarianceFile",
-    help="Covariance file",required=True)
-parser.add_argument("-o", "--outputfile", dest="outputFile",
-    help="Full Output file name", metavar="outputFile",required=True)
-parser.add_argument("-p", "--plotfolder", dest="plotdir",
-    help="Path for output figures", metavar="plotdir",required=True)
-
-args = parser.parse_args()
-
-# Folder and file names for nofZ, for the sources it will depend on the blind
-
-cosebis_filename = args.DataVector
-nzlist=args.NzList
-
-nBins_source = len(nzlist)
-nz={}
-for bin in range(nBins_source):
-    nz['source'+str(bin+1)] = nzlist[bin]
-
-# number density of galaxies per arcmin^2
-# Sources:
-# read from file
-filename = args.NeffFile
-nGal_source = np.loadtxt(filename,comments="#")
-
-# read from file
-filename = args.SigmaeFile
-sigma_e  = np.loadtxt(filename,comments="#")
-
 def saveFitsCOSEBIs():
     scDict = {
         'use_stats': 'En'.lower()
@@ -257,10 +213,6 @@ def saveFitsCOSEBIs():
 
     nGalList     = nGal_source.tolist()
     sigmaEpsList = sigma_e.tolist()
-
-    covName   = args.covarianceFile
-    
-    saveName  = args.outputFile
     
     saveFitsTwoPoint(
         nbTomoN=0, nbTomoG=len(nOfZNameList),
@@ -268,10 +220,14 @@ def saveFitsCOSEBIs():
         prefix_Flinc=None,
         prefix_CosmoSIS=None,
         scDict=scDict,
-        meanTag='file', meanName=cosebis_filename,
-        covTag='file', covName=covName,
-        nOfZNameList=nOfZNameList, nGalList=nGalList, sigmaEpsList=sigmaEpsList,
-        saveName=saveName
+        meanTag='file', 
+        meanName=args.DataVector,
+        covTag='file', 
+        covName=args.covarianceFile,
+        nOfZNameList=nOfZNameList, 
+        nGalList=nGalList, 
+        sigmaEpsList=sigmaEpsList,
+        saveName=args.outputFile
     )
     return
 
@@ -465,6 +421,57 @@ def unitaryTest(name1, name2):
     """
     wtp2.unitaryTest(name1, name2)
     return
+
+#}}}
+
+##################################################################################
+### Making fits files for Phase-1 real data
+
+parser = ArgumentParser(description='Construct a cosmosis mcmc input file')
+parser.add_argument("--datavector", dest="DataVector",nargs='+',
+    help="Full Input file names", metavar="DataVector",required=True)
+parser.add_argument("--nz", dest="NzList",nargs='+',type=str,
+    help="list of Nz per tomographic bin",required=True)
+parser.add_argument("--ntomo", dest="nTomo",type=int,
+    help="Number of tomographic bins",required=True)
+parser.add_argument("--nmaxcosebis", dest="nmaxcosebis",type=int,nargs='+',
+    help="maximum n for cosebis")
+parser.add_argument("--neff", dest="NeffFile",nargs='+',
+    help="Neff values file",required=True)
+parser.add_argument("--sigmae", dest="SigmaeFile",nargs='+',
+    help="sigmae values file",required=True)
+parser.add_argument("--covariance", dest="covarianceFile",nargs='+',
+    help="Covariance file",required=True)
+parser.add_argument("-o", "--outputfile", dest="outputFile",
+    help="Full Output file name", metavar="outputFile",required=True)
+parser.add_argument("-p", "--plotfolder", dest="plotdir",
+    help="Path for output figures", metavar="plotdir",required=True)
+
+args = parser.parse_args()
+
+# Folder and file names for nofZ, for the sources it will depend on the blind
+
+nzlist=args.NzList
+
+#Check that provided files have compatible dimensions: len(datavec)==len(cov) 
+if not len(args.DataVector) == len(args.covarianceFile): 
+    raise ValueError('Number of data vectors must be the same as the number of covariances! %s != %s' % 
+            (str(len(args.DataVector)),str(len(args.covarianceFile))))
+
+nBins_source = len(nzlist)
+nz={}
+for bin in range(nBins_source):
+    nz['source'+str(bin+1)] = nzlist[bin]
+
+# number density of galaxies per arcmin^2
+# Sources:
+# read from file
+filename = args.NeffFile
+nGal_source = np.loadtxt(filename,comments="#")
+
+# read from file
+filename = args.SigmaeFile
+sigma_e  = np.loadtxt(filename,comments="#")
 
 
 ############################################################
