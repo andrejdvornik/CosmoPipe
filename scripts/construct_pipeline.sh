@@ -123,7 +123,7 @@ then
   fi 
   @P_SED_INPLACE@ "s/={.*/={_validitytest_}/" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
 else 
-  echo -en " NO BLOCK : START NEW\n"
+  #echo -en " NO BLOCK : START NEW\n"
   _initialise_datablock
 fi
 #}}}
