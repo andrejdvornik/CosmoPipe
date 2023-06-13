@@ -103,7 +103,7 @@ mix_term_nbins_phi = 100
 mix_term_nmax = 10
 mix_term_dpix_min = 0.25
 mix_term_do_ec = True
-mix_term_file_path_save_triplets = ./input/mixterm/triplets
+mix_term_file_path_save_triplets = ${input_path}/mixterm/triplets
 mix_term_file_path_load_triplets = 
 
 EOF
