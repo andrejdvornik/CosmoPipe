@@ -135,6 +135,8 @@ then
   _add_default_vars
 fi 
 #}}}
+allneeds=''
+allneeds_def=''
 #For each step in the pipeline: 
 for step in ${pipeline_steps}
 do 
@@ -193,6 +195,7 @@ do
     fi 
     if [ "${blockneeds}" != "" ]
     then 
+      allneeds="${allneeds} ${blockneeds}"
       for var in ${blockneeds}
       do 
         #Check whether the variable is already in the pipeline defaults 
@@ -209,14 +212,23 @@ do
               #If so, use the global default 
               grep -m 1 -B 1 "${var}=" defaults.sh >> @PIPELINE@_defaults.sh 
             else 
+              allneeds_def="${allneeds_def} ${var}"
               #Otherwise, insert a blank entry 
               echo "#INSERT DEFAULT VALUE HERE:" >> @PIPELINE@_defaults.sh 
               echo ${var}=@${var}@ >> @PIPELINE@_defaults.sh 
             fi
           else 
+            allneeds_def="${allneeds_def} ${var}"
             #If there is no global defaults, insert a blank entry 
             echo "#INSERT DEFAULT VALUE HERE:" >> @PIPELINE@_defaults.sh 
             echo ${var}=@${var}@ >> @PIPELINE@_defaults.sh 
+          fi 
+        else 
+          #Check if the existing default is a blank entry 
+          exists_isdef=`grep -c "^${var}=@${var}@" @PIPELINE@_defaults.sh || echo`
+          if [ "${exists_isdef}" != "0" ]
+          then 
+            allneeds_def="${allneeds_def} ${var}"
           fi 
         fi 
       done 
@@ -236,8 +248,14 @@ do
       then 
         if [ "${inp}" == "ALLHEAD" ]
         then 
-          #Error 
+          #Warn 
           _message "${RED}(WARNING)${DEF} "
+          if [ "${warnings}" == "" ] 
+          then 
+            warnings="${RED}    WARNINGS:${DEF}\n- ${RED}ALLHEAD${BLU} was requested at a step where no ${RED}DATAHEAD${BLU} was currently assigned. This could be a quirk of the pipeline check.${DEF}\n"
+          else 
+            warnings="${warnings}    - ${RED}ALLHEAD${BLU} was requested at a step where no ${RED}DATAHEAD${BLU} was currently assigned. This could be a quirk of the pipeline check.${DEF}\n"
+          fi 
         else 
           #Error 
           _message " - ERROR!\n\n"
@@ -286,6 +304,24 @@ done
 if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_block.txt ]
 then 
   mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_block.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+fi 
+#}}}
+#Prompt the user about missing default variables, if needed {{{
+if [ "${allneeds}" != "" ]
+then 
+  allneeds=`echo ${allneeds} | sed 's/ /\n/g' | sort | uniq | sed 's/\n/ /g'`
+  if [ "${warnings}" == "" ] 
+  then 
+    warnings="${RED}     WARNINGS:${DEF}\n    ${BLU}The pipeline used the following undeclared runtime variables:${DEF}\n    ${allneeds}\n"
+  else 
+    warnings="${warnings}    ${BLU}The pipeline used the following undeclared runtime variables:${DEF}\n    ${allneeds}\n"
+  fi 
+  if [ "${allneeds_def}" != "" ]
+  then 
+    warnings="${warnings}    ${BLU}Of these variables, the following ${RED}have no default value assigned${BLU}:\n   ${DEF}${allneeds_def}\n    ${BLU}You need to update those variables in the ${DEF}@PIPELINE@_defaults.sh${BLU} file!\n"
+  else 
+    warnings="${warnings} ${RED}    !BUT!${DEF} - ${BLU}all of them were assigned defaults in the ${DEF}@PIPELINE@_defaults.sh${BLU} file.\n    No action is required!\n"
+  fi 
 fi 
 #}}}
 #}}}
@@ -462,6 +498,12 @@ EOF
 cat @RUNROOT@/@SCRIPTPATH@/pipeline_close.sh >> @RUNROOT@/@PIPELINE@_pipeline.sh
 
 #}}}
+
+#If there are warnings, print them: 
+if [ "${warnings}" != "" ] 
+then 
+  _message "${DEF} {\n${warnings}${DEF}    }${DEF}"
+fi 
 
 #End
 trap : 0 
