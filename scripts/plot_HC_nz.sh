@@ -3,9 +3,26 @@
 # File Name : plot_HC_nz.sh
 # Created By : awright
 # Creation Date : 23-03-2023
-# Last Modified : Thu 23 Mar 2023 10:02:33 AM CET
+# Last Modified : Tue 06 Jun 2023 10:59:03 PM CEST
 #
 #=========================================
 
+#Construct the tomographic bin catalogue strings {{{
+binstrings=''
+for i in `seq @BV:NTOMO@`
+do
+  #Define the Z_B limits from the TOMOLIMS {{{
+  ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $n}'`
+  ZB_hi=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $(n+1)}'`
+  #}}}
+  #Define the string to append to the file names {{{
+  ZB_lo_str=`echo $ZB_lo | sed 's/\./p/g'`
+  ZB_hi_str=`echo $ZB_hi | sed 's/\./p/g'`
+  appendstr="_ZB${ZB_lo_str}t${ZB_hi_str}"
+  #}}}
+  binstrings="${binstrings} ${appendstr}"
+done
+#}}}
+
 #Run the R plotting code 
-@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/plot_HC_nz.R @DB:nz_hc_optim@
+@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/plot_HC_nz.R -i @DB:nz_hc_optim@ --binstrings ${binstrings}
