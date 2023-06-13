@@ -3,7 +3,7 @@
 # File Name : cleanfits.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Tue 16 May 2023 02:37:43 PM CEST
+# Last Modified : Wed 17 May 2023 06:55:13 AM CEST
 #
 #=========================================
 
@@ -18,6 +18,6 @@ _message "   > @BLU@Cleaning FITS catalogue for use as LDAC: @DEF@${input##*/}@D
 
 #Convert the catalogue int64 columns to int32
 #@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/cleanfits.R ${input} @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacdesc "@P_SED_INPLACE@" 2>&1
-@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/cleanfits_testing.R ${input} 2>&1
+@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/cleanfits_testing.R ${input} TRUE 2>&1
 
 _message " @BLU@- @RED@Done! (`date +'%a %H:%M'`)\n@DEF@"
