@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:M1NAME BV:M2NAME BV:RNAME BV:SNRNAME BV:WEIGHTNAME DEF PYTHON3BIN RED RUNROOT SCRIPTPATH
+  echo ALLPATCH BLU BV:M1NAME BV:M2NAME BV:RNAME BV:SNRNAME BV:WEIGHTNAME DATABLOCK DEF MBIASCORR PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 
@@ -57,7 +57,7 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo DATAHEAD
+  echo DATAHEAD mbias
 } 
 #}}}
 

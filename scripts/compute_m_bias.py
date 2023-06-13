@@ -3,7 +3,7 @@
 # File Name : compute_m_surface.py
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Tue 30 May 2023 10:46:13 AM CEST
+# Last Modified : Fri 02 Jun 2023 12:49:40 PM CEST
 #
 #=========================================
 
@@ -50,21 +50,34 @@ cata_data = cata_data[cata_data[args.col_weight]>0]
 cata_data.reset_index(drop=True, inplace=True)
 print('selected objects (weight>0)', len(cata_data))
 
+# save useable parameters
+cata_used = pd.DataFrame({
+    'SNR': np.array(cata_data[args.col_SNR]).astype(float),
+    'R': np.array(cata_data[args.col_R]).astype(float),
+    'weight': np.array(cata_data[args.col_weight]).astype(float),
+    })
+
 # load m calibraiton surface 
 cata_surface, ldac_surface = mcf.flexible_read(args.input_surface)
 
 # calculate m
 m_res = pd.DataFrame(-999., index=np.arange(1),
-                    columns = ['m1', 'm2', 'm1_err', 'm2_err','Nwei'])
-m1, m2, m1_err, m2_err = mcf.mCalFunc_from_surface(cata=cata_data, surface=cata_surface, 
-                            col_SNR=args.col_SNR, col_R=args.col_R, col_weight=args.col_weight, 
-                            col_m1=args.col_m12[0], col_m2=args.col_m12[1])
+                    columns = ['m','m_err','m1', 'm2', 'm1_err', 'm2_err','Nwei','Nwei_good','Nwei_good_out','N','N_good'])
+m1, m2, m1_err, m2_err, good_id, goodwt = mcf.mCalFunc_from_surface(cata=cata_used, surface=cata_surface, 
+                                            col_SNR="SNR", col_R="R", col_weight="weight", 
+                                            col_m1=args.col_m12[0], col_m2=args.col_m12[1])
 print(f'{args.input_data}: {(m1+m2)/2.}, {(m1_err+m2_err)/2.}')
+m_res.loc[0, 'm'] = (m1+m2)/2.
+m_res.loc[0, 'm_err'] = np.sqrt(m1_err**2+m2_err**2)
 m_res.loc[0, 'm1'] = m1
 m_res.loc[0, 'm2'] = m2
 m_res.loc[0, 'm1_err'] = m1_err
 m_res.loc[0, 'm2_err'] = m2_err
-m_res.loc[0, 'Nwei'] = np.sum(cata_data[col_weight].values)
+m_res.loc[0, 'Nwei'] = np.sum(cata_data[args.col_weight].values)
+m_res.loc[0, 'Nwei_good'] = np.sum(cata_data.loc[good_id,args.col_weight].values)
+m_res.loc[0, 'Nwei_good_out'] = goodwt
+m_res.loc[0, 'N'] = len(cata_data[args.col_weight].values)
+m_res.loc[0, 'N_good'] = len(cata_data.loc[good_id,args.col_weight].values)
 
 m_res.to_csv(args.outputpath, index=False, float_format='%.6f')
 print(f'results saved to {args.outputpath}')
