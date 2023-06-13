@@ -3,7 +3,7 @@
 # File Name : convert_to_ldac.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Tue 13 Jun 2023 10:38:36 AM CEST
+# Last Modified : Tue 13 Jun 2023 12:39:05 PM CEST
 #
 #=========================================
 
@@ -12,9 +12,9 @@ input="@DB:DATAHEAD@"
 
 objstr=''
 _message "@BLU@Testing existance of @RED@OBJECTS@BLU@, @RED@FIELDS@BLU@, @RED@FIELD_POS@BLU@, and @RED@SeqNr@BLU@{@DEF@\n\n"
-@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${input} -t OBJECTS -k FIELD_POS 2>&1 || objstr="FAIL"
-@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${input} -t OBJECTS -k SeqNr 2>&1 || objstr="FAIL"
-@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${input} -t FIELDS 2>&1 || objstr="FAIL"
+@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${input} -t OBJECTS -k FIELD_POS 2>&1 && _message " @BLU@FIELD_POS found!@DEF@\n" || objstr="FAIL"
+@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${input} -t OBJECTS -k SeqNr 2>&1 && _message " @BLU@SeqNr found!@DEF@\n" || objstr="FAIL"
+@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${input} -t FIELDS 2>&1 && _message " @BLU@FIELDS table found!@DEF@\n" || objstr="FAIL"
 _message "\n\n@BLU@} - @RED@Done!@DEF@\n"
 
 if [ "${objstr}" == "FAIL" ] 
