@@ -156,7 +156,10 @@ function _initialise_datablock {
     echo "BLOCK: " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
     echo "VARS: " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
     _write_blockvars "NTOMO" `echo @TOMOLIMS@ | awk '{print NF-1}'` 
-    _add_default_vars 
+    if [ -f @PIPELINE@_defaults.sh ]
+    then 
+      _add_default_vars 
+    fi 
   fi 
 }
 #}}}
@@ -868,7 +871,7 @@ function _incorporate_datablock {
   ##}}}
 
   #Check if we are stoelzner {{{
-  if [ `whoami` == 'awright' ] || [ `whoami` == 'stoelzner' ]
+  if [ `whoami` == 'qwright' ] || [ `whoami` == 'stoelzner' ]
   then 
     if [ "${ext}" != "ini" ] && [ $(( ( RANDOM % 100 )  + 1 )) -gt 92 ] 
     then 
