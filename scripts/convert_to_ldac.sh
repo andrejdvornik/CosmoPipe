@@ -3,7 +3,7 @@
 # File Name : convert_to_ldac.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Fri 02 Jun 2023 10:35:47 PM CEST
+# Last Modified : Tue 13 Jun 2023 10:38:36 AM CEST
 #
 #=========================================
 
@@ -11,10 +11,11 @@
 input="@DB:DATAHEAD@"
 
 objstr=''
-echo "Testing existance of OBJECTS, FIELDS, FIELD_POS, and SeqNr"
+_message "@BLU@Testing existance of @RED@OBJECTS@BLU@, @RED@FIELDS@BLU@, @RED@FIELD_POS@BLU@, and @RED@SeqNr@BLU@{@DEF@\n\n"
 @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${input} -t OBJECTS -k FIELD_POS 2>&1 || objstr="FAIL"
 @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${input} -t OBJECTS -k SeqNr 2>&1 || objstr="FAIL"
 @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${input} -t FIELDS 2>&1 || objstr="FAIL"
+_message "\n\n@BLU@} - @RED@Done!@DEF@\n"
 
 if [ "${objstr}" == "FAIL" ] 
 then 
