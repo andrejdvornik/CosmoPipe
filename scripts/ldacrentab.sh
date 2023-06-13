@@ -3,7 +3,7 @@
 # File Name : ldacrentab.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Mon 15 May 2023 10:52:28 AM CEST
+# Last Modified : Sat 03 Jun 2023 05:15:40 PM CEST
 #
 #=========================================
 
@@ -16,7 +16,7 @@ _message "   > @BLU@Checking for FITS table in @DEF@${input##*/}@DEF@ "
 @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacdesc -i ${input} > @RUNROOT@/@STORAGEPATH@/rentab.txt 2>&1 
 _message " @BLU@- @RED@Done! (`date +'%a %H:%M'`)\n@DEF@"
 found=`grep -A 1 "BINTABLE" @RUNROOT@/@STORAGEPATH@/rentab.txt | grep -v "BINTABLE" | awk -F. '{print $NF}' | grep -c "OBJECTS" || echo`
-if [ "${found}" != "1" ]
+if [ "${found}" == "0" ]
 then 
   _message "   > @BLU@Checking for name of FITS table in @DEF@${input##*/}@DEF@ "
   tabname=`grep -A 1 "BINTABLE" @RUNROOT@/@STORAGEPATH@/rentab.txt | grep -v "BINTABLE" | awk -F. '{print $NF}' | grep -v "FIELDS" | tail -1 `
@@ -35,5 +35,9 @@ then
     mv ${input}_rentabtmp ${input}
     _message " @BLU@- @RED@Done! (`date +'%a %H:%M'`)\n@DEF@"
   fi 
+elif [ "${found}" != "1" ]
+then
+  _message "@BLU@- @RED@ERROR! There are multiple OBJECTS tables in the file?!@DEF@\n"
+  exit 1 
 fi
 
