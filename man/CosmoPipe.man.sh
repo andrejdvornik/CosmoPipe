@@ -90,7 +90,7 @@ function _varcheck {
   if [ "${_runerr}" != "0" ]
   then 
     _runmissing=`echo ${_runmissing} | sed 's/ /\n/g' | sort | uniq | sed 's/\n/ /g'` 
-    >&2 echo ${_runmissing}
+    #>&2 echo ${_runmissing}
     echo ${_runmissing}
   fi 
 } 
