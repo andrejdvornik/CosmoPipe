@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@=================================@DEF@\n"
-    _message "@BLU@== @RED@ Running cleanfits.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@=================================@DEF@\n"
+    _message "@BLU@=======================================@DEF@\n"
+    _message "@BLU@== @RED@ Running convert_to_ldac.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@=======================================@DEF@\n"
   fi 
 }
 #}}}
@@ -64,7 +64,7 @@ function _outputs {
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/cleanfits.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/convert_to_ldac.sh
 } 
 #}}}
 
