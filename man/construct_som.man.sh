@@ -1,5 +1,5 @@
 #
-# specz_som.sh Documentation & Housekeeping functions
+# construct_som.man.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@=================================@DEF@\n"
-    _message "@BLU@== @RED@ Running specz_som.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@=================================@DEF@\n"
+    _message "@BLU@=====================================@DEF@\n"
+    _message "@BLU@== @RED@ Running construct_som.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@=====================================@DEF@\n"
   fi 
 }
 #}}}
