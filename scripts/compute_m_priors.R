@@ -3,7 +3,7 @@
 # File Name : computs_m_priors.R
 # Created By : awright
 # Creation Date : 12-06-2023
-# Last Modified : Mon 12 Jun 2023 11:00:25 PM CEST
+# Last Modified : Wed 14 Jun 2023 10:30:49 AM CEST
 #
 #=========================================
 
@@ -46,6 +46,12 @@ while (length(inputs)!=0) {
     bias_oname<-inputs[1]
     inputs<-inputs[-1]
     #/*fold*/}}}
+  } else if (inputs[1]=='--uncout') { 
+    #Define the output biases filename /*fold*/ {{{
+    inputs<-inputs[-1]
+    unc_oname<-inputs[1]
+    inputs<-inputs[-1]
+    #/*fold*/}}}
   } else if (inputs[1]=='--covout') { 
     #Define the output covariance filename /*fold*/ {{{
     inputs<-inputs[-1]
@@ -55,7 +61,8 @@ while (length(inputs)!=0) {
   } else if (inputs[1]=='--corr') { 
     #Define the correlation factor for mbias uncertainties /*fold*/ {{{
     inputs<-inputs[-1]
-    corr<-inputs[1]
+    corr<-as.numeric(inputs[1])
+    if (is.na(corr)) { stop("--corr correlation factor must be numeric") }
     inputs<-inputs[-1]
     #/*fold*/}}}
   } else {
@@ -70,10 +77,10 @@ if ( nreal%%1 != 0 ) {
   stop("There are a non-integer number of input catalogues per bin?!") 
 }
 #Initialise the realisation results matrix 
-m_mat<-matrix(NA,ncol=length(binstrings),nrow=length(input.files)/length(binstrings))
+dm_mat<-m_mat<-matrix(NA,ncol=length(binstrings),nrow=length(input.files)/length(binstrings))
 
 #Setup progress bar 
-pb<-txtProgressBar(style=3,min=0,max=length(bias))
+pb<-txtProgressBar(style=3,min=0,max=length(m_mat))
 count<-0
 #For each tomographic bin 
 for (bin in 1:length(binstrings)) { 
@@ -83,7 +90,7 @@ for (bin in 1:length(binstrings)) {
     setTxtProgressBar(pb,count)
     count<-count+1
     #Read the calibration file 
-    mdf<-helpRfuncs::read.file(mcats[i],data.table=FALSE,cols=c(redshift.label,gold.label))
+    mdf<-helpRfuncs::read.file(mcats[i],data.table=FALSE)
     #record the m value 
     m_mat[i,bin]<-mdf$m
     #record the dm value 
@@ -113,7 +120,9 @@ for (i in 1:ncol(sys_cov)) {
 #Compute the full covariance  
 final_cov<-gold_cov+sys_cov
 #Output the m file 
-helpRfuncs::write.file(bias_oname,final_m,colnames=FALSE)
+helpRfuncs::write.file(bias_oname,final_m,col.names=FALSE)
+#Output the dm file 
+helpRfuncs::write.file(unc_oname,final_dm,col.names=FALSE)
 #Output the cov file 
-helpRfuncs::write.file(cov_oname,final_cov,colnames=FALSE)
+helpRfuncs::write.file(cov_oname,final_cov,col.names=FALSE)
 
