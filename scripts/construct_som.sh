@@ -3,17 +3,17 @@
 # File Name : specz_som.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Mon 05 Jun 2023 09:17:08 AM CEST
+# Last Modified : Tue 13 Jun 2023 10:48:53 PM CEST
 #
 #=========================================
 
-#Notify
-_message "@BLU@ > Constructing the SOM {@DEF@\n"
 
 #Construct the SOM 
 outname=@DB:DATAHEAD@
 outname=${outname##*/}
 outext=${outname##*.}
+#Notify
+_message "@BLU@ > Constructing a SOM for @DEF@${outname}@DEF@"
 @P_RSCRIPT@ @RUNROOT@/INSTALL/SOM_DIR/R/SOM_DIR.R \
   -r none -t @DB:DATAHEAD@ \
   --toroidal --topo hexagonal --som.dim 101 101 -np -fn Inf \
@@ -42,7 +42,7 @@ outext=${outname##*.}
   MAG_GAAP_H-MAG_GAAP_Ks MAG_AUTO 2>&1 
 
 #Notify
-_message "@BLU@ } @RED@ - Done! (`date +'%a %H:%M'`)@DEF@\n"
+_message "@RED@ - Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 #Add the new file to the datablock 
 #_add_datablock som CosmoPipeSOM_SOMdata.Rdata
