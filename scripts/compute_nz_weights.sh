@@ -3,12 +3,12 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Tue 06 Jun 2023 10:09:16 PM CEST
+# Last Modified : Tue 13 Jun 2023 10:50:44 PM CEST
 #
 #=========================================
 
 #Notify
-_message "@BLU@ > Computing the SOM Nz {@DEF@\n"
+_message "@BLU@ > Computing the SOM Nz weights for all files {@DEF@\n"
 
 #Output files 
 output_files=''

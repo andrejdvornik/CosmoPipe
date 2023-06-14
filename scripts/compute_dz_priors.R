@@ -3,7 +3,7 @@
 # File Name : computs_dz_priors.R
 # Created By : awright
 # Creation Date : 29-03-2023
-# Last Modified : Thu 08 Jun 2023 10:02:07 PM CEST
+# Last Modified : Tue 13 Jun 2023 10:09:08 PM CEST
 #
 #=========================================
 
@@ -144,7 +144,7 @@ final_biases<-colMeans(bias)
 #Compute the Nz bias covariance  
 final_cov<-cov(bias)
 #Output the bias file 
-helpRfuncs::write.file(bias_oname,final_biases,colnames=FALSE)
+helpRfuncs::write.file(bias_oname,final_biases,col.names=FALSE)
 #Output the cov file 
-helpRfuncs::write.file(cov_oname,final_cov,colnames=FALSE)
+helpRfuncs::write.file(cov_oname,final_cov,col.names=FALSE)
 
