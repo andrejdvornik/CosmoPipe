@@ -82,4 +82,5 @@ ldac_table[args.e1colname]=e1_corr
 ldac_table[args.e2colname]=e2_corr
 
 #Write out the ldac file 
-ldac_table.saveas(args.outputfile,clobber=False)
+ldac_cat['OBJECTS']=ldac_table
+ldac_cat.saveas(args.outputfile,clobber=False)
