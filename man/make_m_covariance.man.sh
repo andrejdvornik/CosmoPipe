@@ -57,7 +57,12 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo mcov cosmosis_mcov
+  outlist=''
+  for patch in @PATCHLIST@ @ALLPATCH@ 
+  do 
+    outlist="${outlist} cosmosis_mcov_${patch}"
+  done 
+  echo mcov ${outlist}
 } 
 #}}}
 
