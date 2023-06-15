@@ -3,7 +3,7 @@
 # File Name : make_data_vector.sh
 # Created By : awright
 # Creation Date : 01-04-2023
-# Last Modified : Thu 01 Jun 2023 06:02:15 PM CEST
+# Last Modified : Thu 15 Jun 2023 11:24:10 AM CEST
 #
 #=========================================
 
@@ -35,11 +35,13 @@ do
   #}}}
 
   #Construct the data vector for cosebis {{{
+  _message " >@BLU@ Constructing data vector for patch ${patch}@DEF@"
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/make_data_vector.py \
     --inputfiles ${filelist}   \
     --mbias   ${biaslist}      \
     --tomobins @BV:TOMOLIMS@  \
     --outputfile  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_vec_${patch}/combined_vector.txt 
+  _message "@RED@ - Done! (`date +'%a %H:%M'`)@DEF@\n"
   #}}}
 
   #Update the datablock 

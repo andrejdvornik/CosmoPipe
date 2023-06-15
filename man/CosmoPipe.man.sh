@@ -264,7 +264,7 @@ function _rename_blockitem {
   done 
   if [ "${_seen}" != 1 ]
   then 
-    _message "@RED@ - ERROR! The requested data block to rename (${1}) does not exist in the data block!"
+    _message "@RED@ - ERROR! The requested data block to rename (${1}) does not exist in the data block!@DEF@\n"
     exit 1 
   fi 
   #Update the datablock txt file: HEAD

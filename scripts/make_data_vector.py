@@ -1,4 +1,5 @@
 import re
+import os
 import numpy as np
 from argparse import ArgumentParser
 
@@ -51,7 +52,7 @@ def rebin(x,signal,weight,x_min,x_max,nbins):
 parser = ArgumentParser(description='Construct an input cosebi data vector for cosmosis mcmc')
 parser.add_argument("-i", "--inputfiles", dest="DataFiles",nargs='+',
     help="Full Input file names", metavar="inputFile",required=True)
-parser.add_argument("-m", "--mbias", dest="mbias",nargs='+',type=float,
+parser.add_argument("-m", "--mbias", dest="mbias",nargs='+',
     help="multiplicative bias per tomographic bin",required=True)
 parser.add_argument("-t", "--tomobins", dest="tomoBins",nargs='+',
     help="tomographic bin limits",required=True)
@@ -81,6 +82,21 @@ for bin in range(nBins_source):
 input_files = []
 m_corr_all  = []
 m = args.mbias
+#Check if mbias is a file or list of files or float 
+mout=[]
+for mval in m:
+    if os.path.isfile(mval):
+        data=np.loadtxt(mval,comments='#')
+        for val in data: 
+            mout.append(val)
+    else:
+        try:
+            mout.append(float(mval))
+        except:
+            raise ValueError(f"provided m {mval} is neither a valid file nor a float?!")
+
+print(mout)
+
 for bin1 in range(nBins_source):
     for bin2 in range(bin1,nBins_source):
         #fileNameInput=name+str(bin1+1)+'_'+str(bin2+1)+'.asc'
@@ -90,7 +106,7 @@ for bin1 in range(nBins_source):
         match=np.array([tomoxcorrstr in i for i in EnDataFiles])
         fileNameInput=EnDataFiles[match][0]
         input_files.append(fileNameInput)
-        m_corr= (1.+m[bin2])*(1.+m[bin1])
+        m_corr= (1.+mout[bin2])*(1.+mout[bin1])
         m_corr_all.append(m_corr)
 
 print(input_files)

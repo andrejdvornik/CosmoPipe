@@ -204,15 +204,15 @@ def mkdir_mine(dirName):
     except FileExistsError:
         print("Directory " , dirName ,  " already exists")
 
-def saveFitsCOSEBIs():
+def saveFitsCOSEBIs(datavec,covariance):
     scDict = {
         'use_stats': 'En'.lower()
     }
 
     nOfZNameList=list(nz.values())
 
-    nGalList     = nGal_source.tolist()
-    sigmaEpsList = sigma_e.tolist()
+    nGalList     = nGal_source#.tolist()
+    sigmaEpsList = sigma_e#.tolist()
     
     saveFitsTwoPoint(
         nbTomoN=0, nbTomoG=len(nOfZNameList),
@@ -221,9 +221,9 @@ def saveFitsCOSEBIs():
         prefix_CosmoSIS=None,
         scDict=scDict,
         meanTag='file', 
-        meanName=args.DataVector,
+        meanName=datavec,
         covTag='file', 
-        covName=args.covarianceFile,
+        covName=covariance,
         nOfZNameList=nOfZNameList, 
         nGalList=nGalList, 
         sigmaEpsList=sigmaEpsList,
@@ -434,7 +434,7 @@ parser.add_argument("--nz", dest="NzList",nargs='+',type=str,
     help="list of Nz per tomographic bin",required=True)
 parser.add_argument("--ntomo", dest="nTomo",type=int,
     help="Number of tomographic bins",required=True)
-parser.add_argument("--nmaxcosebis", dest="nmaxcosebis",type=int,nargs='+',
+parser.add_argument("--nmaxcosebis", dest="nmaxcosebis",type=int,
     help="maximum n for cosebis")
 parser.add_argument("--neff", dest="NeffFile",nargs='+',
     help="Neff values file",required=True)
@@ -466,18 +466,45 @@ for bin in range(nBins_source):
 # number density of galaxies per arcmin^2
 # Sources:
 # read from file
-filename = args.NeffFile
-nGal_source = np.loadtxt(filename,comments="#")
+#filename = args.NeffFile
+#nGal_source = np.loadtxt(filename,comments="#")
+nGal_source=[]
+for tempval in args.NeffFile:
+    if os.path.isfile(tempval):
+        data=np.loadtxt(tempval,comments='#')
+        for val in data: 
+            nGal_source.append(val)
+    else:
+        try:
+            nGal_source.append(float(tempval))
+        except:
+            raise ValueError(f"provided neff {tempval} is neither a valid file nor a float?!")
+
+print(nGal_source)
 
 # read from file
-filename = args.SigmaeFile
-sigma_e  = np.loadtxt(filename,comments="#")
+#filename = args.SigmaeFile
+#sigma_e  = np.loadtxt(filename,comments="#")
+sigma_e=[]
+for tempval in args.SigmaeFile:
+    if os.path.isfile(tempval):
+        data=np.loadtxt(tempval,comments='#')
+        for val in data: 
+            sigma_e.append(val)
+    else:
+        try:
+            sigma_e.append(float(tempval))
+        except:
+            raise ValueError(f"provided sigmae {tempval} is neither a valid file nor a float?!")
+
+print(sigma_e)
 
 
 ############################################################
 # plot things here
 
-saveFitsCOSEBIs()
+for i in range(len(args.DataVector)): 
+   saveFitsCOSEBIs(datavec=args.DataVector[i],covariance=args.covarianceFile[i])
 
 FolderPlots=args.plotdir
 mkdir_mine(FolderPlots)

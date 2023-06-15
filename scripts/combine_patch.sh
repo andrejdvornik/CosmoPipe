@@ -3,7 +3,7 @@
 # File Name : combine_patch.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Fri 26 May 2023 03:18:17 PM CEST
+# Last Modified : Wed 14 Jun 2023 01:55:47 PM CEST
 #
 #=========================================
 
@@ -13,25 +13,15 @@ inputcats="@DB:ALLHEAD@"
 patches=`echo @PATCHLIST@`
 
 #Select one of the patches
-patch=${patches##* }
-#Replace the patch variable with the ALLPATCH variable 
-match=0
-for _file in ${inputcats}
-do 
-  match=`echo ${_file##*/} | grep -c "_${patch}_" || echo`
-  if [ "${match}" != "0" ] 
-  then 
-    outname=`echo ${_file##*/} | sed "s/_${patch}_/_@ALLPATCH@_/"`
-    break
-  fi 
-done 
-
-if [ "${outname}" == "" ] 
+basepatch=${patches##* }
+#Get all the files with this patch 
+sublist=`echo ${inputcats} | sed 's/ /\n/g' | grep "_${basepatch}_" || echo `
+#Check for errors 
+if [ "${sublist}" == "" ]
 then 
   _message "@RED@ - ERROR!\n"
-  _message "@RED@Output all-patch catalogue could not be created because\n"
-  _message "@RED@the patch label _${patch}_ was not found in the main catalogue names.@DEF@\n"
-  exit 1
+  _message "@RED@There are no input files with the patch ${basepatch}?!@DEF@\n"
+  exit 1 
 fi 
 
 #Add a patch label to each catalogue (for subsequent patch extraction, if needed)
@@ -66,20 +56,70 @@ do
   _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
 done 
 
-#Combine the main_cats catalogues into one 
-_message "   > @BLU@Constructing patch-combined catalogue @DEF@${outname}@DEF@ "
-@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacpaste \
-  -i ${inputcats} \
-  -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${outname} 2>&1 
-_message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
 
-#Add the new file to the datablock 
-#Update datahead 
-for _file in ${inputcats}
+#Loop through files 
+for basefile in ${sublist}
 do 
-  #Replace the first file with the output name, then clear the rest
-  _replace_datahead ${_file##*/} "${outname}"
-  outname=""
+  #Define the output name 
+  outname=`echo ${basefile} | sed "s/_${basepatch}_/_@ALLPATCH@_/g" `
+
+  #Get the list of contributing catalogues 
+  inplist=''
+  for patch in ${patches} 
+  do 
+    curfile=`echo ${basefile} | sed "s/_${basepatch}_/_${patch}_/g"` 
+    inplist="${inplist} ${curfile}" 
+  done 
+
+  #Check if input file lengths are ok 
+  links="FALSE"
+  for file in ${inplist} ${outname}
+  do 
+    if [ ${#file} -gt 255 ] 
+    then 
+      links="TRUE"
+    fi 
+  done 
+  
+  if [ "${links}" == "TRUE" ] 
+  then 
+    count=1
+    origlist=${inplist}
+    inplist=''
+    for file in ${origlist} 
+    do 
+      ln -s ${file} infile${count}.lnk 
+      inplist="${inplist} infile${count}.lnk"
+      count=$((count+1))
+    done 
+    #Create output links 
+    ln -s ${outname} outfile.lnk
+    origoname=${outname}
+    outname=outfile.lnk
+  fi 
+
+  #Combine the catalogues into one 
+  _message "   > @BLU@Constructing patch-combined catalogue @DEF@${outname}@DEF@ "
+  @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacpaste \
+    -i ${inplist} \
+    -o ${outname} 2>&1 
+  _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
+
+  if [ "${links}" == "TRUE" ] 
+  then 
+    rm ${inplist} ${outname}
+    inplist=${origlist}
+    outname=${origoname}
+  fi 
+
+  #Add the new file to the datablock 
+  #Update datahead 
+  for _file in ${inplist}
+  do 
+    #Replace the first file with the output name, then clear the rest
+    _replace_datahead ${_file##*/} "${outname}"
+    outname=""
+  done 
 done 
 
 

@@ -27,7 +27,7 @@ except Exception:
   catalogue = ldac_cat['OBJECTS']
   e1=catalogue[args.e1name]
   e2=catalogue[args.e2name]
-  weight=catalogue[args.weightname]
+  weight=catalogue[args.wname]
 
 area=args.area
 

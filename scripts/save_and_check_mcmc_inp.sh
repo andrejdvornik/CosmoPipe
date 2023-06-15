@@ -3,7 +3,7 @@
 # File Name : save_and_check_mcmc_inp.sh
 # Created By : awright
 # Creation Date : 01-04-2023
-# Last Modified : Fri 05 May 2023 10:23:26 AM CEST
+# Last Modified : Thu 15 Jun 2023 11:22:43 AM CEST
 #
 #=========================================
 
@@ -21,10 +21,12 @@ fi
 cov="@DB:cosebis_cov@"
 cov=${cov##*/}
 cov=${cov//.ascii/.fits}
+
 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp.py \
   --datavector @DB:cosebis_vec@ \
   --nz @DB:nz@ \
   --nmaxcosebis @BV:NMAXCOSEBIS@ \
+  --ntomo @BV:NTOMO@ \
   --neff @DB:cosmosis_neff@ \
   --sigmae @DB:cosmosis_sigmae@ \
   --covariance @DB:cosebis_cov@ \
