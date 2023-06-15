@@ -58,7 +58,7 @@ function _inp_data {
 function _outputs { 
   #Data outputs (leave blank if none)
   outlist=''
-  for patch in @PATCHLIST@ @ALLPATCH@ 
+  for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
   do 
     outlist="${outlist} cosmosis_neff_${patch} cosmosis_sigmae_${patch} cosmosis_xipm_${patch}"
   done 
