@@ -65,9 +65,10 @@ then
 fi 
 _message "   >${RED} Creating Initial Directory structure ${DEF}"
 mkdir -p ${RUNROOT}/INSTALL 
-cd ${RUNROOT}/INSTALL
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
+
+cd ${RUNROOT}/INSTALL
 
 #Run Conda installation {{{
 _message "   >${RED} Installing Conda tools ${DEF}"
@@ -94,6 +95,15 @@ fi
 #cp ${PACKROOT}/environment.yml ${PACKROOT}/requirements.txt .
 cp ${PACKROOT}/environment.yml .
 #Install Conda
+nenv=`conda info --envs | grep "^cosmopipe " | wc -l`
+if [ ${nenv} -ne 0 ] 
+then 
+  _message " - ${RED} ERROR!\n\n"
+  _message "There is an existing conda environment that is called 'cosmopipe'!\n"
+  _message "You need to remove it first by running: ${DEF}\n"
+  _message "conda remove -n cosmopipe --all \n"
+  exit 1
+fi 
 conda env create --file environment.yml > conda_install_output.log 2>&1
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
@@ -128,7 +138,8 @@ if [ -d ${RUNROOT}/INSTALL/CosmoPowerCosmosis ]
 then 
   rm -fr CosmoPowerCosmosis
 fi
-git clone https://github.com/KiDS-WL/CosmoPowerCosmosis.git >> gitclone_output.log 2>&1
+#git clone https://github.com/KiDS-WL/CosmoPowerCosmosis.git >> gitclone_output.log 2>&1
+git clone git@github.com:KiDS-WL/CosmoPowerCosmosis.git >> gitclone_output.log 2>&1
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
 
@@ -149,9 +160,18 @@ then
   rm -f pipe_env.bash.${MACHINE}
 fi 
 #conda run -n cosmopipe bash install.sh -m ALL >> THELI_install.log 2>&1
-conda run -n cosmopipe make ldactools.make >> THELI_install.log 2>&1
+warn=FALSE
+echo "bash install.sh -m ALL || echo " > THELI_install.sh
+echo ". pipe_env.bash.${MACHINE}" >> THELI_install.sh
+echo "make ldactools.make" >> THELI_install.sh
+conda run -n cosmopipe bash THELI_install.sh || warn=TRUE >> THELI_install.log 2>&1
+if [ "${warn}" == "TRUE" ] 
+then 
+  _message "${BLU} - ${RED}WARNING!${BLU} Check if ldac tools installed correctly... ${DEF}\n"
+else 
+  _message "${BLU} - Done! ${DEF}\n"
+fi 
 cd ${RUNROOT}/INSTALL
-_message "${BLU} - Done! ${DEF}\n"
 #}}}
 
 #Install cosebis functions {{{
@@ -469,23 +489,26 @@ trap : 0
 _message "${BLU}=======================================${DEF}\n"
 _message "${BLU}==${RED}  Pipeline Installation Complete!  ${BLU}==${DEF}\n"
 _message "${BLU}=======================================${DEF}\n"
-#if [ ! -d ${COSMOFISHER} ]
-#then 
-#  _message "${RED}===============${DEF}    Covariance Warning!   ${BLU}==============\n"
-#  _message "${BLU}This pipeline requires the CosmoFischerForecast repository for computation of covariances.\n"
-#  _message "${BLU}This repository is unfortunately not public, and the \n"
-#  _message "${BLU}authors of this pipeline do not have authorisation to distribute it.\n"
-#  _message "${BLU}Therefore, if you would like to proceed with the use of CosmoPipe then\n"
-#  _message "${BLU}you can do one of two things: \n"
-#  _message "${BLU}   1)${RED} Request this repository directly${BLU} from \n"
-#  _message "${BLU}      Benjamin Joachimi (joachimi AT ucl.ac.uk) \n"
-#  _message "      NOTE:${RED} This may require increasing the value of ${DEF}#define nmaxline_surveywindow 10000 \n"
-#  _message "${BLU}            in psvareos/proc/thps_func.c \n"
-#  _message "${BLU}   2)${RED} Provide you\'re own covariance matrix to the pipeline.\n"
-#  _message "${BLU}However the latter may not be trivial, as the covariance matrix must be specified in the \n"
-#  _message "${BLU}same format as is expected of the outputs from CosmoFischerForecast... \n"
-#  _message "${BLU}   For more information, please contact the authors. \n"
-#  _message "${BLU}=======================================================\n${DEF}\n"
-#fi 
+_message "${BLU}CosmoPipe has been installed at the below path:${DEF}\n"
+_message "${DEF}${RUNROOT}${DEF}\n"
+_message "${BLU}In that directory, you will find: ${DEF}\n"
+_message "  - ${BLU}configure.sh (The pipeline configuration script)${DEF}\n"
+_message "  - ${BLU}variables.sh (The file contains compile-time variables)${DEF}\n"
+_message "    -> ${BLU}These variables cannot be edited after compilation.${DEF}\n"
+_message "  - ${BLU}defaults.sh (The file contains run-time variables)${DEF}\n"
+_message "    -> ${BLU}These variables can be assigned/modified as the pipeline runs, and so this file just${DEF}\n"
+_message "       ${BLU}contains the global default values that they are assigned during compilation. ${DEF}\n"
+_message "    -> ${BLU}Only run-time variables needed by your pipeline are important, and so the compilation${DEF}\n"
+_message "       ${BLU}will select the needed run-time variables and put them into a different bespoke file.${DEF}\n"
+_message "       ${BLU}So you can probably ignore this file for now.${DEF}\n"
+_message "  - ${BLU}pipeline.ini (The pipeline definition script)${DEF}\n\n"
+_message "${RED}To use CosmoPipe: ${DEF}\n"
+_message "  1) ${BLU}Go to the directory containing CosmoPipe (listed above)${DEF}\n"
+_message "  2) ${BLU}Check the ${DEF}variables.sh${BLU} file has all the variables correctly defined${DEF}\n"
+_message "    -> ${BLU}Of particular importance is the ${DEF}PIPELINE${BLU} variable, which tells${DEF}\n"
+_message "       ${BLU}CosmoPipe which pipeline in ${DEF}pipeline.ini${BLU} to construct!${DEF}\n"
+_message "  3) ${BLU}Check the ${DEF}pipeline.ini${BLU} file has your desired pipeline, and that the pipeline is correct${DEF}\n"
+_message "  4) ${BLU}Run the configuration: ${DEF}conda run -n cosmopipe bash configure.sh ${DEF}\n"
+_message "  5) ${BLU}Follow the configuration instructions! ${DEF}\n"
 #}}}
 
