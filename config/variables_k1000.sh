@@ -13,10 +13,10 @@
 #Paths and variables for configuration
 
 #Designation for "all patches"
-ALLPATCH=@ALLPATCH@
+ALLPATCH=NS
 
 #COSEBIs binning format; 'lin' or 'log'
-BINNING=@BINNING@
+BINNING='log'
 
 #String for selecting bins in the first split 
 BINSTRINGONE=@BINSTRINGONE@
@@ -24,7 +24,7 @@ BINSTRINGONE=@BINSTRINGONE@
 BINSTRINGTWO=@BINSTRINGTWO@
 
 #Blind identifier
-BLINDING=@BLINDING@
+BLINDING=blind${BLIND} #blind${BLIND} or UNBLINDED
 
 #Colours 
 RED='\033[0;31m' #Red 
@@ -32,95 +32,95 @@ BLU='\033[0;34m' #Blue
 DEF='\033[0m'    #Default
 
 #Date
-DATE=@DATE@
+DATE="`date`"
 
 #Datablock directory
-DATABLOCK=@DATABLOCK@
+DATABLOCK=CosmoPipe_DataBlock
 
 #Machine type 
-MACHINE=@MACHINE@
+MACHINE=Linux_64
 
 #Root directory for running pipeline
-RUNROOT=@RUNROOT@
+RUNROOT=/net/home/fohlen14/awright/KiDS/Legacy/CosmicShear/Asgari2021_ReRun/
 
 #Directory for runtime scripts (relative to RUNROOT)
-RUNTIME=@RUNTIME@
+RUNTIME=RUNTIME
 
 #Path to pipeline config files (relative to RUNTIME)
-CONFIGPATH=@CONFIGPATH@
+CONFIGPATH=${RUNTIME}/config
 
 #Path for modified scripts (relative to RUNTIME)
-SCRIPTPATH=@SCRIPTPATH@
+SCRIPTPATH=${RUNTIME}/scripts
 
 #Path for logfiles (relative to RUNTIME)
-LOGPATH=@LOGPATH@
+LOGPATH=${RUNTIME}/logs
 
 #Path for manual files (relative to RUNTIME)
-MANUALPATH=@MANUALPATH@
+MANUALPATH=${RUNTIME}/man
 
 #Path for outputs (relative to RUNROOT)
-STORAGEPATH=@STORAGEPATH@
+STORAGEPATH=work/
 
 #Nz file suffix
-NZFILESUFFIX=@NZFILESUFFIX@
+NZFILESUFFIX=_Nz.fits
 
 #List of m-bias values
-MBIASVALUES=@MBIASVALUES@
+MBIASVALUES="-0.0128 -0.0104 -0.0114 +0.0072 +0.0061"
 #List of m-bias  errors 
-MBIASERRORS=@MBIASERRORS@
+MBIASERRORS="0.02 0.02 0.02 0.02 0.02"
 
 #Correlation in m-biases 
-MBIASCORR=@MBIASCORR@
+MBIASCORR=0.99
 
 #Path to Patchwise Catalogues
-PATCHPATH=@PATCHPATH@
+PATCHPATH=/net/home/fohlen11/awright/KiDS/DR4/LF321/patch/
 #String containing all patch designations 
-PATCHLIST=@PATCHLIST@
+PATCHLIST="N S"
 
 #Path to Rscript binary 
-P_RSCRIPT=@P_RSCRIPT@
+P_RSCRIPT=`which Rscript`
 
 #Path to python binary folder
-PYTHON3BIN=@PYTHON3BIN@
+PYTHON3BIN=`which python3`
 
 #Define inplace sed command (different on OSX)
 #P_SED_INPLACE='sed -i "" ' #Darwin
 P_SED_INPLACE='sed -i ' #Linux 
 
 #Root directory for pipeline scripts
-PACKROOT=@PACKROOT@
+PACKROOT=/net/home/fohlen11/awright/src/CosmoPipe
 
 #Pipeline that you wish to run
-PIPELINE=@PIPELINE@
+PIPELINE=AsgariRerun
 
 #Spectroscopic catalogue for SOM Nz Calibration 
-#SPECZCAT=@#SPECZCAT@
-SPECZCAT=@SPECZCAT@
+#SPECZCAT=/net/home/fohlen11/awright/KiDS/DIR/Iteration3/KiDS_2018-07-26_deepspecz_photoz_10th_BLIND_specweight_1000_4.cat
+SPECZCAT=/net/home/fohlen13/mahony/blue_only_cosmic_shear/blue_only/CosmoWrapper_Inputs/KiDS_specz_PAUS_COSMOS2015.fits
 
 #COSEBIs covariance (pre-existing, used if requested)
-COSEBICOVFILE=@COSEBICOVFILE@
+COSEBICOVFILE=/net/home/fohlen13/stoelzner/kids1000_chains/covariance/outputs/Covariance_blindC_nMaximum_20_0.50_300.00_nBins5.ascii
 
 #COSEBIs Data Vector (pre-existing, used if requested)
-COSEBIDATAVEC=@COSEBIDATAVEC@
+COSEBIDATAVEC=/net/home/fohlen13/stoelzner/
 
 #List of input Neff values (pre-existing, used if requested)
-NEFFLIST=@NEFFLIST@
+NEFFLIST="0.55272908 1.06005607 1.66264919 1.12917259 1.17551537"
 
 #List of input sigma_e values (pre-existing, used if requested)
-SIGMAELIST=@SIGMAELIST@
+SIGMAELIST=" "
 
 #Survey ID  
-SURVEY=@SURVEY@
+SURVEY=KiDS_1000_LF321
 
 #Survey Area in arcmin
-SURVEYAREA=@SURVEYAREA@
-SURVEYAREADEG=@SURVEYAREADEG@
+SURVEYAREA=3.12120e+06
+SURVEYAREADEG=867.0
 
 #Username 
-USER=@USER@
+USER=`whoami`
 
 #Super Sample Covariance Matrix: Matrix elements 
-SSCMATRIX=@SSCMATRIX@
+SSCMATRIX=${RUNROOT}/${CONFIGPATH}/cosebis/thps_cov_kids1000_apr5_cl_obs_source_matrix.dat
 #Super Sample Covariance Matrix: ell bins 
-SSCELLVEC=@SSCELLVEC@
+SSCELLVEC=${RUNROOT}/${CONFIGPATH}/cosebis/input_nonGaussian_ell_vec.ascii
 
