@@ -3,7 +3,7 @@
 # File Name : make_data_vector.sh
 # Created By : awright
 # Creation Date : 01-04-2023
-# Last Modified : Thu 15 Jun 2023 11:24:10 AM CEST
+# Last Modified : Mon 19 Jun 2023 08:31:03 PM CEST
 #
 #=========================================
 
@@ -12,12 +12,14 @@ inputs="@DB:cosebis@"
 #Input mbias files 
 mfiles="@DB:mbias@"
 
-for patch in @PATCHLIST@ @ALLPATCH@
+for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
 do 
+  #Remove the 'comb' if needed 
+  patchuse=${patch%comb}
   #Get the input files for this patch (there should be NTOMO catalogues)
   filelist=`echo ${inputs} | sed 's/ /\n/g' | grep "_${patch}_" || echo `
   #Get the m-bias file for this patch (there should be one, with NTOMO entries)
-  biaslist=`echo ${mfiles} | sed 's/ /\n/g' | grep "_${patch}_" | grep "_biases" || echo `
+  biaslist=`echo ${mfiles} | sed 's/ /\n/g' | grep "_${patchuse}_" | grep "_biases" || echo `
 
   #Check if there are any matching files {{{
   if [ "${filelist}" == "" ] 
