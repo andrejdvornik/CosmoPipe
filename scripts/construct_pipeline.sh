@@ -5,6 +5,29 @@
 set -e 
 #set -x 
 
+#Read command line options  {{{
+resume="FALSE"
+while [ $# -gt 0 ] 
+do 
+  case $1 in 
+    "--resume") 
+      resume="TRUE" 
+      shift
+      ;; 
+    *)
+      if [ -f $1 ] 
+      then 
+        pipeline_file=$1
+        shift 
+      else 
+        echo "Unknown command line option: $1"
+        exit 1
+      fi 
+      ;; 
+  esac
+done 
+#}}}
+
 #Source the Script Documentation Functions {{{
 source @RUNROOT@/@MANUALPATH@/CosmoPipe.man.sh
 _initialise
@@ -137,21 +160,79 @@ fi
 #}}}
 allneeds=''
 allneeds_def=''
+echo  > @RUNROOT@/@PIPELINE@_links.R
+currstep=0
+currsubstep=0
 #For each step in the pipeline: 
 for step in ${pipeline_steps}
 do 
   #Strip out the version number 
+  stepnum=${step##*=}            #Strip out numbers 
+  stepnum=${stepnum%%.*}         #Get the first number 
+  substepnum=${step##*=}         #Strip out the numbers 
+  substepnum=${substepnum#*.}    #Remove the first number 
+  if [[ "${substepnum}" =~ .*".".* ]]
+  then 
+    substepnum=${substepnum%%.*}
+  else 
+    substepnum=0
+  fi 
+  #If we have a numbered step {{{
+  if [ "${stepnum}" != "_" ] 
+  then 
+    #Is this part of a new step? {{{
+    if [ ${stepnum} -gt ${currstep} ]
+    then 
+      #If not the first substep: 
+      if [ ${currsubstep} -gt 0 ] 
+      then 
+        #Close the last substep 
+        echo "end" >> @RUNROOT@/@PIPELINE@_links.R
+      fi 
+      currsubstep=0
+      #If not the first step: 
+      if [ ${currstep} -gt 0 ] 
+      then 
+        #Close the last step 
+        echo "end" >> @RUNROOT@/@PIPELINE@_links.R
+      fi 
+      #Open the new step: 
+      echo "subgraph Step ${stepnum}" >> @RUNROOT@/@PIPELINE@_links.R
+      currstep=${stepnum}
+    fi 
+    #}}}
+    #Is this part of a new substep? {{{
+    if [ ${substepnum} -gt ${currsubstep} ]
+    then 
+      #If not the first substep: 
+      if [ ${currsubstep} -gt 0 ] 
+      then 
+        #Close the last step 
+        echo "end" >> @RUNROOT@/@PIPELINE@_links.R
+      fi 
+      #Open the new step: 
+      echo "subgraph Sub-Step ${stepnum}.${substepnum}" >> @RUNROOT@/@PIPELINE@_links.R
+      currsubstep=${substepnum}
+    fi 
+    #}}}
+  fi 
+  #}}}
+
   step=${step%=*}
   #If the step is a HEAD update 
   if [ "${step:0:1}" == "@" ]
   then 
     #Modify the HEAD to the request value {{{
     _write_datahead "${step:1}" "_validitytest_"
+    #Set the "laststep" to be this block element
+    laststep=${step:1}
     #}}}
   elif [ "${step:0:1}" == "!" ]
   then 
     #Modify the datablock with the current HEAD {{{
 		_write_datablock ${step:1} "`_read_datahead`"
+    #Write the link between the previous processing function and this block element
+    echo "${laststep} -.-> ${step:1}(${step:1})" >> @RUNROOT@/@PIPELINE@_links.R
     #}}}
   elif [ "${step:0:1}" == "%" ]
   then 
@@ -160,6 +241,9 @@ do
     oldname=${names%%-*}
     newname=${names##*-}
 		_rename_blockitem "${oldname}" "${newname}" TEST
+    #Rewrite all instances of oldname(oldname) in the links file to newname(newname)
+    cat @RUNROOT@/@PIPELINE@_links.R | sed "s/${oldname}(${oldname})/${newname}(${newname})/g" > @RUNROOT@/@PIPELINE@_links.R.tmp
+    mv @RUNROOT@/@PIPELINE@_links.R.tmp @RUNROOT@/@PIPELINE@_links.R
     #}}}
   elif [ "${step:0:1}" == "~" ]
   then 
@@ -240,31 +324,47 @@ do
     inputs=`_inp_data`
     outputs=`_outputs`
     #}}}
-    #Check the data block for these inputs {{{
+    #Check the data block for these inputs & add graph entries {{{
+    nstep=`grep -c ${step} @RUNROOT@/@PIPELINE@_links.R || echo`
     for inp in $inputs
     do 
-      #If not in the data block 
+      #Add to the graph {{{
+      if [ "${inp}" != "DATAHEAD" ] && [ "${inp}" != "ALLHEAD" ]
+      then 
+        #Add link to the requested blockentry {{{
+        echo "${inp}(${inp}) --> ${step}_${nstep}[${step}]" >> @RUNROOT@/@PIPELINE@_links.R
+        #}}}
+      else 
+        #Add link to current datahead blockentry or the last processing function {{{
+        echo "${laststep} --> ${step}_${nstep}[${step}]" >> @RUNROOT@/@PIPELINE@_links.R
+        #}}}
+      fi 
+      #}}}
+      #If not in the data block {{{
       if [ "$(_inblock $inp)" == "0" ] 
       then 
         if [ "${inp}" == "ALLHEAD" ]
         then 
-          #Warn 
+          #Warn {{{
           _message "${RED}(WARNING)${DEF} "
           if [ "${warnings}" == "" ] 
           then 
-            warnings="${RED}    WARNINGS:${DEF}\n- ${RED}ALLHEAD${BLU} was requested at a step where no ${RED}DATAHEAD${BLU} was currently assigned. This could be a quirk of the pipeline check.${DEF}\n"
+            warnings="${RED}    WARNINGS:${DEF}\n     - ${RED}ALLHEAD${BLU} was requested at a step where no ${RED}DATAHEAD${BLU} was currently assigned. This could be a quirk of the pipeline check.${DEF}\n"
           else 
-            warnings="${warnings}    - ${RED}ALLHEAD${BLU} was requested at a step where no ${RED}DATAHEAD${BLU} was currently assigned. This could be a quirk of the pipeline check.${DEF}\n"
+            warnings="${warnings}     - ${RED}ALLHEAD${BLU} was requested at a step where no ${RED}DATAHEAD${BLU} was currently assigned. This could be a quirk of the pipeline check.${DEF}\n"
           fi 
+          #}}}
         else 
-          #Error 
+          #Error {{{
           _message " - ERROR!\n\n"
           _message "   ${RED}ERROR: ${BLU}Input ${DEF}${inp}${BLU} does not exist in the data-block when needed for step ${DEF}${step}${BLU}!${DEF}\n" 
           _message "                ${BLU}`_read_datablock`\n"
           _message "   ${RED}       Pipeline is invalid!${DEF}\n" 
           exit 1 
+          #}}}
         fi 
       fi 
+      #}}}
     done 
     #}}}
     #Save these outputs to the data block  {{{
@@ -273,16 +373,73 @@ do
       if [ "${out}" != "DATAHEAD" ] && [ "${out}" != "ALLHEAD" ]
       then 
         _write_datablock $out "_validitytest_"
+        echo "${step}_${nstep}[${step}] --> ${out}(${out})" >> @RUNROOT@/@PIPELINE@_links.R
+      else 
+        laststep="${step}_${nstep}[${step}]"
       fi 
     done 
     datablock=`_read_datablock`
     #}}}
   fi 
 done
-#Reset the documentation functions 
+#Close the last subgraph {{{
+echo "end" >> @RUNROOT@/@PIPELINE@_links.R
+#}}}
+#Remove unused patch-wise assignments from graph (assuming they are dummies) {{{
+skip=''
+for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+do 
+  #Get all entries matching this patch {{{
+  patch_links=`awk -F\> '{print $NF}' @RUNROOT@/@PIPELINE@_links.R | grep "_${patch})$" || echo`
+  #}}}
+  #Loop through the patchlinks {{{
+  for link in ${patch_links}
+  do 
+    #Item name {{{
+    name=${link%%(*}
+    #}}}
+    #Check if there is a starting use of this product {{{
+    nstart=`awk -F\> '{print $1}' @RUNROOT@/@PIPELINE@_links.R | grep -c "^${name}[ (]" || echo `
+    #}}}
+    #If not, add it to the removal list {{{
+    if [ ${nstart} -eq 0 ] 
+    then 
+      if [ "${skip}" == "" ] 
+      then 
+        skip="${name}(${name})$"
+      else 
+        skip="${skip}\|${name}(${name})"
+      fi 
+    fi 
+    #}}}
+  done 
+  #}}}
+done 
+#Remove skipped entries {{{
+if [ "${skip}" != "" ]
+then 
+  grep -v "${skip}" @RUNROOT@/@PIPELINE@_links.R > @RUNROOT@/@PIPELINE@_links.R.tmp
+  mv @RUNROOT@/@PIPELINE@_links.R.tmp @RUNROOT@/@PIPELINE@_links.R
+fi 
+#}}}
+#}}}
+#Add graph colouring {{{ 
+assignments=`awk -F\> '{print $NF}' @RUNROOT@/@PIPELINE@_links.R | grep ")$" | awk -F\( '{printf $1 " "}' || echo`
+assignments=`echo ${assignments}`
+echo  "classDef green fill:#9f6,stroke:#333,stroke-width:2px;" >> @RUNROOT@/@PIPELINE@_links.R
+echo "class ${assignments// /,} green" >> @RUNROOT@/@PIPELINE@_links.R
+#}}}
+#Finalise the graph file {{{
+cat @RUNROOT@/@SCRIPTPATH@/graph_base.R @RUNROOT@/@PIPELINE@_links.R > @RUNROOT@/@PIPELINE@_graph.R
+echo '")' >> @RUNROOT@/@PIPELINE@_graph.R 
+#}}}
+
+#Reset the documentation functions {{{
 VERBOSE=0 _initialise
-#Remove the test block 
+#}}}
+#Remove the test block {{{
 rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+#}}}
 #Remove empty datablock directories {{{
 for item in `ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/`
 do 
@@ -309,18 +466,19 @@ fi
 #Prompt the user about missing default variables, if needed {{{
 if [ "${allneeds}" != "" ]
 then 
-  allneeds=`echo ${allneeds} | sed 's/ /\n/g' | sort | uniq | sed 's/\n/ /g'`
+  allneeds=`echo ${allneeds} | sed 's/ /\n/g' | sort | uniq | awk '{printf $0 " "}'`
+  allneeds_def=`echo ${allneeds_def} | sed 's/ /\n/g' | sort | uniq | awk '{printf $0 " "}'`
   if [ "${warnings}" == "" ] 
   then 
-    warnings="${RED}     WARNINGS:${DEF}\n    ${BLU}The pipeline used the following undeclared runtime variables:${DEF}\n    ${allneeds}\n"
+    warnings="${RED}     WARNINGS:${DEF}\n     ${BLU}The pipeline used the following undeclared runtime variables:${DEF}\n     ${allneeds}\n"
   else 
-    warnings="${warnings}    ${BLU}The pipeline used the following undeclared runtime variables:${DEF}\n    ${allneeds}\n"
+    warnings="${warnings}     ${BLU}The pipeline used the following undeclared runtime variables:${DEF}\n     ${allneeds}\n"
   fi 
   if [ "${allneeds_def}" != "" ]
   then 
-    warnings="${warnings}    ${BLU}Of these variables, the following ${RED}have no default value assigned${BLU}:\n   ${DEF}${allneeds_def}\n    ${BLU}You need to update those variables in the ${DEF}@PIPELINE@_defaults.sh${BLU} file!\n"
+    warnings="${warnings}     ${BLU}Of these variables, the following ${RED}have no default value assigned${BLU}:\n     ${DEF}${allneeds_def}\n     ${BLU}You need to update those variables in the ${DEF}@PIPELINE@_defaults.sh${BLU} file!\n"
   else 
-    warnings="${warnings} ${RED}    !BUT!${DEF} - ${BLU}all of them were assigned defaults in the ${DEF}@PIPELINE@_defaults.sh${BLU} file.\n    No action is required!\n"
+    warnings="${warnings} ${RED}     !BUT!${DEF} - ${BLU}all of them were assigned defaults in the ${DEF}@PIPELINE@_defaults.sh${BLU} file.\n     No action is required!\n"
   fi 
 fi 
 #}}}
@@ -502,7 +660,7 @@ cat @RUNROOT@/@SCRIPTPATH@/pipeline_close.sh >> @RUNROOT@/@PIPELINE@_pipeline.sh
 #If there are warnings, print them: 
 if [ "${warnings}" != "" ] 
 then 
-  _message "${DEF} {\n${warnings}${DEF}    }${DEF}"
+  _message "${DEF} {\n${warnings}${DEF}   }${DEF}"
 fi 
 
 #End
