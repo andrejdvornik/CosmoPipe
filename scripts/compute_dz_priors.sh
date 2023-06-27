@@ -3,7 +3,7 @@
 # File Name : compute_m_bias.sh
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Thu 08 Jun 2023 10:02:31 PM CEST
+# Last Modified : Mon 26 Jun 2023 11:02:49 AM CEST
 #
 #=========================================
 
@@ -42,6 +42,7 @@ done
 @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/compute_dz_priors.R -c ${calib_cats} -r ${refr_cats} \
   --binstrings ${binstrings} \
   -w @BV:WEIGHTNAME@ \
+  --sys-error @BV:NZSYSERROR@ \
   -g "SOMweight" \
   -z @BV:ZSPECNAME@ \
   --biasout @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzbias/Nz_biases.txt \

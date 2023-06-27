@@ -3,7 +3,7 @@
 # File Name : computs_dz_priors.R
 # Created By : awright
 # Creation Date : 29-03-2023
-# Last Modified : Tue 13 Jun 2023 10:09:08 PM CEST
+# Last Modified : Tue 27 Jun 2023 10:50:15 AM CEST
 #
 #=========================================
 
@@ -55,6 +55,15 @@ while (length(inputs)!=0) {
     #Define the output biases filename /*fold*/ {{{
     inputs<-inputs[-1]
     bias_oname<-inputs[1]
+    inputs<-inputs[-1]
+    #/*fold*/}}}
+  } else if (inputs[1]=='--syserr') { 
+    #Define the Systematic contribution to the covariance /*fold*/ {{{
+    inputs<-inputs[-1]
+    sys_error<-as.numeric(inputs[1])
+    if (is.na(sys_error)) stop("Systematic error contribution cannot be NA")
+    if (!is.finite(sys_error)) stop("Systematic error contribution cannot be non-finite")
+    if (sys_error<0) stop("Systematic error contribution cannot be negative")
     inputs<-inputs[-1]
     #/*fold*/}}}
   } else if (inputs[1]=='--covout') { 
@@ -142,7 +151,21 @@ close(pb)
 #Compute the mean biases per bin 
 final_biases<-colMeans(bias)
 #Compute the Nz bias covariance  
-final_cov<-cov(bias)
+if (sys_error!=0) { 
+  #if needed, include systematic component 
+  final_cov<-orig_cov<-cov(bias)
+  diag(final_cov)<-diag(final_cov)+sys_error^2
+  orig_cor<-cov2cor(orig_cov)
+  for (i in 1:ncol(orig_cov)) {
+    for (j in 1:nrow(orig_cov)) {
+      if (i != j) {
+        final_cov[i,j]<-(diag(final_cov)[i]+sys_error)*(diag(final_cov)[j]+sys_error)*orig_cor[i,j]
+      }
+    }
+  }
+} else { 
+  final_cov<-orig_cov
+} 
 #Output the bias file 
 helpRfuncs::write.file(bias_oname,final_biases,col.names=FALSE)
 #Output the cov file 
