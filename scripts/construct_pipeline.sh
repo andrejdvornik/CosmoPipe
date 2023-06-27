@@ -43,7 +43,7 @@ blockneeds=`_varcheck $0`
 
 #Read the pipeline description file {{{
 pipeline_steps=`_read_pipe @PIPELINE@`
-#>&2 echo ${pipeline_steps}
+echo ${pipeline_steps}
 count=0
 #If there are any substeps 
 while [[ " ${pipeline_steps} " =~ " ." ]]
@@ -68,9 +68,9 @@ do
   #If count > 100: there is something wrong 
   if [ $count -gt 100 ] 
   then 
-    _message " -ERROR! Something has gone wrong with the pipeline step determination...\n"
-    _message " Current pipeline step list is:\n"
-    _message " ${pipeline_steps}"
+    VERBOSE=1 _message " -ERROR! Something has gone wrong with the pipeline step determination...\n"
+    VERBOSE=1 _message " Current pipeline step list is:\n"
+    VERBOSE=1 _message " ${pipeline_steps}"
     exit 1
   fi 
 done
@@ -106,16 +106,16 @@ then
   if [ "${_err}" == "1" ]
   then 
     #If there was only one missing file 
-    _message "${RED} - ERROR${DEF}\n\n"
-    _message "   ${RED}ERROR: script ${missing} does not exist in the script path!${DEF}\n"
-    _message "   ${BLU}       it is either misspelled in the pipeline.ini file, or does not exist yet!${DEF}\n"
+    VERBOSE=1 _message "${RED} - ERROR${DEF}\n\n"
+    VERBOSE=1 _message "   ${RED}ERROR: script ${missing} does not exist in the script path!${DEF}\n"
+    VERBOSE=1 _message "   ${BLU}       it is either misspelled in the pipeline.ini file, or does not exist yet!${DEF}\n"
     exit 1
   else 
     #If there was many missing files 
-    _message "${RED} - ERROR${DEF}\n\n"
-    _message "${RED}ERROR: the following ${_err} scripts do not exist in the script path!${DEF}\n"
-    _message "${missing}\n"
-    _message "${BLU}They are either misspelled in the pipeline.ini file, or does not exist yet!${DEF}\n"
+    VERBOSE=1 _message "${RED} - ERROR${DEF}\n\n"
+    VERBOSE=1 _message "${RED}ERROR: the following ${_err} scripts do not exist in the script path!${DEF}\n"
+    VERBOSE=1 _message "${missing}\n"
+    VERBOSE=1 _message "${BLU}They are either misspelled in the pipeline.ini file, or does not exist yet!${DEF}\n"
     exit 1
   fi 
 fi 
@@ -166,6 +166,7 @@ currsubstep=0
 #For each step in the pipeline: 
 for step in ${pipeline_steps}
 do 
+  echo ${step}
   #Strip out the version number 
   stepnum=${step##*=}            #Strip out numbers 
   stepnum=${stepnum%%.*}         #Get the first number 
@@ -216,12 +217,14 @@ do
     fi 
     #}}}
   fi 
+  echo links: subgraph specified
   #}}}
 
   step=${step%=*}
   #If the step is a HEAD update 
   if [ "${step:0:1}" == "@" ]
   then 
+    echo HEAD assignment: writing ${step:1} to datahead 
     #Modify the HEAD to the request value {{{
     _write_datahead "${step:1}" "_validitytest_"
     #Set the "laststep" to be this block element
@@ -229,6 +232,7 @@ do
     #}}}
   elif [ "${step:0:1}" == "!" ]
   then 
+    echo BLOCK assignment: writing datahead to ${step:1} 
     #Modify the datablock with the current HEAD {{{
 		_write_datablock ${step:1} "`_read_datahead`"
     #Write the link between the previous processing function and this block element
@@ -240,6 +244,7 @@ do
     names=${step:1}
     oldname=${names%%-*}
     newname=${names##*-}
+    echo BLOCK rename: moving ${oldname} to ${newname}
 		_rename_blockitem "${oldname}" "${newname}" TEST
     #Rewrite all instances of oldname(oldname) in the links file to newname(newname)
     cat @RUNROOT@/@PIPELINE@_links.R | sed "s/${oldname}(${oldname})/${newname}(${newname})/g" > @RUNROOT@/@PIPELINE@_links.R.tmp
@@ -256,19 +261,22 @@ do
   elif [ "${step:0:1}" == "+" ]
   then 
     #Add the new variable to the datablock {{{
+    echo Variable assignment: ${step:1}
     _write_blockvars ${step:1} "_validitytest_"
     #}}}
   else 
     #Check for the manual file  {{{
+    echo Script: ${step}
     if [ ! -f @RUNROOT@/@MANUALPATH@/${step}.man.sh ]
     then 
       #If not found, error 
-      _message "${RED} - ERROR${DEF}\n\n"
-      _message "${RED}ERROR: the manual files for the following script are not available!\n   ${step}.sh!${DEF}\n"
+      VERBOSE=1 _message "${RED} - ERROR${DEF}\n\n"
+      VERBOSE=1 _message "${RED}ERROR: the manual files for the following script are not available!\n   ${step}.sh!${DEF}\n"
       exit 1
     fi
     #}}}
     #Source the step documentation {{{
+    echo Source documentation: ${step}.man.sh
     source @RUNROOT@/@MANUALPATH@/${step}.man.sh 
     #}}}
     #Perform the variable check {{{
@@ -319,6 +327,7 @@ do
       #sort @PIPELINE@_defaults.sh | uniq > @PIPELINE@_defaults_uniq.sh
       #mv @PIPELINE@_defaults_uniq.sh @PIPELINE@_defaults.sh
     fi 
+    echo Completed Block-needs runtime variable check.
     #}}}
     #Check inputs and outputs {{{
     inputs=`_inp_data`
@@ -326,8 +335,10 @@ do
     #}}}
     #Check the data block for these inputs & add graph entries {{{
     nstep=`grep -c ${step} @RUNROOT@/@PIPELINE@_links.R || echo`
+    echo Checking inputs 
     for inp in $inputs
     do 
+      echo -n "  ${inp} "
       #Add to the graph {{{
       if [ "${inp}" != "DATAHEAD" ] && [ "${inp}" != "ALLHEAD" ]
       then 
@@ -341,12 +352,14 @@ do
       fi 
       #}}}
       #If not in the data block {{{
+      echo "$(_inblock $inp)" || echo "FAILED BLOCKCHECK" 
       if [ "$(_inblock $inp)" == "0" ] 
       then 
         if [ "${inp}" == "ALLHEAD" ]
         then 
+          echo "warning message"
           #Warn {{{
-          _message "${RED}(WARNING)${DEF} "
+          VERBOSE=1 _message "${RED}(WARNING)${DEF} "
           if [ "${warnings}" == "" ] 
           then 
             warnings="${RED}    WARNINGS:${DEF}\n     - ${RED}ALLHEAD${BLU} was requested at a step where no ${RED}DATAHEAD${BLU} was currently assigned. This could be a quirk of the pipeline check.${DEF}\n"
@@ -355,11 +368,13 @@ do
           fi 
           #}}}
         else 
+          echo "Error message"
           #Error {{{
-          _message " - ERROR!\n\n"
-          _message "   ${RED}ERROR: ${BLU}Input ${DEF}${inp}${BLU} does not exist in the data-block when needed for step ${DEF}${step}${BLU}!${DEF}\n" 
-          _message "                ${BLU}`_read_datablock`\n"
-          _message "   ${RED}       Pipeline is invalid!${DEF}\n" 
+          VERBOSE=1 _message " - ERROR!\n\n"
+          VERBOSE=1 _message "   ${RED}ERROR: ${BLU}Input ${DEF}${inp}${BLU} does not exist in the data-block when needed for step ${DEF}${step}${BLU}!${DEF}\n" 
+          VERBOSE=1 _message "   ${RED}       ${BLU}Check the ${DEF}@PIPELINE@_pipeline.log${BLU} file for details of the construction.\n" 
+          echo "`_read_datablock`"
+          VERBOSE=1 _message "   ${RED}       Pipeline is invalid!${DEF}\n" 
           exit 1 
           #}}}
         fi 
@@ -368,6 +383,7 @@ do
     done 
     #}}}
     #Save these outputs to the data block  {{{
+    echo Checking outputs 
     for out in $outputs
     do 
       if [ "${out}" != "DATAHEAD" ] && [ "${out}" != "ALLHEAD" ]
@@ -382,6 +398,7 @@ do
     #}}}
   fi 
 done
+echo Done: Pipeline check complete 
 #Close the last subgraph {{{
 echo "end" >> @RUNROOT@/@PIPELINE@_links.R
 #}}}
@@ -580,7 +597,7 @@ do
     #}}}
   elif [ "${step:0:1}" == "+" ]
   then 
-    #>&2 echo "ASSIGNMENT TIME: ${step}"
+    echo "ASSIGNMENT TIME: ${step}"
     #If this is a blockvariable assignment: {{{
     _var=${step:1}
     _varval=${_var#*=}
@@ -660,7 +677,7 @@ cat @RUNROOT@/@SCRIPTPATH@/pipeline_close.sh >> @RUNROOT@/@PIPELINE@_pipeline.sh
 #If there are warnings, print them: 
 if [ "${warnings}" != "" ] 
 then 
-  _message "${DEF} {\n${warnings}${DEF}   }${DEF}"
+  VERBOSE=1 _message "${DEF} {\n${warnings}${DEF}   }${DEF}"
 fi 
 
 #End
