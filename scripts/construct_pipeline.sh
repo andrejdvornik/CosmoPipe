@@ -12,6 +12,7 @@ do
   case $1 in 
     "--resume") 
       resume="TRUE" 
+      echo "Resuming pipeline from requested location!"
       shift
       ;; 
     *)
@@ -52,6 +53,18 @@ do
   #Loop through the steps
   for step in ${pipeline_steps}
   do 
+    #Check if we are running a 'resume' {{{
+    if [ "${resume}" == "TRUE" ] 
+    then 
+      #If so, did we find 'RESUME' 
+      if [ "${step}" == "RESUME" ] 
+      then 
+        echo "skipping over RESUME item"
+        #If so, continue 
+        continue
+      fi 
+    fi
+    #}}}
     #Strip out the step number {{{
     stepnum=${step##*=}
     step=${step%=*}
@@ -59,10 +72,12 @@ do
     #If the step is a substep
     if [ "${step:0:1}" == "." ]
     then 
+      echo "Getting substeps for step: ${step}"
       #Read the substep modes 
       sublist=`_read_pipe $step ${stepnum}` 
       #Replace the substep (whole matches only)
       pipeline_steps=`echo " $pipeline_steps " | sed "s/ $step=${stepnum} / $sublist /" | xargs echo `
+      echo "  -> ${sublist}"
     fi 
   done 
   #If count > 100: there is something wrong 
@@ -80,6 +95,19 @@ done
 _err=0
 for step in ${pipeline_steps}
 do 
+  echo "Checking scripts for step ${step}"
+  #Check if we are running a 'resume' {{{
+  if [ "${resume}" == "TRUE" ] 
+  then 
+    #If so, did we find 'RESUME' 
+    if [ "${step}" == "RESUME" ] 
+    then 
+      echo "  -> Skipping RESUME item"
+      #If so, continue 
+      continue
+    fi 
+  fi
+  #}}}
   #Strip out the version number 
   step=${step%=*}
   #If the step is not a HEAD or VARS change
@@ -97,7 +125,10 @@ do
         missing="${missing}\n${step}.sh"
       fi 
       _err=$((_err+1))
+      echo "  -> Script ${step}.sh not found!"
     fi 
+  else 
+    echo "  -> this is not a script step! Continuing..."
   fi
 done 
 #If there was an error, prompt and stop 
@@ -158,16 +189,31 @@ then
   _add_default_vars
 fi 
 #}}}
+#Initialise variables {{{
 allneeds=''
 allneeds_def=''
 echo  > @RUNROOT@/@PIPELINE@_links.R
 currstep=0
 currsubstep=0
+found_resume="FALSE"
+#}}}
 #For each step in the pipeline: 
 for step in ${pipeline_steps}
 do 
   echo ${step}
-  #Strip out the version number 
+  #Check if we are running a 'resume' {{{
+  if [ "${resume}" == "TRUE" ] 
+  then 
+    #If so, did we find 'RESUME' 
+    if [ "${step}" == "RESUME" ] 
+    then 
+      #If so, document and continue 
+      found_resume='TRUE'
+      continue
+    fi 
+  fi
+  #}}}
+  #Strip out the version number {{{
   stepnum=${step##*=}            #Strip out numbers 
   stepnum=${stepnum%%.*}         #Get the first number 
   substepnum=${step##*=}         #Strip out the numbers 
@@ -178,6 +224,7 @@ do
   else 
     substepnum=0
   fi 
+  #}}}
   #If we have a numbered step {{{
   if [ "${stepnum}" != "_" ] 
   then 
@@ -229,6 +276,11 @@ do
     _write_datahead "${step:1}" "_validitytest_"
     #Set the "laststep" to be this block element
     laststep=${step:1}
+    #If resuming and haven't found the "RESUME" entry, save this assignment
+    if [ "${resume}" == "TRUE" ] && [ "${found_resume}" == "FALSE" ]
+    then 
+      lastassign=${step:1}
+    fi 
     #}}}
   elif [ "${step:0:1}" == "!" ]
   then 
@@ -399,6 +451,7 @@ do
   fi 
 done
 echo Done: Pipeline check complete 
+#Final Graph edits {{{
 #Close the last subgraph {{{
 echo "end" >> @RUNROOT@/@PIPELINE@_links.R
 #}}}
@@ -449,6 +502,7 @@ echo "class ${assignments// /,} green" >> @RUNROOT@/@PIPELINE@_links.R
 #Finalise the graph file {{{
 cat @RUNROOT@/@SCRIPTPATH@/graph_base.R @RUNROOT@/@PIPELINE@_links.R > @RUNROOT@/@PIPELINE@_graph.R
 echo '")' >> @RUNROOT@/@PIPELINE@_graph.R 
+#}}}
 #}}}
 
 #Reset the documentation functions {{{
@@ -514,9 +568,48 @@ _add_default_vars
 EOF
 #}}}
 
+#Check if we are running a 'resume' {{{
+if [ "${resume}" == "TRUE" ] 
+then 
+  #Start by performing the last assignment before the resume {{{
+  cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
+	
+	#Modify the HEAD to the request value
+	#Intermediate Step: write block item ${lastassign} to current DATAHEAD {{{
+	#Notify
+	_message "@BLU@Copying requested elements of ${lastassign} to DATAHEAD @DEF@ {\n"
+	#Modify the current HEAD to requested block element
+	_add_datahead "${lastassign}"
+	#Notify
+	_message "} - @RED@Done!@DEF@\n"
+	#}}}
+
+
+	EOF
+  #}}}
+fi
+#}}}
+
 #For each step in the pipeline {{{
+found_resume="FALSE"
 for step in ${pipeline_steps}
 do 
+  #Check if we are running a 'resume' {{{
+  if [ "${resume}" == "TRUE" ] 
+  then 
+    #If so, did we find 'RESUME' 
+    if [ "${step}" == "RESUME" ] 
+    then 
+      #If so, document and continue 
+      found_resume='TRUE'
+      continue
+    elif [ "${found_resume}" == "FALSE" ] && [ "${step:0:1}" != "+" ]
+    then 
+      echo "RESUME means that we skip step: ${step}" 
+      continue 
+    fi 
+  fi
+  #}}}
   #Strip out the version number {{{
   stepnum=${step##*=}
   step=${step%=*}
