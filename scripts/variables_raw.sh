@@ -32,7 +32,7 @@ BLU='\033[0;34m' #Blue
 DEF='\033[0m'    #Default
 
 #Date
-DATE=@DATE@
+DATE=`date`
 
 #Datablock directory
 DATABLOCK=@DATABLOCK@
