@@ -64,6 +64,15 @@ STORAGEPATH=@STORAGEPATH@
 #Nz file suffix
 NZFILESUFFIX=@NZFILESUFFIX@
 
+#Input Nz bias values (if needed) 
+NZBIAS=@NZBIAS@
+
+#Input Nz covariance matrix (if needed) 
+NZCOVFILE=@NZCOVFILE@
+
+#Bin width for Nz construction  
+NZSTEP=@NZSTEP@
+
 #List of m-bias values
 MBIASVALUES=@MBIASVALUES@
 #List of m-bias  errors 
@@ -88,7 +97,7 @@ PYTHON3BIN=@PYTHON3BIN@
 P_SED_INPLACE='sed -i ' #Linux 
 
 #Root directory for pipeline scripts
-PACKROOT=@PACKROOT@
+PACKROOT=`pwd`
 
 #Pipeline that you wish to run
 PIPELINE=@PIPELINE@
@@ -117,7 +126,7 @@ SURVEYAREA=@SURVEYAREA@
 SURVEYAREADEG=@SURVEYAREADEG@
 
 #Username 
-USER=@USER@
+USER=`whoami`
 
 #Super Sample Covariance Matrix: Matrix elements 
 SSCMATRIX=@SSCMATRIX@
