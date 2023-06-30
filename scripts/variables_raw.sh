@@ -11,6 +11,34 @@
 ##
 
 #Paths and variables for configuration
+#Variables required for master installation 
+
+#Root directory for pipeline scripts
+PACKROOT=`pwd`
+
+#Date
+DATE=`date`
+
+#Username 
+USER=`whoami`
+
+#Machine type 
+MACHINE=Linux_64
+
+#Path to Rscript binary (can just be "Rscript" if you want $PATH to take charge)
+P_RSCRIPT=Rscript 
+
+#Define inplace sed command (different on OSX)
+#P_SED_INPLACE='sed -i "" ' #Darwin
+P_SED_INPLACE='sed -i ' #Linux 
+
+#Colours 
+RED='\033[0;31m' #Red 
+BLU='\033[0;34m' #Blue 
+DEF='\033[0m'    #Default
+
+
+#Variables requires at pipeline compilation 
 
 #Designation for "all patches"
 ALLPATCH=@ALLPATCH@
@@ -26,19 +54,8 @@ BINSTRINGTWO=@BINSTRINGTWO@
 #Blind identifier
 BLINDING=@BLINDING@
 
-#Colours 
-RED='\033[0;31m' #Red 
-BLU='\033[0;34m' #Blue 
-DEF='\033[0m'    #Default
-
-#Date
-DATE=`date`
-
 #Datablock directory
 DATABLOCK=@DATABLOCK@
-
-#Machine type 
-MACHINE=@MACHINE@
 
 #Root directory for running pipeline
 RUNROOT=@RUNROOT@
@@ -86,18 +103,8 @@ PATCHPATH=@PATCHPATH@
 #String containing all patch designations 
 PATCHLIST=@PATCHLIST@
 
-#Path to Rscript binary 
-P_RSCRIPT=@P_RSCRIPT@
-
 #Path to python binary folder
 PYTHON3BIN=@PYTHON3BIN@
-
-#Define inplace sed command (different on OSX)
-#P_SED_INPLACE='sed -i "" ' #Darwin
-P_SED_INPLACE='sed -i ' #Linux 
-
-#Root directory for pipeline scripts
-PACKROOT=`pwd`
 
 #Pipeline that you wish to run
 PIPELINE=@PIPELINE@
@@ -124,9 +131,6 @@ SURVEY=@SURVEY@
 #Survey Area in arcmin
 SURVEYAREA=@SURVEYAREA@
 SURVEYAREADEG=@SURVEYAREADEG@
-
-#Username 
-USER=`whoami`
 
 #Super Sample Covariance Matrix: Matrix elements 
 SSCMATRIX=@SSCMATRIX@

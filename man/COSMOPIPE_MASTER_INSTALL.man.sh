@@ -12,28 +12,21 @@ function _prompt {
   if [ "$1" != "0" ] 
   then 
     sleep .2
-    _message "I will be running with many ${RED} pre-defined ${DEF} variables! A sample are below:\n"
-    _message "(These can be edited now in the MASTER_INSTALL ${RED} or ${DEF} later in your configure.sh)\n"
+    _message "I will be running with many ${RED} pre-defined ${DEF} variables! \n"
+    _message "(These ${RED} must be defined now (!!!) ${DEF} or the install will fail\n"
     sleep .2
+    _message "    PACKROOT${BLU}=${RED}$PACKROOT ${DEF}\n"
     _message "    RUNROOT${BLU}=${RED}$RUNROOT ${DEF}\n"
-    _message "    SURVEY${BLU}=${RED}$SURVEY ${DEF}\n"
-    _message "    SURVEYAREA${BLU}=${RED}$SURVEYAREA ${DEF}\n"
-    _message "    PATCHPATH${BLU}=${RED}$PATCHPATH ${DEF}\n"
-    _message "    PATCHLIST${BLU}=${RED}$PATCHLIST ${DEF}\n"
-    _message "    ALLPATCH${BLU}=${RED}$ALLPATCH ${DEF}\n"
-    _message "    FILESUFFIX${BLU}=${RED}$FILESUFFIX ${DEF}\n"
     _message "    USER${BLU}=${RED}$USER ${DEF}\n"
-    _message "    WEIGHTNAME${BLU}=${RED}$WEIGHTNAME ${DEF}\n"
-    _message "    FILEBODY${BLU}=${RED}$FILEBODY ${DEF}\n"
-    _message "    TOMOLIMS${BLU}=${RED}\"$TOMOLIMS\" ${DEF}\n"
-    _message "    SCRIPTPATH${BLU}=${RED}$SCRIPTPATH ${DEF}\n"
-    _message "    STORAGEPATH${BLU}=${RED}$STORAGEPATH ${DEF}\n"
-    _message "    CONFIGPATH${BLU}=${RED}$CONFIGPATH ${DEF}\n"
+    _message "    MACHINE${BLU}=${RED}$MACHINE ${DEF}\n"
+    _message "    P_RSCRIPT${BLU}=${RED}$P_RSCRIPT ${DEF}\n"
+    _message "    P_SED_INPLACE${BLU}=${RED}$P_SED_INPLACE ${DEF}\n"
     sleep .2
     _message "\n"
-    _message "If you want to update these now then you ${RED} may kill the script now ${DEF} and\n"
-    _message "edit the COSMOPIPE_MASTER_INSTALL.sh script variables (at the top of the file). Otherwise you \n" 
-    _message "will need to edit and rerun the configure script after the MASTER_INSTALL is completed. \n" 
+    _message "If any of the above are empty or filled with place-holder values, \n"
+    _message "then you ${RED} should kill the script now ${DEF} and\n"
+    _message "pass relevant values for the parameters on the command line, like this:\n"
+    _message "  bash COSMOPIPE_MASTER_INSTALL.sh --packroot \`pwd\` --runroot /path/to/run/root/ --user \`whoami\` --machine MyArch_64 --p_rscript Rscript --p_sed_inplace 'sed -i ' \n" 
     sleep .2
     _message "${BLU}You have 10 sec to decide... ${DEF}"
     
