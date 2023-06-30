@@ -103,6 +103,20 @@ EOF
 
 #Statistic {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+[statistic]
+file = %(COSEBIs_PATH)s/libbandpower.so
+type = cosmic_shear_e
+response_function_type = tophat
+analytic = 1
+output_section_name = bandpower_shear_e
+l_min = @BV:LMINBANDPOWERS@
+l_max = @BV:LMAXBANDPOWERS@
+nbands = 8
+apodise = 1
+delta_x = @BV:APODISATIONWIDTH@
+theta_min = @BV:THETAMINXI@
+theta_max = @BV:THETAMAXXI@
+output_foldername = %(BandpowersPath)s
 
 EOF
 #}}}

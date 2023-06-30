@@ -1,5 +1,5 @@
 #
-# cosmosis_constructor.sh Documentation & Housekeeping functions
+# calculate_bandpowers.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -8,7 +8,7 @@ function _prompt {
   if [ "$1" != "0" ] 
   then
     _message "@BLU@============================================@DEF@\n"
-    _message "@BLU@== @RED@ Running cosmosis_constructor.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@== @RED@ Running calculate_bandpowers.sh Mode @BLU@ ==@DEF@\n"
     _message "@BLU@============================================@DEF@\n"
   fi 
 }
@@ -17,8 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Constructs a cosmosis .ini file from CosmoPipe '
-  echo '# variables'
+  echo '# Calculate bandpowers from input xipm'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,28 +42,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLINDING BV:APODISATIONWIDTH BV:BLIND BV:BOLTZMAN BV:COSMOSIS_PIPELINE BV:DVLENGTH BV:LIST_INPUT_SAMPLER BV:LMAXBANDPOWERS BV:LMINBANDPOWERS BV:NMAXCOSEBIS BV:NMINCOSEBIS BV:NTOMO BV:SAMPLER BV:STATISTIC BV:THETAMAXCOV BV:THETAMAXXI BV:THETAMINCOV BV:THETAMINXI CONFIGPATH DATABLOCK P_SED_INPLACE RUNROOT STORAGEPATH SURVEY
+  echo BINNING BLU BV:APODISATIONWIDTH BV:LMAXBANDPOWERS BV:LMINBANDPOWERS BV:NMAXCOSEBIS BV:THETAMAXCOV BV:THETAMINCOV DATABLOCK DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo mcmc_inp nzcov
+  echo DATAHEAD
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo mcmc_inp
+  echo bandpowers
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/cosmosis_constructor.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/calculate_bandpowers.sh
 } 
 #}}}
 
