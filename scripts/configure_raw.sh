@@ -39,7 +39,29 @@ _prompt ${VERBOSE}
 _varcheck $0
 #}}}
 
-if [ "$1" != "--pipeline-only" ]
+#Read command line options  {{{
+pipeline_only=FALSE
+resume=""
+while [ $# -gt 0 ] 
+do 
+  case $1 in 
+    "--pipeline_only") 
+      pipeline_only=TRUE
+      shift 
+      ;; 
+    "--resume") 
+      resume="--resume" 
+      shift
+      ;; 
+    *)
+      echo "Unknown command line option: $1"
+      exit 1
+      ;; 
+  esac
+done 
+#}}}
+
+if [ "${pipeline_only}" == "FALSE" ]
 then 
 
 #Remove any previous pipeline versions {{{
@@ -108,7 +130,7 @@ done
 for pipe in ${PIPELINE}
 do 
   _message "   >${RED} Constructing Pipeline ${pipe} ${DEF}" 
-  PIPELINE=${pipe} VERBOSE=0 bash ${RUNROOT}/${SCRIPTPATH}/construct_pipeline.sh ${RUNROOT}/pipeline.ini 
+  PIPELINE=${pipe} VERBOSE=0 bash ${RUNROOT}/${SCRIPTPATH}/construct_pipeline.sh ${RUNROOT}/pipeline.ini ${resume} > ${pipe}_pipeline.log
   _message "${BLU} - Done! ${DEF}\n"
 done 
 #}}}

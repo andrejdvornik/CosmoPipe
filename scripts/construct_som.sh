@@ -3,7 +3,7 @@
 # File Name : specz_som.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Tue 13 Jun 2023 10:48:53 PM CEST
+# Last Modified : Wed 28 Jun 2023 09:36:21 PM CEST
 #
 #=========================================
 
@@ -39,7 +39,7 @@ _message "@BLU@ > Constructing a SOM for @DEF@${outname}@DEF@"
   MAG_GAAP_g-MAG_GAAP_Ks MAG_GAAP_r-MAG_GAAP_Ks \
   MAG_GAAP_@BV:IMAGNAME@-MAG_GAAP_Ks MAG_GAAP_Z-MAG_GAAP_Ks \
   MAG_GAAP_Y-MAG_GAAP_Ks MAG_GAAP_J-MAG_GAAP_Ks \
-  MAG_GAAP_H-MAG_GAAP_Ks MAG_AUTO 2>&1 
+  MAG_GAAP_H-MAG_GAAP_Ks @BV:REFMAGNAME@ 2>&1 
 
 #Notify
 _message "@RED@ - Done! (`date +'%a %H:%M'`)@DEF@\n"

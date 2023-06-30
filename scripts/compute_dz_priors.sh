@@ -3,11 +3,11 @@
 # File Name : compute_m_bias.sh
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Mon 26 Jun 2023 11:02:49 AM CEST
+# Last Modified : Tue 27 Jun 2023 11:26:37 AM CEST
 #
 #=========================================
 
-#For each file in the datahead, compute the bias
+#For each file in the calib and reference catalogue folders, compute the bias
 calib_cats="@DB:som_weight_calib_cats@"
 refr_cats="@DB:som_weight_refr_cats@"
 
@@ -42,7 +42,7 @@ done
 @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/compute_dz_priors.R -c ${calib_cats} -r ${refr_cats} \
   --binstrings ${binstrings} \
   -w @BV:WEIGHTNAME@ \
-  --sys-error @BV:NZSYSERROR@ \
+  --syserr @BV:NZSYSERROR@ \
   -g "SOMweight" \
   -z @BV:ZSPECNAME@ \
   --biasout @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzbias/Nz_biases.txt \

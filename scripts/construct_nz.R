@@ -3,7 +3,7 @@
 # File Name : compute_nz.R
 # Created By : awright
 # Creation Date : 22-03-2023
-# Last Modified : Wed 17 May 2023 12:40:32 PM CEST
+# Last Modified : Mon 26 Jun 2023 11:13:28 AM CEST
 #
 #=========================================
 
@@ -13,10 +13,11 @@ input<-commandArgs(T)
 cat<-helpRfuncs::read.file(input[1])
 speczname<-input[2]
 output<-input[3]
+binstep<-as.numeric(input[4])
 
 #Construct the Nz {{{
 nzdist<-plotrix::weighted.hist(cat[[speczname]],w=cat$SOMweight/sum(cat$SOMweight),
-                               breaks=seq(0,6.001,by=0.05),plot=F)
+                               breaks=seq(0,6.001,by=binstep),plot=F)
 #/*fend*/}}}
 
 #Output the Nz #/*fold*/{{{

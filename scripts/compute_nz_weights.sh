@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Tue 13 Jun 2023 10:50:44 PM CEST
+# Last Modified : Thu 29 Jun 2023 06:35:53 AM CEST
 #
 #=========================================
 
@@ -46,7 +46,7 @@ done
   MAG_GAAP_g-MAG_GAAP_Ks MAG_GAAP_r-MAG_GAAP_Ks \
   MAG_GAAP_@BV:IMAGNAME@-MAG_GAAP_Ks MAG_GAAP_Z-MAG_GAAP_Ks \
   MAG_GAAP_Y-MAG_GAAP_Ks MAG_GAAP_J-MAG_GAAP_Ks \
-  MAG_GAAP_H-MAG_GAAP_Ks MAG_AUTO >&2 
+  MAG_GAAP_H-MAG_GAAP_Ks @BV:REFMAGNAME@ >&2 
 
 #Make the directory for the main catalogues 
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_cats ]

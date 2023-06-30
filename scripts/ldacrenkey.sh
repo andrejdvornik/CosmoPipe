@@ -3,7 +3,7 @@
 # File Name : ldacrenkey.sh
 # Created By : awright
 # Creation Date : 16-06-2023
-# Last Modified : Tue 13 Jun 2023 07:36:28 PM CEST
+# Last Modified : Wed 28 Jun 2023 10:13:28 PM CEST
 #
 #=========================================
 
@@ -11,7 +11,29 @@
 input="@DB:DATAHEAD@"
 #Output file name 
 ext=${input##*.}
-output=${input//.${ext}/_ren.${ext}}
+#Avoid duplicate "_ren" extensions {{{
+if [[ "${input}" =~ "_ren" ]]
+then 
+  count=${input##*_ren}
+  count=${count%.${ext}}
+  if [ "${count}" == "" ] 
+  then 
+    #Check if we randomly matched a different "_ren"
+    if [[ "${input}" =~ "_ren.${ext}" ]]
+    then 
+      count=2
+      output=${input//_ren.${ext}/_ren${count}.${ext}}
+    else 
+      output=${input//.${ext}/_ren.${ext}}
+    fi 
+  else 
+    ncount=$((count+1))
+    output=${input//_ren${count}.${ext}/_ren${ncount}.${ext}}
+  fi 
+else 
+  output=${input//.${ext}/_ren.${ext}}
+fi 
+#}}}
 
 #Notify 
 _message "   > @BLU@Renaming FITS Column@RED@ @BV:OLDKEY@ @BLU@to@RED@ @BV:NEWKEY@ @BLU@for file @DEF@${input##*/}"

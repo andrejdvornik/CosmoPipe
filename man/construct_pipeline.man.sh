@@ -108,6 +108,8 @@ function _read_pipe {
           if (substr($i,1,1) == "@" || substr($i,1,1) == "!" || substr($i,1,1) == "%" ) {
             #Step has no number
             print $i "=_"
+          } else if ( $i == "RESUME") {
+            print $i 
           } else if (substr($i,1,1) == "+") {
             #Step is a variable assignment 
             match($i,"=")

@@ -3,7 +3,7 @@
 # File Name : ldackeepcols.sh
 # Created By : awright
 # Creation Date : 12-06-2023
-# Last Modified : Tue 13 Jun 2023 09:22:55 AM CEST
+# Last Modified : Thu 29 Jun 2023 03:09:31 PM CEST
 #
 #=========================================
 
@@ -50,7 +50,7 @@ cols=`@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacdesc -i ${input} -t OBJECT
 #Select the columns to remove 
 delcols=`echo ${cols} | sed 's/ /\n/g' | grep -iv "${keepstr}" || echo `
 
-if [ "${delcols}" == "${allcols}" ]
+if [ "${delcols}" == "${cols}" ]
 then 
   _message "@RED@ - ERROR! Deletion would remove all columns?!@DEF@\n"
   exit 1

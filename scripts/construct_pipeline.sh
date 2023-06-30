@@ -91,6 +91,10 @@ do
 done
 #}}}
 
+#If running resume, and RESUME not found, create it explicitly {{{
+
+#}}}
+
 #Check that all functions exits {{{
 _err=0
 for step in ${pipeline_steps}
@@ -450,6 +454,16 @@ do
     #}}}
   fi 
 done
+#Check for resume errors {{{
+if [ "${resume}" == "TRUE" ] && [ "${found_resume}" == "FALSE" ]
+then 
+  echo "Error: resume requested but no RESUME item found"
+  #Error 
+  VERBOSE=1 _message " - ERROR!\n\n"
+  VERBOSE=1 _message "   ${RED}ERROR: ${BLU}--resume was requested, but there is no ${RED}RESUME${BLU} item in the pipeline!${DEF}\n" 
+  exit 1 
+fi 
+#}}}
 echo Done: Pipeline check complete 
 #Final Graph edits {{{
 #Close the last subgraph {{{
