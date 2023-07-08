@@ -17,14 +17,14 @@ _message "@BLU@Constructing Tomographic bins for catalogue:@DEF@ ${inputfile##*/
 outputlist=""
 for i in `seq $NTOMO`
 do
-  #Define the Z_B limits from the TOMOLIMS {{{
-  ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $n}'`
-  ZB_hi=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $(n+1)}'`
+  #Define the TOMOVAR limits from the TOMOLIMS {{{
+  TV_lo=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $n}'`
+  TV_hi=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $(n+1)}'`
   #}}}
   #Define the string to append to the file names {{{
-  ZB_lo_str=`echo $ZB_lo | sed 's/\./p/g'`
-  ZB_hi_str=`echo $ZB_hi | sed 's/\./p/g'`
-  appendstr="_ZB${ZB_lo_str}t${ZB_hi_str}"
+  TV_lo_str=`echo $TV_lo | sed 's/\./p/g'`
+  TV_hi_str=`echo $TV_hi | sed 's/\./p/g'`
+  appendstr="_ZB${TV_lo_str}t${TV_hi_str}"
   #}}}
   #Define the output file name {{{
   outputname=${inputfile//.${extn}/${appendstr}.${extn}}
@@ -36,18 +36,18 @@ do
   if [ -f ${outputname} ] 
   then 
     #If it exists, remove it 
-    _message "  > @BLU@Removing previous catalogue for tomographic bin ${i}@DEF@ ($ZB_lo < ZB <= $ZB_hi)"
+    _message "  > @BLU@Removing previous catalogue for tomographic bin ${i}@DEF@ ($TV_lo < @BV:TOMOVAR@ <= $TV_hi)"
     rm -f ${outputname}
     _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
   fi 
   #}}}
   #Construct the output tomographic bin {{{
-  _message "   > @BLU@Constructing catalogue for tomographic bin ${i}@DEF@ ($ZB_lo < ZB <= $ZB_hi)"
+  _message "   > @BLU@Constructing catalogue for tomographic bin ${i}@DEF@ ($TV_lo < @BV:TOMOVAR@ <= $TV_hi)"
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
            -i ${inputfile} \
   	       -o ${outputname} \
   	       -t OBJECTS \
-  	       -c "(Z_B>${ZB_lo})AND(Z_B<=${ZB_hi});" 2>&1
+  	       -c "(@BV:TOMOVAR@>${TV_lo})AND(@BV:TOMOVAR@<=${TV_hi});" 2>&1
   _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
   #}}}
 done

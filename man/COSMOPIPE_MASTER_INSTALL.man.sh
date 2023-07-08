@@ -13,7 +13,7 @@ function _prompt {
   then 
     sleep .2
     _message "I will be running with many ${RED} pre-defined ${DEF} variables! \n"
-    _message "(These ${RED} must be defined now (!!!) ${DEF} or the install will fail\n"
+    _message "(These ${RED}must be defined now ${BLU}(!!!) ${DEF}otherwise the install will fail:\n"
     sleep .2
     _message "    PACKROOT${BLU}=${RED}$PACKROOT ${DEF}\n"
     _message "    RUNROOT${BLU}=${RED}$RUNROOT ${DEF}\n"

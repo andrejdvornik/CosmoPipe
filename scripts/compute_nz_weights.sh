@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Thu 29 Jun 2023 06:35:53 AM CEST
+# Last Modified : Sat 08 Jul 2023 06:53:21 AM CEST
 #
 #=========================================
 
@@ -23,7 +23,7 @@ done
   -t @DB:som_weight_training@ \
   -ct "" -cr @BV:WEIGHTNAME@ \
   --old.som @DB:ALLHEAD@ \
-  --factor.nbins Inf --optimise --force \
+  --factor.nbins Inf --optimise --optimise.minN @BV:MINNHC@ --force \
   -sc @BV:NTHREADS@ \
   --short.write --refr.flag @BV:ADDITIONALFLAGS@ \
   -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ -of ${output_files} \
