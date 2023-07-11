@@ -30,8 +30,8 @@ fi
 # -s = minimum theta
 # -l = maximum theta
 # -w = width of apodisation window
-# -a = minimum ell
-# -c = maximum ell
+# -z = minimum ell
+# -x = maximum ell
 # -d = statistic (==bandpowers)
 
 _message "    -> @BLU@Computing bandpowers for file @RED@${input##*/}@DEF@"
@@ -39,10 +39,11 @@ _message "    -> @BLU@Computing bandpowers for file @RED@${input##*/}@DEF@"
   -i ${input} \
   -t "meanr" -p "xip" -m "xim" \
   --cfoldername ${outfold} \
-  -o ${output} -b @BINNING@ -n @BV:NMAXCOSEBIS@ -s @BV:THETAMINCOV@ \
+  -o ${output} -b @BINNING@ -s @BV:THETAMINCOV@ \
   -l @BV:THETAMAXCOV@ \
-  -w @BV:APODISATIONWIDTH@ -a @BV:LMINBANDPOWERS@ -c @BV:LMAXBANDPOWERS@ \
-  -d "bandpowers" 2>&1 
+  -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
+  -k @BV:NBANDPOWERS@ \
+  -d "bandpowers_ee" 2>&1 
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 #Add the files to the datablock 
