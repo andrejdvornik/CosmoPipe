@@ -38,7 +38,7 @@ parser.add_argument('-g','--gamma_t_col', dest="gamma_t_col", type=str, nargs='?
     help='column for gamma_t')
 parser.add_argument('-q','--gamma_x_col', dest="gamma_x_col", type=str, nargs='?', required=False,
     help='column for gamma_x')
-parser.add_argument('-j','--w_theta_col', dest="w_theta", type=str, nargs='?', required=False,
+parser.add_argument('-j','--w_theta_col', dest="w_theta_col", type=str, nargs='?', required=False,
     help='column for clustering correlation function')
 parser.add_argument('-s','--thetamin', dest="thetamin", type=float, default=0.5, nargs='?', 
     help='value of thetamin in arcmins, default is 0.5')
@@ -94,7 +94,7 @@ xip_col=args.xip_col
 xim_col=args.xim_col
 gamma_t_col=args.gamma_t_col
 gamma_x_col=args.gamma_x_col
-w_theta=args.w_theta
+w_theta_col=args.w_theta_col
 thetamin=args.thetamin
 thetamax=args.thetamax
 cfoldername=args.cfoldername
@@ -136,6 +136,8 @@ if xip_col:
 if gamma_t_col:
     gamma_t=tpcf_data[gamma_t_col]
     gamma_x=tpcf_data[gamma_x_col]
+if w_theta_col:
+    w_theta=tpcf_data[w_theta_col]
 
 # Yell at the user if the normalisation and roots files aren't provided when calculating COSEBIs
 if mode=='cosebis':
@@ -322,9 +324,9 @@ elif mode =='bandpowers_nn':
         filter[i]=f(theta_mid*arcmin2rad, ell[i], ell[i+1])*T(theta_mid, thetamin_apod, thetamax_apod, logwidth)
         N = np.log(ell[i+1]/ell[i])
         Integral=sum(filter[i]*w_theta*delta_theta)
-        Cnn[i]=IntegralE*2*np.pi/N*arcmin2rad
+        Cnn[i]=Integral*2*np.pi/N*arcmin2rad
     CnnfileName=cfoldername+"/Cnn_"+outputfile+".asc"
-    np.savetxt(CnEfileName,Cnn)
+    np.savetxt(CnnfileName,Cnn)
     if save:
         FilterFileName=cfoldername+"/Filter_"+outputfile+".asc"
         np.savetxt(FilterFileName,filter)
