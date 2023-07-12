@@ -6,7 +6,7 @@ import math, os
 from matplotlib.patches import Rectangle
 from scipy.interpolate import interp1d
 from scipy import pi,sqrt,exp
-from measure_statistics import tminus_quad, tplus, tminus, gplus, gminus, T, str2bool, h
+from measure_statistics import tminus_quad, tplus, tminus, gplus, gminus, T, str2bool, h, f
 from argparse import ArgumentParser
 
 # Written by Marika Asgari (ma@roe.ac.uk), bandpowers implementation by B.Stoelzner
@@ -38,6 +38,8 @@ parser.add_argument('-g','--gamma_t_col', dest="gamma_t_col", type=str, nargs='?
     help='column for gamma_t')
 parser.add_argument('-q','--gamma_x_col', dest="gamma_x_col", type=str, nargs='?', required=False,
     help='column for gamma_x')
+parser.add_argument('-j','--w_theta_col', dest="w_theta", type=str, nargs='?', required=False,
+    help='column for clustering correlation function')
 parser.add_argument('-s','--thetamin', dest="thetamin", type=float, default=0.5, nargs='?', 
     help='value of thetamin in arcmins, default is 0.5')
 parser.add_argument('-l','--thetamax', dest="thetamax", type=float, default=300.0, nargs='?', 
@@ -92,6 +94,7 @@ xip_col=args.xip_col
 xim_col=args.xim_col
 gamma_t_col=args.gamma_t_col
 gamma_x_col=args.gamma_x_col
+w_theta=args.w_theta
 thetamin=args.thetamin
 thetamax=args.thetamax
 cfoldername=args.cfoldername
@@ -268,7 +271,6 @@ elif mode =='bandpowers_ee':
     CB = np.zeros(nbins)
     filter_plus = np.zeros((nbins,len(theta_mid)))
     filter_minus = np.zeros((nbins,len(theta_mid)))
-
     ell = np.logspace(np.log10(ellmin), np.log10(ellmax), nbins+1)
 
     for i in range(len(ell)-1):
@@ -294,7 +296,6 @@ elif mode =='bandpowers_ne':
     CnE = np.zeros(nbins)
     CnB = np.zeros(nbins)
     filter = np.zeros((nbins,len(theta_mid)))
-
     ell = np.logspace(np.log10(ellmin), np.log10(ellmax), nbins+1)
 
     for i in range(len(ell)-1):
@@ -313,4 +314,17 @@ elif mode =='bandpowers_ne':
         FilterFileName=cfoldername+"/Filter_"+outputfile+".asc"
         np.savetxt(FilterFileName,filter)
 elif mode =='bandpowers_nn':
-    raise Exception('Not implemented!')
+    Cnn = np.zeros(nbins)
+    filter = np.zeros((nbins,len(theta_mid)))
+    ell = np.logspace(np.log10(ellmin), np.log10(ellmax), nbins+1)
+
+    for i in range(len(ell)-1):
+        filter[i]=f(theta_mid*arcmin2rad, ell[i], ell[i+1])*T(theta_mid, thetamin_apod, thetamax_apod, logwidth)
+        N = np.log(ell[i+1]/ell[i])
+        Integral=sum(filter[i]*w_theta*delta_theta)
+        Cnn[i]=IntegralE*2*np.pi/N*arcmin2rad
+    CnnfileName=cfoldername+"/Cnn_"+outputfile+".asc"
+    np.savetxt(CnEfileName,Cnn)
+    if save:
+        FilterFileName=cfoldername+"/Filter_"+outputfile+".asc"
+        np.savetxt(FilterFileName,filter)

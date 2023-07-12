@@ -106,6 +106,10 @@ def G(x):
 def h(theta, l_lo, l_up):
     h = -1/(theta**2) * ((theta*l_up*jv(1,theta*l_up)-theta*l_lo*jv(1,theta*l_lo)) + 2*jv(0,theta*l_up) - 2*jv(0,theta*l_lo))
     return(h)
+# f for nn
+def f(theta, lo_lo, l_up):
+    f = l_up*jv(1,theta*l_up) - l_lo*jv(1,theta*l_lo)
+    return(f)
 # Apodisation window
 def T(theta, theta_lo, theta_up, logwidth):
     x_lo = np.log(theta_lo)
