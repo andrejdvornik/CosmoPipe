@@ -36,6 +36,8 @@ parser.add_argument('-m','--xim_col', dest="xim_col", type=str, nargs='?', requi
     help='column for xi_minus')
 parser.add_argument('-g','--gamma_t_col', dest="gamma_t_col", type=str, nargs='?', required=False,
     help='column for gamma_t')
+parser.add_argument('-q','--gamma_x_col', dest="gamma_x_col", type=str, nargs='?', required=False,
+    help='column for gamma_x')
 parser.add_argument('-s','--thetamin', dest="thetamin", type=float, default=0.5, nargs='?', 
     help='value of thetamin in arcmins, default is 0.5')
 parser.add_argument('-l','--thetamax', dest="thetamax", type=float, default=300.0, nargs='?', 
@@ -89,6 +91,7 @@ theta_col=args.theta_col
 xip_col=args.xip_col
 xim_col=args.xim_col
 gamma_t_col=args.gamma_t_col
+gamma_x_col=args.gamma_x_col
 thetamin=args.thetamin
 thetamax=args.thetamax
 cfoldername=args.cfoldername
@@ -129,6 +132,7 @@ if xip_col:
     xim=tpcf_data[xim_col]
 if gamma_t_col:
     gamma_t=tpcf_data[gamma_t_col]
+    gamma_x=tpcf_data[gamma_x_col]
 
 # Yell at the user if the normalisation and roots files aren't provided when calculating COSEBIs
 if mode=='cosebis':
@@ -287,7 +291,8 @@ elif mode =='bandpowers_ee':
         np.savetxt(FilterMinusFileName,filter_minus)
 
 elif mode =='bandpowers_ne':
-    Cne = np.zeros(nbins)
+    CnE = np.zeros(nbins)
+    CnB = np.zeros(nbins)
     filter = np.zeros((nbins,len(theta_mid)))
 
     ell = np.logspace(np.log10(ellmin), np.log10(ellmax), nbins+1)
@@ -295,11 +300,15 @@ elif mode =='bandpowers_ne':
     for i in range(len(ell)-1):
         filter[i]=h(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin_apod, thetamax_apod, logwidth)
         N = np.log(ell[i+1]/ell[i])
-        Integral=sum(filter[i]*gamma_t*delta_theta)
-        Cne[i]=Integral*2*np.pi/N*arcmin2rad
+        IntegralE=sum(filter[i]*gamma_t*delta_theta)
+        IntegralB=sum(filter[i]*gamma_x*delta_theta)
+        CnE[i]=IntegralE*2*np.pi/N*arcmin2rad
+        CnB[i]=IntegralB*2*np.pi/N*arcmin2rad
 
-    CnefileName=cfoldername+"/Cne_"+outputfile+".asc"
-    np.savetxt(CnefileName,Cne)
+    CnEfileName=cfoldername+"/CnE_"+outputfile+".asc"
+    CnBfileName=cfoldername+"/CnB_"+outputfile+".asc"
+    np.savetxt(CnEfileName,CnE)
+    np.savetxt(CnBfileName,CnB)
     if save:
         FilterFileName=cfoldername+"/Filter_"+outputfile+".asc"
         np.savetxt(FilterFileName,filter)
