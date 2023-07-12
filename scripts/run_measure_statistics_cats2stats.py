@@ -64,10 +64,15 @@ parser.add_argument('-c','--norm', dest="normfile", metavar="norm",required=Fals
     help='normalisation file name and address for T_plus/minus for COSEBIs')
 parser.add_argument('-r','--root', dest="rootfile", metavar="root",required=False,
     help='roots file name and address for T_plus/minus for COSEBIs')
+    
 
 #Bandpowers options
 parser.add_argument('-w','--logwidth', dest="logwidth", type=float,default=0.5, nargs='?', 
     help='width of apodisation window for bandpowers')
+parser.add_argument('--thetaminbp', dest="thetaminbp", type=float, default=0.5, nargs='?', 
+    help='value of apodisation thetamin in arcmins, default is 0.5')
+parser.add_argument('--thetamaxbp', dest="thetamaxbp", type=float, default=300.0, nargs='?', 
+    help='value of apodisation thetamax, in arcmins, default is 300')
 parser.add_argument('-z','--ellmin', dest="ellmin", type=float,default=100, nargs='?', 
     help='value of ellmin for bandpowers')
 parser.add_argument('-x','--ellmax', dest="ellmax", type=float,default=1500, nargs='?', 
@@ -99,6 +104,8 @@ normfile=args.normfile
 rootfile=args.rootfile
 # Bandpower options
 logwidth=args.logwidth
+thetamin_apod=args.thetaminbp
+thetamax_apod=args.thetamaxbp
 ellmin=args.ellmin
 ellmax=args.ellmax
 nbins=args.nbins
@@ -261,8 +268,8 @@ elif mode =='bandpowers_ee':
     ell = np.logspace(np.log10(ellmin), np.log10(ellmax), nbins+1)
 
     for i in range(len(ell)-1):
-        filter_plus[i]=gplus(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin, thetamax, logwidth)
-        filter_minus[i]=gminus(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin, thetamax, logwidth)
+        filter_plus[i]=gplus(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin_apod, thetamax_apod, logwidth)
+        filter_minus[i]=gminus(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin_apod, thetamax_apod, logwidth)
         N = np.log(ell[i+1]/ell[i])
         Integral_plus=sum(filter_plus[i]*xip*delta_theta)
         Integral_minus=sum(filter_minus[i]*xim*delta_theta)
@@ -274,27 +281,27 @@ elif mode =='bandpowers_ee':
     np.savetxt(CEfileName,CE)
     np.savetxt(CBfileName,CB)
     if save:
-        IntegPlusFileName=cfoldername+"/FilterPlus_"+outputfile+".asc"
-        IntegMinusFileName=cfoldername+"/FilterMinus_"+outputfile+".asc"
-        np.savetxt(IntegPlusFileName,filter_plus)
-        np.savetxt(IntegMinusFileName,filter_minus)
+        FilterPlusFileName=cfoldername+"/FilterPlus_"+outputfile+".asc"
+        FilterMinusFileName=cfoldername+"/FilterMinus_"+outputfile+".asc"
+        np.savetxt(FilterPlusFileName,filter_plus)
+        np.savetxt(FilterMinusFileName,filter_minus)
 
 elif mode =='bandpowers_ne':
     Cne = np.zeros(nbins)
-    integ = np.zeros((nbins,len(theta_mid)))
+    filter = np.zeros((nbins,len(theta_mid)))
 
     ell = np.logspace(np.log10(ellmin), np.log10(ellmax), nbins+1)
 
     for i in range(len(ell)-1):
-        integ[i]=h(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin, thetamax, logwidth)*gamma_t
+        filter[i]=h(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin_apod, thetamax_apod, logwidth)
         N = np.log(ell[i+1]/ell[i])
-        Integral=sum(integ[i]*delta_theta)
-        CE[i]=Integral*2*np.pi/N*arcmin2rad
+        Integral=sum(filter[i]*gamma_t*delta_theta)
+        Cne[i]=Integral*2*np.pi/N*arcmin2rad
 
     CnefileName=cfoldername+"/Cne_"+outputfile+".asc"
     np.savetxt(CnefileName,Cne)
     if save:
-        IntegFileName=cfoldername+"/Filter_"+outputfile+".asc"
-        np.savetxt(IntegFileName,integ)
+        FilterFileName=cfoldername+"/Filter_"+outputfile+".asc"
+        np.savetxt(FilterFileName,filter)
 elif mode =='bandpowers_nn':
     raise Exception('Not implemented!')

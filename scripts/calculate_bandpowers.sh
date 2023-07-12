@@ -42,7 +42,7 @@ _message "    -> @BLU@Computing bandpowers for file @RED@${input##*/}@DEF@"
   -o ${output} -b @BINNING@ -s @BV:THETAMINCOV@ \
   -l @BV:THETAMAXCOV@ \
   -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
-  -k @BV:NBANDPOWERS@ \
+  -k @BV:NBANDPOWERS@  --thetaminbp @BV:THETAMINBP@ --thetamaxbp @BV:THETAMAXBP@\
   -d "bandpowers_ee" 2>&1 
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
