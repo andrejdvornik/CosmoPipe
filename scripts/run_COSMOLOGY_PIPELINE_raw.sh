@@ -182,7 +182,7 @@ for PATCH in @PATCHLIST@ @ALLPATCH@
 do 
   echo -n "Computing the 1D c-term for all sources in patch ${PATCH}"
   ${P_PYTHON} @RUNROOT@/@SCRIPTPATH@/ave_e_vs_ZB_rot.py \
-    ${PATCH} @WEIGHTNAME@ @FILEBODY@ > @STORAGEPATH@/e_vs_ZB_${PATCH}_@FILEBODY@_@WEIGHTNAME@.dat
+    ${PATCH} @WEIGHTNAME@ '@FILEBODY@' > @STORAGEPATH@/e_vs_ZB_${PATCH}_@FILEBODY@_@WEIGHTNAME@.dat
   echo " - Done!"
 done
 
