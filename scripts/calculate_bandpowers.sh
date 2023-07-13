@@ -8,7 +8,7 @@
 #Input file 
 input=@DB:DATAHEAD@
 #Bandpower mode: EE, NE, or NN
-mode=@DB:BANDPOWERMODE@ 
+mode=@BV:BANDPOWERMODE@ 
 #Output file 
 output=${input##*/}
 output=${output%_ggcorr*}
