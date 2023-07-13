@@ -284,8 +284,8 @@ elif mode =='bandpowers_ee':
         CE[i]=(Integral_plus+Integral_minus)*np.pi/N*arcmin2rad
         CB[i]=(Integral_plus-Integral_minus)*np.pi/N*arcmin2rad
 
-    CEfileName=cfoldername+"/CE_"+outputfile+".asc"
-    CBfileName=cfoldername+"/CB_"+outputfile+".asc"
+    CEfileName=cfoldername+"/CEE_"+outputfile+".asc"
+    CBfileName=cfoldername+"/CBB_"+outputfile+".asc"
     np.savetxt(CEfileName,CE)
     np.savetxt(CBfileName,CB)
     if save:

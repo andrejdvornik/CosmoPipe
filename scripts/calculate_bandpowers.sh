@@ -1,12 +1,14 @@
 #
 #
-# Script to construct COSEBIs from 2pt correlation functions
+# Script to construct bandpowers from 2pt correlation functions
 #
 #
 
 
 #Input file 
-input=@DB:DATAHEAD@ 
+input=@DB:DATAHEAD@
+#Bandpower mode: EE, NE, or NN
+mode=@DB:BANDPOWERMODE@ 
 #Output file 
 output=${input##*/}
 output=${output%_ggcorr*}
@@ -34,23 +36,66 @@ fi
 # -x = maximum ell
 # -d = statistic (==bandpowers)
 
-_message "    -> @BLU@Computing bandpowers for file @RED@${input##*/}@DEF@"
-@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/run_measure_statistics_cats2stats.py \
-  -i ${input} \
-  -t "meanr" -p "xip" -m "xim" \
-  --cfoldername ${outfold} \
-  -o ${output} -b @BINNING@ -s @BV:THETAMINCOV@ \
-  -l @BV:THETAMAXCOV@ \
-  -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
-  -k @BV:NBANDPOWERS@  --thetaminbp @BV:THETAMINBP@ --thetamaxbp @BV:THETAMAXBP@\
-  -d "bandpowers_ee" 2>&1 
-_message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
+if [ "${mode^^}" == "EE" ]
+then
+  _message "    -> @BLU@Computing EE bandpowers for file @RED@${input##*/}@DEF@"
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/run_measure_statistics_cats2stats.py \
+    -i ${input} \
+    -t "meanr" -p "xip" -m "xim" \
+    --cfoldername ${outfold} \
+    -o ${output} -b @BINNING@ -s @BV:THETAMINCOV@ \
+    -l @BV:THETAMAXCOV@ \
+    -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
+    -k @BV:NBANDPOWERS@  --thetaminbp @BV:THETAMINBP@ --thetamaxbp @BV:THETAMAXBP@\
+    -d "bandpowers_ee" 2>&1 
+  _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
-#Add the files to the datablock 
-Enfile="CE_${output}.asc"
-Bnfile="CB_${output}.asc"
-bandpowerblock=`_read_datablock bandpowers`
-_write_datablock bandpowers "`_blockentry_to_filelist ${bandpowerblock}` ${CEfile} ${CBfile}"
+  #Add the files to the datablock 
+  CEEfile="CEE_${output}.asc"
+  CBBfile="CBB_${output}.asc"
+  bandpowerblock=`_read_datablock bandpowers`
+  _write_datablock bandpowers "`_blockentry_to_filelist ${bandpowerblock}` ${CEEfile} ${CBBfile}"
 
+elif [ "${mode^^}" == "NE" ]
+then
+_message "    -> @BLU@Computing nE bandpowers for file @RED@${input##*/}@DEF@"
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/run_measure_statistics_cats2stats.py \
+    -i ${input} \
+    -t "meanr" -g "gamT" -q "gamX" \
+    --cfoldername ${outfold} \
+    -o ${output} -b @BINNING@ -s @BV:THETAMINCOV@ \
+    -l @BV:THETAMAXCOV@ \
+    -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
+    -k @BV:NBANDPOWERS@  --thetaminbp @BV:THETAMINBP@ --thetamaxbp @BV:THETAMAXBP@\
+    -d "bandpowers_ne" 2>&1 
+  _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
+  #Add the files to the datablock 
+  CnEfile="CnE_${output}.asc"
+  CnBfile="CnB_${output}.asc"
+  bandpowerblock=`_read_datablock bandpowers`
+  _write_datablock bandpowers "`_blockentry_to_filelist ${bandpowerblock}` ${CnEfile} ${CnBfile}"
 
+elif [ "${mode^^}" == "NN" ]
+then
+_message "    -> @BLU@Computing nn bandpowers for file @RED@${input##*/}@DEF@"
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/run_measure_statistics_cats2stats.py \
+    -i ${input} \
+    -t "meanr" -j "xi" \
+    --cfoldername ${outfold} \
+    -o ${output} -b @BINNING@ -s @BV:THETAMINCOV@ \
+    -l @BV:THETAMAXCOV@ \
+    -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
+    -k @BV:NBANDPOWERS@  --thetaminbp @BV:THETAMINBP@ --thetamaxbp @BV:THETAMAXBP@\
+    -d "bandpowers_nn" 2>&1 
+  _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
+
+  #Add the files to the datablock 
+  Cnnfile="Cnn_${output}.asc"
+  bandpowerblock=`_read_datablock bandpowers`
+  _write_datablock bandpowers "`_blockentry_to_filelist ${bandpowerblock}` ${Cnnfile}"
+
+else 
+  _message "Bandpower mode unknown: ${mode^^}\n"
+  exit 1
+fi
