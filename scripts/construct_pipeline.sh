@@ -43,7 +43,7 @@ blockneeds=`_varcheck $0`
 #}}}
 
 #Read the pipeline description file {{{
-pipeline_steps=`_read_pipe @PIPELINE@`
+pipeline_steps=`VERBOSE=1 _read_pipe @PIPELINE@`
 echo ${pipeline_steps}
 count=0
 #If there are any substeps 
@@ -74,7 +74,7 @@ do
     then 
       echo "Getting substeps for step: ${step}"
       #Read the substep modes 
-      sublist=`_read_pipe $step ${stepnum}` 
+      sublist=`VERBOSE=1 _read_pipe $step ${stepnum}` 
       #Replace the substep (whole matches only)
       pipeline_steps=`echo " $pipeline_steps " | sed "s/ $step=${stepnum} / $sublist /" | xargs echo `
       echo "  -> ${sublist}"
@@ -177,12 +177,12 @@ then
   then 
     #echo -en " REMOVE BLOCK & START NEW (${ntest})\n"
     rm  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-    _initialise_datablock
+    VERBOSE=1 _initialise_datablock
   fi 
   @P_SED_INPLACE@ "s/={.*/={_validitytest_}/" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
 else 
   #echo -en " NO BLOCK : START NEW\n"
-  _initialise_datablock
+  VERBOSE=1 _initialise_datablock
 fi
 #}}}
 
@@ -190,7 +190,7 @@ fi
 #Add default variables (if they exist) {{{
 if [ -f @PIPELINE@_defaults.sh ]
 then 
-  _add_default_vars
+  VERBOSE=1 _add_default_vars
 fi 
 #}}}
 #Initialise variables {{{
@@ -277,7 +277,7 @@ do
   then 
     echo HEAD assignment: writing ${step:1} to datahead 
     #Modify the HEAD to the request value {{{
-    _write_datahead "${step:1}" "_validitytest_"
+    VERBOSE=1 _write_datahead "${step:1}" "_validitytest_"
     #Set the "laststep" to be this block element
     laststep=${step:1}
     #If resuming and haven't found the "RESUME" entry, save this assignment
@@ -290,9 +290,14 @@ do
   then 
     echo BLOCK assignment: writing datahead to ${step:1} 
     #Modify the datablock with the current HEAD {{{
-		_write_datablock ${step:1} "`_read_datahead`"
+		VERBOSE=1 _write_datablock ${step:1} "`_read_datahead`"
     #Write the link between the previous processing function and this block element
     echo "${laststep} -.-> ${step:1}(${step:1})" >> @RUNROOT@/@PIPELINE@_links.R
+    #If resuming and haven't found the "RESUME" entry, save this assignment
+    if [ "${resume}" == "TRUE" ] && [ "${found_resume}" == "FALSE" ]
+    then 
+      lastassign=${step:1}
+    fi 
     #}}}
   elif [ "${step:0:1}" == "%" ]
   then 
@@ -301,7 +306,7 @@ do
     oldname=${names%%-*}
     newname=${names##*-}
     echo BLOCK rename: moving ${oldname} to ${newname}
-		_rename_blockitem "${oldname}" "${newname}" TEST
+		VERBOSE=1 _rename_blockitem "${oldname}" "${newname}" TEST
     #Rewrite all instances of oldname(oldname) in the links file to newname(newname)
     cat @RUNROOT@/@PIPELINE@_links.R | sed "s/${oldname}(${oldname})/${newname}(${newname})/g" > @RUNROOT@/@PIPELINE@_links.R.tmp
     mv @RUNROOT@/@PIPELINE@_links.R.tmp @RUNROOT@/@PIPELINE@_links.R
@@ -311,14 +316,14 @@ do
     #Modify the HEAD to the request value {{{
     for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
     do 
-		  _write_datablock ${step:1}_${patch} "`_read_datahead ${step:1}`"
+		  VERBOSE=1 _write_datablock ${step:1}_${patch} "`_read_datahead ${step:1}`"
     done 
     #}}}
   elif [ "${step:0:1}" == "+" ]
   then 
     #Add the new variable to the datablock {{{
     echo Variable assignment: ${step:1}
-    _write_blockvars ${step:1} "_validitytest_"
+    VERBOSE=1 _write_blockvars ${step:1} "_validitytest_"
     #}}}
   else 
     #Check for the manual file  {{{
@@ -363,17 +368,17 @@ do
               allneeds_def="${allneeds_def} ${var}"
               #Otherwise, insert a blank entry 
               echo "#INSERT DEFAULT VALUE HERE:" >> @PIPELINE@_defaults.sh 
-              echo ${var}=@${var}@ >> @PIPELINE@_defaults.sh 
+              echo ${var}=@BV:${var}@ >> @PIPELINE@_defaults.sh 
             fi
           else 
             allneeds_def="${allneeds_def} ${var}"
             #If there is no global defaults, insert a blank entry 
             echo "#INSERT DEFAULT VALUE HERE:" >> @PIPELINE@_defaults.sh 
-            echo ${var}=@${var}@ >> @PIPELINE@_defaults.sh 
+            echo ${var}=@BV:${var}@ >> @PIPELINE@_defaults.sh 
           fi 
         else 
           #Check if the existing default is a blank entry 
-          exists_isdef=`grep -c "^${var}=@${var}@" @PIPELINE@_defaults.sh || echo`
+          exists_isdef=`grep -c "^${var}=@BV:${var}@" @PIPELINE@_defaults.sh || echo`
           if [ "${exists_isdef}" != "0" ]
           then 
             allneeds_def="${allneeds_def} ${var}"
@@ -552,7 +557,7 @@ fi
 if [ "${allneeds}" != "" ]
 then 
   allneeds=`echo ${allneeds} | sed 's/ /\n/g' | sort | uniq | awk '{printf $0 " "}'`
-  allneeds_def=`echo ${allneeds_def} | sed 's/ /\n/g' | sort | uniq | awk '{printf $0 " "}'`
+  allneeds_def=`echo ${allneeds_def} | sed 's/ /\n/g' | sort | uniq | awk '{printf $0 " "}' | echo `
   if [ "${warnings}" == "" ] 
   then 
     warnings="${RED}     WARNINGS:${DEF}\n     ${BLU}The pipeline used the following undeclared runtime variables:${DEF}\n     ${allneeds}\n"
@@ -563,7 +568,7 @@ then
   then 
     warnings="${warnings}     ${BLU}Of these variables, the following ${RED}have no default value assigned${BLU}:\n     ${DEF}${allneeds_def}\n     ${BLU}You need to update those variables in the ${DEF}@PIPELINE@_defaults.sh${BLU} file!\n"
   else 
-    warnings="${warnings} ${RED}     !BUT!${DEF} - ${BLU}all of them were assigned defaults in the ${DEF}@PIPELINE@_defaults.sh${BLU} file.\n     No action is required!\n"
+    warnings="${warnings} ${RED}    !BUT!${DEF} - ${BLU}all of them were assigned defaults in the ${DEF}@PIPELINE@_defaults.sh${BLU} file!\n     So there is ${RED}no action is required${BLU}!${DEF}\n"
   fi 
 fi 
 #}}}
