@@ -3,11 +3,12 @@
 # File Name : mcal_functions.py
 # Created By : awright
 # Creation Date : 25-05-2023
-# Last Modified : Fri 02 Jun 2023 10:33:40 PM CEST
+# Last Modified : Thu 22 Jun 2023 05:40:30 PM CEST
 #
 #=========================================
 
 #Required packages 
+print("importing")
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm 
@@ -20,18 +21,22 @@ import astropandas as apd
 #Functions used for m-calibration pipeline 
 #Flexible file read {{{
 def flexible_read(filepath,as_df=True): 
+    print("reading:",filepath)
     #Get the file extension 
     file_extension=filepath.split(".")[-1]
     if file_extension == 'csv':
         #Read CSV with pandas 
+        print("reading as CSV")
         ldac_cat=None
         cata = pd.read_csv(filepath)
     elif file_extension == 'asc':
         #Read ASCII with pandas 
+        print("reading as ASCII")
         ldac_cat=None
         cata = pd.read_csv(filepath)
     elif file_extension == 'feather':
         #Read feather with pandas 
+        print("reading as feather")
         ldac_cat=None
         cata = pd.read_feather(filepath)
     elif file_extension == 'fits' or file_extension == 'cat':
@@ -40,11 +45,13 @@ def flexible_read(filepath,as_df=True):
             #Read LDAC with ldac tools
             ldac_cat = ldac.LDACCat(filepath)
             cata = ldac_cat['OBJECTS']
+            print("reading as LDAC")
             if as_df: 
                 #Convert the catalogue to a pandas data frame 
                 cata=pd.DataFrame(cata.hdu.data)
         except Exception:
             #If that fails, read with fits 
+            print("reading as FITS")
             ldac_cat=None
             cata = apd.read_fits(filepath)
     else:
