@@ -3,7 +3,7 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Fri 05 May 2023 10:49:58 AM CEST
+# Last Modified : Sat 08 Jul 2023 10:37:05 PM CEST
 #
 #=========================================
 
@@ -151,6 +151,7 @@ fi
 #}}}
 
 #Requested sampler {{{
+OUTPUTNAME="%(OUTPUT_FOLDER)s/output_%(RUN_NAME)s.txt"
 SAMPLER="@BV:SAMPLER@"
 VALUES=values
 PRIORS=priors
@@ -262,8 +263,7 @@ then
 	filename = %(OUTPUT_FOLDER)s/output_${list_input}_%(blind)s.txt 
 	
 	EOF
-  @P_SED_INPLACE@ "s@filename = %(OUTPUT_FOLDER)s/output_%(RUN_NAME)s.txt@filename = %(OUTPUT_FOLDER)s/output_list_%(RUN_NAME)s.txt@g" \
-  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini
+  OUTPUTNAME="%(OUTPUT_FOLDER)s/output_list_${list_input}_%(blind)s.txt"
 
 #}}}
 elif [ "${SAMPLER^^}" == "EMCEE" ] #{{{
@@ -284,7 +284,7 @@ fi
 extraparams="cosmological_parameters/S_8 cosmological_parameters/sigma_8 cosmological_parameters/A_s cosmological_parameters/omega_m cosmological_parameters/omega_nu cosmological_parameters/omega_lambda cosmological_parameters/cosmomc_theta"
 #Add nz shift values to outputs {{{
 shifts=""
-NTOMO=@BV:NTOMO@
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 for i in `seq ${NTOMO}`
 do 
    shifts="${shifts} nofz_shifts/bias_${i}"
@@ -317,7 +317,7 @@ debug = F
 sampler = %(SAMPLER_NAME)s
 
 [output]
-filename = %(OUTPUT_FOLDER)s/output_%(RUN_NAME)s.txt
+filename = ${OUTPUTNAME}
 format = text
 
 EOF
