@@ -3,7 +3,7 @@
 # File Name : make_m_covariance.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Tue 13 Jun 2023 09:57:23 AM CEST
+# Last Modified : Sat 08 Jul 2023 08:49:32 AM CEST
 #
 #=========================================
 
@@ -40,7 +40,7 @@ do
     @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/make_m_covariance.py \
       --msigm ${msigm} \
       --mcorr ${mcorr} \
-      --output "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov/m_corr_r" 2>&1
+      --output "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov/m_corr_${patch}_r" 2>&1
     
     outputlist="${outputlist} m_corr_${patch}_r.ascii m_corr_${patch}_r_0p02.ascii m_corr_${patch}_r_correl.ascii m_corr_${patch}_r_uncorrelated_inflated.ascii m_corr_${patch}_r_uncorrelated_inflated_0p02.ascii"
 
