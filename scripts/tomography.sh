@@ -3,7 +3,7 @@
 #
 
 #Get the number of tomographic bins 
-NTOMO="@BV:NTOMO@"
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 
 #Input Filename & Extension {{{
 inputfile=@DB:DATAHEAD@

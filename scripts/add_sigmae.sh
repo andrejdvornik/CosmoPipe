@@ -3,7 +3,7 @@
 # File Name : add_sigmae.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Fri 05 May 2023 10:18:30 AM CEST
+# Last Modified : Fri 07 Jul 2023 08:04:20 PM CEST
 #
 #=========================================
 
@@ -15,7 +15,8 @@ fi
 
 outputlist=''
 filelist="@DB:ALLHEAD@"
-for inp in `seq @BV:NTOMO@` 
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
+for inp in `seq ${NTOMO}` 
 do 
   file=`echo ${filelist} | awk -v n=$inp '{print $n}'`
   sigmae=`echo @SIGMAELIST@ | awk -v n=$inp '{print $n}'`

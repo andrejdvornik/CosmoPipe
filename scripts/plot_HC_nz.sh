@@ -3,13 +3,14 @@
 # File Name : plot_HC_nz.sh
 # Created By : awright
 # Creation Date : 23-03-2023
-# Last Modified : Tue 06 Jun 2023 10:59:03 PM CEST
+# Last Modified : Fri 07 Jul 2023 08:07:57 PM CEST
 #
 #=========================================
 
 #Construct the tomographic bin catalogue strings {{{
 binstrings=''
-for i in `seq @BV:NTOMO@`
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
+for i in `seq ${NTOMO}`
 do
   #Define the Z_B limits from the TOMOLIMS {{{
   ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $n}'`

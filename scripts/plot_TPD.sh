@@ -3,7 +3,7 @@
 # File Name : plot_TPD.sh
 # Created By : awright
 # Creation Date : 18-04-2023
-# Last Modified : Fri 05 May 2023 10:22:26 AM CEST
+# Last Modified : Sat 08 Jul 2023 10:39:11 PM CEST
 #
 #=========================================
 
@@ -37,14 +37,16 @@ then
   mkdir -p @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
 fi 
 
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
+
 #Run the R plotting code 
 @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/plot_TPD_corner.R \
   --datavec ${datavec} \
   --covariance ${covariance} \
   --tpds @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/output_list_@BV:LIST_INPUT_SAMPLER@_@BV:BLIND@.txt \
-  --ntomo @BV:NTOMO@ \
+  --ntomo ${NTOMO} \
   --sampler @BV:LIST_INPUT_SAMPLER@ \
   --output @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/TPD_@BV:LIST_INPUT_SAMPLER@_@BV:BLIND@.pdf \
-  --xlabel "${xlabel}" --ylabel "${ylabel}"
+  --xlabel "${xlabel}" --ylabel "${ylabel}" 2>&1
 
 

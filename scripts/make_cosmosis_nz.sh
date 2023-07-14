@@ -3,19 +3,20 @@
 # File Name : make_cosmosis_nz.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Wed 24 May 2023 04:10:13 PM CEST
+# Last Modified : Fri 07 Jul 2023 08:07:21 PM CEST
 #
 #=========================================
 
 
 inputs="@DB:nz@"
 
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 outputlist=''
 for patch in @PATCHLIST@ @ALLPATCH@ 
 do 
   filelist=''
   #Get the file list {{{
-  for ZBIN1 in `seq @BV:NTOMO@`
+  for ZBIN1 in `seq ${NTOMO}`
   do
     #Define the Z_B limits from the TOMOLIMS {{{
     ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN1 '{print $n}'`

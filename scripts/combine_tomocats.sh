@@ -3,7 +3,7 @@
 # File Name : combine_cats.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Fri 09 Jun 2023 05:03:08 PM CEST
+# Last Modified : Fri 07 Jul 2023 08:05:40 PM CEST
 #
 #=========================================
 
@@ -37,12 +37,13 @@ then
   exit 1 
 fi 
 
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 #For each bin-one catalogue: 
 for file in ${binone_input}
 do 
   #Get the tomographic file list for these catalogues 
   filelist=""
-  for i in `seq @BV:NTOMO@`
+  for i in `seq ${NTOMO}`
   do
     #Define the Z_B limits from the TOMOLIMS {{{
     ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $n}'`

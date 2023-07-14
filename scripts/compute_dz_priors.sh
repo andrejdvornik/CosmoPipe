@@ -3,7 +3,7 @@
 # File Name : compute_m_bias.sh
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Tue 27 Jun 2023 11:26:37 AM CEST
+# Last Modified : Fri 07 Jul 2023 08:06:13 PM CEST
 #
 #=========================================
 
@@ -23,7 +23,8 @@ fi
 
 #Construct the tomographic bin catalogue strings {{{
 binstrings=''
-for i in `seq @BV:NTOMO@`
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
+for i in `seq ${NTOMO}`
 do
   #Define the Z_B limits from the TOMOLIMS {{{
   ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $n}'`

@@ -3,7 +3,7 @@
 # File Name : match_to_sims.sh
 # Created By : awright
 # Creation Date : 15-06-2023
-# Last Modified : Tue 11 Jul 2023 08:09:12 AM UTC
+# Last Modified : Tue 11 Jul 2023 03:38:30 PM CEST
 #
 #=========================================
 
@@ -94,8 +94,9 @@ do
           ${feature_list} \
           --norm \
           --duplicates \
+          --progress \
           --clone @BV:ZSPECDATA@ ${data_features} \
-          --idx-interval 1000 \
+          --idx-interval @BV:MATCH_NIDX@ \
           --z-cut 2>&1 
 
   #Notify 

@@ -3,7 +3,7 @@
 # File Name : compute_m_bias.sh
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Tue 13 Jun 2023 09:50:34 AM CEST
+# Last Modified : Fri 07 Jul 2023 08:06:32 PM CEST
 #
 #=========================================
 
@@ -128,7 +128,8 @@ do
 
   #Construct the tomographic bin catalogue strings {{{
   binstrings=''
-  for i in `seq @BV:NTOMO@`
+  NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
+  for i in `seq ${NTOMO}`
   do
     #Define the Z_B limits from the TOMOLIMS {{{
     ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $n}'`
@@ -145,7 +146,7 @@ do
 
   #Output the m-prior files {{{
   nfile=`echo ${filelist} | awk '{print NF}'`
-  if [ ${nfile} -gt @BV:NTOMO@ ]
+  if [ ${nfile} -gt ${NTOMO} ]
   then 
     #If there are multiple realisations {{{
     #If needed, create the output cov directory {{{
@@ -169,7 +170,7 @@ do
     _write_datablock mcov_${patch} "m_${patch}_covariance.txt"
     #}}}
     #}}}
-  elif [ ${nfile} -eq @BV:NTOMO@ ]
+  elif [ ${nfile} -eq ${NTOMO} ]
   then 
     #Output the m-bias values for this patch into the mbias block {{{
     tail -qn 1 ${filelist} | awk -F, '{printf $1" "}' > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias/m_${patch}_biases.txt

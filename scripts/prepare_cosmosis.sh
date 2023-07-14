@@ -3,13 +3,15 @@
 # File Name : prepare_cosmosis.sh
 # Created By : awright
 # Creation Date : 31-03-2023
-# Last Modified : Thu 15 Jun 2023 08:55:51 AM CEST
+# Last Modified : Fri 07 Jul 2023 08:09:30 PM CEST
 #
 #=========================================
 
 #For each of the files in the nz directory 
 inputs="@DB:nz@"
 headfiles="@DB:ALLHEAD@"
+
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 
 #N_effective & sigmae {{{
 for stat in neff sigmae
@@ -93,91 +95,18 @@ do
   done 
 done 
 #}}}
-#
-##Sigma_e {{{
-#outlist=''
-#for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
-#do 
-#  #Get all the files in this patch {{{
-#  patchinputs=''
-#  for file in ${inputs}
-#  do 
-#    if [[ "$file" =~ .*"_${patch}_".* ]]
-#    then 
-#      patchinputs="${patchinputs} ${file}"
-#    fi 
-#  done 
-#  #}}}
-#  #If there are no files in this patch, skip {{{
-#  if [ "${patchinputs}" == "" ] 
-#  then 
-#    continue
-#  fi 
-#  #}}}
-#  #Create the sigmae directory {{{
-#  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae_${patch} ]
-#  then 
-#    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae_${patch}/
-#  fi 
-#  #}}}
-#  #Get all the sigmae files for this patch {{{
-#  sigmae_list=''
-#  for file in ${patchinputs} 
-#  do 
-#    #Get the file extension and names {{{
-#    ext=${file##*.}
-#    sigmae_file=${file//\/nz\//\/sigmae\/}
-#    #}}}
-#    #Find the matching file {{{
-#    sigmae_file=`compgen -G ${sigmae_file//_Nz.${ext}/_*_sigmae.txt} || echo `
-#    if [ ! -f ${sigmae_file} ] 
-#    then 
-#      _message "@RED@ ERROR!\n@DEF@"
-#      _message "@RED@ There is no sigma_e file:\n@DEF@"
-#      _message "${sigmae_file}\n"
-#      _message "@BLU@ ==> You probably need to run the @DEF@neff_sigmae@BLU@ mode when these catalogues are in the DATAHEAD!\n"
-#      _message "@BLU@ ==> Or you didn't merge the goldclasses with the main catalogue?!\n"
-#      exit 1
-#    fi 
-#    #}}}
-#    #Add file to the sigmae list {{{
-#    sigmae_list="${sigmae_list} ${sigmae_file}"
-#    #}}}
-#  done 
-#  #}}}
-#  #Define the output sigma_e file {{{
-#  sigmae_file=${sigmae_file##*/}
-#  sigmae_file=${sigmae_file%_ZB*}_sigmae.txt 
-#  #}}}
-#  #Remove preexisting files {{{
-#  if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae_${patch}/${sigmae_file} ]
-#  then 
-#    _message " > @BLU@Removing previous cosmosis sigmae file@DEF@"
-#    rm @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae_${patch}/${sigmae_file}
-#    _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
-#  fi 
-#  #}}}
-#  #Construct the output file, maintaining order {{{
-#  paste ${sigmae_list} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_sigmae_${patch}/${sigmae_file}
-#  #}}}
-#  #Add the sigma_e file to the datablock {{{
-#  _write_datablock "cosmosis_sigmae_${patch}" "${sigmae_file}"
-#  #}}}
-#done 
-##}}}
-#  
+
 #Xipm {{{
 if [ "${headfiles}" != "" ]
 then 
   _message "Copying XIpm catalogues from datahead into cosmosis_xipm {\n"
   #Loop over patches {{{
-  ntomo="@BV:NTOMO@"
   outall=''
   for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
   do 
     outlist=''
     #Loop over tomographic bins in this patch {{{
-    for ZBIN1 in `seq ${ntomo}`
+    for ZBIN1 in `seq ${NTOMO}`
     do
       #Define the Z_B limits from the TOMOLIMS {{{
       ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN1 '{print $n}'`
@@ -189,7 +118,7 @@ then
       appendstr="_ZB${ZB_lo_str}t${ZB_hi_str}"
       #}}}
       #Loop over the second ZB bins {{{
-      for ZBIN2 in `seq $ZBIN1 ${ntomo}`
+      for ZBIN2 in `seq $ZBIN1 ${NTOMO}`
       do
         #Define the Z_B limits from the TOMOLIMS {{{
         ZB_lo2=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN2 '{print $n}'`
@@ -221,11 +150,11 @@ then
         #Copy the file {{{
         _message " > @BLU@ Patch @DEF@${patch}@BLU@ ZBIN @DEF@${ZBIN1}@BLU@x@DEF@${ZBIN2}"
         cp ${file} \
-          @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm_${patch}/XI_@SURVEY@_${patch}_nBins_${ntomo}_Bin${ZBIN1}_Bin${ZBIN2}.ascii
+          @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm_${patch}/XI_@SURVEY@_${patch}_nBins_${NTOMO}_Bin${ZBIN1}_Bin${ZBIN2}.ascii
         _message " - @RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
         #}}}
         #Save the file to the output list {{{
-        outlist="${outlist} XI_@SURVEY@_${patch}_nBins_${ntomo}_Bin${ZBIN1}_Bin${ZBIN2}.ascii"
+        outlist="${outlist} XI_@SURVEY@_${patch}_nBins_${NTOMO}_Bin${ZBIN1}_Bin${ZBIN2}.ascii"
         #}}}
       done 
       #}}}
@@ -263,7 +192,7 @@ cp @RUNROOT@/@CONFIGPATH@/values.ini @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosi
 echo "[nofz_shifts]" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini 
 #Add the uncorrelated tomographic bin shifts 
 tomoval_all=`cat @DB:nzbias_uncorr@`
-for tomo in `seq @BV:NTOMO@`
+for tomo in `seq ${NTOMO}`
 do 
   tomoval=`echo ${tomoval_all} | awk -v n=${tomo} '{print $n}'`
   echo "uncorr_bias_${tomo} = -5.0 ${tomoval} 5.0 " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
@@ -273,7 +202,7 @@ echo > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
 #Update the values with the uncorrelated Dz priors
 echo "[nofz_shifts]" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini 
 #Add the uncorrelated tomographic bin shifts 
-for tomo in `seq @BV:NTOMO@`
+for tomo in `seq ${NTOMO}`
 do 
   tomoval=`echo ${tomoval_all} | awk -v n=${tomo} '{print $n}'`
   echo "uncorr_bias_${tomo} = gaussian ${tomoval} 1.0 " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini

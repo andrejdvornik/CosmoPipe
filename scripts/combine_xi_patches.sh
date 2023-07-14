@@ -3,7 +3,7 @@
 # File Name : combine_xi_patches.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Fri 19 May 2023 02:05:21 PM CEST
+# Last Modified : Fri 07 Jul 2023 08:06:00 PM CEST
 #
 #=========================================
 
@@ -11,9 +11,9 @@
 _message "Combining Correlation Functions by patch\n"
 headfiles="@DB:ALLHEAD@"
 
-ntomo="@BV:NTOMO@"
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 #Loop over tomographic bins in this patch 
-for ZBIN1 in `seq ${ntomo}`
+for ZBIN1 in `seq ${NTOMO}`
 do
   #Define the Z_B limits from the TOMOLIMS {{{
   ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN1 '{print $n}'`
@@ -25,7 +25,7 @@ do
   appendstr="_ZB${ZB_lo_str}t${ZB_hi_str}"
   #}}}
   
-  for ZBIN2 in `seq $ZBIN1 ${ntomo}`
+  for ZBIN2 in `seq $ZBIN1 ${NTOMO}`
   do
     ZB_lo2=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN2 '{print $n}'`
     ZB_hi2=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN2 '{print $(n+1)}'`

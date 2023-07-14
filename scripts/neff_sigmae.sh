@@ -3,7 +3,7 @@
 # File Name : neff_sigmae.sh
 # Created By : awright
 # Creation Date : 28-03-2023
-# Last Modified : Fri 19 May 2023 11:19:54 AM CEST
+# Last Modified : Fri 07 Jul 2023 08:07:49 PM CEST
 #
 #=========================================
 
@@ -41,12 +41,12 @@ _message "> @BLU@Computing sigma_e and n_effective for catalogue:@DEF@ ${catname
   --area ${SurveyArea} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cov_input/${catbase}_neff_sigmae.txt 
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
-ntomo="@BV:NTOMO@"
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 
 tail -n +2 @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cov_input/${catbase}_neff_sigmae.txt \
-  | head -n ${ntomo} | awk '{ printf $2" " }' >  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/neff/${catbase}_neff.txt 
+  | head -n ${NTOMO} | awk '{ printf $2" " }' >  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/neff/${catbase}_neff.txt 
 tail -n +2 @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cov_input/${catbase}_neff_sigmae.txt \
-  | head -n ${ntomo} | awk '{ printf $7" " }' > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/sigmae/${catbase}_sigmae.txt 
+  | head -n ${NTOMO} | awk '{ printf $7" " }' > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/sigmae/${catbase}_sigmae.txt 
 
 #Add the new file to the datablock 
 neffblock=`_read_datablock neff`
