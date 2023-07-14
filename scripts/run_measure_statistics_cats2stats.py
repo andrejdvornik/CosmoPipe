@@ -289,8 +289,8 @@ elif mode =='bandpowers_ee':
     np.savetxt(CEfileName,CE)
     np.savetxt(CBfileName,CB)
     if save:
-        FilterPlusFileName=cfoldername+"/FilterPlus_"+outputfile+".asc"
-        FilterMinusFileName=cfoldername+"/FilterMinus_"+outputfile+".asc"
+        FilterPlusFileName=cfoldername+"/FilterEEPlus_"+outputfile+".asc"
+        FilterMinusFileName=cfoldername+"/FilterEEMinus_"+outputfile+".asc"
         np.savetxt(FilterPlusFileName,filter_plus)
         np.savetxt(FilterMinusFileName,filter_minus)
 
@@ -313,7 +313,7 @@ elif mode =='bandpowers_ne':
     np.savetxt(CnEfileName,CnE)
     np.savetxt(CnBfileName,CnB)
     if save:
-        FilterFileName=cfoldername+"/Filter_"+outputfile+".asc"
+        FilterFileName=cfoldername+"/FilterNE_"+outputfile+".asc"
         np.savetxt(FilterFileName,filter)
 elif mode =='bandpowers_nn':
     Cnn = np.zeros(nbins)
@@ -328,5 +328,5 @@ elif mode =='bandpowers_nn':
     CnnfileName=cfoldername+"/Cnn_"+outputfile+".asc"
     np.savetxt(CnnfileName,Cnn)
     if save:
-        FilterFileName=cfoldername+"/Filter_"+outputfile+".asc"
+        FilterFileName=cfoldername+"/FilterNN_"+outputfile+".asc"
         np.savetxt(FilterFileName,filter)
