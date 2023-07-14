@@ -44,7 +44,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BINSTRINGONE BINSTRINGTWO BV:NTOMO CONFIGPATH RUNROOT
+  echo BINSTRINGONE BINSTRINGTWO BV:TOMOLIMS CONFIGPATH RUNROOT
 } 
 #}}}
 
