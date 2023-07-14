@@ -93,15 +93,24 @@ def integ_xi(xi_func,theta_edges, ntheta):
     return xip_integrated
 
 # calculates g_plus/gminus functions for Bandpowers
-def gplus(theta,l_lo,l_up):
+def gplus(theta, l_lo, l_up):
     gplus = 1/(theta**2) * (theta*l_up*jv(1,theta*l_up)-theta*l_lo*jv(1,theta*l_lo))
     return gplus
-def gminus(theta,l_lo,l_up):
+def gminus(theta, l_lo, l_up):
     gminus = 1/(theta**2) * (G(theta*l_up)-G(theta*l_lo))
     return gminus
 def G(x):
     G = (x-8/x)*jv(1,x)-8*jv(2,x)
     return(G)
+# h for ne
+def h(theta, l_lo, l_up):
+    h = -1/(theta**2) * ((theta*l_up*jv(1,theta*l_up)-theta*l_lo*jv(1,theta*l_lo)) + 2*jv(0,theta*l_up) - 2*jv(0,theta*l_lo))
+    return(h)
+# f for nn
+def f(theta, l_lo, l_up):
+    f = l_up*jv(1,theta*l_up) - l_lo*jv(1,theta*l_lo)
+    return(f)
+# Apodisation window
 def T(theta, theta_lo, theta_up, logwidth):
     x_lo = np.log(theta_lo)
     x_up = np.log(theta_up)

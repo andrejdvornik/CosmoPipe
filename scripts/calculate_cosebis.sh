@@ -54,13 +54,14 @@ fi
 # --root = TLogsRootsAndNorms/Root_${tmin}-${tmax}.table
 
 _message "    -> @BLU@Computing COSEBIs for file @RED@${input##*/}@DEF@"
-@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/run_measure_cosebis_cats2stats.py \
+@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/run_measure_statistics_cats2stats.py \
   -i ${input} \
   -t "meanr" -p "xip" -m "xim" \
   --cfoldername ${outfold} \
   -o ${output} -b @BINNING@ -n @BV:NMAXCOSEBIS@ -s @BV:THETAMINCOV@ \
   -l @BV:THETAMAXCOV@ --tfoldername ${SRCLOC}/Tplus_minus \
-  --norm ${normfile} --root ${rootfile} 2>&1 
+  --norm ${normfile} --root ${rootfile} \
+  -d "cosebis" 2>&1 
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 #Add the files to the datablock 

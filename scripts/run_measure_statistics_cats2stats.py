@@ -6,11 +6,11 @@ import math, os
 from matplotlib.patches import Rectangle
 from scipy.interpolate import interp1d
 from scipy import pi,sqrt,exp
-from measure_cosebis import tminus_quad, tplus, tminus, gplus, gminus, T, str2bool
+from measure_statistics import tminus_quad, tplus, tminus, gplus, gminus, T, str2bool, h, f
 from argparse import ArgumentParser
 
-# Written by Marika Asgari (ma@roe.ac.uk)
-# Python script to return COSEBIS E and B modes given a measured 2pt correlation function
+# Written by Marika Asgari (ma@roe.ac.uk), bandpowers implementation by B.Stoelzner
+# Python script to return COSEBIS E and B modes and Bandpowers (EE, NE, NN) given a measured 2pt correlation function
 # Note that the input correlation function needs to contain data that 
 # exactly spans the required ${tmin}-${tmax} range
 
@@ -22,102 +22,127 @@ from argparse import ArgumentParser
 
 # Specify the input arguments
 parser = ArgumentParser(description='Take input 2pcfs files and calculate 2pt statistics')
-parser.add_argument("-d", "--statistic", dest="statistic",
-    help="Desired 2pt statistic, must be either cosebis or bandpowers", type=str, required=True)
+parser.add_argument("-d", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis', 'bandpowers_ee', 'bandpowers_ne', 'bandpowers_nn'],
+    help="Desired 2pt statistic, must be either cosebis, bandpowers_ee, bandpowers_ne, or bandpowers_nn")
 
-parser.add_argument("-i", "--inputfile", dest="inputfile",
-    help="Full Input file name", metavar="inputFile",required=True)
+# Input file, columns, theta range, and other options
+parser.add_argument("-i", "--inputfile", dest="inputfile", required=True,
+    help="Full Input file name", metavar="inputFile")
+parser.add_argument('-t','--theta_col', dest="theta_col", type=str,nargs='?', required=True,
+    help='column for theta')
+parser.add_argument('-p','--xip_col', dest="xip_col", type=str,nargs='?', required=False,
+    help='column for xi_plus')
+parser.add_argument('-m','--xim_col', dest="xim_col", type=str, nargs='?', required=False,
+    help='column for xi_minus')
+parser.add_argument('-g','--gamma_t_col', dest="gamma_t_col", type=str, nargs='?', required=False,
+    help='column for gamma_t')
+parser.add_argument('-q','--gamma_x_col', dest="gamma_x_col", type=str, nargs='?', required=False,
+    help='column for gamma_x')
+parser.add_argument('-j','--w_theta_col', dest="w_theta_col", type=str, nargs='?', required=False,
+    help='column for clustering correlation function')
+parser.add_argument('-s','--thetamin', dest="thetamin", type=float, default=0.5, nargs='?', 
+    help='value of thetamin in arcmins, default is 0.5')
+parser.add_argument('-l','--thetamax', dest="thetamax", type=float, default=300.0, nargs='?', 
+    help='value of thetamax, in arcmins, default is 300')
+parser.add_argument('--cfoldername', dest="cfoldername", default="./2pt_results",required=False,
+    help='full name and address of the folder for output files, default is 2pt_results')
+parser.add_argument("-o", "--outputfile", dest="outputfile", metavar="outputFile",required=True,
+    help="output file name suffix. The outputs are cfoldername/En_${outputfile}.ascii and cfoldername/Bn_${outputfile}.ascii")
+parser.add_argument('-b','--binning', dest="binning", default="log",required=False,
+    help='log or lin binning, default is log')
+parser.add_argument('-f','--force',dest="force",nargs='?',default=False,required=False,
+    help='Do not check if the bin edges match. Default is FALSE.')
+parser.add_argument('--save_kernels',dest="save_kernels",nargs='?',default=False,required=False,
+    help='Write kernels to disk. Default is FALSE.')
 
-parser.add_argument('-t','--theta_col', dest="theta_col", type=str,nargs='?',required=True,
-         help='column for theta, default is 0')
-
-parser.add_argument('-p','--xip_col', dest="xip_col", type=str,nargs='?',required=True,
-         help='column for xi_plus, default is 1')
-
-parser.add_argument('-m','--xim_col', dest="xim_col", type=str, nargs='?',required=True,
-         help='column for xi_minus, default is 2')
-
-
-parser.add_argument('--cfoldername', dest="cfoldername", 
-    help='full name and address of the folder for En/Bn files, default is 2pt_results',default="./2pt_results",required=False)
-
-parser.add_argument("-o", "--outputfile", dest="outputfile"
-                    ,help="output file name suffix. The outputs are cfoldername/En_${outputfile}.ascii and cfoldername/Bn_${outputfile}.ascii"
-                    ,metavar="outputFile",required=True)
-
-
-parser.add_argument('-b','--binning', dest="binning", help='log or lin binning, default is log',default="log",required=False)
-parser.add_argument('-f','--force',dest="force",nargs='?', help='Do not check if the bin edges match. Default is FALSE.',default=False,required=False)
-
-parser.add_argument('-n','--nCOSEBIs', dest="nModes", type=int,default=10, nargs='?',
-         help='number of COSEBIs modes to produce, default is 10')
-
-parser.add_argument('-s','--thetamin', dest="thetamin", type=float,default=0.5, 
-    nargs='?', help='value of thetamin in arcmins')
-
-parser.add_argument('-l','--thetamax', dest="thetamax", type=float,default=300.0, 
-    nargs='?', help='value of thetamax, in arcmins')
-
-parser.add_argument('--tfoldername', dest="tfoldername", help='name and full address of the folder for Tplus Tminus files, will make it if it does not exist',default="Tplus_minus",required=False)
-parser.add_argument('--tplusfile', dest="tplusfile", help='name of Tplus file, will look for it before running the code',default="Tplus",required=False)
-parser.add_argument('--tminusfile', dest="tminusfile", help='name of Tplus file, will look for it before running the code',default="Tminus",required=False)
-
-parser.add_argument('-c','--norm', dest="normfile", help='normalisation file name and address for T_plus/minus', metavar="norm",required=True)
-parser.add_argument('-r','--root', dest="rootfile", help='roots file name and address for T_plus/minus', metavar="root",required=True)
+# COSEBIs options
+parser.add_argument('-n','--nCOSEBIs', dest="nCOSEBIs", type=int, default=10, nargs='?',
+    help='number of COSEBIs modes to produce, default is 10')
+parser.add_argument('--tfoldername', dest="tfoldername", default="Tplus_minus", required=False,
+    help='name and full address of the folder for Tplus Tminus files for COSEBIs, will make it if it does not exist')
+parser.add_argument('--tplusfile', dest="tplusfile", default="Tplus", required=False,
+    help='name of Tplus file for COSEBIs, will look for it before running the code')
+parser.add_argument('--tminusfile', dest="tminusfile", default="Tminus", required=False,
+    help='name of Tplus file for COSEBIs, will look for it before running the code')
+parser.add_argument('-c','--norm', dest="normfile", metavar="norm",required=False,
+    help='normalisation file name and address for T_plus/minus for COSEBIs')
+parser.add_argument('-r','--root', dest="rootfile", metavar="root",required=False,
+    help='roots file name and address for T_plus/minus for COSEBIs')
+    
 
 #Bandpowers options
-parser.add_argument('-w','--logwidth', dest="logwidth", type=float,default=0.5, 
-    nargs='?', help='width of apodisation window for bandpowers')
-
-parser.add_argument('-a','--ellmin', dest="ellmin", type=float,default=100, 
-    nargs='?', help='value of ellmin for bandpowers')
-
-parser.add_argument('-c','--ellmax', dest="ellmax", type=float,default=1500, 
-    nargs='?', help='value of ellmax for bandpowers')
-
+parser.add_argument('-w','--logwidth', dest="logwidth", type=float,default=0.5, nargs='?', 
+    help='width of apodisation window for bandpowers')
+parser.add_argument('--thetaminbp', dest="thetaminbp", type=float, default=0.5, nargs='?', 
+    help='value of apodisation thetamin in arcmins, default is 0.5')
+parser.add_argument('--thetamaxbp', dest="thetamaxbp", type=float, default=300.0, nargs='?', 
+    help='value of apodisation thetamax, in arcmins, default is 300')
+parser.add_argument('-z','--ellmin', dest="ellmin", type=float,default=100, nargs='?', 
+    help='value of ellmin for bandpowers')
+parser.add_argument('-x','--ellmax', dest="ellmax", type=float,default=1500, nargs='?', 
+    help='value of ellmax for bandpowers')
 parser.add_argument('-k','--nbins', dest="nbins", type=int,default=8, nargs='?',
-         help='number of logarithmic bandpowers bins between ellmin and ellmax to produce, default is 8')
-
+    help='number of logarithmic bandpowers bins between ellmin and ellmax to produce, default is 8')
 
 args = parser.parse_args()
-
+# Mode
+mode=args.statistic 
+# General options
 inputfile=args.inputfile
 theta_col=args.theta_col
 xip_col=args.xip_col
 xim_col=args.xim_col
-outputfile=args.outputfile
-nModes=args.nModes
+gamma_t_col=args.gamma_t_col
+gamma_x_col=args.gamma_x_col
+w_theta_col=args.w_theta_col
 thetamin=args.thetamin
 thetamax=args.thetamax
-normfile=args.normfile
-rootfile=args.rootfile
+cfoldername=args.cfoldername
+outputfile=args.outputfile
+binning=args.binning
+DontCheckBinEdges=str2bool(args.force)
+# COSEBIs options
+nModes=args.nCOSEBIs
+tfoldername=args.tfoldername
 tplusfile=args.tplusfile
 tminusfile=args.tminusfile
-tfoldername=args.tfoldername
-cfoldername=args.cfoldername
-binning=args.binning
+normfile=args.normfile
+rootfile=args.rootfile
+# Bandpower options
+logwidth=args.logwidth
+thetamin_apod=args.thetaminbp
+thetamax_apod=args.thetamaxbp
 ellmin=args.ellmin
 ellmax=args.ellmax
-logwidth=args.logwidth
 nbins=args.nbins
-mode=args.statistic 
-DontCheckBinEdges=str2bool(args.force)
+save=args.save_kernels
 
-print('input file is '+inputfile+', making COSEBIs for '+str(nModes)+' modes and theta in ['+'%.2f' %thetamin+"'," 
+print('Input file is '+inputfile+', making '+str(mode)+' for theta in ['+'%.2f' %thetamin+"'," 
     +'%.2f' %thetamax+"'], outputfiles are: "+cfoldername+"/En_"+outputfile+'.ascii and '+cfoldername+'/Bn_'+outputfile+'.ascii')
 
 
 # Load the input 2pt correlation function data
 file=open(inputfile)
 header=file.readline().strip('#').split()
-xipm_in=np.loadtxt(file,comments='#')
-xipm_data={}
+tpcf_in=np.loadtxt(file,comments='#')
+tpcf_data={}
 for i, col in enumerate(header):
-    xipm_data[col]=xipm_in[:,i]
+    tpcf_data[col]=tpcf_in[:,i]
 
-theta=xipm_data[theta_col]
-xip=xipm_data[xip_col]
-xim=xipm_data[xim_col]
+theta=tpcf_data[theta_col]
+if xip_col:
+    xip=tpcf_data[xip_col]
+    xim=tpcf_data[xim_col]
+if gamma_t_col:
+    gamma_t=tpcf_data[gamma_t_col]
+    gamma_x=tpcf_data[gamma_x_col]
+if w_theta_col:
+    w_theta=tpcf_data[w_theta_col]
+
+# Yell at the user if the normalisation and roots files aren't provided when calculating COSEBIs
+if mode=='cosebis':
+    if not ((normfile != None) and (rootfile != None)):
+        raise Exception('Normfile and rootfile need to be provided when calculating COSEBIs!')
 
 # Conversion from xi_pm to COSEBIS depends on linear or log binning in the 2pt output
 # Check that the data exactly spans the theta_min -theta_max range that has been defined
@@ -159,18 +184,23 @@ elif(binning=='lin'):
     if(nbins_within_range<1000):
         raise ValueError("The low number of bins in the input 2pt correlation function data will result in low accuracy.  Provide finer linear binned data with bins>100, exiting now ...")
 
-#OK now we can perform the COSEBI integrals
+#OK now we can perform the integrals
 arcmin=180*60/np.pi
-
-if not os.path.exists(tfoldername):
-    os.makedirs(tfoldername)
+arcmin2rad = 2*np.pi/360/60
 
 if not os.path.exists(cfoldername):
     os.makedirs(cfoldername)
 
 if mode =='cosebis':
+    if not os.path.exists(tfoldername):
+        os.makedirs(tfoldername)
+
     En=np.zeros(nModes)
     Bn=np.zeros(nModes)
+    integ_plus = np.zeros((nModes,len(theta_mid)))
+    integ_minus = np.zeros((nModes,len(theta_mid)))
+    filter_plus = np.zeros((nModes,len(theta_mid)))
+    filter_minus = np.zeros((nModes,len(theta_mid)))
 
     #Define theta-strings for Tplus/minus filename
     tmin='%.2f' % thetamin
@@ -218,11 +248,13 @@ if mode =='cosebis':
         tp_func=interp1d(tp[:,0], tp[:,1])
         tm_func=interp1d(tm[:,0], tm[:,1])
         # 
-        integ_plus=tp_func(theta_mid)*theta_mid*xip[good_args]
-        integ_minus=tm_func(theta_mid)*theta_mid*xim[good_args]
+        integ_plus[n-1]=tp_func(theta_mid)*theta_mid*xip[good_args]
+        integ_minus[n-1]=tm_func(theta_mid)*theta_mid*xim[good_args]
+        filter_plus[n-1]=tp_func(theta_mid)*theta_mid
+        filter_minus[n-1]=tm_func(theta_mid)*theta_mid
         # 
-        Integral_plus=sum(integ_plus*delta_theta)
-        Integral_minus=sum(integ_minus*delta_theta)
+        Integral_plus=sum(integ_plus[n-1]*delta_theta)
+        Integral_minus=sum(integ_minus[n-1]*delta_theta)
         En[n-1]=0.5*(Integral_plus+Integral_minus)/arcmin/arcmin
         Bn[n-1]=0.5*(Integral_plus-Integral_minus)/arcmin/arcmin
 
@@ -230,29 +262,71 @@ if mode =='cosebis':
     BnfileName=cfoldername+"/Bn_"+outputfile+".asc"
     np.savetxt(EnfileName,En)
     np.savetxt(BnfileName,Bn)
+    if save:
+        IntegPlusFileName=cfoldername+"/FilterPlus_"+outputfile+".asc"
+        IntegMinusFileName=cfoldername+"/FilterMinus_"+outputfile+".asc"
+        np.savetxt(IntegPlusFileName,filter_plus)
+        np.savetxt(IntegMinusFileName,filter_minus)
 
-elif mode =='bandpowers':
-    arcmin2rad = 2*np.pi/360/60
-
-    CE=np.zeros(nbins)
-    CB=np.zeros(nbins)
-
+elif mode =='bandpowers_ee':
+    CE = np.zeros(nbins)
+    CB = np.zeros(nbins)
+    filter_plus = np.zeros((nbins,len(theta_mid)))
+    filter_minus = np.zeros((nbins,len(theta_mid)))
     ell = np.logspace(np.log10(ellmin), np.log10(ellmax), nbins+1)
 
     for i in range(len(ell)-1):
-        integ_plus=gplus(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin, thetamax, logwidth)*xip
-        integ_minus=gminus(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin, thetamax, logwidth)*xim
+        filter_plus[i]=gplus(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin_apod, thetamax_apod, logwidth)
+        filter_minus[i]=gminus(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin_apod, thetamax_apod, logwidth)
         N = np.log(ell[i+1]/ell[i])
-        Integral_plus=sum(integ_plus*delta_theta)
-        Integral_minus=sum(integ_minus*delta_theta)
+        Integral_plus=sum(filter_plus[i]*xip*delta_theta)
+        Integral_minus=sum(filter_minus[i]*xim*delta_theta)
         CE[i]=(Integral_plus+Integral_minus)*np.pi/N*arcmin2rad
         CB[i]=(Integral_plus-Integral_minus)*np.pi/N*arcmin2rad
 
-    CEfileName=cfoldername+"/CE_"+outputfile+".asc"
-    CBfileName=cfoldername+"/CB_"+outputfile+".asc"
+    CEfileName=cfoldername+"/CEE_"+outputfile+".asc"
+    CBfileName=cfoldername+"/CBB_"+outputfile+".asc"
     np.savetxt(CEfileName,CE)
     np.savetxt(CBfileName,CB)
+    if save:
+        FilterPlusFileName=cfoldername+"/FilterEEPlus_"+outputfile+".asc"
+        FilterMinusFileName=cfoldername+"/FilterEEMinus_"+outputfile+".asc"
+        np.savetxt(FilterPlusFileName,filter_plus)
+        np.savetxt(FilterMinusFileName,filter_minus)
 
+elif mode =='bandpowers_ne':
+    CnE = np.zeros(nbins)
+    CnB = np.zeros(nbins)
+    filter = np.zeros((nbins,len(theta_mid)))
+    ell = np.logspace(np.log10(ellmin), np.log10(ellmax), nbins+1)
 
+    for i in range(len(ell)-1):
+        filter[i]=h(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin_apod, thetamax_apod, logwidth)
+        N = np.log(ell[i+1]/ell[i])
+        IntegralE=sum(filter[i]*gamma_t*delta_theta)
+        IntegralB=sum(filter[i]*gamma_x*delta_theta)
+        CnE[i]=IntegralE*2*np.pi/N*arcmin2rad
+        CnB[i]=IntegralB*2*np.pi/N*arcmin2rad
 
+    CnEfileName=cfoldername+"/CnE_"+outputfile+".asc"
+    CnBfileName=cfoldername+"/CnB_"+outputfile+".asc"
+    np.savetxt(CnEfileName,CnE)
+    np.savetxt(CnBfileName,CnB)
+    if save:
+        FilterFileName=cfoldername+"/FilterNE_"+outputfile+".asc"
+        np.savetxt(FilterFileName,filter)
+elif mode =='bandpowers_nn':
+    Cnn = np.zeros(nbins)
+    filter = np.zeros((nbins,len(theta_mid)))
+    ell = np.logspace(np.log10(ellmin), np.log10(ellmax), nbins+1)
 
+    for i in range(len(ell)-1):
+        filter[i]=f(theta_mid*arcmin2rad, ell[i], ell[i+1])*T(theta_mid, thetamin_apod, thetamax_apod, logwidth)
+        N = np.log(ell[i+1]/ell[i])
+        Integral=sum(filter[i]*w_theta*delta_theta)
+        Cnn[i]=Integral*2*np.pi/N*arcmin2rad
+    CnnfileName=cfoldername+"/Cnn_"+outputfile+".asc"
+    np.savetxt(CnnfileName,Cnn)
+    if save:
+        FilterFileName=cfoldername+"/FilterNN_"+outputfile+".asc"
+        np.savetxt(FilterFileName,filter)
