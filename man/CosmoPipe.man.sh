@@ -14,7 +14,10 @@ function _initialise {
 
 #Finalisation function {{{
 function _finalise {
+  #Unset functions
   _unset_functions
+  #Mark this step as completed
+  echo ${0##*/} >> @PIPELINE@_status.sh
   trap : 0 
 }
 #}}}
@@ -155,7 +158,6 @@ function _initialise_datablock {
     echo "HEAD: " > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
     echo "BLOCK: " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
     echo "VARS: " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-    _write_blockvars "NTOMO" `echo @TOMOLIMS@ | awk '{print NF-1}'` 
     if [ -f @PIPELINE@_defaults.sh ]
     then 
       _add_default_vars 
@@ -360,24 +362,61 @@ function _add_datahead {
     exit 1 
   fi 
   #}}}
-  #remove the existing data in the datahead
-  if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD ]
-  then 
-    dir=`pwd`
-    cd @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD
-    rm -fr ./*.*
-    cd $dir
-  fi 
-  #Copy the requested data to the datahead, if the directory contains anything  
-  if [ "$(ls -A @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1})" ] 
-  then 
-    _message " @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD"
-    rsync -autv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ >> @RUNROOT@/@LOGPATH@/datahead_write.log
-    _message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
-  fi 
-  #Get the files in this data
+  #Get the files in this data{{{
   _files=`_read_datablock ${1}`
   _files=`_blockentry_to_filelist ${_files}`
+  #}}}
+  #remove the data in the datahead that we aren't going to use {{{
+  if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD ]
+  then 
+    _headfiles=`_read_datahead`
+    #For each file in the DATAHEAD {{{
+    for hfile in ${_headfiles}
+    do 
+      #Check for a matching file in the block object 
+      found="FALSE"
+      for file in ${_files}
+      do 
+        #If there is a matching file 
+        if [ "${hfile}" == "${file}" ]
+        then 
+          #If there is a matching file, log and break 
+          found="TRUE"
+          break 
+        fi 
+      done 
+      #If not found, delete
+      if [ "${found}" == "FALSE" ] 
+      then 
+        #Delete the file 
+        rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${hfile}
+      fi 
+    done 
+    #}}}
+    ## Old method: delete everything! {{{
+    #dir=`pwd`
+    #cd @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD
+    #rm -fr ./*.*
+    #cd $dir
+    #}}}
+  fi 
+  #}}}
+  #Copy the requested data to the datahead, if the directory contains anything {{{
+  if [ "$(ls -A @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1})" ] 
+  then 
+    _message " @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD:\n"
+    #Copy the files one-by-one (to ensure that there isn't accidental use of datablock waste...)
+    #For each file in the block element {{{
+    for file in ${_files}
+    do 
+      _message " @BLU@  -->@DEF@ ${file}\n"
+      #Copy the file (will skip if file is unchanged)
+      rsync -atv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${file} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ >> @RUNROOT@/@LOGPATH@/datahead_write.log
+      _message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
+    done 
+    #}}}
+    _message " @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD@BLU@ Done!@DEF@\n"
+  fi 
   #Update the datablock txt file 
   echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   for _file in ${_files} 
@@ -590,7 +629,7 @@ function _add_datablock {
       if [ -e "$_file" ]
       then 
         _message " @BLU@>@DEF@ ${_file##*/} @BLU@-->@DEF@ ${1}"
-        rsync -autv $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${_file##*/} >> @RUNROOT@/@LOGPATH@/datablock_add.log
+        rsync -atv $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${_file##*/} >> @RUNROOT@/@LOGPATH@/datablock_add.log
         _message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       fi 
     done 
@@ -722,7 +761,8 @@ function _inblock {
     #Current datablock 
     _block=`_read_datablock`
     #Check whether the requested data object is in the datablock 
-    echo " ${_block} " | grep -c " ${_data}=" | xargs echo || echo 
+    #echo " ${_block} " | grep -c " ${_data}=" | xargs echo || echo 
+    echo " ${_block} " | grep -c " ${_data}="  || echo 
   fi 
 }
 #}}}
