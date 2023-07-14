@@ -3,7 +3,7 @@
 # File Name : computs_dz_priors.R
 # Created By : awright
 # Creation Date : 29-03-2023
-# Last Modified : Tue 27 Jun 2023 10:50:15 AM CEST
+# Last Modified : Thu 06 Jul 2023 09:22:09 AM CEST
 #
 #=========================================
 
@@ -108,7 +108,14 @@ if ( nreal%%1 != 0 ) {
   stop("There are a non-integer number of input catalogues per bin?!") 
 }
 #Initialise the realisation results matrix 
-muzcalib<-muzrefr<-bias<-muzrefr_nogold<-bias_nogold<-matrix(NA,ncol=length(binstrings),nrow=length(input.calib)/length(binstrings))
+def<-matrix(NA,ncol=length(binstrings),nrow=length(input.calib)/length(binstrings))
+colnames(def)<-binstrings
+wtot<-wtot_gold<-ntot<-ntot_gold<-dneff<-
+  muzcalib<-muzrefr<-bias<-muzrefr_nogold<-
+    bias_nogold<-def
+
+#Delta n_eff calculation 
+dneff_calc<-function(w,S) return=(sum(w*S)^2/sum(w^2*S)) / (sum(w)^2/sum(w^2))
 
 #Setup progress bar 
 pb<-txtProgressBar(style=3,min=0,max=length(bias))
@@ -137,6 +144,11 @@ for (bin in 1:length(binstrings)) {
       refr[[redshift.label]][which(refr[[redshift.label]]<0)]<-0
     }
     #Compute the bias: z_est - z_true 
+    wtot[i,bin]<-sum(w=refr[[weight.label]])
+    wtot_gold[i,bin]<-sum(w=refr[[weight.label]]*refr[[gold.label]])
+    ntot[i,bin]<-nrow(refr)
+    ntot_gold[i,bin]<-sum(refr[[gold.label]])
+    dneff[i,bin]<-dneff_calc(w=refr[[weight.label]],S=refr[[gold.label]])
     muzcalib[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]])
     muzrefr[i,bin]<-weighted.mean(refr[[redshift.label]],(refr[[weight.label]]*refr[[gold.label]]))
     muzrefr_nogold[i,bin]<-weighted.mean(refr[[redshift.label]],refr[[weight.label]])
@@ -148,12 +160,18 @@ for (bin in 1:length(binstrings)) {
 }
 close(pb)
 
+for (stat in c("wtot","wtot_gold","ntot","ntot_gold","dneff","muzcalib","muzrefr","muzrefr_nogold","bias_nogold","bias")) { 
+  cat(paste(stat,"\n"))
+  print(rbind(means=colMeans(get(stat)),
+              stdev=matrixStats::colSds(get(stat))))
+}
+
 #Compute the mean biases per bin 
 final_biases<-colMeans(bias)
+final_cov<-orig_cov<-cov(bias)
 #Compute the Nz bias covariance  
 if (sys_error!=0) { 
   #if needed, include systematic component 
-  final_cov<-orig_cov<-cov(bias)
   diag(final_cov)<-diag(final_cov)+sys_error^2
   orig_cor<-cov2cor(orig_cov)
   for (i in 1:ncol(orig_cov)) {
@@ -163,8 +181,6 @@ if (sys_error!=0) {
       }
     }
   }
-} else { 
-  final_cov<-orig_cov
 } 
 #Output the bias file 
 helpRfuncs::write.file(bias_oname,final_biases,col.names=FALSE)
