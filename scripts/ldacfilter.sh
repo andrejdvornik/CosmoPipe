@@ -3,7 +3,7 @@
 # File Name : ldacfilter.sh
 # Created By : awright
 # Creation Date : 16-05-2023
-# Last Modified : Wed 28 Jun 2023 10:14:05 PM CEST
+# Last Modified : Tue 04 Jul 2023 09:24:49 PM CEST
 #
 #=========================================
 
@@ -11,14 +11,15 @@
 input="@DB:DATAHEAD@"
 ext=${input##*.}
 #Avoid duplicate "_filt" extensions {{{
-if [[ "${input}" =~ "_filt" ]]
+inputbase=${input##*/}
+if [[ "${inputbase}" =~ "_filt" ]]
 then 
-  count=${input##*_filt}
+  count=${inputbase##*_filt}
   count=${count%.${ext}}
-  if [ "${count}" == "" ] 
+  if [ "${count}" == "" ] || ! [[ ${count} =~ "^[0-9]+$" ]] 
   then 
     #Check if we randomly matched a different "_filt"
-    if [[ "${input}" =~ "_filt.${ext}" ]]
+    if [[ "${inputbase}" =~ "_filt.${ext}" ]]
     then 
       count=2
       output=${input//_filt.${ext}/_filt${count}.${ext}}
@@ -44,6 +45,6 @@ _message "@BLU@Creating Filtered catalogue for @DEF@${input##*/}@DEF@"
   -c "(@BV:FILTERCOND@);" \
   -o ${output} 2>&1 
 _message " @BLU@- @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
-output=${input//.${ext}/_filt.${ext}}
+#output=${input//.${ext}/_filt.${ext}}
 _replace_datahead ${input##*/} ${output##*/}
 
