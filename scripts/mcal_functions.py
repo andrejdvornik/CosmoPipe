@@ -3,7 +3,7 @@
 # File Name : mcal_functions.py
 # Created By : awright
 # Creation Date : 25-05-2023
-# Last Modified : Fri 14 Jul 2023 02:42:45 PM CEST
+# Last Modified : Fri 14 Jul 2023 03:12:18 PM CEST
 #
 #=========================================
 
@@ -60,12 +60,12 @@ def flexible_read(filepath,as_df=True):
     #Convert 32 bit cols to 64bit 
     if isinstance(cata, pd.DataFrame):
         if any(cata.dtypes=="float32"): 
-            cata_data.loc[:,cata_data.dtypes=="float32"]=cata_data.loc[:,cata_data.dtypes=="float32"].astype(float)
-        for key in cata_data.keys():
-            if ">" in str(cata_data[key].dtype):
-                cata_data[key]=cata_data[key].astype(str(cata_data[key].dtype).replace(">","<"))
-            if "<" in str(cata_data[key].dtype):
-                cata_data[key]=cata_data[key].astype(str(cata_data[key].dtype).replace("<",">"))
+            cata.loc[:,cata.dtypes=="float32"]=cata.loc[:,cata.dtypes=="float32"].astype(float)
+        for key in cata.keys():
+            if ">" in str(cata[key].dtype):
+                cata[key]=cata[key].astype(str(cata[key].dtype).replace(">","<"))
+            if "<" in str(cata[key].dtype):
+                cata[key]=cata[key].astype(str(cata[key].dtype).replace("<",">"))
     #Return the catalogue 
     return cata, ldac_cat
 #}}}
