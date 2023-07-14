@@ -134,7 +134,7 @@ for ibin_R in range(args.nbins_R):
     mask_binR = (obj_cat['bin_R'] == ibin_R)
 
     # bin in R
-    obj_cat['bin_snr'][mask_binR] = pd.qcut(obj_cat[col_snr][mask_binR], args.nbins_SNR, 
+    obj_cat.loc[:,('bin_snr',mask_binR)] = pd.qcut(obj_cat.loc[:,(col_snr,mask_binR)], args.nbins_SNR, 
                                                 duplicates='drop',labels=False, retbins=False)
 
 print('Constructing Data Frame')
@@ -223,14 +223,14 @@ pd_cat_corr.loc[(pd_cat_corr['AlphaRecalC_weight']<maxweight/1000.), 'AlphaRecal
 
 # merge
 obj_cat['AlphaRecal_index'] = np.zeros(len(obj_cat)) 
-obj_cat['AlphaRecal_index'][pd_cat_corr['AlphaRecal_index']] = pd_cat_corr['AlphaRecal_index']
+obj_cat.loc[:,('AlphaRecal_index',pd_cat_corr['AlphaRecal_index'])] = pd_cat_corr['AlphaRecal_index']
 obj_cat['AlphaRecalC_variance'] = np.zeros(len(obj_cat)) 
-obj_cat['AlphaRecalC_variance'][pd_cat_corr['AlphaRecal_index']] = pd_cat_corr['AlphaRecalC_variance']
+obj_cat.loc[:,('AlphaRecalC_variance',pd_cat_corr['AlphaRecal_index'])] = pd_cat_corr['AlphaRecalC_variance']
 obj_cat['AlphaRecalC_weight'] = np.zeros(len(obj_cat)) 
-obj_cat['AlphaRecalC_weight'][pd_cat_corr['AlphaRecal_index']] = pd_cat_corr['AlphaRecalC_weight']
+obj_cat.loc[:,'AlphaRecalC_weight',pd_cat_corr['AlphaRecal_index'])] = pd_cat_corr['AlphaRecalC_weight']
 
 # if raw weight is zero, keep it zero
-obj_cat['AlphaRecalC_weight'][obj_cat[col_weight]<maxweight/1000.] = 0
+obj_cat.loc[:,('AlphaRecalC_weight',obj_cat[col_weight]<maxweight/1000.)] = 0
 
 # save
 mcf.flexible_write(obj_cat,args.outpath,ldac_cat)
