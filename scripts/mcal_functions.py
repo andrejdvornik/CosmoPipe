@@ -3,7 +3,7 @@
 # File Name : mcal_functions.py
 # Created By : awright
 # Creation Date : 25-05-2023
-# Last Modified : Thu 22 Jun 2023 05:40:30 PM CEST
+# Last Modified : Fri 14 Jul 2023 02:42:45 PM CEST
 #
 #=========================================
 
@@ -59,8 +59,13 @@ def flexible_read(filepath,as_df=True):
         raise Exception(f'Not supported input file type! {filepath}\nMust be one of csv/fits/cat/feather.')
     #Convert 32 bit cols to 64bit 
     if isinstance(cata, pd.DataFrame):
-        if any(cata.dtypes)=="float32": 
+        if any(cata.dtypes=="float32"): 
             cata_data.loc[:,cata_data.dtypes=="float32"]=cata_data.loc[:,cata_data.dtypes=="float32"].astype(float)
+        for key in cata_data.keys():
+            if ">" in str(cata_data[key].dtype):
+                cata_data[key]=cata_data[key].astype(str(cata_data[key].dtype).replace(">","<"))
+            if "<" in str(cata_data[key].dtype):
+                cata_data[key]=cata_data[key].astype(str(cata_data[key].dtype).replace("<",">"))
     #Return the catalogue 
     return cata, ldac_cat
 #}}}
