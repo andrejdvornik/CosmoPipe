@@ -41,6 +41,7 @@ _varcheck $0
 
 #Read command line options  {{{
 pipeline_only=FALSE
+recheck=FALSE
 resume=""
 while [ $# -gt 0 ] 
 do 
@@ -53,65 +54,90 @@ do
       resume="--resume" 
       shift
       ;; 
-    *)
+    "--*")
       echo "Unknown command line option: $1"
       exit 1
       ;; 
+    *)
+      if [ "$1" != "${PIPELINE}" ] 
+      then 
+        ${P_SED_INPLACE} "s/^PIPELINE=/PIPELINE=${1} #/" @RUNROOT@/variables.sh
+        PIPELINE=$1
+        recheck=TRUE
+      fi 
+      shift
+      ;;
   esac
 done 
+if [ "${recheck}" == "TRUE" ] 
+then 
+  source @RUNROOT@/variables.sh 
+fi 
 #}}}
 
 if [ "${pipeline_only}" == "FALSE" ]
 then 
-
-#Remove any previous pipeline versions {{{
-if [ -d ${RUNROOT}/${RUNTIME} ]
-then 
-  _message "   >${RED} Removing previous configuration ${DEF}" 
-  rm -fr ${RUNROOT}/${RUNTIME}
+  
+  #Remove any previous pipeline versions {{{
+  if [ -d ${RUNROOT}/${RUNTIME} ]
+  then 
+    _message "   >${RED} Removing previous configuration scripts ${DEF}" 
+    rm -fr ${RUNROOT}/${RUNTIME}/${SCRIPTPATH}
+    _message "${BLU} - Done! ${DEF}\n"
+    _message "   >${RED} Removing previous configuration manual files ${DEF}" 
+    rm -fr ${RUNROOT}/${RUNTIME}/${MANUALPATH}
+    _message "${BLU} - Done! ${DEF}\n"
+    _message "   >${RED} Removing previous configuration configs ${DEF}" 
+    rm -fr ${RUNROOT}/${RUNTIME}/${CONFIGPATH}
+    _message "${BLU} - Done! ${DEF}\n"
+    if [ "${resume}" == "" ] 
+    then 
+      _message "   >${RED} Removing previous configuration log files ${DEF}" 
+      rm -fr ${RUNROOT}/${RUNTIME}/${LOGPATH}
+      _message "${BLU} - Done! ${DEF}\n"
+    fi 
+  fi 
+  mkdir -p ${RUNROOT}/${RUNTIME}
+  #}}}
+  
+  #Make and populate the runtime scripts directory {{{
+  _message "   >${RED} Copying Provided Data Products to Storage Path${DEF}" 
+  mkdir -p ${RUNROOT}/${STORAGEPATH}
+  rsync -autv ${PACKROOT}/data/* ${RUNROOT}/${STORAGEPATH}/ > ${RUNROOT}/INSTALL/datatranfer.log 2>&1 
   _message "${BLU} - Done! ${DEF}\n"
-fi 
-mkdir -p ${RUNROOT}/${RUNTIME}
-#}}}
-
-#Make and populate the runtime scripts directory {{{
-_message "   >${RED} Copying Provided Data Products to Storage Path${DEF}" 
-mkdir -p ${RUNROOT}/${STORAGEPATH}
-rsync -autv ${PACKROOT}/data/* ${RUNROOT}/${STORAGEPATH}/ > ${RUNROOT}/INSTALL/datatranfer.log 2>&1 
-_message "${BLU} - Done! ${DEF}\n"
-_message "   >${RED} Copying scripts & configs to Run directory${DEF}" 
-mkdir -p ${RUNROOT}/${LOGPATH}/
-rsync -autv ${PACKROOT}/scripts/* ${RUNROOT}/${SCRIPTPATH}/ >> ${RUNROOT}/INSTALL/datatranfer.log 2>&1 
-rsync -autv ${PACKROOT}/config/* ${RUNROOT}/${CONFIGPATH}/ >> ${RUNROOT}/INSTALL/datatranfer.log 2>&1 
-rsync -autv ${PACKROOT}/man/* ${RUNROOT}/${MANUALPATH}/ >> ${RUNROOT}/INSTALL/datatranfer.log 2>&1 
-_message "${BLU} - Done! ${DEF}\n"
-# _message "   >${RED} Copying post processing scripts to Run directory${DEF}" 
-# rsync -autvz ${RUNROOT}/INSTALL/post_process_mcmcs/make_all.py ${RUNROOT}/${SCRIPTPATH}/ \
-#   >> ${RUNROOT}/INSTALL/datatranfer.log 2>&1 
-# _message "${BLU} - Done! ${DEF}\n"
-cd ${RUNROOT}
-#}}}
-
-##Make a copy of the CosmoFisherForecast Repository {{{
-#mkdir -p ${RUNROOT}/${SCRIPTPATH}/CosmoFisherForecast
-#cp -rf ${COSMOFISHER}/* ${RUNROOT}/${SCRIPTPATH}/CosmoFisherForecast/
-##}}}
-
-##Convert Survey area from arcmin to deg {{{
-#SURVEYAREADEG="`awk -v s=${SURVEYAREA} 'BEGIN { printf "%.4f", s/3600.0 }'`"
-##Add derived quantity to option list 
-#OPTLIST=`echo $OPTLIST SURVEYAREADEG`
-##}}}
-
-#Update the runtime scripts with the relevant paths & variables {{{
-_message "   >${RED} Modify Runtime Scripts ${DEF}" 
-for OPT in $OPTLIST
-do 
-  ${P_SED_INPLACE} "s#\\@${OPT}\\@#${!OPT//\\/\\\\}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*  ${RUNROOT}/${MANUALPATH}/*.*
-done 
-_message "${BLU} - Done! ${DEF}\n"
-#}}}
-
+  _message "   >${RED} Copying scripts & configs to Run directory${DEF}" 
+  mkdir -p ${RUNROOT}/${LOGPATH}/
+  rsync -autv ${PACKROOT}/scripts/* ${RUNROOT}/${SCRIPTPATH}/ >> ${RUNROOT}/INSTALL/datatranfer.log 2>&1 
+  rsync -autv ${PACKROOT}/config/* ${RUNROOT}/${CONFIGPATH}/ >> ${RUNROOT}/INSTALL/datatranfer.log 2>&1 
+  rsync -autv ${PACKROOT}/man/* ${RUNROOT}/${MANUALPATH}/ >> ${RUNROOT}/INSTALL/datatranfer.log 2>&1 
+  _message "${BLU} - Done! ${DEF}\n"
+  # _message "   >${RED} Copying post processing scripts to Run directory${DEF}" 
+  # rsync -autvz ${RUNROOT}/INSTALL/post_process_mcmcs/make_all.py ${RUNROOT}/${SCRIPTPATH}/ \
+  #   >> ${RUNROOT}/INSTALL/datatranfer.log 2>&1 
+  # _message "${BLU} - Done! ${DEF}\n"
+  cd ${RUNROOT}
+  #}}}
+  
+  ##Make a copy of the CosmoFisherForecast Repository {{{
+  #mkdir -p ${RUNROOT}/${SCRIPTPATH}/CosmoFisherForecast
+  #cp -rf ${COSMOFISHER}/* ${RUNROOT}/${SCRIPTPATH}/CosmoFisherForecast/
+  ##}}}
+  
+  ##Convert Survey area from arcmin to deg {{{
+  #SURVEYAREADEG="`awk -v s=${SURVEYAREA} 'BEGIN { printf "%.4f", s/3600.0 }'`"
+  ##Add derived quantity to option list 
+  #OPTLIST=`echo $OPTLIST SURVEYAREADEG`
+  ##}}}
+  
+  #Update the runtime scripts with the relevant paths & variables {{{
+  _message "   >${RED} Modify Runtime Scripts ${DEF}" 
+  for OPT in $OPTLIST
+  do 
+    ${P_SED_INPLACE} "s#\\@${OPT}\\@#${!OPT//\\/\\\\}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*  ${RUNROOT}/${MANUALPATH}/*.*
+  done 
+  _message "${BLU} - Done! ${DEF}\n"
+  #}}}
+  
 fi 
 
 #Check if a pipeline file exists {{{
