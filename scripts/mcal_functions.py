@@ -3,7 +3,7 @@
 # File Name : mcal_functions.py
 # Created By : awright
 # Creation Date : 25-05-2023
-# Last Modified : Mon 17 Jul 2023 04:36:10 PM CEST
+# Last Modified : Mon 17 Jul 2023 07:27:30 PM CEST
 #
 #=========================================
 
@@ -71,7 +71,7 @@ def flexible_read(filepath,as_df=True):
 #}}}
 
 #Flexible file write {{{
-def flexible_write(cata,filepath,ldac_cat=None): 
+def flexible_write(cata,filepath,ldac_cat=None,table_name='OBJECTS'): 
     #Get the file extension 
     file_extension=filepath.split(".")[-1]
     if file_extension == 'csv':
@@ -93,9 +93,63 @@ def flexible_write(cata,filepath,ldac_cat=None):
         #Write LDAC with ldac tools
         print("Writing .cat file as LDAC")
         if isinstance(cata, pd.DataFrame):
-            cata = ldac.LDACTable(cata) 
+            #Check ordering 
+            if any(ldac_cat[table_name]['SeqNr']!=cata['SeqNr']):
+                raise Exception("catalogue 'cata' is not ordered to match SeqNr")
+            #Check the catalogue keys 
+            ldac_keys=ldac_cat[table_name].keys()
+            cata_keys=cata.keys()
+            #Loop over the catalogue keys 
+            for key in cata_keys: 
+                #Do we need to update the ldac catalogue 
+                if key in ldac_keys: 
+                    #Do we need to update a catalogue column?
+                    if any(ldac_cat[key]!=cata[key]): 
+                        print(f"Updating key {key}")
+                        #Update it 
+                        ldac_cat[key]=cata[key]
+                else: 
+                    print(f"Adding key {key}")
+                    #Add the column 
+                    ldac_cat[key]=cata[key]
+
         #Rejoin the ldac object and data catalogue
-        ldac_cat['OBJECTS']=cata
+        #ldac_cat['OBJECTS']=cata
+        ldac_cat[table_name].update=1
+        #Delete existing file
+        if os.path.exists(filepath):
+            print("Deleting old LDAC file")
+            os.remove(filepath)
+        #Write to LDAC
+        print("Writing")
+        ldac_cat.saveas(filepath)
+    elif file_extension == 'fits' and not ldac_cat is None:
+        #Write LDAC with ldac tools
+        print("Writing .fits file as LDAC")
+        if isinstance(cata, pd.DataFrame):
+            #Check ordering 
+            if any(ldac_cat[table_name]['SeqNr']!=cata['SeqNr']):
+                raise Exception("catalogue 'cata' is not ordered to match SeqNr")
+            #Check the catalogue keys 
+            ldac_keys=ldac_cat[table_name].keys()
+            cata_keys=cata.keys()
+            #Loop over the catalogue keys 
+            for key in cata_keys: 
+                #Do we need to update the ldac catalogue 
+                if key in ldac_keys: 
+                    #Do we need to update a catalogue column?
+                    if any(ldac_cat[key]!=cata[key]): 
+                        print(f"Updating key {key}")
+                        #Update it 
+                        ldac_cat[key]=cata[key]
+                else: 
+                    print(f"Adding key {key}")
+                    #Add the column 
+                    ldac_cat[key]=cata[key]
+
+        #Rejoin the ldac object and data catalogue
+        #ldac_cat['OBJECTS']=cata
+        ldac_cat[table_name].update=1
         #Delete existing file
         if os.path.exists(filepath):
             print("Deleting old LDAC file")
@@ -106,19 +160,6 @@ def flexible_write(cata,filepath,ldac_cat=None):
     elif file_extension == 'cat' and ldac_cat is None:
         print("Writing .cat file as FITS")
         apd.to_fits(cata, filepath)
-    elif file_extension == 'fits' and not ldac_cat is None:
-        print("Writing .fits file as LDAC")
-        if isinstance(cata, pd.DataFrame):
-            cata = ldac.LDACTable(cata) 
-        #Rejoin the ldac object and data catalogue
-        ldac_cat['OBJECTS']=cata
-        #Delete existing file
-        if os.path.exists(filepath):
-            print("Deleting old LDAC file")
-            os.remove(filepath)
-        #Write to LDAC
-        print("Writing")
-        ldac_cat.saveas(filepath)
     elif file_extension == 'fits' and ldac_cat is None:
         print("Writing .fits file as FITS")
         apd.to_fits(cata, filepath)
