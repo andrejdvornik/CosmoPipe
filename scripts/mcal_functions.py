@@ -3,7 +3,7 @@
 # File Name : mcal_functions.py
 # Created By : awright
 # Creation Date : 25-05-2023
-# Last Modified : Fri 14 Jul 2023 03:12:18 PM CEST
+# Last Modified : Mon 17 Jul 2023 10:27:49 AM CEST
 #
 #=========================================
 
@@ -85,14 +85,20 @@ def flexible_write(cata,filepath,ldac_cat=None):
         cata = pd.to_feather(filepath)
     elif file_extension == 'cat' and not ldac_cat is None:
         #Write LDAC with ldac tools
+        print("Writing .cat file as LDAC")
         try: 
+            print("Trying objects assignment")
             ldac_cat['OBJECTS'].hdu.data=cata
             ldac_cat['OBJECTS'][1]=ldac_cat['OBJECTS'][1]
         except: 
+            print("Failed, trying objects assignment again!")
             ldac_cat['OBJECTS']=cata
             ldac_cat['OBJECTS'][1]=ldac_cat['OBJECTS'][1]
         if os.path.exists(filepath):
+            print("Deleting old LDAC file")
             os.remove(filepath)
+        ldac_cat.update = 1 
+        print("Writing")
         ldac_cat.saveas(filepath)
     elif file_extension == 'fits':
         #If FITS, try ldac first 
