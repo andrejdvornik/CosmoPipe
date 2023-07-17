@@ -3,7 +3,7 @@
 # File Name : mcal_functions.py
 # Created By : awright
 # Creation Date : 25-05-2023
-# Last Modified : Mon 17 Jul 2023 10:27:49 AM CEST
+# Last Modified : Mon 17 Jul 2023 04:36:10 PM CEST
 #
 #=========================================
 
@@ -76,45 +76,52 @@ def flexible_write(cata,filepath,ldac_cat=None):
     file_extension=filepath.split(".")[-1]
     if file_extension == 'csv':
         #Write CSV with pandas 
+        if not isinstance(cata, pd.DataFrame):
+            raise Exception("catalogue 'cata' must be a pandas data.frame for CSV write")
         cata.to_csv(filepath)
     elif file_extension == 'asc':
         #Write ASCII with pandas 
+        if not isinstance(cata, pd.DataFrame):
+            raise Exception("catalogue 'cata' must be a pandas data.frame for ascii write")
         cata.to_csv(filepath)
     elif file_extension == 'feather':
         #Write feather with pandas 
+        if not isinstance(cata, pd.DataFrame):
+            raise Exception("catalogue 'cata' must be a pandas data.frame for feather write")
         cata = pd.to_feather(filepath)
     elif file_extension == 'cat' and not ldac_cat is None:
         #Write LDAC with ldac tools
         print("Writing .cat file as LDAC")
-        try: 
-            print("Trying objects assignment")
-            ldac_cat['OBJECTS'].hdu.data=cata
-            ldac_cat['OBJECTS'][1]=ldac_cat['OBJECTS'][1]
-        except: 
-            print("Failed, trying objects assignment again!")
-            ldac_cat['OBJECTS']=cata
-            ldac_cat['OBJECTS'][1]=ldac_cat['OBJECTS'][1]
+        if isinstance(cata, pd.DataFrame):
+            cata = ldac.LDACTable(cata) 
+        #Rejoin the ldac object and data catalogue
+        ldac_cat['OBJECTS']=cata
+        #Delete existing file
         if os.path.exists(filepath):
             print("Deleting old LDAC file")
             os.remove(filepath)
-        ldac_cat.update = 1 
+        #Write to LDAC
         print("Writing")
         ldac_cat.saveas(filepath)
-    elif file_extension == 'fits':
-        #If FITS, try ldac first 
-        if not ldac_cat is None:
-            print("Writing .fits file as LDAC")
-            #Write LDAC with ldac tools
-            ldac_cat['OBJECTS']=cata
-            ldac_cat.update = 1 
-            if os.path.exists(filepath):
-                print("Deleting old LDAC file")
-                os.remove(filepath)
-            ldac_cat.saveas(filepath)
-        else:
-            print("Writing .fits file as FITS")
-            #If that fails, write with fits 
-            apd.to_fits(cata, filepath)
+    elif file_extension == 'cat' and ldac_cat is None:
+        print("Writing .cat file as FITS")
+        apd.to_fits(cata, filepath)
+    elif file_extension == 'fits' and not ldac_cat is None:
+        print("Writing .fits file as LDAC")
+        if isinstance(cata, pd.DataFrame):
+            cata = ldac.LDACTable(cata) 
+        #Rejoin the ldac object and data catalogue
+        ldac_cat['OBJECTS']=cata
+        #Delete existing file
+        if os.path.exists(filepath):
+            print("Deleting old LDAC file")
+            os.remove(filepath)
+        #Write to LDAC
+        print("Writing")
+        ldac_cat.saveas(filepath)
+    elif file_extension == 'fits' and ldac_cat is None:
+        print("Writing .fits file as FITS")
+        apd.to_fits(cata, filepath)
     else:
         #Error if not supported 
         raise Exception(f'Not supported input file type! {filepath}\nMust be one of csv/fits/cat/feather.')
