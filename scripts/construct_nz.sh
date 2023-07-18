@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 22-03-2023
-# Last Modified : Mon 26 Jun 2023 11:12:43 AM CEST
+# Last Modified : Tue 18 Jul 2023 11:11:06 AM CEST
 #
 #=========================================
 
@@ -26,7 +26,7 @@ do
   @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/construct_nz.R ${input} \
     @BV:ZSPECNAME@ \
     @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz/${output} \
-    @NZSTEP@
+    @BV:NZSTEP@
 
 done
 
