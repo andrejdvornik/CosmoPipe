@@ -227,12 +227,7 @@ obj_cat = obj_cat.merge(pd_cat_corr, how = 'outer', on = 'AlphaRecal_index')
 # if raw weight is zero, keep it zero
 obj_cat.loc[obj_cat[col_weight]<maxweight/1000.,'AlphaRecalC_weight'] = 0
 
-print(obj_cat.columns)
-print(ldac_cat['OBJECTS'].keys())
 # save
-# mcf.flexible_write(obj_cat,args.outpath,ldac_cat)
-mcf.flexible_write(obj_cat,args.outpath,ldac_cat)
+mcf.flexible_write(obj_cat,args.outpath, ldac_cat)
 print('final results saved to', args.outpath)
 
-check_cat, ldac_check_cat=mcf.flexible_read(args.outpath)
-print(check_cat.columns)

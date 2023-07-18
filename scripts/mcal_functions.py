@@ -104,14 +104,14 @@ def flexible_write(cata,filepath,ldac_cat=None,table_name='OBJECTS'):
                 #Do we need to update the ldac catalogue 
                 if key in ldac_keys: 
                     #Do we need to update a catalogue column?
-                    if any(ldac_cat[key]!=cata[key]): 
+                    if any(ldac_cat[table_name][key]!=cata[key]): 
                         print(f"Updating key {key}")
                         #Update it 
-                        ldac_cat[key]=cata[key]
+                        ldac_cat[table_name][key]=cata[key]
                 else: 
                     print(f"Adding key {key}")
                     #Add the column 
-                    ldac_cat[key]=cata[key]
+                    ldac_cat[table_name][key]=cata[key]
 
         #Rejoin the ldac object and data catalogue
         #ldac_cat['OBJECTS']=cata
@@ -138,14 +138,14 @@ def flexible_write(cata,filepath,ldac_cat=None,table_name='OBJECTS'):
                 #Do we need to update the ldac catalogue 
                 if key in ldac_keys: 
                     #Do we need to update a catalogue column?
-                    if any(ldac_cat[key]!=cata[key]): 
+                    if any(ldac_cat[table_name][key]!=cata[key]): 
                         print(f"Updating key {key}")
                         #Update it 
-                        ldac_cat[key]=cata[key]
+                        ldac_cat[table_name][key]=cata[key]
                 else: 
                     print(f"Adding key {key}")
                     #Add the column 
-                    ldac_cat[key]=cata[key]
+                    ldac_cat[table_name][key]=cata[key]
 
         #Rejoin the ldac object and data catalogue
         #ldac_cat['OBJECTS']=cata
