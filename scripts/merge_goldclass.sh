@@ -3,7 +3,7 @@
 # File Name : merge_goldclass.sh
 # Created By : awright
 # Creation Date : 27-03-2023
-# Last Modified : Mon 15 May 2023 09:06:00 AM CEST
+# Last Modified : Wed 19 Jul 2023 09:44:54 AM CEST
 #
 #=========================================
 
@@ -33,6 +33,7 @@ do
     _message "@RED@Unable to proceed with LDAC joinkey\n@DEF@"
     exit 1
   fi 
+  outfile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_gold/${outname}
   #}}}
   #Get the main catalogue name for this file {{{
   maincat=${input##*/}
@@ -45,27 +46,74 @@ do
     _message "@RED@Main catalogue corresponding to calibration catalogue was not found?!@DEF@\n"
     exit 1
   fi 
+  mainfile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_reference/${maincat}
+  #}}}
+  #Check if input file lengths are ok {{{
+  links="FALSE"
+  for file in ${input} ${outfile} ${mainfile}
+  do 
+    if [ ${#file} -gt 255 ] 
+    then 
+      links="TRUE"
+    fi 
+  done 
+  #}}}
+  #If needed, make the links {{{
+  if [ "${links}" == "TRUE" ] 
+  then 
+    #Remove existing infile links 
+    if [ -e infile.lnk ]
+    then 
+      rm infile.lnk
+    fi 
+    #Remove existing outfile links 
+    if [ -e outfile.lnk ]
+    then 
+      rm outfile.lnk
+    fi 
+    #Create input link
+    originp=${input}
+    ln -s ${input} infile.lnk 
+    input="infile.lnk"
+    #Create output links 
+    ln -s ${outfile} outfile.lnk
+    origout=${outfile}
+    outfile=outfile.lnk
+    #Create maincat links 
+    ln -s ${mainfile} mainfile.lnk
+    origmain=${mainfile}
+    mainfile=mainfile.lnk
+  fi 
   #}}}
   #Merge the goldclass column {{{
   _message "   > @BLU@Merging goldclass column for ${i}@DEF@${input##*/}"
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacjoinkey \
-    -i @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_reference/${maincat} \
+    -i ${mainfile} \
     -p ${input} \
-    -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_gold/${outname}_tmp \
-    -k SOMweight -t OBJECTS > @RUNROOT@/@LOGPATH@/${outname//.${outext}/.log} 2>&1
+    -o ${outfile}_tmp \
+    -k SOMweight -t OBJECTS 2>&1
   _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
   #}}}
   #Construct the output tomographic bin {{{
   _message "   > @BLU@Removing non-gold sources for ${i}@DEF@${input##*/}"
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
-           -i @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_gold/${outname}_tmp \
-  	       -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_gold/${outname} \
+           -i ${outfile}_tmp \
+  	       -o ${outfile} \
   	       -t OBJECTS \
-  	       -c "(SOMweight>0);" >>@RUNROOT@/@LOGPATH@/${outname//.${outext}/.log} 2>&1 
+  	       -c "(SOMweight>0);" 2>&1 
   _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
   #}}}
   #Remove the temporary file {{{
-  rm @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_gold/${outname}_tmp
+  rm ${outfile}_tmp
+  #}}}
+  #If using links, remove them {{{
+  if [ "${links}" == "TRUE" ] 
+  then 
+    rm ${input} ${outfile} ${mainfile}
+    input=${originp}
+    outfile=${origout}
+    mainfile=${origmain}
+  fi 
   #}}}
   #Save the output file to the list {{{
   outlist="$outlist $outname"
