@@ -23,7 +23,6 @@ then
   _message "@RED@There are no input files with the patch ${basepatch}?!@DEF@\n"
   exit 1 
 fi 
-
 #Add a patch label to each catalogue (for subsequent patch extraction, if needed)
 for cata in ${inputcats}
 do 
@@ -35,6 +34,29 @@ do
       break
     fi 
   done
+  #Check if input file lengths are ok {{{
+  links="FALSE"
+  for file in ${cata}
+  do 
+    if [ ${#file} -gt 255 ] 
+    then 
+      links="TRUE"
+    fi 
+  done 
+  #}}}
+  #If needed, make the links {{{
+  if [ "${links}" == "TRUE" ] 
+  then 
+    #Remove existing infile links 
+    if [ -e infile.lnk ]
+    then 
+      rm infile.lnk
+    fi 
+    #Create input link
+    originp=${cata}
+    ln -s ${cata} infile.lnk 
+    cata="infile.lnk"
+  fi 
   #Check if the patch label exists
   cleared=1
   _message "   > @BLU@Testing existence of Patch ID column in @DEF@${cata##*/}@DEF@ "
