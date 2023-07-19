@@ -215,6 +215,25 @@ polychord_outfile_root = pc_run
 EOF
 
 #}}}
+elif [ "${SAMPLER^^}" == "NAUTILUS" ] #{{{
+then 
+
+cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini <<- EOF
+[nautilus]
+live_points = 2000
+enlarge_per_dim = 1.1
+split_threshold = 100
+n_networks = 8
+n_batch = 128
+filepath = %(OUTPUT_FOLDER)s/Nautilus/run_nautilus.hdf5
+resume = False
+f_live = 0.01
+discard_exploration = True
+verbose = True
+
+EOF
+
+#}}}
 elif [ "${SAMPLER^^}" == "APRIORI" ] #{{{
 then 
 
