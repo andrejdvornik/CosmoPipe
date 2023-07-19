@@ -3,7 +3,7 @@
 # File Name : combine_cats.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Fri 07 Jul 2023 08:05:40 PM CEST
+# Last Modified : Wed 19 Jul 2023 07:12:09 PM CEST
 #
 #=========================================
 
@@ -80,7 +80,7 @@ do
   outputname=${file##*/}
   outputname=${outputname//${binone_appendstr}/}
   extn=${outputname##*.}
-  outname=${outputname//.${ext}/_comb.${ext}}
+  outname=${outputname//.${extn}/_comb.${extn}}
   outname=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${outname} 
   
   #Check if input file lengths are ok 
