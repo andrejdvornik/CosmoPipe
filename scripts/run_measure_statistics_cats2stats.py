@@ -143,6 +143,9 @@ if w_theta_col:
 if mode=='cosebis':
     if not ((normfile != None) and (rootfile != None)):
         raise Exception('Normfile and rootfile need to be provided when calculating COSEBIs!')
+if mode.startswith('bandpowers'):
+    if ellmin>ellmax:
+        raise Exception('ell_min must be smaller than ell_max!')
 
 # Conversion from xi_pm to COSEBIS depends on linear or log binning in the 2pt output
 # Check that the data exactly spans the theta_min -theta_max range that has been defined
