@@ -82,22 +82,23 @@ then
   if [ -d ${RUNROOT}/${RUNTIME} ]
   then 
     _message "   >${RED} Removing previous configuration scripts ${DEF}" 
-    rm -fr ${RUNROOT}/${RUNTIME}/${SCRIPTPATH}
+    rm -fr ${RUNROOT}/${SCRIPTPATH}
     _message "${BLU} - Done! ${DEF}\n"
     _message "   >${RED} Removing previous configuration manual files ${DEF}" 
-    rm -fr ${RUNROOT}/${RUNTIME}/${MANUALPATH}
+    rm -fr ${RUNROOT}/${MANUALPATH}
     _message "${BLU} - Done! ${DEF}\n"
     _message "   >${RED} Removing previous configuration configs ${DEF}" 
-    rm -fr ${RUNROOT}/${RUNTIME}/${CONFIGPATH}
+    rm -fr ${RUNROOT}/${CONFIGPATH}
     _message "${BLU} - Done! ${DEF}\n"
     if [ "${resume}" == "" ] 
     then 
       _message "   >${RED} Removing previous configuration log files ${DEF}" 
-      rm -fr ${RUNROOT}/${RUNTIME}/${LOGPATH}
+      rm -fr ${RUNROOT}/${LOGPATH}
       _message "${BLU} - Done! ${DEF}\n"
     fi 
+  else 
+    mkdir -p ${RUNROOT}/${RUNTIME}
   fi 
-  mkdir -p ${RUNROOT}/${RUNTIME}
   #}}}
   
   #Make and populate the runtime scripts directory {{{
