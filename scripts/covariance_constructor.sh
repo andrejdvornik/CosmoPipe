@@ -3,7 +3,7 @@
 # File Name : covariance_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Fri 05 May 2023 10:49:58 AM CEST
+# Last Modified : Thu Jul 20 13:08:03 2023
 #
 #=========================================
 
@@ -40,6 +40,7 @@ input_path="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs"
 output_path=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_@BV:STATISTIC@
 # COSEBIs basis function path
 COSEBISLOC=@RUNROOT@/@CONFIGPATH@/cosebis/
+
 # Base settings {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 [covariance terms]
