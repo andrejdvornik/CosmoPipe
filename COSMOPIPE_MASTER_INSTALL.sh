@@ -93,7 +93,7 @@ fi
 
 #Copy the environment & requirements files to the INSTALL directory
 #cp ${PACKROOT}/environment.yml ${PACKROOT}/requirements.txt .
-cp ${PACKROOT}/environment.yml .
+cp ${PACKROOT}/environment*.yml .
 #Install Conda
 nenv=`conda info --envs | grep "^cosmopipe " | wc -l`
 if [ ${nenv} -ne 0 ] 
@@ -104,7 +104,12 @@ then
   _message "conda remove -n cosmopipe --all \n"
   exit 1
 fi 
-conda env create --file environment.yml > conda_install_output.log 2>&1
+if [ "`uname`" == "Darwin" ]
+then 
+  conda env create --file environment_darwin.yml > conda_install_output.log 2>&1
+else 
+  conda env create --file environment.yml > conda_install_output.log 2>&1
+fi 
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
 
@@ -463,6 +468,7 @@ cd ${RUNROOT}
 _message "   >${RED} Update the configure script ${DEF}"
 MACHINE=`uname`
 THELIPATH=`echo ${RUNROOT}/INSTALL/theli-1.6.1/bin/${MACHINE}*`
+cp ${PACKROOT}/update_configure.sh ${RUNROOT}/
 cp ${PACKROOT}/scripts/configure_raw.sh ${RUNROOT}/configure.sh 
 cp ${PACKROOT}/scripts/variables_raw.sh ${RUNROOT}/variables.sh 
 cp ${PACKROOT}/config/pipeline.ini ${RUNROOT}/pipeline.ini 
