@@ -9,6 +9,12 @@
 
 #Script to generate a covariance .ini
 
+#Create the covariance_inputs directory
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs ]
+then 
+  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/
+fi 
+
 # Infer statistic {{{
 STATISTIC="@BV:STATISTIC@"
 if [ "${STATISTIC^^}" == "XIPM" ]
@@ -31,7 +37,9 @@ fi
 # Covariance input path (just pointing to a inputs folder in the datablock) 
 input_path="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs"
 # Output path
-output_path=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance/
+output_path=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_@BV:STATISTIC@
+# COSEBIs basis function path
+COSEBISLOC=@RUNROOT@/@CONFIGPATH@/cosebis/
 # Base settings {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 [covariance terms]
@@ -82,8 +90,8 @@ if [ "${STATISTIC^^}" == "XIPM" ]
 then
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covTHETAspace settings]
-theta_min = @BV:THETAMINXI@
-theta_max = @BV:THETAMAXXI@
+theta_min = @BV:THETAMINCOV@
+theta_max = @BV:THETAMAXCOV@
 theta_bins = @BV:NTHETABINXI@
 theta_type = log
 theta_list = 1, 2, 3
@@ -112,8 +120,8 @@ then
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covCOSEBI settings]
 En_modes = @BV:NMAXCOSEBIS@
-theta_min = @BV:THETAMINXI@
-theta_max = @BV:THETAMAXXI@
+theta_min = @BV:THETAMINCOV@
+theta_max = @BV:THETAMAXCOV@
 En_accuracy = 1e-4
 Wn_style = log
 
@@ -123,12 +131,12 @@ then
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covbandpowers settings]
 apodisation_log_width = 0.5
-theta_lo = @BV:THETAMINXI@
-theta_up = @BV:THETAMAXXI@
+theta_lo = @BV:THETAMINCOV@
+theta_up = @BV:THETAMAXCOV@
 theta_binning = 300
 ell_min = @BV:LMINBANDPOWERS@
 ell_max = @BV:LMAXBANDPOWERS@
-ell_bins = @BV:NBINSBANDPOWERS@
+ell_bins = @BV:NBANDPOWERS@
 ell_type = log
 
 EOF
@@ -139,29 +147,21 @@ fi
 # Survey specs {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 [survey specs]
-mask_directory = ${input_path}/mask
-mask_file_clust = mask_BOSS_2dFLenS_wcs_nside4096.fits
-alm_file_clust = alms_clust.ascii
-survey_area_clust_in_deg2 = 1500
-n_eff_clust = 1.18, 1.85
-survey_area_ggl_in_deg2 = 1000
-mask_file_lensing = mask_BOSS_2dFLenS_wcs_nside4096.fits
-alm_file_lensing = alms_lens.ascii
-survey_area_lensing_in_deg2 = 867
+survey_area_lensing_in_deg2 = @SURVEYAREADEG@
 ellipticity_dispersion = 0.270211643434, 0.261576890227, 0.276513819228, 0.265404482999, 0.286084532469
 n_eff_lensing = 0.605481425815, 1.163822540526, 1.764459694692, 1.249143662985, 1.207829761642 
 
 EOF
 #}}}
 
+nzfilelist=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz/*.fits`
 # Redshift distribution {{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 [redshift]
-z_directory = ${input_path}/redshift_distribution
-zclust_file = BOSS_and_2dFLenS_n_of_z1_res_0.01.asc, BOSS_and_2dFLenS_n_of_z2_res_0.01.asc
-value_loc_in_clustbin = left
-zlens_file = K1000_photoz_1.asc, K1000_photoz_2.asc, K1000_photoz_3.asc, K1000_photoz_4.asc, K1000_photoz_5.asc
+z_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz/
+zlens_file = ${nzfilelist}
 value_loc_in_lensbin = mid
+zlens_extension = Main
 
 EOF
 #}}}
@@ -238,10 +238,10 @@ lower_calc_limit = 1e-200
 [tabulated inputs files]
 npair_directory = ${input_path}/npair/
 npair_mm_file = XI_K1000_theta_0.5_300.0_nBins_5_Bin?_Bin?.ascii
-cosebi_directory = ${input_path}/cosebis/
-wn_log_file = WnLog?.table
-Tn_plus_file = Tplus?.table
-Tn_minus_file = Tminus?.table
+cosebi_directory = ${COSEBISLOC}
+wn_log_file = WnLog/WnLog?.table
+Tn_plus_file = Tplus_minus/Tplus_n?.table
+Tn_minus_file = Tplus_minus/Tminus_n?.table
 
 [misc]
 num_cores = 8
@@ -254,7 +254,7 @@ cat \
   @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_base.ini \
   @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini \
   @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini > \
-  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed.ini
+  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@BV:STATISTIC@_@SURVEY@_CosmoPipe_constructed.ini
 
 #}}}
 

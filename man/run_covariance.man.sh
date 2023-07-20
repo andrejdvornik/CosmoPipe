@@ -1,5 +1,5 @@
 #
-# covariance_constructor.sh Documentation & Housekeeping functions
+# run_covariance.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@==============================================@DEF@\n"
-    _message "@BLU@== @RED@ Running covariance_constructor.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@==============================================@DEF@\n"
+    _message "@BLU@======================================@DEF@\n"
+    _message "@BLU@== @RED@ Running run_covariance.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@======================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,7 +17,8 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Constructs a covariance .ini file'
+  echo '# Run the OneCovariance code using a CosmoPipe .ini '
+  echo '# file'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -42,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BV:GAUSS BV:LBINSCOV BV:LMAXBANDPOWERS BV:LMAXCOV BV:LMINBANDPOWERS BV:LMINCOV BV:NBANDPOWERS BV:NMAXCOSEBIS BV:NONGAUSS BV:NTHETABINXI BV:SPLIT_GAUSS BV:SSC BV:STATISTIC BV:THETAMAXCOV BV:THETAMINCOV DATABLOCK RUNROOT STORAGEPATH SURVEY
+  echo BLU DATABLOCK DEF PYTHON3BIN RED RUNROOT STORAGEPATH SURVEY
 } 
 #}}}
 
@@ -56,14 +57,14 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo cov
+  echo 
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/covariance_constructor.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/run_covariance.sh
 } 
 #}}}
 
