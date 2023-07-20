@@ -3,13 +3,11 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - camb
-  - cosmosis
-  - cosmosis-build-standard-library
-  - emcee
-  - nautilus-sampler
-  - python=3.8
+  - python
   - pip
+  - cosmosis=2.3.2
+  - cosmosis-build-standard-library
+  - numpy<1.24
   - r=4.1
   - pip:
     - astropandas
