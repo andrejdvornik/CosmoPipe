@@ -223,7 +223,7 @@ pd_cat_corr.loc[(pd_cat_corr['AlphaRecalC_weight']>maxweight), 'AlphaRecalC_weig
 pd_cat_corr.loc[(pd_cat_corr['AlphaRecalC_weight']<maxweight/1000.), 'AlphaRecalC_weight'] = 0.
 
 # merge
-obj_cat = obj_cat.merge(pd_cat_corr, how = 'outer', on = 'AlphaRecal_index')
+obj_cat = obj_cat.merge(pd_cat_corr, how = 'outer', on = 'AlphaRecal_index',suffixes=('_orig',None))
 # if raw weight is zero, keep it zero
 obj_cat.loc[obj_cat[col_weight]<maxweight/1000.,'AlphaRecalC_weight'] = 0
 
