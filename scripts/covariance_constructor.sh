@@ -3,7 +3,7 @@
 # File Name : covariance_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Thu Jul 20 13:09:29 2023
+# Last Modified : Thu Jul 20 13:26:48 2023
 #
 #=========================================
 
@@ -146,17 +146,31 @@ fi
 #}}}
 
 # Survey specs {{{
+#Get the neffective list 
+nefflist=""
+for file in @DB:cosmosis_neff@
+do 
+  nefflist="${nefflist} `cat ${file}`"
+done 
+nefflist=`echo ${nefflist} | sed 's/ /,/g'`
+#get the sigmae list 
+sigmaelist=""
+for file in @DB:cosmosis_sigmae@
+do 
+  sigmaelist="${sigmaelist} `cat ${file}`"
+done 
+sigmaelist=`echo ${sigmaelist} | sed 's/ /,/g'`
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 [survey specs]
 survey_area_lensing_in_deg2 = @SURVEYAREADEG@
-ellipticity_dispersion = 0.270211643434, 0.261576890227, 0.276513819228, 0.265404482999, 0.286084532469
-n_eff_lensing = 0.605481425815, 1.163822540526, 1.764459694692, 1.249143662985, 1.207829761642 
+ellipticity_dispersion = ${sigmaelist}
+n_eff_lensing = ${nefflist}
 
 EOF
 #}}}
 
-nzfilelist=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz/*.fits`
 # Redshift distribution {{{
+nzfilelist="@DB:nz@"
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 [redshift]
 z_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz/
