@@ -7,7 +7,7 @@ inplist=''
 for patch in @PATCHLIST@
 do 
   file=`ls @PATCHPATH@/*_${patch}_*`
-  if [ ! -f ${file} ]
+  if [ "${file}" == "" ] || [ ! -f ${file} ]
   then 
     _message "@RED@ERROR!\n@DEF@There is no catalogue in the PATCHPATH with the patch designation ${patch}!"
     exit 1 

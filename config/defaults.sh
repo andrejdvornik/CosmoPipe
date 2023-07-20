@@ -58,6 +58,9 @@ MBIASCORR=0.99
 #Limits of the tomographic bins
 TOMOLIMS='0.1 0.3 0.5 0.7 0.9 1.2'
 
+#Variable used to define tomographic bins 
+TOMOVAR=Z_B
+
 #Theta limits for covariance 
 THETAMINCOV="0.50"
 #Theta limits for covariance 
