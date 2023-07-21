@@ -131,7 +131,7 @@ elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
 then
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covbandpowers settings]
-apodisation_log_width = 0.5
+apodisation_log_width = @BV:APODISATIONWIDTH@
 theta_lo = @BV:THETAMINCOV@
 theta_up = @BV:THETAMAXCOV@
 theta_binning = 300
