@@ -73,10 +73,10 @@ parser.add_argument('-r','--root', dest="rootfile", metavar="root",required=Fals
 #Bandpowers options
 parser.add_argument('-w','--logwidth', dest="logwidth", type=float,default=0.5, nargs='?', 
     help='width of apodisation window for bandpowers')
-parser.add_argument('--thetaminbp', dest="thetaminbp", type=float, default=0.5, nargs='?', 
-    help='value of apodisation thetamin in arcmins, default is 0.5')
-parser.add_argument('--thetamaxbp', dest="thetamaxbp", type=float, default=300.0, nargs='?', 
-    help='value of apodisation thetamax, in arcmins, default is 300')
+parser.add_argument('--thetamin_apod', dest="thetamin_apod", type=float, nargs='?', 
+    help='value of apodisation thetamin in arcmins. By default the apodisation window will go to zero at thetamin and thetamax. This can be overruled by setting thetaminbp and thetamaxbp')
+parser.add_argument('--thetamax_apod', dest="thetamax_apod", type=float, nargs='?', 
+    help='value of apodisation thetamax, in arcmins. By default the apodisation window will go to zero at thetamin and thetamax. This can be overruled by setting thetaminbp and thetamaxbp')
 parser.add_argument('-z','--ellmin', dest="ellmin", type=float,default=100, nargs='?', 
     help='value of ellmin for bandpowers')
 parser.add_argument('-x','--ellmax', dest="ellmax", type=float,default=1500, nargs='?', 
@@ -110,8 +110,8 @@ normfile=args.normfile
 rootfile=args.rootfile
 # Bandpower options
 logwidth=args.logwidth
-thetamin_apod=args.thetaminbp
-thetamax_apod=args.thetamaxbp
+thetamin_apod=args.thetamin_apod
+thetamax_apod=args.thetamax_apod
 ellmin=args.ellmin
 ellmax=args.ellmax
 nbins=args.nbins
@@ -146,6 +146,13 @@ if mode=='cosebis':
 if mode.startswith('bandpowers'):
     if ellmin>ellmax:
         raise Exception('ell_min must be smaller than ell_max!')
+    try:
+        thetamin_apod
+        thetamax_apod
+        print('You have set explicitly set thetamin_apod = %.2f and thetamax_apod = %.2f. This means that scales outside this range will leak into the apodisation window. You have been warned!'%(thetamin_apod, thetamax_apod))
+    except: 
+        thetamin_apod = np.exp(np.log(thetamin)+logwidth/2)
+        thetamax_apod = np.exp(np.log(thetamax)-logwidth/2)
 
 # Conversion from xi_pm to COSEBIS depends on linear or log binning in the 2pt output
 # Check that the data exactly spans the theta_min -theta_max range that has been defined
