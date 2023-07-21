@@ -170,8 +170,6 @@ EOF
 #}}}
 
 # Redshift distribution {{{
-# nzfilelist="@DB:nz@"
-nzfilelist=`echo @DB:nz@ | sed 's/ /,/g'`
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 [redshift]
 z_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz/
