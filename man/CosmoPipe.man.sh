@@ -7,13 +7,19 @@ function _initialise {
     _message "${RED} - ERROR! Manual file does not exist!"
     exit 1
   fi 
+  #Documentation file 
   source @RUNROOT@/@MANUALPATH@/${_callname//.sh/.man.sh}
+  #Startup prompt 
   _prompt ${VERBOSE}
+  #Starting time 
+  _message "@BLU@Start time: @DEF@`date +'%a %H:%M'`\n"
 }
 #}}}
 
 #Finalisation function {{{
 function _finalise {
+  #Concluding time 
+  _message "@BLU@End time: @DEF@`date +'%a %H:%M'`\n"
   #Unset functions
   _unset_functions
   #Mark this step as completed
@@ -409,9 +415,9 @@ function _add_datahead {
     #For each file in the block element {{{
     for file in ${_files}
     do 
-      _message " @BLU@  -->@DEF@ ${file}\n"
+      _message " @BLU@  -->@DEF@ ${file}"
       #Copy the file (will skip if file is unchanged)
-      rsync -atv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${file} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ >> @RUNROOT@/@LOGPATH@/datahead_write.log
+      rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${file} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ >> @RUNROOT@/@LOGPATH@/datahead_write.log
       _message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
     done 
     #}}}
@@ -629,7 +635,7 @@ function _add_datablock {
       if [ -e "$_file" ]
       then 
         _message " @BLU@>@DEF@ ${_file##*/} @BLU@-->@DEF@ ${1}"
-        rsync -atv $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${_file##*/} >> @RUNROOT@/@LOGPATH@/datablock_add.log
+        rsync -atvL $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${_file##*/} >> @RUNROOT@/@LOGPATH@/datablock_add.log
         _message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       fi 
     done 
