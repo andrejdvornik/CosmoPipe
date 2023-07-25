@@ -8,7 +8,7 @@
 #=========================================
 
 #Create the covariance output directory
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance ]
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_@BV:STATISTIC@ ]
 then 
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_@BV:STATISTIC@/
 fi 

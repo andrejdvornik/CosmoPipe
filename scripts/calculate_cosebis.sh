@@ -20,8 +20,8 @@ fi
 
 # check whether the pre-computed COSEBIS tables exist
 SRCLOC=@RUNROOT@/@CONFIGPATH@/cosebis
-normfile=${SRCLOC}/TLogsRootsAndNorms/Normalization_@BV:THETAMINCOV@-@BV:THETAMAXCOV@.table
-rootfile=${SRCLOC}/TLogsRootsAndNorms/Root_@BV:THETAMINCOV@-@BV:THETAMAXCOV@.table
+normfile=${SRCLOC}/TLogsRootsAndNorms/Normalization_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
+rootfile=${SRCLOC}/TLogsRootsAndNorms/Root_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
 
 if [ ! -f ${normfile} ] 
 then 
@@ -58,8 +58,8 @@ _message "    -> @BLU@Computing COSEBIs for file @RED@${input##*/}@DEF@"
   -i ${input} \
   -t "meanr" -p "xip" -m "xim" \
   --cfoldername ${outfold} \
-  -o ${output} -b @BINNING@ -n @BV:NMAXCOSEBIS@ -s @BV:THETAMINCOV@ \
-  -l @BV:THETAMAXCOV@ --tfoldername ${SRCLOC}/Tplus_minus \
+  -o ${output} -b @BINNING@ -n @BV:NMAXCOSEBIS@ -s @BV:THETAMINXI@ \
+  -l @BV:THETAMAXXI@ --tfoldername ${SRCLOC}/Tplus_minus \
   --norm ${normfile} --root ${rootfile} \
   -d "cosebis" 2>&1 
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"

@@ -131,7 +131,7 @@ elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
 then
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covbandpowers settings]
-apodisation_log_width = 0.5
+apodisation_log_width = @BV:APODISATIONWIDTH@
 theta_lo = @BV:THETAMINCOV@
 theta_up = @BV:THETAMAXCOV@
 theta_binning = 300
@@ -170,13 +170,12 @@ EOF
 #}}}
 
 # Redshift distribution {{{
-nzfilelist="@DB:nz@"
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 [redshift]
-z_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz/
-zlens_file = ${nzfilelist}
+z_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz/
+zlens_file =@DB:cosmosis_nz@
 value_loc_in_lensbin = mid
-zlens_extension = Main
+zlens_extension = NZ_SOURCE
 
 EOF
 #}}}
@@ -251,12 +250,12 @@ small_k_damping_for1h = damped
 lower_calc_limit = 1e-200
 
 [tabulated inputs files]
-npair_directory = ${input_path}/npair/
-npair_mm_file = XI_K1000_theta_0.5_300.0_nBins_5_Bin?_Bin?.ascii
-cosebi_directory = ${COSEBISLOC}
-wn_log_file = WnLog/WnLog?.table
-Tn_plus_file = Tplus_minus/Tplus_n?.table
-Tn_minus_file = Tplus_minus/Tminus_n?.table
+npair_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/
+npair_mm_file = @BV:NPAIRBASE@_Bin?_Bin?.ascii
+cosebi_directory = @RUNROOT@/INSTALL/covariance/onecov/input/cosebis/
+wn_log_file = WnLog?.table
+Tn_plus_file = Tplus?.table
+Tn_minus_file = Tminus?.table
 
 [misc]
 num_cores = 8

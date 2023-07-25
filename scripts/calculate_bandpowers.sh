@@ -43,10 +43,10 @@ then
     -i ${input} \
     -t "meanr" -p "xip" -m "xim" \
     --cfoldername ${outfold} \
-    -o ${output} -b @BINNING@ -s @BV:THETAMINCOV@ \
-    -l @BV:THETAMAXCOV@ \
+    -o ${output} -b @BINNING@ -s @BV:THETAMINXI@ \
+    -l @BV:THETAMAXXI@ \
     -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
-    -k @BV:NBANDPOWERS@  --thetaminbp @BV:THETAMINBP@ --thetamaxbp @BV:THETAMAXBP@\
+    -k @BV:NBANDPOWERS@ \
     -d "bandpowers_ee" 2>&1 
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
@@ -63,10 +63,10 @@ _message "    -> @BLU@Computing nE bandpowers for file @RED@${input##*/}@DEF@"
     -i ${input} \
     -t "meanr" -g "gamT" -q "gamX" \
     --cfoldername ${outfold} \
-    -o ${output} -b @BINNING@ -s @BV:THETAMINCOV@ \
-    -l @BV:THETAMAXCOV@ \
+    -o ${output} -b @BINNING@ -s @BV:THETAMINXI@ \
+    -l @BV:THETAMAXXI@ \
     -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
-    -k @BV:NBANDPOWERS@  --thetaminbp @BV:THETAMINBP@ --thetamaxbp @BV:THETAMAXBP@\
+    -k @BV:NBANDPOWERS@ \
     -d "bandpowers_ne" 2>&1 
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
@@ -83,10 +83,10 @@ _message "    -> @BLU@Computing nn bandpowers for file @RED@${input##*/}@DEF@"
     -i ${input} \
     -t "meanr" -j "xi" \
     --cfoldername ${outfold} \
-    -o ${output} -b @BINNING@ -s @BV:THETAMINCOV@ \
-    -l @BV:THETAMAXCOV@ \
+    -o ${output} -b @BINNING@ -s @BV:THETAMINXI@ \
+    -l @BV:THETAMAXXI@ \
     -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
-    -k @BV:NBANDPOWERS@  --thetaminbp @BV:THETAMINBP@ --thetamaxbp @BV:THETAMAXBP@\
+    -k @BV:NBANDPOWERS@ \
     -d "bandpowers_nn" 2>&1 
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 

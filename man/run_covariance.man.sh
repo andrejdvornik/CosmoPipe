@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU DATABLOCK DEF PYTHON3BIN RED RUNROOT STORAGEPATH SURVEY
+  echo BLU BV:STATISTIC DATABLOCK DEF PYTHON3BIN RED RUNROOT STORAGEPATH SURVEY
 } 
 #}}}
 
