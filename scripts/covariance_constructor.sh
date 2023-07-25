@@ -71,8 +71,8 @@ save_alms = True
 
 [covELLspace settings]
 ell_min = @BV:LMINCOV@
-ell_max = @BV:LMAXCOV@
-ell_bins = @BV:LBINSCOV@
+-ell_max = @BV:LMAXCOV@
+-ell_bins = @BV:LBINSCOV@
 ell_type = log
 delta_z = 0.08
 tri_delta_z = 0.5
@@ -121,8 +121,8 @@ then
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covCOSEBI settings]
 En_modes = @BV:NMAXCOSEBIS@
-theta_min = @BV:THETAMINCOV@
-theta_max = @BV:THETAMAXCOV@
+theta_min = @BV:THETAMINXI@
+theta_max = @BV:THETAMAXXI@
 En_accuracy = 1e-4
 Wn_style = log
 
@@ -132,8 +132,8 @@ then
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covbandpowers settings]
 apodisation_log_width = @BV:APODISATIONWIDTH@
-theta_lo = @BV:THETAMINCOV@
-theta_up = @BV:THETAMAXCOV@
+theta_lo = @BV:THETAMINXI@
+theta_up = @BV:THETAMAXXI@
 theta_binning = 300
 ell_min = @BV:LMINBANDPOWERS@
 ell_max = @BV:LMAXBANDPOWERS@
