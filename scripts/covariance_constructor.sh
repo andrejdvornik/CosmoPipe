@@ -250,6 +250,8 @@ small_k_damping_for1h = damped
 lower_calc_limit = 1e-200
 
 [tabulated inputs files]
+npair_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/
+npair_mm_file = @BV:NPAIRBASE@_Bin?_Bin?.ascii
 cosebi_directory = @RUNROOT@/INSTALL/covariance/onecov/input/cosebis/
 wn_log_file = WnLog?.table
 Tn_plus_file = Tplus?.table
