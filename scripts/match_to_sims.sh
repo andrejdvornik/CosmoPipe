@@ -3,7 +3,7 @@
 # File Name : match_to_sims.sh
 # Created By : awright
 # Creation Date : 15-06-2023
-# Last Modified : Tue 11 Jul 2023 03:38:30 PM CEST
+# Last Modified : Tue 25 Jul 2023 10:55:41 AM CEST
 #
 #=========================================
 
@@ -84,7 +84,7 @@ do
   output_file=${current_data//.${ext}/_simmatch.${ext}}
   
   #Notify that we are matching these catalogues 
-  _message "   @BLU@@BV:ZSPECDATA@ @BV:ZSPECSIM@@DEF@\n"
+  #_message "   @BLU@@BV:ZSPECDATA@ @BV:ZSPECSIM@@DEF@\n"
   _message " > @BLU@Matching simulation catalogue @RED@${current_sim##*/}@BLU@ to data catalogue @RED@${current_data##*/}@DEF@"
   @PYTHON3BIN@ @RUNROOT@/INSTALL/galselect/bin/select_gals.py \
           -d ${current_data} \
