@@ -3,7 +3,7 @@
 # File Name : ldackeepcols.sh
 # Created By : awright
 # Creation Date : 12-06-2023
-# Last Modified : Thu 29 Jun 2023 03:09:31 PM CEST
+# Last Modified : Fri 28 Jul 2023 11:41:32 AM CEST
 #
 #=========================================
 
@@ -47,12 +47,25 @@ keepstr="${keepstr// /\\|}"
 #Get the list of all columns 
 cols=`@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacdesc -i ${input} -t OBJECTS 2>&1 | grep "Key name" | awk -F. '{print $NF}' || echo `
 
+if [ "${cols}" == "" ] 
+then 
+  _message "@RED@ - ERROR! Column read using ldacdesc failed! Is this an LDAC catalogue?@DEF@\n"
+  _message "${input}\n"
+  exit 1 
+fi 
+
 #Select the columns to remove 
 delcols=`echo ${cols} | sed 's/ /\n/g' | grep -iv "${keepstr}" || echo `
 
 if [ "${delcols}" == "${cols}" ]
 then 
   _message "@RED@ - ERROR! Deletion would remove all columns?!@DEF@\n"
+  _message "@BLU@columns:@DEF@\n"
+  _message "${cols}\n"
+  _message "@BLU@delete cols:@DEF@"
+  _message "${delcols}\n"
+  _message "@BLU@keep strings:@DEF@\n"
+  _message "${keepstr}"
   exit 1
 elif [ "${delcols}" == "" ] 
 then 
