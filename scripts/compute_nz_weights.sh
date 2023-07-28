@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Sat 08 Jul 2023 06:53:21 AM CEST
+# Last Modified : Wed 26 Jul 2023 09:08:10 AM CEST
 #
 #=========================================
 
@@ -15,6 +15,7 @@ output_files=''
 for _file in @DB:som_weight_reference@
 do
   output_files="${output_files} ${_file##*/}"
+  ext=${_file##*.}
 done
 
 #Construct the SOM 
@@ -54,7 +55,7 @@ then
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_cats
 fi 
 #Add the new main files to the datablock 
-calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_refr_DIRsom*.fits `
+calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_refr_DIRsom*.${ext}`
 filenames=''
 for file in $calibcats
 do 
@@ -72,7 +73,7 @@ if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_calib_cats ]
 then 
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_calib_cats
 fi 
-calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_DIRsom*.fits `
+calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_DIRsom*.${ext} `
 filenames=''
 for file in $calibcats
 do 
