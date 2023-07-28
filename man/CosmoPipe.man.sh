@@ -459,11 +459,18 @@ function _replace_datahead {
     #If this is the file we want to update 
     if [ "${_file}" == "${1##*/}" ] 
     then 
-      #Replace this file in the datahead
-      >&2 echo "replace ${1##*/} -> ${2##*/}"
+      #Make sure we don't delete what we want to keep 
+      if [ "${_file}" == "${2##*/}" ]
+      then 
+        #Don't delete the new file!
+        >&2 echo "name unchanged ${1##*/} -> ${2##*/}"
+      else 
+        #Replace this file in the datahead
+        >&2 echo "replace ${1##*/} -> ${2##*/}"
+        #Remove the old file 
+        rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${_file}
+      fi 
       echo "${2##*/}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-      #Remove the old file 
-      rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${_file}
     else 
       #Otherwise keep going
       echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
