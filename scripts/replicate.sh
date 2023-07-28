@@ -3,7 +3,7 @@
 # File Name : replicate.sh
 # Created By : awright
 # Creation Date : 25-04-2023
-# Last Modified : Tue 25 Jul 2023 10:51:44 AM CEST
+# Last Modified : Fri 28 Jul 2023 12:17:09 PM CEST
 #
 #=========================================
 
@@ -11,6 +11,7 @@ NREPL=@BV:NREPL@
 
 for file in @DB:ALLHEAD@ 
 do 
+  outlist=''
   for i in `seq ${NREPL}` 
   do 
     ofile=${file##*/}
@@ -21,7 +22,7 @@ do
     #Add duplicate to output list 
     outlist="$outlist $ofile"
   done 
+  _replace_datahead "${file}" "${outlist}"
 done 
 
-_writelist_datahead "${outlist}"
 
