@@ -460,17 +460,37 @@ function _replace_datahead {
     if [ "${_file}" == "${1##*/}" ] 
     then 
       #Make sure we don't delete what we want to keep 
-      if [ "${_file}" == "${2##*/}" ]
+      _delete=TRUE
+      #Loop over new files 
+      for _newfile in ${2} 
+      do 
+        #Is the old file in the new file list?
+        if [ "${_file}" == "${_newfile##*/}" ]
+        then 
+          #Don't delete the new file!
+          _delete=FALSE
+        fi 
+      done 
+      if [ "${_delete}" == "FALSE" ]
       then 
         #Don't delete the new file!
-        >&2 echo "name unchanged ${1##*/} -> ${2##*/}"
-      else 
+        >&2 echo "name unchanged ${1##*/} -> ${_newfile##*/}"
+      elif [ "${_delete}" == "TRUE" ] 
+      then 
         #Replace this file in the datahead
-        >&2 echo "replace ${1##*/} -> ${2##*/}"
-        #Remove the old file 
-        rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${_file}
+        >&2 echo "replace ${1##*/} -> ${_newfile##*/}"
+        #Remove the old file(s)
+        rm -f ${_delete_list}
+      else 
+        >&2 echo "_delete variable in _replace_datahead has invalid value: ${_delete}?!"
+        exit 1
       fi 
-      echo "${2##*/}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+      #Loop over new files 
+      for _newfile in ${2} 
+      do 
+        #Add new file to the data block 
+        echo "${_newfile##*/}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+      done 
     else 
       #Otherwise keep going
       echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
