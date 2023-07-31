@@ -3,7 +3,7 @@
 # File Name : mcal_functions.py
 # Created By : awright
 # Creation Date : 25-05-2023
-# Last Modified : Thu 20 Jul 2023 09:12:20 AM CEST
+# Last Modified : Mon 31 Jul 2023 02:27:36 PM CEST
 #
 #=========================================
 
@@ -103,11 +103,20 @@ def flexible_write(cata,filepath,ldac_cat=None,table_name='OBJECTS'):
             for key in cata_keys: 
                 #Do we need to update the ldac catalogue 
                 if key in ldac_keys: 
+                    print(f"Checking key {key}")
                     #Do we need to update a catalogue column?
-                    if any(ldac_cat[table_name][key]!=cata[key]): 
-                        print(f"Updating key {key}")
-                        #Update it 
-                        ldac_cat[table_name][key]=cata[key]
+                    if type(ldac_cat[table_name][key]) == np.chararray: 
+                        charvec=cata[key].to_numpy().astype(str)
+                        if any(ldac_cat[table_name][key]!=charvec): 
+                            print(f"Updating charachter key {key}")
+                            #Update it 
+                            ldac_cat[table_name][key]=charvec 
+                        del charvec 
+                    else: 
+                        if any(ldac_cat[table_name][key]!=cata[key]): 
+                            print(f"Updating non-charachter key {key}")
+                            #Update it 
+                            ldac_cat[table_name][key]=cata[key]
                 else: 
                     print(f"Adding key {key}")
                     #Add the column 
