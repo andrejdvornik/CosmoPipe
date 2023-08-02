@@ -3,7 +3,7 @@
 # File Name : ldacrenkey.sh
 # Created By : awright
 # Creation Date : 16-06-2023
-# Last Modified : Mon 31 Jul 2023 01:13:45 PM CEST
+# Last Modified : Wed 02 Aug 2023 09:49:09 PM CEST
 #
 #=========================================
 
@@ -12,8 +12,11 @@ input="@DB:DATAHEAD@"
 #Output file name 
 ext=${input##*.}
 #Avoid duplicate "_ren" extensions {{{
+echo "Checking for duplicate _ren labels in ${input} (${ext})" 
 if [[ "${input}" =~ "_ren" ]]
 then 
+  echo "Found existing _ren label. Checking for trailing number" 
+  _numbr='^[0-9]+$'
   count=${input##*_ren}
   count=${count%.${ext}}
   if [ "${count}" == "" ] 
@@ -26,7 +29,7 @@ then
     else 
       output=${input//.${ext}/_ren.${ext}}
     fi 
-  elif ! [[ ${count} =~ '^[0-9]+$' ]] ; then
+  elif ! [[ ${count} =~ ${_numbr} ]] ; then
     #Count is not a number: there is no ending _ren! 
     output=${input//.${ext}/_ren.${ext}}
   else 
