@@ -3,7 +3,7 @@
 # File Name : plot_HC_nz.sh
 # Created By : awright
 # Creation Date : 23-03-2023
-# Last Modified : Fri 07 Jul 2023 08:07:57 PM CEST
+# Last Modified : Wed 26 Jul 2023 09:10:55 AM CEST
 #
 #=========================================
 
@@ -26,4 +26,5 @@ done
 #}}}
 
 #Run the R plotting code 
-@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/plot_HC_nz.R -i @DB:nz_hc_optim@ --binstrings ${binstrings}
+@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/plot_HC_nz.R -i @DB:nz_hc_optim@ --binstrings ${binstrings} 2>&1
+
