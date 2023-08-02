@@ -3,20 +3,20 @@
 #
 
 #Get the filename 
-orig=@DB:DATAHEAD@
-orig=${orig##*/}
+input=@DB:DATAHEAD@
+#create the output name 
+ext=${input##*.}
+output=${input%.${ext}}_adapt.${ext}
 
 #Notify 
-_message "  > @BLU@Constructing Adapt catalogue for file: @DEF@${orig}\n"
+_message "  > @BLU@Constructing Adapt catalogue for file: @DEF@${input##*/}"
 
 #Construct the adapt catalogue 
-@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/construct_adapt_catalogue.R @DB:DATAHEAD@ @DB:DATAHEAD@ 2>&1
+@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/construct_adapt_catalogue.R ${input} ${output} 2>&1
 
-#The script forcibly renames .cat files to .fits
-#Make sure that this is reflected in the DATAHEAD 
-new=${orig/.cat/.fits}
-if [ "$new" != "${orig}" ] 
-then 
-  _replace_datahead ${orig} ${new} 
-fi 
+#Notify 
+_message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
+
+#Update the datahead 
+_replace_datahead "${input##*/}" "${output##*/}" 
 

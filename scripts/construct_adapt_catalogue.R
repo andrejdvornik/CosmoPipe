@@ -24,7 +24,7 @@ if (length(inputs)>1) {
   outfile<-inputs[2]
 } else { 
   outend<-helpRfuncs::vecsplit(inputs[1],'.',-1)
-  outfile<-sub(paste0(".",outend),paste0("_adapt.fits"),inputs[1])
+  outfile<-sub(paste0(".",outend),paste0("_adapt.",outend),inputs[1])
   if (outfile==inputs[1]) { 
     stop(paste("unable to create a distinct outfile because infile has no extension",
                                  "and output directory is the same as input?!"))
@@ -35,7 +35,7 @@ if (outfile==inputs[1]) {
 } 
 #Output the catalogue 
 cat(paste0("Writing ",outfile))
-helpRfuncs::write.file(file=outfile,cat,extname='OBJECTS')
+helpRfuncs::write.file(file=outfile,cat)
 cat(paste0(" - Done\n"))
 
 
