@@ -3,7 +3,7 @@
 # File Name : ldacrenkey.sh
 # Created By : awright
 # Creation Date : 16-06-2023
-# Last Modified : Wed 28 Jun 2023 10:13:28 PM CEST
+# Last Modified : Mon 31 Jul 2023 01:13:45 PM CEST
 #
 #=========================================
 
@@ -26,6 +26,9 @@ then
     else 
       output=${input//.${ext}/_ren.${ext}}
     fi 
+  elif ! [[ ${count} =~ '^[0-9]+$' ]] ; then
+    #Count is not a number: there is no ending _ren! 
+    output=${input//.${ext}/_ren.${ext}}
   else 
     ncount=$((count+1))
     output=${input//_ren${count}.${ext}/_ren${ncount}.${ext}}
