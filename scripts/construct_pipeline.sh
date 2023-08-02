@@ -76,7 +76,7 @@ do
       #Read the substep modes 
       sublist=`VERBOSE=1 _read_pipe $step ${stepnum}` 
       #Replace the substep (whole matches only)
-      pipeline_steps=`echo " $pipeline_steps " | sed "s/ $step=${stepnum} / $sublist /" | xargs echo `
+      pipeline_steps=`echo " $pipeline_steps " | sed "s/ $step=${stepnum} / ${sublist//\//\\\/} /" | xargs echo `
       echo "  -> ${sublist}"
     fi 
   done 
