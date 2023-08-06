@@ -3,7 +3,7 @@
 # File Name : get_features.sh
 # Created By : awright
 # Creation Date : 06-08-2023
-# Last Modified : Sun Aug  6 21:42:50 2023
+# Last Modified : Sun Aug  6 22:05:56 2023
 #
 #=========================================
 
@@ -76,5 +76,5 @@ then
 fi 
 
 #Assign the feature space to the block variables 
-_write_blockvars "SOMFEATURES "${features}"
+_write_blockvars "SOMFEATURES" "${features}"
 
