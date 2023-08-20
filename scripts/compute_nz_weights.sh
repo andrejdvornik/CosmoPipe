@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Wed 26 Jul 2023 09:08:10 AM CEST
+# Last Modified : Sun Aug  6 22:21:14 2023
 #
 #=========================================
 
@@ -24,30 +24,12 @@ done
   -t @DB:som_weight_training@ \
   -ct "" -cr @BV:WEIGHTNAME@ \
   --old.som @DB:ALLHEAD@ \
-  --factor.nbins Inf --optimise --optimise.minN @BV:MINNHC@ --force \
+  --factor.nbins Inf @BV:OPTIMISE@ --optimise.minN @BV:MINNHC@ --force \
   -sc @BV:NTHREADS@ \
   --short.write --refr.flag @BV:ADDITIONALFLAGS@ \
   -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ -of ${output_files} \
   --zr.label @BV:ZPHOTNAME@ --zt.label @BV:ZSPECNAME@ \
-  -k MAG_GAAP_u-MAG_GAAP_g \
-  MAG_GAAP_u-MAG_GAAP_r MAG_GAAP_g-MAG_GAAP_r \
-  MAG_GAAP_u-MAG_GAAP_@BV:IMAGNAME@ MAG_GAAP_g-MAG_GAAP_@BV:IMAGNAME@ \
-  MAG_GAAP_r-MAG_GAAP_@BV:IMAGNAME@ MAG_GAAP_u-MAG_GAAP_Z \
-  MAG_GAAP_g-MAG_GAAP_Z MAG_GAAP_r-MAG_GAAP_Z \
-  MAG_GAAP_@BV:IMAGNAME@-MAG_GAAP_Z MAG_GAAP_u-MAG_GAAP_Y \
-  MAG_GAAP_g-MAG_GAAP_Y MAG_GAAP_r-MAG_GAAP_Y \
-  MAG_GAAP_@BV:IMAGNAME@-MAG_GAAP_Y MAG_GAAP_Z-MAG_GAAP_Y \
-  MAG_GAAP_u-MAG_GAAP_J MAG_GAAP_g-MAG_GAAP_J \
-  MAG_GAAP_r-MAG_GAAP_J MAG_GAAP_@BV:IMAGNAME@-MAG_GAAP_J \
-  MAG_GAAP_Z-MAG_GAAP_J MAG_GAAP_Y-MAG_GAAP_J \
-  MAG_GAAP_u-MAG_GAAP_H MAG_GAAP_g-MAG_GAAP_H \
-  MAG_GAAP_r-MAG_GAAP_H MAG_GAAP_@BV:IMAGNAME@-MAG_GAAP_H \
-  MAG_GAAP_Z-MAG_GAAP_H MAG_GAAP_Y-MAG_GAAP_H \
-  MAG_GAAP_J-MAG_GAAP_H MAG_GAAP_u-MAG_GAAP_Ks \
-  MAG_GAAP_g-MAG_GAAP_Ks MAG_GAAP_r-MAG_GAAP_Ks \
-  MAG_GAAP_@BV:IMAGNAME@-MAG_GAAP_Ks MAG_GAAP_Z-MAG_GAAP_Ks \
-  MAG_GAAP_Y-MAG_GAAP_Ks MAG_GAAP_J-MAG_GAAP_Ks \
-  MAG_GAAP_H-MAG_GAAP_Ks @BV:REFMAGNAME@ >&2 
+  -k @BV:SOMFEATURES@ 2>&1 
 
 #Make the directory for the main catalogues 
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_cats ]
