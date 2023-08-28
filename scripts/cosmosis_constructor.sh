@@ -27,11 +27,22 @@ redshift_name = source
 SAMPLER_NAME = @BV:SAMPLER@
 RUN_NAME = %(SAMPLER_NAME)s_%(blind)s
 
-data_file = @DB:mcmc_inp@
-
+COSEBIS_PATH = %(MY_PATH)s/INSTALL/kcap/cosebis/
 
 EOF
 #}}}
+STATISTIC="@BV:STATISTIC@"
+if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
+then
+  datafile=@DB:mcmc_inp_cosebis@
+elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
+then 
+  datafile=@DB:mcmc_inp_bandpowers@
+fi
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
+data_file = ${datafile}
+
+EOF
 
 #Set up the scale cuts module {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
@@ -46,7 +57,6 @@ EOF
 #}}}
 
 #Requested statistic {{{
-STATISTIC="@BV:STATISTIC@"
 if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 then 
   #Scalecuts {{{
@@ -103,7 +113,7 @@ EOF
 
 #Statistic {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
-[statistic]
+[bandpowers]
 file = %(COSEBIs_PATH)s/libbandpower.so
 type = cosmic_shear_e
 response_function_type = tophat
@@ -116,7 +126,7 @@ apodise = 1
 delta_x = @BV:APODISATIONWIDTH@
 theta_min = @BV:THETAMINXI@
 theta_max = @BV:THETAMAXXI@
-output_foldername = %(BandpowersPath)s
+output_foldername = %(COSEBIS_PATH)s/bandpowers_window/
 
 EOF
 #}}}
@@ -225,7 +235,7 @@ enlarge_per_dim = 1.1
 split_threshold = 100
 n_networks = 8
 n_batch = 128
-filepath = %(OUTPUT_FOLDER)s/Nautilus/run_nautilus.hdf5
+filepath = %(OUTPUT_FOLDER)s/run_nautilus.hdf5
 resume = False
 f_live = 0.01
 discard_exploration = True
@@ -328,8 +338,8 @@ fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
 likelihoods  = loglike
 extra_output = ${extraparams} ${shifts} ${listparam}
-quiet = F
-timing = T
+quiet = T
+timing = F
 debug = F
 
 [runtime]
@@ -583,7 +593,7 @@ cat \
   @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_boltzman.ini \
   @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini \
   @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini > \
-  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed.ini
+  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_@BV:STATISTIC@.ini
 
 #}}}
 
