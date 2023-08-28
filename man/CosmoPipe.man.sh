@@ -355,80 +355,93 @@ function _read_datahead {
 function _add_datahead { 
   _block=`_read_datablock`
   _vars=`_read_blockvars`
-  #Copy the requested data to the datahead 
-  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/ ] 
+  #If the request is for nothing
+  if [ "${1}" == "" ] 
   then 
-    _message "@RED@ - ERROR! The requested data block component ${1} does not have a folder in the data block?!"
-    exit 1 
-  fi 
-  #If the directory is empty {{{
-  if [ ! "$(ls -A @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1})" ]
-  then 
-    _message "@RED@ - ERROR! The requested data block component ${1} is empty?!"
-    exit 1 
-  fi 
-  #}}}
-  #Get the files in this data{{{
-  _files=`_read_datablock ${1}`
-  _files=`_blockentry_to_filelist ${_files}`
-  #}}}
-  #remove the data in the datahead that we aren't going to use {{{
-  if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD ]
-  then 
-    _headfiles=`_read_datahead`
-    #For each file in the DATAHEAD {{{
-    for hfile in ${_headfiles}
-    do 
-      #Check for a matching file in the block object 
-      found="FALSE"
-      for file in ${_files}
+    #Clear the datahead {{{
+    echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    #Remove any datahead files 
+    rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*
+    #}}}
+  else 
+    #Copy the requested data to the datahead {{{
+    if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/ ] 
+    then 
+      _message "@RED@ - ERROR! The requested data block component ${1} does not have a folder in the data block?!"
+      exit 1 
+    fi 
+    #If the directory is empty {{{
+    if [ ! "$(ls -A @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1})" ]
+    then 
+      _message "@RED@ - ERROR! The requested data block component ${1} is empty?!"
+      exit 1 
+    fi 
+    #}}}
+    #Get the files in this data{{{
+    _files=`_read_datablock ${1}`
+    _files=`_blockentry_to_filelist ${_files}`
+    #}}}
+    #remove the data in the datahead that we aren't going to use {{{
+    if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD ]
+    then 
+      _headfiles=`_read_datahead`
+      #For each file in the DATAHEAD {{{
+      for hfile in ${_headfiles}
       do 
-        #If there is a matching file 
-        if [ "${hfile}" == "${file}" ]
+        #Check for a matching file in the block object 
+        found="FALSE"
+        for file in ${_files}
+        do 
+          #If there is a matching file 
+          if [ "${hfile}" == "${file}" ]
+          then 
+            #If there is a matching file, log and break 
+            found="TRUE"
+            break 
+          fi 
+        done 
+        #If not found, delete
+        if [ "${found}" == "FALSE" ] 
         then 
-          #If there is a matching file, log and break 
-          found="TRUE"
-          break 
+          #Delete the file 
+          rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${hfile}
         fi 
       done 
-      #If not found, delete
-      if [ "${found}" == "FALSE" ] 
-      then 
-        #Delete the file 
-        rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${hfile}
-      fi 
-    done 
+      #}}}
+      ## Old method: delete everything! {{{
+      #dir=`pwd`
+      #cd @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD
+      #rm -fr ./*.*
+      #cd $dir
+      #}}}
+    fi 
     #}}}
-    ## Old method: delete everything! {{{
-    #dir=`pwd`
-    #cd @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD
-    #rm -fr ./*.*
-    #cd $dir
-    #}}}
-  fi 
-  #}}}
-  #Copy the requested data to the datahead, if the directory contains anything {{{
-  if [ "$(ls -A @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1})" ] 
-  then 
-    _message " @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD:\n"
-    #Copy the files one-by-one (to ensure that there isn't accidental use of datablock waste...)
-    #For each file in the block element {{{
-    for file in ${_files}
+    #Copy the requested data to the datahead, if the directory contains anything {{{
+    if [ "$(ls -A @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1})" ] 
+    then 
+      _message " @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD:\n"
+      #Copy the files one-by-one (to ensure that there isn't accidental use of datablock waste...)
+      #For each file in the block element {{{
+      for file in ${_files}
+      do 
+        _message " @BLU@  -->@DEF@ ${file}"
+        #Copy the file (will skip if file is unchanged)
+        rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${file} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ >> @RUNROOT@/@LOGPATH@/datahead_write.log
+        _message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
+      done 
+      #}}}
+      _message " @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD@BLU@ Done!@DEF@\n"
+    fi 
+    #Update the datablock txt file 
+    echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    for _file in ${_files} 
     do 
-      _message " @BLU@  -->@DEF@ ${file}"
-      #Copy the file (will skip if file is unchanged)
-      rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${file} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ >> @RUNROOT@/@LOGPATH@/datahead_write.log
-      _message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
+      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
     done 
     #}}}
-    _message " @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD@BLU@ Done!@DEF@\n"
+    #}}}
   fi 
-  #Update the datablock txt file 
-  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  for _file in ${_files} 
-  do 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done 
+  #Output the rest of the block information {{{
   echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   for _file in ${_block} 
   do 
@@ -441,6 +454,7 @@ function _add_datahead {
     #_file=`echo $_file`
     echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   done
+  #}}}
 }
 #}}}
 
