@@ -3,7 +3,7 @@
 # File Name : covariance_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Thu Jul 20 13:26:48 2023
+# Last Modified : Mon 28 Aug 2023 11:17:16 AM CEST
 #
 #=========================================
 
@@ -96,8 +96,8 @@ if [ "${STATISTIC^^}" == "XIPM" ]
 then
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covTHETAspace settings]
-theta_min = @BV:THETAMINCOV@
-theta_max = @BV:THETAMAXCOV@
+theta_min = @BV:THETAMINXI@
+theta_max = @BV:THETAMAXXI@
 theta_bins = @BV:NTHETABINXI@
 theta_type = log
 theta_list = 1, 2, 3
