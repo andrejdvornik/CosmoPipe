@@ -3,7 +3,7 @@
 # File Name : prepare_cosmosis.sh
 # Created By : awright
 # Creation Date : 31-03-2023
-# Last Modified : Fri 07 Jul 2023 08:09:30 PM CEST
+# Last Modified : Mon 28 Aug 2023 09:51:25 AM CEST
 #
 #=========================================
 
@@ -11,7 +11,22 @@
 inputs="@DB:nz@"
 headfiles="@DB:ALLHEAD@"
 
+#Number of tomographic bins 
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
+
+#All possible prior values that might need specification
+PRIOR_AIA="@BV:PRIOR_AIA@"
+PRIOR_ABARY="@BV:PRIOR_ABARY@"
+PRIOR_LOGTAGN="@BV:PRIOR_LOGTAGN@"
+PRIOR_OMCH2="@BV:PRIOR_OMCH2@"
+PRIOR_OMBH2="@BV:PRIOR_OMBH2@"
+PRIOR_H0="@BV:PRIOR_H0@"
+PRIOR_NS="@BV:PRIOR_NS@"
+PRIOR_S8INPUT="@BV:PRIOR_S8INPUT@"
+PRIOR_OMEGA_K="@BV:PRIOR_OMEGAK@"
+PRIOR_W="@BV:PRIOR_W@"
+PRIOR_WA="@BV:PRIOR_WA@"
+PRIOR_MNU="@BV:PRIOR_MNU@"
 
 #N_effective & sigmae {{{
 for stat in neff sigmae
@@ -187,19 +202,225 @@ then
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/
 fi 
 #Generate the _values.ini file: 
-cp @RUNROOT@/@CONFIGPATH@/values.ini @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
-#Update the values with the uncorrelated Dz priors
+#cp @RUNROOT@/@CONFIGPATH@/values.ini @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini ]
+then 
+  _message "  @BLU@Deleting previous _values file@DEF@"
+  rm @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+  _message "@RED@ - Done!@DEF@\n"
+fi 
+if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini ]
+then 
+  _message "  @BLU@Deleting previous _priors file@DEF@"
+  rm @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+  _message "@RED@ - Done!@DEF@\n"
+fi 
+#Add cosmological parameters: {{{
+blockname="[cosmological_parameters]"
+echo "${blockname}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+found_gauss=FALSE
+for param in omch2 ombh2 h0 n_s s_8_input omega_k w wa mnu 
+do 
+  #Load the prior variable name {{{
+  pvar=${param^^}
+  pvar=PRIOR_${pvar//_/}
+  #}}}
+  #get the prior value {{{
+  pprior=`echo ${!pvar}`
+  #}}}
+  #Check the prior is correctly specified {{{
+  nprior=`echo ${pprior} | awk '{print NF}'` 
+  if [ ${nprior} -ne 3 ] 
+  then 
+    _message "@RED@ ERROR - prior @DEF@${pvar}@RED@ does not have 3 values! Must be tophat ('lo start hi') or gaussian ('gaussian mean sd')@DEF@\n"
+    _message "@RED@         it is: @DEF@${pprior}\n"
+    exit 1 
+  fi 
+  #}}}
+  #Write the prior {{{
+  if [ "${pprior%% *}" == "gaussian" ]
+  then 
+    #Prior is a gaussian {{{
+    #Construct the tophat prior: [-10 sigma, +10 sigma ] {{{
+    pstring=`echo ${pprior} | awk '{print $2-10*$3,$2,$2+10*$3}'`
+    echo "${param} = ${pstring}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+    #}}}
+    #Add the gaussian prior to the priors.ini file  {{{
+    if [ "${found_gauss}" == "FALSE" ]
+    then 
+      echo "${blockname}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+      found_gauss=TRUE
+    fi 
+    #Write the gaussian prior to the priors file 
+    echo "${param} = ${pprior}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+    #}}}
+    #}}}
+  else 
+    #Write the tophat prior to the priors file {{{
+    echo "${param} = ${pprior}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+    #}}}
+  fi 
+  #}}}
+done 
+#}}}
+#Add halo model 2020 parameters: {{{
+blockname="[halo_model_parameters_2020]"
+echo "${blockname}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+found_gauss=FALSE
+for param in log_T_AGN
+do 
+  #Load the prior variable name {{{
+  pvar=${param^^}
+  pvar=PRIOR_${pvar//_/}
+  #}}}
+  #get the prior value {{{
+  pprior=`echo ${!pvar}`
+  #}}}
+  #Check the prior is correctly specified {{{
+  nprior=`echo ${pprior} | awk '{print NF}'` 
+  if [ ${nprior} -ne 3 ] 
+  then 
+    _message "@RED@ ERROR - prior @DEF@${pvar}@RED@ does not have 3 values! Must be tophat ('lo start hi') or gaussian ('gaussian mean sd')@DEF@\n"
+    _message "@RED@         it is: @DEF@${pprior}\n"
+    exit 1 
+  fi 
+  #}}}
+  #Write the prior {{{
+  if [ "${pprior%% *}" == "gaussian" ]
+  then 
+    #Prior is a gaussian {{{
+    #Construct the tophat prior: [-10 sigma, +10 sigma ] {{{
+    pstring=`echo ${pprior} | awk '{print $2-10*$3,$2,$2+10*$3}'`
+    echo "${param} = ${pstring}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+    #}}}
+    #Add the gaussian prior to the priors.ini file  {{{
+    if [ "${found_gauss}" == "FALSE" ]
+    then 
+      echo "${blockname}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+      found_gauss=TRUE
+    fi 
+    #Write the gaussian prior to the priors file 
+    echo "${param} = ${pprior}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+    #}}}
+    #}}}
+  else 
+    #Write the tophat prior to the priors file {{{
+    echo "${param} = ${pprior}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+    #}}}
+  fi 
+  #}}}
+done 
+#}}}
+#Add halo model 2015 parameters: {{{
+blockname="[halo_model_parameters]"
+echo "${blockname}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+found_gauss=FALSE
+for param in Abary 
+do 
+  #Load the prior variable name {{{
+  pvar=${param^^}
+  pvar=PRIOR_${pvar//_/}
+  #}}}
+  #get the prior value {{{
+  pprior=`echo ${!pvar}`
+  #}}}
+  #Check the prior is correctly specified {{{
+  nprior=`echo ${pprior} | awk '{print NF}'` 
+  if [ ${nprior} -ne 3 ] 
+  then 
+    _message "@RED@ ERROR - prior @DEF@${pvar}@RED@ does not have 3 values! Must be tophat ('lo start hi') or gaussian ('gaussian mean sd')@DEF@\n"
+    _message "@RED@         it is: @DEF@${pprior}\n"
+    exit 1 
+  fi 
+  #}}}
+  #Write the prior {{{
+  if [ "${pprior%% *}" == "gaussian" ]
+  then 
+    #Prior is a gaussian {{{
+    #Construct the tophat prior: [-10 sigma, +10 sigma ] {{{
+    pstring=`echo ${pprior} | awk '{print $2-10*$3,$2,$2+10*$3}'`
+    echo "${param//bary/} = ${pstring}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+    #}}}
+    #Add the gaussian prior to the priors.ini file  {{{
+    if [ "${found_gauss}" == "FALSE" ]
+    then 
+      echo "${blockname}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+      found_gauss=TRUE
+    fi 
+    #Write the gaussian prior to the priors file 
+    echo "${param//bary/} = ${pprior}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+    #}}}
+    #}}}
+  else 
+    #Write the tophat prior to the priors file {{{
+    echo "${param//bary/} = ${pprior}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+    #}}}
+  fi 
+  #}}}
+done 
+#}}}
+#Add intrinsic alignment parameters: {{{
+blockname="[intrinsic_alignment_parameters]"
+echo "${blockname}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+found_gauss=FALSE
+for param in AIA 
+do 
+  #Load the prior variable name {{{
+  pvar=${param^^}
+  pvar=PRIOR_${pvar//_/}
+  #}}}
+  #get the prior value {{{
+  pprior=`echo ${!pvar}`
+  #}}}
+  #Check the prior is correctly specified {{{
+  nprior=`echo ${pprior} | awk '{print NF}'` 
+  if [ ${nprior} -ne 3 ] 
+  then 
+    _message "@RED@ ERROR - prior @DEF@${pvar}@RED@ does not have 3 values! Must be tophat ('lo start hi') or gaussian ('gaussian mean sd')@DEF@\n"
+    _message "@RED@         it is: @DEF@${pprior}\n"
+    exit 1 
+  fi 
+  #}}}
+  #Write the prior {{{
+  if [ "${pprior%% *}" == "gaussian" ]
+  then 
+    #Prior is a gaussian {{{
+    #Construct the tophat prior: [-10 sigma, +10 sigma ] {{{
+    pstring=`echo ${pprior} | awk '{print $2-10*$3,$2,$2+10*$3}'`
+    echo "${param//IA/} = ${pstring}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+    #}}}
+    #Add the gaussian prior to the priors.ini file  {{{
+    if [ "${found_gauss}" == "FALSE" ]
+    then 
+      echo "${blockname}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+      found_gauss=TRUE
+    fi 
+    #Write the gaussian prior to the priors file 
+    echo "${param//IA/} = ${pprior}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+    #}}}
+    #}}}
+  else 
+    #Write the tophat prior to the priors file {{{
+    echo "${param//IA/} = ${pprior}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+    #}}}
+  fi 
+  #}}}
+done 
+#}}}
+
+#Update the values with the uncorrelated Dz priors {{{
 echo "[nofz_shifts]" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini 
 #Add the uncorrelated tomographic bin shifts 
 tomoval_all=`cat @DB:nzbias_uncorr@`
 for tomo in `seq ${NTOMO}`
 do 
   tomoval=`echo ${tomoval_all} | awk -v n=${tomo} '{print $n}'`
-  echo "uncorr_bias_${tomo} = -5.0 ${tomoval} 5.0 " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+  tomolo=`echo $tomoval | awk '{print $1-5.00}'`
+  tomohi=`echo $tomoval | awk '{print $1+5.00}'`
+  echo "uncorr_bias_${tomo} = ${tomolo} ${tomoval} ${tomohi} " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
 done
-#Generate the _priors.ini file: 
-echo > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
-#Update the values with the uncorrelated Dz priors
+#}}}
+#Update the priors with the uncorrelated Dz priors {{{
 echo "[nofz_shifts]" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini 
 #Add the uncorrelated tomographic bin shifts 
 for tomo in `seq ${NTOMO}`
@@ -207,6 +428,7 @@ do
   tomoval=`echo ${tomoval_all} | awk -v n=${tomo} '{print $n}'`
   echo "uncorr_bias_${tomo} = gaussian ${tomoval} 1.0 " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
 done
+#}}}
 
 _write_datablock "cosmosis_inputs" "@SURVEY@_values.ini @SURVEY@_priors.ini"
 #}}}
