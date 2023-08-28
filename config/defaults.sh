@@ -10,18 +10,27 @@
 #i-magnitude label
 IMAGNAME=i
 
+#List of magnitudes for use in calibration 
+MAGLIST="MAG_GAAP_u MAG_GAAP_g MAG_GAAP_r MAG_GAAP_i1 MAG_GAAP_i2 MAG_GAAP_Z MAG_GAAP_Y MAG_GAAP_J MAG_GAAP_H MAG_GAAP_Ks"
+
+#Reference magnitude for use in calibration 
+REFMAGNAME="MAG_AUTO"
+
+#Form of the SOM calibration feature space ({ALLMAG,MAG,ALLCOLOUR,COLOUR})
+FEATURETYPES="ALLCOLOUR+MAG"
+
 #Blind Character
-BLIND=C #A B C 
+BLIND=A
 
 #Shape measurement variables: e1
-E1NAME=autocal_e1_C
+E1NAME=autocal_e1_@BV:BLIND@
 #Shape measurement variables: e2  
-E2NAME=autocal_e2_C
+E2NAME=autocal_e2_@BV:BLIND@
 
 #Uncorrected shape measurement variables: e1
-RAWE1NAME=autocal_e1_C
+RAWE1NAME=autocal_e1_@BV:BLIND@
 #Uncorrected shape measurement variables: e2  
-RAWE2NAME=autocal_e2_C
+RAWE2NAME=autocal_e2_@BV:BLIND@
 
 #PSF Shape measurement variables: e1
 PSFE1NAME=PSF_e1
@@ -37,7 +46,7 @@ DECNAME=DELTA_J2000
 NBOOT=300
 
 #Specz column name
-ZSPECNAME='z_spec_B'
+ZSPECNAME='z_spec'
 
 #Photo-z column name
 ZPHOTNAME='Z_B'
@@ -46,7 +55,7 @@ ZPHOTNAME='Z_B'
 NTHREADS=32
 
 #Nz delta-z stepsize
-NZSTEP=@NZSTEP@
+NZSTEP=0.05
 
 #List of m-bias values 
 MBIASVALUES="-0.0128 -0.0104 -0.0114 +0.0072 +0.0061"
@@ -79,7 +88,7 @@ NMINCOSEBIS=1
 NMAXCOSEBIS=5
 
 #Name of the lensing weight variable  
-WEIGHTNAME=recal_weight_@BV:BLIND@
+WEIGHTNAME=weight
 
 #Statistic of choice for chain 
 STATISTIC=cosebis
@@ -171,6 +180,16 @@ NEWKEY=@BV:NEWKEY@
 
 #Number of iterations in SOM construction 
 NITER=1000
+#Do we want to optimise the number of heirarchical clusters?
+OPTIMISE=--optimise
+#What is the minium number of allowed HCs
+MINNHC=2000 
+
+#Do we want to normalise (whiten) the feature space before matching?
+MATCHNORMALISE=--norm
+
+#Do we want to allow duplicates in the matching process? 
+MATCHDUPLICATES=--duplicates 
 
 #Systematic error for Nz bias estimation 
 NZSYSERROR=0.01
@@ -199,6 +218,34 @@ REFCHAIN=@BV:REFCHAIN@
 
 #Statistic to compute 
 STATISTIC=cosebis
+
+#Priors in cosmosis syntax
+#Priors: Omega_m*c*h^2
+PRIOR_OMCH2="0.051 0.11570 0.255"
+#Priors: Omega_b*c*h^2
+PRIOR_OMBH2="0.019 0.02233 0.026"
+#Priors: H0
+PRIOR_H0="0.64 0.68980 0.82"
+#Priors: n_s
+PRIOR_NS="0.84 0.96900 1.1"
+#Priors: S_8
+PRIOR_S8INPUT="0.1 0.77700 1.3"
+#Priors: Omega_K
+PRIOR_W="-1.0"
+PRIOR_OMEGAK="0.0"
+#Priors: w_0
+PRIOR_W="-1.0"
+#Priors: w_a 
+PRIOR_WA="0.0"
+#Priors: m_nu
+PRIOR_MNU="0.06"
+#Priors: log(T_AGN)
+PRIOR_LOGTAGN="7.1 8.0 8.3"
+#Priors: Baryon feedback Amplitude A (HM2015)
+PRIOR_ABARY="2.0 2.6 3.13"
+#Priors: A_IA
+PRIOR_AIA="-6.0 1.0 6.0"
+
 
 
 
