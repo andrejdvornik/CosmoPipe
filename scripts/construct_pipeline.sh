@@ -311,19 +311,20 @@ do
     cat @RUNROOT@/@PIPELINE@_links.R | sed "s/${oldname}(${oldname})/${newname}(${newname})/g" > @RUNROOT@/@PIPELINE@_links.R.tmp
     mv @RUNROOT@/@PIPELINE@_links.R.tmp @RUNROOT@/@PIPELINE@_links.R
     #}}}
+  elif [ "${step:0:1}" == "-" ]
+  then 
+    echo UNIMPLEMENTED
   elif [ "${step:0:1}" == "~" ]
   then 
-    #Modify the HEAD to the request value {{{
-    for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
-    do 
-		  VERBOSE=1 _write_datablock ${step:1}_${patch} "`_read_datahead ${step:1}`"
-    done 
-    #}}}
+    echo UNIMPLEMENTED
   elif [ "${step:0:1}" == "+" ]
   then 
     #Add the new variable to the datablock {{{
     echo Variable assignment: ${step:1}
-    VERBOSE=1 _write_blockvars ${step:1} "_validitytest_"
+    _var=${step:1}
+    _varval=${_var#*=}
+    _var=${_var%%=*}
+    _write_blockvars ${_var} "${_varval}"
     #}}}
   else 
     #Check for the manual file  {{{
@@ -443,16 +444,51 @@ do
       #}}}
     done 
     #}}}
+    #Expand any outputs that are variables {{{
+    outlist=''
+    for out in ${outputs} 
+    do 
+      #Check if the output is drawn from a variable {{{
+      if [ "${out:0:4}" == "@BV:" ] 
+      then 
+        #Read the output(s) {{{
+        out=${out//@/}
+        out=${out:3}
+        out=`_read_blockvars ${out}`
+        #Extract the name of the item
+        out=${out#*=}
+        #Remove leading and trailing braces
+        out=${out//\{,/}
+        out=${out//\{/}
+        out=${out//\}/}
+        #Add spaces
+        out=${out//,/ }
+        #}}}
+      fi 
+      #}}}
+      #Add it to the list {{{
+      outlist="${outlist} ${out}"
+      #}}}
+    done 
+    #}}}
     #Save these outputs to the data block  {{{
     echo Checking outputs 
-    for out in $outputs
+    for out in $outlist
     do 
-      if [ "${out}" != "DATAHEAD" ] && [ "${out}" != "ALLHEAD" ]
+      #Check for a DATAHEAD modification
+      if [ "${out}" == "DATAHEAD" ] || [ "${out}" == "ALLHEAD" ] 
       then 
-        _write_datablock $out "_validitytest_"
-        echo "${step}_${nstep}[${step}] --> ${out}(${out})" >> @RUNROOT@/@PIPELINE@_links.R
-      else 
+        #Don't update the block (not needed), but track the last step for the flowchart 
         laststep="${step}_${nstep}[${step}]"
+      elif [ "${out:0:3}" == "BV:" ] 
+      then 
+        #Add it to the datablock 
+        _write_blockvars ${out:3} "__validitytest__"
+      else 
+        #Update the datablock 
+        _write_datablock $out "_validitytest_"
+        #Add link to diagram 
+        echo "${step}_${nstep}[${step}] --> ${out}(${out})" >> @RUNROOT@/@PIPELINE@_links.R
       fi 
     done 
     datablock=`_read_datablock`
@@ -557,7 +593,7 @@ fi
 if [ "${allneeds}" != "" ]
 then 
   allneeds=`echo ${allneeds} | sed 's/ /\n/g' | sort | uniq | awk '{printf $0 " "}'`
-  allneeds_def=`echo ${allneeds_def} | sed 's/ /\n/g' | sort | uniq | awk '{printf $0 " "}' | echo `
+  allneeds_def=`echo ${allneeds_def} | sed 's/ /\n/g' | sort | uniq | awk '{printf $0 " "}' || echo `
   if [ "${warnings}" == "" ] 
   then 
     warnings="${RED}     WARNINGS:${DEF}\n     ${BLU}The pipeline used the following undeclared runtime variables:${DEF}\n     ${allneeds}\n"
