@@ -3,7 +3,7 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Sat 08 Jul 2023 10:37:05 PM CEST
+# Last Modified : Mon 28 Aug 2023 11:21:07 AM CEST
 #
 #=========================================
 
@@ -32,17 +32,21 @@ COSEBIS_PATH = %(MY_PATH)s/INSTALL/kcap/cosebis/
 EOF
 #}}}
 STATISTIC="@BV:STATISTIC@"
+#Define the data file name {{{ 
 if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 then
   datafile=@DB:mcmc_inp_cosebis@
+#}}}
 elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
 then 
   datafile=@DB:mcmc_inp_bandpowers@
 fi
+#}}}
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 data_file = ${datafile}
 
 EOF
+#}}}
 
 #Set up the scale cuts module {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
@@ -75,8 +79,8 @@ EOF
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 ;COSEBIs settings
 COSEBIS_PATH = %(MY_PATH)s/INSTALL/kcap/cosebis/
-tmin_cosebis = @BV:THETAMINCOV@
-tmax_cosebis = @BV:THETAMAXCOV@
+tmin_cosebis = @BV:THETAMINXI@
+tmax_cosebis = @BV:THETAMAXXI@
 nmax_cosebis = @BV:NMAXCOSEBIS@
 WnLogPath = @RUNROOT@/@CONFIGPATH@/cosebis/WnLog/
 
