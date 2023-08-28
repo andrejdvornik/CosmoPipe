@@ -3,7 +3,7 @@
 # File Name : match_to_sims.sh
 # Created By : awright
 # Creation Date : 15-06-2023
-# Last Modified : Tue 25 Jul 2023 10:55:41 AM CEST
+# Last Modified : Sun Aug  6 22:29:21 2023
 #
 #=========================================
 
@@ -11,7 +11,7 @@
 #Get the catalogues to match from the DATAHEAD 
 input="@DB:ALLHEAD@"
 ninp=`echo ${input} | awk '{print NF}'`
-#Simulation catalogues are assumed to be in sims_main 
+#Simulation catalogues are assumed to be in match_base
 sims="@DB:match_base@"
 nsim=`echo ${sims} | awk '{print NF}'`
 #Check for more mismatch in simulation and data catalogues  {{{
@@ -92,9 +92,7 @@ do
           -o ${output_file} \
           -z @BV:ZSPECDATA@ @BV:ZSPECSIM@ \
           ${feature_list} \
-          --norm \
-          --duplicates \
-          --progress \
+          @BV:MATCHNORMALISE@ @BV:MATCHDUPLICATES@ \
           --clone @BV:ZSPECDATA@ ${data_features} \
           --idx-interval @BV:MATCH_NIDX@ \
           --z-cut 2>&1 

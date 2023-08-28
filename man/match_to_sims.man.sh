@@ -44,14 +44,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:DATAFEATURES BV:MATCH_NIDX BV:SIMFEATURES BV:ZSPECDATA BV:ZSPECSIM DEF PYTHON3BIN RED RUNROOT
+  echo BLU BV:DATAFEATURES BV:MATCH_NIDX BV:MATCHNORMALISE BV:MATCHDUPLICATES BV:SIMFEATURES BV:ZSPECDATA BV:ZSPECSIM DEF PYTHON3BIN RED RUNROOT
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo sims_main ALLHEAD
+  echo match_base ALLHEAD
 } 
 #}}}
 
