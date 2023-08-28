@@ -180,7 +180,8 @@ for name, group in pd_cat.groupby(by=['bin_R', 'bin_snr']):
     # calculate alpha using least square
     mod_ols = sm.OLS(Var[fitmask], sm.add_constant(e_psf_rotated[fitmask]))
     # compute the heteroskedasticity weights 
-    fitvals = mod_ols.fit().predict()
+    res_ols = mod_ols.fit()
+    fitvals = res_ols.predict()
     residuals = np.abs(Var[fitmask]-fitvals)
     resid_mod_ols = sm.OLS(residuals,sm.add_constant(fitvals))
     resid_wgt = 1.0 / resid_mod_ols.fit().predict()**2
@@ -192,8 +193,12 @@ for name, group in pd_cat.groupby(by=['bin_R', 'bin_snr']):
     #alpha = res_ols.params[1]
 
     #Get the results 
-    res_wls = mod_wls.fit()
-    alpha = res_wls.params[1]
+    try: 
+        res_wls = mod_wls.fit()
+        alpha = res_wls.params[1]
+    except:
+        print(f"warning: weighted LS fit failed in bin {name}")
+        alpha = res_ols.params[1]
     # alpha_err = (res_ols.cov_params()[1, 1])**0.5
 
     # >>>>>>>>>>>>>>>> correct 
