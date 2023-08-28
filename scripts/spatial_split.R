@@ -3,7 +3,7 @@
 # File Name : spatial_split.R
 # Created By : awright
 # Creation Date : 10-07-2023
-# Last Modified : Sun 20 Aug 2023 10:46:24 PM CEST
+# Last Modified : Mon Aug 21 06:00:46 2023
 #
 #=========================================
 
@@ -91,7 +91,7 @@ cat<-helpRfuncs::read.file(input.cat)
 #}}}
 
 #Check that the x.name and y.name varaibles are in the catalogue 
-if ((!x.name %in% colnames(cat)) & (!y.name %in% colnames(cat)) {  
+if ((!x.name %in% colnames(cat)) & (!y.name %in% colnames(cat))) {  
   stop(paste("Neither",x.name,"nor",y.name,"variables are in the provided catalogue!")) 
 } else if (!x.name %in% colnames(cat)) {  
   stop(paste(x.name,"variable is not in provided catalogue!")) 
