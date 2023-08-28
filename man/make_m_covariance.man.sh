@@ -60,7 +60,7 @@ function _outputs {
   outlist=''
   for patch in @PATCHLIST@ @ALLPATCH@ 
   do 
-    outlist="${outlist} cosmosis_mcov_${patch}"
+    outlist="${outlist} cosmosis_mcov_${patch} cosmosis_mbias_${patch}"
   done 
   echo mcov ${outlist}
 } 

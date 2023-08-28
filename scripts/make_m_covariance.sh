@@ -67,6 +67,16 @@ do
     _write_datablock cosmosis_mcov_${patch} "m_corr_${patch}_r.ascii" 
   fi 
   
+  #Make the cosmosis mbias directory (split per patch) 
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_mbias_${patch} ]
+    then 
+      mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_mbias_${patch}
+  fi
+mbias=`echo ${mfiles} | sed 's/ /\n/g' | grep "_${patch}_" | grep "_biases" || echo `
+mbias=${mbias##*/}
+cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias/${mbias} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_mbias_${patch}/${mbias}
+_write_datablock cosmosis_mbias_${patch} "${mbias}" 
+
 done
 
 if [ "${outputlist}" != "" ] 
