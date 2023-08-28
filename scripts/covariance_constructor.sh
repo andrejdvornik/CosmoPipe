@@ -40,7 +40,12 @@ input_path="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs"
 output_path=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_@BV:STATISTIC@
 # COSEBIs basis function path
 COSEBISLOC=@RUNROOT@/@CONFIGPATH@/cosebis/
-
+mbiaslist=""
+for file in @DB:cosmosis_mbias@
+do 
+  mbiaslist="${mbiaslist} `cat ${file}`"
+done 
+mbiaslist=`echo ${mbiaslist} | sed 's/ /,/g'`
 # Base settings {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 [covariance terms]
@@ -71,14 +76,14 @@ save_alms = True
 
 [covELLspace settings]
 ell_min = @BV:LMINCOV@
--ell_max = @BV:LMAXCOV@
--ell_bins = @BV:LBINSCOV@
+ell_max = @BV:LMAXCOV@
+ell_bins = @BV:LBINSCOV@
 ell_type = log
 delta_z = 0.08
 tri_delta_z = 0.5
 integration_steps = 500
 nz_interpolation_polynom_order = 1
-mult_shear_bias = 0.0192, 0.007671, 0.00711, 0.005669, 0.006
+mult_shear_bias = ${mbiaslist}
 limber = True
 pixelised_cell = False
 pixel_Nside = 2048
@@ -129,11 +134,13 @@ Wn_style = log
 EOF
 elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
 then
+theta_lo=`echo 'e(l(@BV:THETAMINXI@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+theta_up=`echo 'e(l(@BV:THETAMAXXI@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covbandpowers settings]
 apodisation_log_width = @BV:APODISATIONWIDTH@
-theta_lo = @BV:THETAMINXI@
-theta_up = @BV:THETAMAXXI@
+theta_lo = ${theta_lo}
+theta_up = ${theta_up}
 theta_binning = 300
 ell_min = @BV:LMINBANDPOWERS@
 ell_max = @BV:LMAXBANDPOWERS@
