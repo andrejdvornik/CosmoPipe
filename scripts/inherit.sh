@@ -3,7 +3,7 @@
 # File Name : inherit.sh
 # Created By : awright
 # Creation Date : 20-08-2023
-# Last Modified : Sun 20 Aug 2023 10:21:09 PM CEST
+# Last Modified : Tue 29 Aug 2023 03:42:07 PM CEST
 #
 #=========================================
 
@@ -42,7 +42,7 @@ do
   
   #Loop through the new files 
   filelist=''
-  for file in `ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${block}` 
+  for file in `ls ${pipepath}/${block}` 
   do 
     #Add the new file to the filelist 
     filelist="${filelist} ${file##*/}"
