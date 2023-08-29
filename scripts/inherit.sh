@@ -3,7 +3,7 @@
 # File Name : inherit.sh
 # Created By : awright
 # Creation Date : 20-08-2023
-# Last Modified : Tue 29 Aug 2023 03:42:07 PM CEST
+# Last Modified : Tue 29 Aug 2023 03:44:05 PM CEST
 #
 #=========================================
 
@@ -47,7 +47,7 @@ do
     #Add the new file to the filelist 
     filelist="${filelist} ${file##*/}"
     #Inherit! 
-    rsync -atvL ${pipepath}/${file##*/} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${block}/${file##*/}
+    rsync -atvL ${pipepath}/${block}/${file##*/} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${block}/${file##*/}
   done 
   
   #Update the datablock 
