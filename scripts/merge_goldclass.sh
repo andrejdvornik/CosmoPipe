@@ -90,10 +90,19 @@ do
     mainfile=mainfile.lnk
   fi 
   #}}}
+  #Remove zero weight sources from main catalogue {{{
+  _message "   > @BLU@Removing zero-weight sources for ${i}@DEF@${mainfile##*/}"
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
+           -i ${mainfile} \
+  	       -o ${mainfile}_tmp \
+  	       -t OBJECTS \
+  	       -c "(@BV:WEIGHTNAME@>0);" 2>&1 
+  _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
+  #}}}
   #Merge the goldclass column {{{
   _message "   > @BLU@Merging goldclass column for ${i}@DEF@${input##*/}"
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacjoinkey \
-    -i ${mainfile} \
+    -i ${mainfile}_tmp \
     -p ${input} \
     -o ${outfile}_tmp \
     -k SOMweight -t OBJECTS 2>&1
