@@ -94,7 +94,12 @@ do
   done 
   
   if [ "${links}" == "TRUE" ] 
-  then 
+  then
+    #Remove existing outfile links 
+    if [ -h outfile.lnk ]
+    then 
+      rm outfile.lnk
+    fi 
     count=1
     origlist=${filelist}
     filelist=''

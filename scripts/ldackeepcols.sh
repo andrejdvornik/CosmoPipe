@@ -28,7 +28,17 @@ do
 done 
 
 if [ "${links}" == "TRUE" ] 
-then 
+then
+  #Remove existing infile links 
+  if [ -h infile.lnk ]
+  then 
+    rm infile.lnk
+  fi 
+  #Remove existing outfile links 
+  if [ -h outfile.lnk ]
+  then 
+    rm outfile.lnk
+  fi
   #Create input link
   originp=${input}
   ln -s ${input} infile.lnk 

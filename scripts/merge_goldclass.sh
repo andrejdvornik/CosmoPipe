@@ -62,15 +62,20 @@ do
   if [ "${links}" == "TRUE" ] 
   then 
     #Remove existing infile links 
-    if [ -e infile.lnk ]
+    if [ -h infile.lnk ]
     then 
       rm infile.lnk
     fi 
     #Remove existing outfile links 
-    if [ -e outfile.lnk ]
+    if [ -h outfile.lnk ]
     then 
       rm outfile.lnk
-    fi 
+    fi
+    #Remove existing mainfile links 
+    if [ -h mainfile.lnk ]
+    then 
+      rm mainfile.lnk
+    fi  
     #Create input link
     originp=${input}
     ln -s ${input} infile.lnk 
@@ -85,10 +90,19 @@ do
     mainfile=mainfile.lnk
   fi 
   #}}}
+  #Remove zero weight sources from main catalogue {{{
+  _message "   > @BLU@Removing zero-weight sources for ${i}@DEF@${mainfile##*/}"
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/ldacfilter.py \
+           -i ${mainfile} \
+  	       -o ${mainfile}_tmp \
+  	       -t OBJECTS \
+  	       -c "(@BV:WEIGHTNAME@>0);" 2>&1 
+  _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
+  #}}}
   #Merge the goldclass column {{{
   _message "   > @BLU@Merging goldclass column for ${i}@DEF@${input##*/}"
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacjoinkey \
-    -i ${mainfile} \
+    -i ${mainfile}_tmp \
     -p ${input} \
     -o ${outfile}_tmp \
     -k SOMweight -t OBJECTS 2>&1

@@ -48,7 +48,7 @@ do
   if [ "${links}" == "TRUE" ] 
   then 
     #Remove existing infile links 
-    if [ -e infile.lnk ]
+    if [ -h infile.lnk ]
     then 
       rm infile.lnk
     fi 

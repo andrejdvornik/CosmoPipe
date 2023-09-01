@@ -12,6 +12,30 @@ input="@DB:DATAHEAD@"
 
 #Notify 
 _message "   > @BLU@Checking for FITS table in @DEF@${input##*/}@DEF@ "
+
+#Check if input file lengths are ok 
+links="FALSE"
+for file in ${input}
+do 
+  if [ ${#file} -gt 255 ] 
+  then 
+    links="TRUE"
+  fi 
+done 
+
+if [ "${links}" == "TRUE" ] 
+then
+  #Remove existing infile links 
+  if [ -h infile.lnk ]
+  then 
+    rm infile.lnk
+  fi
+  #Create input link
+  originp=${input}
+  ln -s ${input} infile.lnk 
+  input="infile.lnk"
+fi 
+
 #Get the existing table name 
 @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacdesc -i ${input} > @RUNROOT@/@STORAGEPATH@/rentab.txt 2>&1 
 _message " @BLU@- @RED@Done! (`date +'%a %H:%M'`)\n@DEF@"
