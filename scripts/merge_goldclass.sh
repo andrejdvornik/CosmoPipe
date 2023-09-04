@@ -62,17 +62,17 @@ do
   if [ "${links}" == "TRUE" ] 
   then 
     #Remove existing infile links 
-    if [ -h infile.lnk ]
+    if [ -e infile.lnk ] || [ -h infile.lnk ]
     then 
       rm infile.lnk
     fi 
     #Remove existing outfile links 
-    if [ -h outfile.lnk ]
+    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
     then 
       rm outfile.lnk
     fi
     #Remove existing mainfile links 
-    if [ -h mainfile.lnk ]
+    if [ -e mainfile.lnk ] || [ -h mainfile.lnk ]
     then 
       rm mainfile.lnk
     fi  

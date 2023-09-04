@@ -26,7 +26,7 @@ done
 if [ "${links}" == "TRUE" ] 
 then
   #Remove existing infile links 
-  if [ -h infile.lnk ]
+  if [ -e infile.lnk ] || [ -h infile.lnk ]
   then 
     rm infile.lnk
   fi

@@ -48,13 +48,13 @@ do
   if [ "${links}" == "TRUE" ] 
   then 
     #Remove existing infile links 
-    if [ -h infile.lnk ]
+    if [ -e infile.lnk ] || [ -h infile.lnk ]
     then 
       rm infile.lnk
     fi 
     #Create input link
     originp=${cata}
-    ln -s ${cata} infile.lnk 
+    ln -s ${cata} infile.lnk
     cata="infile.lnk"
   fi 
   #Check if the patch label exists
@@ -110,10 +110,20 @@ do
     inplist=''
     for file in ${origlist} 
     do 
+    #Remove existing infile links 
+    if [ -h infile${count}.lnk ]
+    then 
+      rm infile${count}.lnk
+    fi
       ln -s ${file} infile${count}.lnk 
       inplist="${inplist} infile${count}.lnk"
       count=$((count+1))
     done 
+      #Remove existing outfile links 
+    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    then 
+      rm outfile.lnk
+    fi
     #Create output links 
     ln -s ${outname} outfile.lnk
     origoname=${outname}
