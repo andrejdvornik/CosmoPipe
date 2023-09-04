@@ -155,13 +155,13 @@ if __name__ == '__main__':
             #Try with the new treecorr syntax
             with treecorr.util.make_writer(outfile,precision=12) as writer:
                 writer.write(
-                    ['r_nom','meanr','meanlogr','xip','xim','xip_pm','xim_im','sigma_xip', 'npairs', 'weight','npairs_weighted' ],
-                    [ gg.rnom,gg.meanr, gg.meanlogr,gg.xip, gg.xim, gg.xip_im, gg.xim_im, np.sqrt(gg.varxip), gg.npairs, gg.weight, npairs_weighted])
+                    ['r_nom','meanr','meanlogr','xip','xim','xip_im','xim_im','sigma_xip','sigma_xim', 'npairs', 'weight','npairs_weighted' ],
+                    [ gg.rnom,gg.meanr, gg.meanlogr,gg.xip, gg.xim, gg.xip_im, gg.xim_im, np.sqrt(gg.varxip), np.sqrt(gg.varxim), gg.npairs, gg.weight, npairs_weighted])
         except: 
             #Try with the old treecorr syntax 
             treecorr.util.gen_write(outfile,
-                    ['r_nom','meanr','meanlogr','xip','xim','xip_pm','xim_im','sigma_xip', 'npairs', 'weight','npairs_weighted' ],
-                    [ gg.rnom,gg.meanr, gg.meanlogr,gg.xip, gg.xim, gg.xip_im, gg.xim_im, np.sqrt(gg.varxip), gg.npairs, 
+                    ['r_nom','meanr','meanlogr','xip','xim','xip_im','xim_im','sigma_xip','sigma_xim', 'npairs', 'weight','npairs_weighted' ],
+                    [ gg.rnom,gg.meanr, gg.meanlogr,gg.xip, gg.xim, gg.xip_im, gg.xim_im, np.sqrt(gg.varxip), np.sqrt(gg.varxim), gg.npairs, 
                     gg.weight, npairs_weighted], precision=12)
 
 
