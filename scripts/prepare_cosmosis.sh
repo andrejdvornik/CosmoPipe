@@ -23,7 +23,7 @@ PRIOR_OMBH2="@BV:PRIOR_OMBH2@"
 PRIOR_H0="@BV:PRIOR_H0@"
 PRIOR_NS="@BV:PRIOR_NS@"
 PRIOR_S8INPUT="@BV:PRIOR_S8INPUT@"
-PRIOR_OMEGA_K="@BV:PRIOR_OMEGAK@"
+PRIOR_OMEGAK="@BV:PRIOR_OMEGAK@"
 PRIOR_W="@BV:PRIOR_W@"
 PRIOR_WA="@BV:PRIOR_WA@"
 PRIOR_MNU="@BV:PRIOR_MNU@"
@@ -230,7 +230,7 @@ do
   #}}}
   #Check the prior is correctly specified {{{
   nprior=`echo ${pprior} | awk '{print NF}'` 
-  if [ ${nprior} -ne 3 ] 
+  if [ ${nprior} -ne 3 ] && [ ${nprior} -ne 1 ] 
   then 
     _message "@RED@ ERROR - prior @DEF@${pvar}@RED@ does not have 3 values! Must be tophat ('lo start hi') or gaussian ('gaussian mean sd')@DEF@\n"
     _message "@RED@         it is: @DEF@${pprior}\n"
@@ -278,7 +278,7 @@ do
   #}}}
   #Check the prior is correctly specified {{{
   nprior=`echo ${pprior} | awk '{print NF}'` 
-  if [ ${nprior} -ne 3 ] 
+  if [ ${nprior} -ne 3 ] && [ ${nprior} -ne 1 ]
   then 
     _message "@RED@ ERROR - prior @DEF@${pvar}@RED@ does not have 3 values! Must be tophat ('lo start hi') or gaussian ('gaussian mean sd')@DEF@\n"
     _message "@RED@         it is: @DEF@${pprior}\n"
@@ -326,7 +326,7 @@ do
   #}}}
   #Check the prior is correctly specified {{{
   nprior=`echo ${pprior} | awk '{print NF}'` 
-  if [ ${nprior} -ne 3 ] 
+  if [ ${nprior} -ne 3 ] && [ ${nprior} -ne 1 ]
   then 
     _message "@RED@ ERROR - prior @DEF@${pvar}@RED@ does not have 3 values! Must be tophat ('lo start hi') or gaussian ('gaussian mean sd')@DEF@\n"
     _message "@RED@         it is: @DEF@${pprior}\n"
@@ -374,14 +374,14 @@ do
   #}}}
   #Check the prior is correctly specified {{{
   nprior=`echo ${pprior} | awk '{print NF}'` 
-  if [ ${nprior} -ne 3 ] 
+  if [ ${nprior} -ne 3 ] && [ ${nprior} -ne 1 ] 
   then 
     _message "@RED@ ERROR - prior @DEF@${pvar}@RED@ does not have 3 values! Must be tophat ('lo start hi') or gaussian ('gaussian mean sd')@DEF@\n"
     _message "@RED@         it is: @DEF@${pprior}\n"
     exit 1 
   fi 
   #}}}
-  #Write the prior {{{
+  #Write the prior {{{   
   if [ "${pprior%% *}" == "gaussian" ]
   then 
     #Prior is a gaussian {{{
