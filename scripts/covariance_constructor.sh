@@ -98,7 +98,7 @@ cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_c
 [covTHETAspace settings]
 theta_min = @BV:THETAMINXI@
 theta_max = @BV:THETAMAXXI@
-theta_bins = @BV:NTHETABINXI@
+theta_bins = @BV:NXIPM@
 theta_type = log
 theta_list = 1, 2, 3
 xi_pp = True

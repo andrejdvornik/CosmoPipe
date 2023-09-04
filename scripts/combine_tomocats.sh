@@ -96,7 +96,7 @@ do
   if [ "${links}" == "TRUE" ] 
   then
     #Remove existing outfile links 
-    if [ -h outfile.lnk ]
+    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
     then 
       rm outfile.lnk
     fi 

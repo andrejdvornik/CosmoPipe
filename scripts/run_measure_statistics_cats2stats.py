@@ -6,8 +6,9 @@ import math, os
 from matplotlib.patches import Rectangle
 from scipy.interpolate import interp1d
 from scipy import pi,sqrt,exp
-from measure_statistics import tminus_quad, tplus, tminus, gplus, gminus, T, str2bool, h, f
+from measure_statistics import tminus_quad, tplus, tminus, gplus, gminus, T, str2bool, h, f, rebin
 from argparse import ArgumentParser
+import treecorr
 
 # Written by Marika Asgari (ma@roe.ac.uk), bandpowers implementation by B.Stoelzner
 # Python script to return COSEBIS E and B modes and Bandpowers (EE, NE, NN) given a measured 2pt correlation function
@@ -22,8 +23,8 @@ from argparse import ArgumentParser
 
 # Specify the input arguments
 parser = ArgumentParser(description='Take input 2pcfs files and calculate 2pt statistics')
-parser.add_argument("-d", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis', 'bandpowers_ee', 'bandpowers_ne', 'bandpowers_nn'],
-    help="Desired 2pt statistic, must be either cosebis, bandpowers_ee, bandpowers_ne, or bandpowers_nn")
+parser.add_argument("-d", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis', 'bandpowers_ee', 'bandpowers_ne', 'bandpowers_nn', 'xipm'],
+    help="Desired 2pt statistic, must be either cosebis, bandpowers_ee, bandpowers_ne, bandpowers_nn, or xipm")
 
 # Input file, columns, theta range, and other options
 parser.add_argument("-i", "--inputfile", dest="inputfile", required=True,
@@ -70,7 +71,7 @@ parser.add_argument('-r','--root', dest="rootfile", metavar="root",required=Fals
     help='roots file name and address for T_plus/minus for COSEBIs')
     
 
-#Bandpowers options
+# Bandpowers options
 parser.add_argument('-w','--logwidth', dest="logwidth", type=float,default=0.5, nargs='?', 
     help='width of apodisation window for bandpowers')
 parser.add_argument('--thetamin_apod', dest="thetamin_apod", type=float, nargs='?', 
@@ -81,8 +82,12 @@ parser.add_argument('-z','--ellmin', dest="ellmin", type=float,default=100, narg
     help='value of ellmin for bandpowers')
 parser.add_argument('-x','--ellmax', dest="ellmax", type=float,default=1500, nargs='?', 
     help='value of ellmax for bandpowers')
-parser.add_argument('-k','--nbins', dest="nbins", type=int,default=8, nargs='?',
+parser.add_argument('-k','--nbins_bp', dest="nbins_bp", type=int,default=8, nargs='?',
     help='number of logarithmic bandpowers bins between ellmin and ellmax to produce, default is 8')
+
+# xipm options
+parser.add_argument('--nbins_xipm', dest="nbins_xipm", type=int,default=9, nargs='?',
+    help='number of xipm bins to produce, default is 9')
 
 args = parser.parse_args()
 # Mode
@@ -114,8 +119,10 @@ thetamin_apod=args.thetamin_apod
 thetamax_apod=args.thetamax_apod
 ellmin=args.ellmin
 ellmax=args.ellmax
-nbins=args.nbins
-save=args.save_kernels
+nbins_bp=args.nbins_bp
+save_kernels=args.save_kernels
+# xipm options
+nbins_xipm=args.nbins_xipm
 
 print('Input file is '+inputfile+', making '+str(mode)+' for theta in ['+'%.2f' %thetamin+"'," 
     +'%.2f' %thetamax+"'], outputfiles are: "+cfoldername+"/En_"+outputfile+'.ascii and '+cfoldername+'/Bn_'+outputfile+'.ascii')
@@ -201,7 +208,7 @@ arcmin2rad = 2*np.pi/360/60
 if not os.path.exists(cfoldername):
     os.makedirs(cfoldername)
 
-if mode =='cosebis':
+if mode == 'cosebis':
     if not os.path.exists(tfoldername):
         os.makedirs(tfoldername)
 
@@ -272,18 +279,18 @@ if mode =='cosebis':
     BnfileName=cfoldername+"/Bn_"+outputfile+".asc"
     np.savetxt(EnfileName,En)
     np.savetxt(BnfileName,Bn)
-    if save:
+    if save_kernels:
         IntegPlusFileName=cfoldername+"/FilterPlus_"+outputfile+".asc"
         IntegMinusFileName=cfoldername+"/FilterMinus_"+outputfile+".asc"
         np.savetxt(IntegPlusFileName,filter_plus)
         np.savetxt(IntegMinusFileName,filter_minus)
 
-elif mode =='bandpowers_ee':
-    CE = np.zeros(nbins)
-    CB = np.zeros(nbins)
-    filter_plus = np.zeros((nbins,len(theta_mid)))
-    filter_minus = np.zeros((nbins,len(theta_mid)))
-    ell = np.logspace(np.log10(ellmin), np.log10(ellmax), nbins+1)
+elif mode == 'bandpowers_ee':
+    CE = np.zeros(nbins_bp)
+    CB = np.zeros(nbins_bp)
+    filter_plus = np.zeros((nbins_bp,len(theta_mid)))
+    filter_minus = np.zeros((nbins_bp,len(theta_mid)))
+    ell = np.logspace(np.log10(ellmin), np.log10(ellmax), nbins_bp+1)
 
     for i in range(len(ell)-1):
         filter_plus[i]=gplus(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin_apod, thetamax_apod, logwidth)
@@ -298,17 +305,17 @@ elif mode =='bandpowers_ee':
     CBfileName=cfoldername+"/CBB_"+outputfile+".asc"
     np.savetxt(CEfileName,CE)
     np.savetxt(CBfileName,CB)
-    if save:
+    if save_kernels:
         FilterPlusFileName=cfoldername+"/FilterEEPlus_"+outputfile+".asc"
         FilterMinusFileName=cfoldername+"/FilterEEMinus_"+outputfile+".asc"
         np.savetxt(FilterPlusFileName,filter_plus)
         np.savetxt(FilterMinusFileName,filter_minus)
 
-elif mode =='bandpowers_ne':
-    CnE = np.zeros(nbins)
-    CnB = np.zeros(nbins)
-    filter = np.zeros((nbins,len(theta_mid)))
-    ell = np.logspace(np.log10(ellmin), np.log10(ellmax), nbins+1)
+elif mode == 'bandpowers_ne':
+    CnE = np.zeros(nbins_bp)
+    CnB = np.zeros(nbins_bp)
+    filter = np.zeros((nbins_bp,len(theta_mid)))
+    ell = np.logspace(np.log10(ellmin), np.log10(ellmax), nbins_bp+1)
 
     for i in range(len(ell)-1):
         filter[i]=h(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin_apod, thetamax_apod, logwidth)
@@ -325,10 +332,11 @@ elif mode =='bandpowers_ne':
     if save:
         FilterFileName=cfoldername+"/FilterNE_"+outputfile+".asc"
         np.savetxt(FilterFileName,filter)
-elif mode =='bandpowers_nn':
-    Cnn = np.zeros(nbins)
-    filter = np.zeros((nbins,len(theta_mid)))
-    ell = np.logspace(np.log10(ellmin), np.log10(ellmax), nbins+1)
+
+elif mode == 'bandpowers_nn':
+    Cnn = np.zeros(nbins_bp)
+    filter = np.zeros((nbins_bp,len(theta_mid)))
+    ell = np.logspace(np.log10(ellmin), np.log10(ellmax), nbins_bp+1)
 
     for i in range(len(ell)-1):
         filter[i]=f(theta_mid*arcmin2rad, ell[i], ell[i+1])*T(theta_mid, thetamin_apod, thetamax_apod, logwidth)
@@ -337,6 +345,46 @@ elif mode =='bandpowers_nn':
         Cnn[i]=Integral*2*np.pi/N*arcmin2rad
     CnnfileName=cfoldername+"/Cnn_"+outputfile+".asc"
     np.savetxt(CnnfileName,Cnn)
-    if save:
+    if save_kernels:
         FilterFileName=cfoldername+"/FilterNN_"+outputfile+".asc"
         np.savetxt(FilterFileName,filter)
+
+elif mode == 'xipm':
+    if binning=='lin':
+        lin_not_log = True
+    else:
+        lin_not_log = False
+    meanr = tpcf_data['meanr']
+    meanlnr = tpcf_data['meanlogr']
+    weight = tpcf_data['weight']
+    keys = tpcf_data.keys()
+    
+    wgtBlock_keys = ['weight', 'npairs', 'npairs_weighted']
+    valueBlock_keys = [k for k in keys if (k not in wgtBlock_keys) and (k not in ['r_nom','meanr', 'meanlogr'])]
+
+    valueBlock = np.array([tpcf_data[key] for key in valueBlock_keys])
+    wgtBlock = np.array([tpcf_data[key] for key in wgtBlock_keys])
+
+    xipmfileName=cfoldername+"/xipm_binned_"+outputfile+".asc"
+
+    ## Turn sigma into sigma^2
+    sigma_idx = [i for i,k in enumerate(valueBlock_keys) if k.startswith('sigma')]
+    valueBlock[sigma_idx] = valueBlock[sigma_idx]**2
+
+    ## Rebin
+    ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock = rebin(thetamin, thetamax, nbins_xipm, lin_not_log, meanr, meanlnr, weight, valueBlock, wgtBlock)
+
+    ## Turn sigma^2 into sigma
+    valueBlock[sigma_idx] = np.sqrt(valueBlock[sigma_idx])
+
+    all_keys = np.concatenate((['r_nom','meanr', 'meanlogr'], valueBlock_keys, wgtBlock_keys))
+    print(all_keys)
+    print(ctrBin.shape)
+    print(binned_valueBlock.shape)
+    print(binned_wgtBlock.shape)
+    all_binned_data = np.vstack((ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock))
+    print(all_binned_data.shape)
+    # Write it out to a file and praise-be for Jarvis and his well documented code
+    treecorr.util.gen_write(xipmfileName, all_keys, all_binned_data, precision=12)
+else:
+    raise Exception('Unknown mode!')
