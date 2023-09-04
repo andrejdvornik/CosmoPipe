@@ -18,6 +18,8 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
+# COSEBIS
+
 # calculates T_plus logarithmic functions for COSEBIs
 def tplus(tmin,tmax,n,norm,root,ntheta=10000):
     theta=np.logspace(np.log10(tmin),np.log10(tmax),ntheta)
@@ -92,6 +94,8 @@ def integ_xi(xi_func,theta_edges, ntheta):
         xip_integrated[tbin]=sum(xi_func(theta_in_range)*theta_in_range)/sum(theta_in_range)
     return xip_integrated
 
+# BANDPOWERS
+
 # calculates g_plus/gminus functions for Bandpowers
 def gplus(theta, l_lo, l_up):
     gplus = 1/(theta**2) * (theta*l_up*jv(1,theta*l_up)-theta*l_lo*jv(1,theta*l_lo))
@@ -128,4 +132,63 @@ def T(theta, theta_lo, theta_up, logwidth):
         elif x >= x_up+logwidth/2:
             T[i] = 0
     return(T)
+
+# XIPM
+
+# This function is copied from Cat_to_obs_K100_P1/Calc_2pt_Stats/calc_rebin_gt_xi.py
+def rebin(r_min, r_max, N_r, lin_not_log, meanr, meanlnr, weight, valueBlock, wgtBlock):
+    """
+    valueBlock are the columns that are treated like data.
+    The output value is the weighted sum.
+    
+    wgtBlock are the columns that are treated like weights.
+    The output value is the sum. 
+    """
+    
+    if lin_not_log == 'true':
+        bAndC  = np.linspace(r_min, r_max, 2*N_r+1)
+    else:
+        bAndC  = np.logspace(np.log10(r_min), np.log10(r_max), 2*N_r+1)
+    
+    ctrBin    = bAndC[1::2] ## [arcmin]
+    bins      = bAndC[0::2]
+    wgt_r     = weight * meanr
+    wgt_lnr   = weight * meanlnr
+    wgt_value = weight * valueBlock
+    N_col_v   = valueBlock.shape[0]
+    N_col_w   = wgtBlock.shape[0]
+    
+    if wgt_value.ndim > 1:
+        wgt_value = wgt_value.T
+    if wgtBlock.ndim > 1:
+        wgtBlock  = wgtBlock.T
+    
+    
+    binned_r          = []
+    binned_lnr        = []
+    binned_valueBlock = []
+    binned_wgtBlock   = []
+    
+    for i in range(N_r):
+        ind = (meanr > bins[i]) * (meanr < bins[i+1])
+        
+        if ind.any():
+            wgt_sum = weight[ind].sum()
+            binned_r.append(wgt_r[ind].sum() / wgt_sum)
+            binned_lnr.append(wgt_lnr[ind].sum() / wgt_sum)
+            binned_valueBlock.append(wgt_value[ind].sum(axis=0) / wgt_sum)
+            binned_wgtBlock.append(wgtBlock[ind].sum(axis=0))
+        else:
+            print("WARNING: not enough bins to rebin to "+str(N_r)+" log bins")
+            binned_r.append(np.nan)
+            binned_lnr.append(np.nan)
+            binned_valueBlock.append([np.nan]*N_col_v)
+            binned_wgtBlock.append([np.nan]*N_col_w)
+    
+    binned_r   = np.array(binned_r)
+    binned_lnr = np.array(binned_lnr)
+    binned_valueBlock = np.array(binned_valueBlock).T
+    binned_wgtBlock   = np.array(binned_wgtBlock).T
+    
+    return ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock
 
