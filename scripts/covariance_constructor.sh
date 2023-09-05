@@ -68,7 +68,7 @@ unbiased_clustering = False
 directory = ${output_path}
 file = covariance_list.dat, covariance_matrix.mat
 style = list, matrix
-corrmatrix_plot = correlation_coefficient.pdf
+corrmatrix_plot = False
 save_configs = save_configs.ini
 save_Cells = True
 save_trispectra = False
@@ -103,6 +103,8 @@ theta_type = log
 theta_list = 1, 2, 3
 xi_pp = True
 xi_mm = True
+theta_accuracy = 1e-5
+integration_intervals = 50
 
 mix_term_file_path_catalog = ${input_path}/mixterm/catalog
 mix_term_col_name_weight = weight
