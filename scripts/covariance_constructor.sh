@@ -87,6 +87,7 @@ mult_shear_bias = ${mbiaslist}
 limber = True
 pixelised_cell = False
 pixel_Nside = 2048
+integration_intervals = 50
 
 EOF
 #}}}
@@ -104,7 +105,6 @@ theta_list = 1, 2, 3
 xi_pp = True
 xi_mm = True
 theta_accuracy = 1e-5
-integration_intervals = 50
 
 mix_term_file_path_catalog = ${input_path}/mixterm/catalog
 mix_term_col_name_weight = weight
@@ -143,7 +143,7 @@ cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_c
 apodisation_log_width = @BV:APODISATIONWIDTH@
 theta_lo = ${theta_lo}
 theta_up = ${theta_up}
-theta_binning = 300
+theta_binning = @BV:NTHETABINXI@
 ell_min = @BV:LMINBANDPOWERS@
 ell_max = @BV:LMAXBANDPOWERS@
 ell_bins = @BV:NBANDPOWERS@
@@ -259,6 +259,8 @@ small_k_damping_for1h = damped
 lower_calc_limit = 1e-200
 
 [tabulated inputs files]
+npair_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/
+npair_mm_file = @BV:NPAIRBASE@_Bin?_Bin?.ascii
 cosebi_directory = @RUNROOT@/INSTALL/covariance/onecov/input/cosebis/
 wn_log_file = WnLog?.table
 Tn_plus_file = Tplus?.table
