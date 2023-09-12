@@ -40,6 +40,10 @@ then
 elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
 then 
   datafile=@DB:mcmc_inp_bandpowers@
+#}}}
+elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
+then 
+  datafile=@DB:mcmc_inp_xipm@
 fi
 #}}}
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
@@ -140,17 +144,60 @@ elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
 then 
   #scale cut {{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
-use_stats = xipm
+use_stats = xiP xiM
 xi_plus_extension_name = xiP
 xi_minus_extension_name = xiM
 xi_plus_section_name = shear_xi_plus_binned
 xi_minus_section_name = shear_xi_minus_binned
+keep_ang_xiP  = @BV:THETAMINXI@ @BV:THETAMAXXI@ 
+keep_ang_xiM  = @BV:THETAMINXIM@ @BV:THETAMAXXIM@
 
 EOF
 #}}}
- 
+
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'` 
 #statistic {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+[xip_binned]
+file = %(COSEBIS_PATH)s/libxipm_binned.so
+output_section_name= shear_xi_plus_binned 
+input_section_name= shear_xi_plus ;
+type=plus 
+
+theta_min=@BV:THETAMINXI@
+theta_max=@BV:THETAMAXXI@
+nTheta=@BV:NXIPM@
+
+weighted_binning = 1 
+
+;InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/@BV:NPAIRBASE@
+;InputNpair_suffix = .ascii
+;Column_theta = 1 
+;Column_Npair = 11 ;
+nBins_in = ${NTOMO}
+
+add_2D_cterm = 0 
+add_c_term = 0  
+
+[xim_binned]
+file = %(COSEBIS_PATH)s/libxipm_binned.so
+output_section_name = shear_xi_minus_binned 
+type = minus 
+input_section_name = shear_xi_minus
+
+theta_min = @BV:THETAMINXI@
+theta_max = @BV:THETAMAXXI@
+nTheta = @BV:NXIPM@
+
+weighted_binning = 1 
+;InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/@BV:NPAIRBASE@
+;InputNpair_suffix = .ascii
+;Column_theta = 1 
+;Column_Npair = 11 
+nBins_in = ${NTOMO} 
+
+add_2D_cterm = 0
+add_c_term = 0 
 
 EOF
 #}}}
@@ -582,6 +629,15 @@ do
 			file = %(KCAP_PATH)s/utils/mini_like.py
 			input_section_name = scale_cuts_output
 			like_name = loglike
+
+			EOF
+    	;; #}}}
+	"cl2xi") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(CSL_PATH)s/shear/cl_to_xi_nicaea/nicaea_interface.so
+			corr_type = 0
+
 			EOF
     	;; #}}}
   esac
