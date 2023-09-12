@@ -267,7 +267,7 @@ Tn_plus_file = Tplus?.table
 Tn_minus_file = Tminus?.table
 
 [misc]
-num_cores = 8
+num_cores = @BV:COVNCORES@
 
 EOF
 #}}}
