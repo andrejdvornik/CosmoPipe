@@ -29,6 +29,8 @@ RUN_NAME = %(SAMPLER_NAME)s_%(blind)s
 
 COSEBIS_PATH = %(MY_PATH)s/INSTALL/kcap/cosebis/
 
+2PT_STATS_PATH = %(MY_PATH)s/INSTALL/2pt_stats/
+
 EOF
 #}}}
 STATISTIC="@BV:STATISTIC@"
@@ -94,13 +96,13 @@ EOF
 #statistic {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [cosebis]
-file = %(COSEBIs_PATH)s/libcosebis.so
+file = %(2PT_STATS_PATH)s/cl_to_cosebis/cl_to_cosebis_interface.so
 theta_min = %(tmin_cosebis)s
 theta_max = %(tmax_cosebis)s
 n_max = %(nmax_cosebis)s
-Roots_n_Norms_FolderName = %(COSEBIS_PATH)s/TLogsRootsAndNorms/
+Roots_n_Norms_FolderName = %(2PT_STATS_PATH)s/TLogsRootsAndNorms/
 Wn_Output_FolderName = %(WnLogPath)s
-Tn_Output_FolderName = %(COSEBIS_PATH)s/TpnLog/
+Tn_Output_FolderName = %(2PT_STATS_PATH)s/TpnLog/
 output_section_name =  cosebis
 add_2D_cterm = 0 ; (optional) DEFAULT is 0: don't add it
 
@@ -122,7 +124,7 @@ EOF
 #Statistic {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [bandpowers]
-file = %(COSEBIs_PATH)s/libbandpower.so
+file = %(2PT_STATS_PATH)s/band_powers/band_powers_interface.so
 type = cosmic_shear_e
 response_function_type = tophat
 analytic = 1
@@ -159,9 +161,9 @@ NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 #statistic {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [xip_binned]
-file = %(COSEBIS_PATH)s/libxipm_binned.so
+file = %(2PT_STATS_PATH)s/bin_xi/bin_xi_interface.so
 output_section_name= shear_xi_plus_binned 
-input_section_name= shear_xi_plus ;
+input_section_name= shear_xi_plus 
 type=plus 
 
 theta_min=@BV:THETAMINXI@
@@ -170,17 +172,17 @@ nTheta=@BV:NXIPM@
 
 weighted_binning = 1 
 
-;InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/@BV:NPAIRBASE@
-;InputNpair_suffix = .ascii
-;Column_theta = 1 
-;Column_Npair = 11 ;
+InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/@BV:NPAIRBASE@
+InputNpair_suffix = .ascii
+Column_theta_Name = meanr 
+Column_Npair_Name = npairs_weighted
 nBins_in = ${NTOMO}
 
 add_2D_cterm = 0 
 add_c_term = 0  
 
 [xim_binned]
-file = %(COSEBIS_PATH)s/libxipm_binned.so
+file = %(2PT_STATS_PATH)s/bin_xi/bin_xi_interface.so
 output_section_name = shear_xi_minus_binned 
 type = minus 
 input_section_name = shear_xi_minus
@@ -190,10 +192,10 @@ theta_max = @BV:THETAMAXXI@
 nTheta = @BV:NXIPM@
 
 weighted_binning = 1 
-;InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/@BV:NPAIRBASE@
-;InputNpair_suffix = .ascii
-;Column_theta = 1 
-;Column_Npair = 11 
+InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/@BV:NPAIRBASE@
+InputNpair_suffix = .ascii
+Column_theta_Name = meanr 
+Column_Npair_Name = npairs_weighted
 nBins_in = ${NTOMO} 
 
 add_2D_cterm = 0
@@ -462,8 +464,8 @@ elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] #{{{
 then 
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_boltzman.ini <<- EOF
 [cosmopower]
-file = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/cosmosis_modules/cosmopower_interface_mead2020_feedback_log10_ratio.py
-path_2_trained_emulator = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/train_emulator_camb_new/outputs/
+file = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/cosmosis_modules/cosmopower_interface_S8.py
+path_2_trained_emulator = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/train_emulator_camb_S8/outputs/
 use_specific_k_modes = F
 ; otherwise it uses the k-modes the emulator is trained on
 kmax = 10.0
