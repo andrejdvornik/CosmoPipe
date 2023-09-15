@@ -8,32 +8,6 @@
 #=========================================
 
 #Script to generate a cosmosis .ini, values, & priors file 
-
-#Prepare the starting items {{{
-cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
-[DEFAULT]
-MY_PATH      = @RUNROOT@/
-
-stats_name    = @BV:STATISTIC@
-CSL_PATH      = %(MY_PATH)s/INSTALL/cosmosis-standard-library/
-KCAP_PATH     = %(MY_PATH)s/INSTALL/kcap/
-
-OUTPUT_FOLDER =  %(MY_PATH)s/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/%(stats_name)s/chain/
-CONFIG_FOLDER = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/
-
-blind         = @BV:BLIND@
-redshift_name = source
-
-SAMPLER_NAME = @BV:SAMPLER@
-RUN_NAME = %(SAMPLER_NAME)s_%(blind)s
-
-COSEBIS_PATH = %(MY_PATH)s/INSTALL/kcap/cosebis/
-
-2PT_STATS_PATH = %(MY_PATH)s/INSTALL/2pt_stats/
-
-EOF
-#}}}
-
 # Infer splitmode {{{
 SPLITMODE=@BV:SPLITMODE@
 if [ "${SPLITMODE^^}" == "CATALOGUE" ] 
@@ -52,6 +26,36 @@ else
   exit 1
   #}}}
 fi
+#}}}
+
+if [ "${SPLITMODE^^}" == "ZBIN" ]
+then
+OUTPUTNAME="%(SPLITMODE)s_bin@BV:ZBIN@"
+else:
+OUTPUTNAME="%(SPLITMODE)s"
+#Prepare the starting items {{{
+cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
+[DEFAULT]
+MY_PATH      = @RUNROOT@/
+
+stats_name    = @BV:STATISTIC@
+CSL_PATH      = %(MY_PATH)s/INSTALL/cosmosis-standard-library/
+KCAP_PATH     = %(MY_PATH)s/INSTALL/kcap/
+
+OUTPUT_FOLDER =  %(MY_PATH)s/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/%(stats_name)s/chain/2cosmo/
+CONFIG_FOLDER = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/
+
+blind         = @BV:BLIND@
+redshift_name = source
+
+SAMPLER_NAME = @BV:SAMPLER@
+RUN_NAME = %(OUTPUTNAME)s_split_%(SAMPLER_NAME)s_%(blind)s
+
+COSEBIS_PATH = %(MY_PATH)s/INSTALL/kcap/cosebis/
+
+2PT_STATS_PATH = %(MY_PATH)s/INSTALL/2pt_stats/
+
+EOF
 #}}}
 
 #Data files  {{{
@@ -112,16 +116,16 @@ fi
 
 #Requested statistic {{{
 STATISTIC="@BV:STATISTIC@"
+NTMOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 
 if [ "${SPLITMODE^^}" == "ZBIN" ]
 then
 ZBIN=@BV:ZBIN@
-ntomo=@BV:NTOMO@
 tomostring=''
 nottomostring=''
-for tomo1 in `seq ${ntomo}` 
+for tomo1 in `seq ${NTOMO}` 
 do
-  for tomo2 in `seq ${tomo1} ${ntomo}` 
+  for tomo2 in `seq ${tomo1} ${NTOMO}` 
   do 
     if [ $tomo1 -ne ${ZBIN} ] && [ $tomo2 -ne ${ZBIN} ]
     then 
@@ -133,10 +137,9 @@ do
 done
 elif [ "${SPLITMODE^^}" == "ACCC" ]
 then
-ntomo=@BV:NTOMO@
-for tomo1 in `seq ${ntomo}` 
+for tomo1 in `seq ${NTOMO}` 
 do
-  for tomo2 in `seq ${tomo1} ${ntomo}` 
+  for tomo2 in `seq ${tomo1} ${NTOMO}` 
   do 
     if [ $tomo1 -ne $tomo2 ] 
     then 
@@ -636,7 +639,6 @@ fi
 extraparams="cosmological_parameters/S_8 cosmological_parameters/sigma_8 cosmological_parameters/A_s cosmological_parameters/omega_m cosmological_parameters/omega_nu cosmological_parameters/omega_lambda cosmological_parameters/cosmomc_theta"
 #Add nz shift values to outputs {{{
 shifts=""
-NTOMO=@BV:NTOMO@
 for i in `seq ${NTOMO}`
 do 
    shifts="${shifts} nofz_shifts/bias_${i}"
