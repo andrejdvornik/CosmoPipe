@@ -27,8 +27,6 @@ redshift_name = source
 SAMPLER_NAME = @BV:SAMPLER@
 RUN_NAME = %(SAMPLER_NAME)s_%(blind)s
 
-COSEBIS_PATH = %(MY_PATH)s/INSTALL/kcap/cosebis/
-
 2PT_STATS_PATH = %(MY_PATH)s/INSTALL/2pt_stats/
 
 EOF
@@ -84,7 +82,6 @@ EOF
 #Base variables {{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 ;COSEBIs settings
-COSEBIS_PATH = %(MY_PATH)s/INSTALL/kcap/cosebis/
 tmin_cosebis = @BV:THETAMINXI@
 tmax_cosebis = @BV:THETAMAXXI@
 nmax_cosebis = @BV:NMAXCOSEBIS@
@@ -105,6 +102,7 @@ Wn_Output_FolderName = %(WnLogPath)s
 Tn_Output_FolderName = %(2PT_STATS_PATH)s/TpnLog/
 output_section_name =  cosebis
 add_2D_cterm = 0 ; (optional) DEFAULT is 0: don't add it
+add_c_term = 0
 
 EOF
 #}}}
@@ -293,6 +291,7 @@ resume = False
 f_live = 0.01
 discard_exploration = True
 verbose = True
+n_eff = 30000
 
 EOF
 
