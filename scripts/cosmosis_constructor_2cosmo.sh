@@ -30,9 +30,10 @@ fi
 
 if [ "${SPLITMODE^^}" == "ZBIN" ]
 then
-OUTPUTNAME="%(SPLITMODE)s_bin@BV:ZBIN@"
-else:
-OUTPUTNAME="%(SPLITMODE)s"
+OUTPUTNAME="${SPLITMODE}@BV:ZBIN@"
+else
+OUTPUTNAME="${SPLITMODE}"
+fi
 #Prepare the starting items {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 [DEFAULT]
@@ -41,6 +42,7 @@ MY_PATH      = @RUNROOT@/
 stats_name    = @BV:STATISTIC@
 CSL_PATH      = %(MY_PATH)s/INSTALL/cosmosis-standard-library/
 KCAP_PATH     = %(MY_PATH)s/INSTALL/kcap/
+ADDITIONAL_MODULES_PATH = %(MY_PATH)s/INSTALL/2cosmo_modules/
 
 OUTPUT_FOLDER =  %(MY_PATH)s/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/%(stats_name)s/chain/2cosmo/
 CONFIG_FOLDER = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/
@@ -49,14 +51,26 @@ blind         = @BV:BLIND@
 redshift_name = source
 
 SAMPLER_NAME = @BV:SAMPLER@
-RUN_NAME = %(OUTPUTNAME)s_split_%(SAMPLER_NAME)s_%(blind)s
-
-COSEBIS_PATH = %(MY_PATH)s/INSTALL/kcap/cosebis/
+RUN_NAME = ${OUTPUTNAME}_split_%(SAMPLER_NAME)s_%(blind)s
 
 2PT_STATS_PATH = %(MY_PATH)s/INSTALL/2pt_stats/
 
 EOF
 #}}}
+STATISTIC="@BV:STATISTIC@"
+#Define the data file name {{{ 
+if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
+then
+  datafile=@DB:mcmc_inp_cosebis@
+#}}}
+elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
+then 
+  datafile=@DB:mcmc_inp_bandpowers@
+#}}}
+elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
+then 
+  datafile=@DB:mcmc_inp_xipm@
+fi
 
 #Data files  {{{
 if [ "${SPLITMODE^^}" == "CATALOGUE" ] 
@@ -70,9 +84,9 @@ EOF
 else
 # some modules (load_nz_fits) take different data files as input by default. For non-catalogue-like splits we don't need this
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
-data_file_1 = @DB:mcmc_inp@
-data_file_2 = @DB:mcmc_inp@
-data_file = @DB:mcmc_inp@
+data_file_1 = ${datafile}
+data_file_2 = ${datafile}
+data_file = ${datafile}
 
 EOF
 fi
@@ -115,8 +129,7 @@ fi
 #}}}
 
 #Requested statistic {{{
-STATISTIC="@BV:STATISTIC@"
-NTMOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 
 if [ "${SPLITMODE^^}" == "ZBIN" ]
 then
@@ -201,7 +214,6 @@ fi
 #Base variables {{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 ;COSEBIs settings
-COSEBIS_PATH = %(MY_PATH)s/INSTALL/kcap/cosebis/
 tmin_cosebis = @BV:THETAMINXI@
 tmax_cosebis = @BV:THETAMAXXI@
 nmax_cosebis = @BV:NMAXCOSEBIS@
@@ -284,7 +296,7 @@ apodise = 1
 delta_x = @BV:APODISATIONWIDTH@
 theta_min = @BV:THETAMINXI@
 theta_max = @BV:THETAMAXXI@
-output_foldername = %(COSEBIS_PATH)s/bandpowers_window/
+output_foldername = %(2PT_STATS_PATH)s/bandpowers_window/
 
 EOF
 #}}}
@@ -294,7 +306,7 @@ elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
 then 
   #scale cut {{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_1.ini <<- EOF
-use_stats = xipm
+use_stats = xiP xiM
 xi_plus_extension_name = xiP
 xi_minus_extension_name = xiM
 xi_plus_section_name = shear_xi_plus_binned
@@ -303,7 +315,7 @@ keep_ang_xiP  = @BV:THETAMINXI@ @BV:THETAMAXXI@
 keep_ang_xiM  = @BV:THETAMINXIM@ @BV:THETAMAXXIM@
 EOF
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_2.ini <<- EOF
-use_stats = xipm
+use_stats = xiP xiM
 xi_plus_extension_name = xiP
 xi_minus_extension_name = xiM
 xi_plus_section_name = shear_xi_plus_binned
@@ -314,7 +326,7 @@ EOF
 if [ "${SPLITMODE^^}" == "ZBIN" ] || [ "${SPLITMODE^^}" == "ACCC" ]
 then 
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_uncut.ini <<- EOF
-use_stats = xipm
+use_stats = xiP xiM
 xi_plus_extension_name = xiP
 xi_minus_extension_name = xiM
 xi_plus_section_name = shear_xi_plus_binned
@@ -423,6 +435,13 @@ input_section_name_2 = scale_cuts_output_2
 output_section_name = scale_cuts_output
 
 EOF
+if [ "${SPLITMODE^^}" == "ZBIN" ] || [ "${SPLITMODE^^}" == "ANGULAR" ] || [ "${SPLITMODE^^}" == "ACCC" ]
+then
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_2cosmo_base.ini <<- EOF
+input_section_name_uncut = scale_cuts_output_uncut
+
+EOF
+fi
 
 if [ "${STATISTIC^^}" == "COSEBIS" ] 
 then 
@@ -488,8 +507,8 @@ fi
 
 #Requested sampler {{{
 SAMPLER="@BV:SAMPLER@"
-VALUES=values
-PRIORS=priors
+VALUES=values_2cosmo
+PRIORS=priors_2cosmo
 listparam=''
 if [ "${SAMPLER^^}" == "TEST" ] #{{{
 then 
@@ -663,8 +682,8 @@ fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
 likelihoods  = loglike
 extra_output = ${extraparams} ${shifts} ${listparam}
-quiet = F
-timing = T
+quiet = T
+timing = F
 debug = F
 
 [runtime]
@@ -983,6 +1002,14 @@ do
 			like_name = loglike
 			EOF
     	;; #}}}
+	"cl2xi") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(CSL_PATH)s/shear/cl_to_xi_nicaea/nicaea_interface.so
+			corr_type = 0
+
+			EOF
+    	;; #}}}
   esac
 done
 #}}}
@@ -1010,7 +1037,7 @@ cat \
   @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_boltzman.ini \
   @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini \
   @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini > \
-  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed.ini
+  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_@BV:STATISTIC@_2cosmo_${OUTPUTNAME}.ini
 
 #}}}
 
