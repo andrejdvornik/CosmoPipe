@@ -333,6 +333,7 @@ xi_plus_section_name = shear_xi_plus_binned
 xi_minus_section_name = shear_xi_minus_binned
 keep_ang_xiP  = @BV:THETAMINXI@ @BV:THETAMAXXI@ 
 keep_ang_xiM  = @BV:THETAMINXIM@ @BV:THETAMAXXIM@
+
 EOF
 fi
 if [ "${SPLITMODE^^}" == "ZBIN" ] || [ "${SPLITMODE^^}" == "ACCC" ]
@@ -446,12 +447,18 @@ fi
 if [ "${STATISTIC^^}" == "COSEBIS" ] 
 then 
 	source_section=cosebis
+	dest1=cosebis_set1
+	dest2=cosebis_set2
 elif [ "${STATISTIC^^}" == "BANDPOWERS" ] 
 then
 	source_section=bandpower_shear_e
+	dest1=bandpowers_set1
+	dest2=bandpowers_set2
 elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
 then
   source_section="shear_xi_plus_binned shear_xi_minus_binned"
+  dest1="xip_set1 xim_set1"
+  dest2="xip_set2 xim_set2"
   #}}}
 else 
   #ERROR: unknown statistic {{{
@@ -463,12 +470,12 @@ cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_co
 [copy_1]
 file = %(CSL_PATH)s/utility/copy/copy_section.py
 source = ${source_section}
-dest = theory_set1
+dest = ${dest1}
 
 [copy_2]
 file = %(CSL_PATH)s/utility/copy/copy_section.py
 source = ${source_section}
-dest = theory_set2
+dest = ${dest2}
 
 EOF
 
@@ -494,7 +501,7 @@ then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_2cosmo_base.ini <<- EOF
 [delete]
 file = %(CSL_PATH)s/utility/delete/delete_section.py
-sections = distances intrinsic_power matter_intrinsic_power matter_power_lin matter_power_nl intrinsic_alignment_parameters shear_xi_plus_binned shear_xi_minus_binned cosmological_parameters halo_model_parameters recfast
+sections = distances intrinsic_power matter_intrinsic_power matter_power_lin matter_power_nl intrinsic_alignment_parameters shear_xi_plus shear_xi_minus shear_xi_plus_binned shear_xi_minus_binned cosmological_parameters halo_model_parameters recfast
 			
 EOF
 else 
@@ -820,7 +827,8 @@ fi
 
 #Additional Modules {{{
 echo > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini
-for module in @BV:COSMOSIS_PIPELINE@
+modulelist=`echo @BV:COSMOSIS_PIPELINE@ | sed 's/ /\n/g' | sort | uniq | awk '{printf $0 " "}'`
+for module in ${modulelist}
 do 
   case ${module} in 
     "sample_S8") #{{{
