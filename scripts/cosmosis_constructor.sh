@@ -134,7 +134,7 @@ apodise = 1
 delta_x = @BV:APODISATIONWIDTH@
 theta_min = @BV:THETAMINXI@
 theta_max = @BV:THETAMAXXI@
-output_foldername = %(COSEBIS_PATH)s/bandpowers_window/
+output_foldername = %(2PT_STATS_PATH)s/bandpowers_window/
 
 EOF
 #}}}
