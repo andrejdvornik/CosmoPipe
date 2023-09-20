@@ -18,7 +18,7 @@ stats_name    = @BV:STATISTIC@
 CSL_PATH      = %(MY_PATH)s/INSTALL/cosmosis-standard-library/
 KCAP_PATH     = %(MY_PATH)s/INSTALL/kcap/
 
-OUTPUT_FOLDER =  %(MY_PATH)s/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/%(stats_name)s/chain/
+OUTPUT_FOLDER = %(MY_PATH)s/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/%(stats_name)s/chain/
 CONFIG_FOLDER = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/
 
 blind         = @BV:BLIND@
@@ -129,7 +129,7 @@ analytic = 1
 output_section_name = bandpower_shear_e
 l_min = @BV:LMINBANDPOWERS@
 l_max = @BV:LMAXBANDPOWERS@
-nbands = 8
+nbands = @BV:NBANDPOWERS@
 apodise = 1
 delta_x = @BV:APODISATIONWIDTH@
 theta_min = @BV:THETAMINXI@
