@@ -291,7 +291,7 @@ analytic = 1
 output_section_name = bandpower_shear_e
 l_min = @BV:LMINBANDPOWERS@
 l_max = @BV:LMAXBANDPOWERS@
-nbands = 8
+nbands = @BV:NBANDPOWERS@
 apodise = 1
 delta_x = @BV:APODISATIONWIDTH@
 theta_min = @BV:THETAMINXI@
@@ -548,7 +548,7 @@ cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_con
 [multinest]
 max_iterations=100000
 multinest_outfile_root= %(OUTPUT_FOLDER)s/%(RUN_NAME)s_
-resume=T
+resume=F
 tolerance = 0.01
 constant_efficiency = F
 live_points = 1000
@@ -670,6 +670,25 @@ do
    shifts="${shifts} nofz_shifts/bias_${i}"
 done
 #}}}
+#Add tpds to outputs {{{
+tpdparams=""
+for tomo1 in `seq ${NTOMO}` 
+do
+  for tomo2 in `seq ${tomo1} ${NTOMO}` 
+  do 
+	if [ "${STATISTIC^^}" == "BANDPOWERS" ] 
+	then
+      tpdparams="${tpdparams} bandpowers_set1/bin_${tomo2}_${tomo1}#@BV:NBANDPOWERS@ bandpowers_set2/bin_${tomo2}_${tomo1}#@BV:NBANDPOWERS@"
+	elif [ "${STATISTIC^^}" == "COSEBIS" ] 
+	then
+	  tpdparams="${tpdparams} cosebis_set1/bin_${tomo2}_${tomo1}#@BV:NMAXCOSEBIS@ cosebis_set2/bin_${tomo2}_${tomo1}#@BV:NMAXCOSEBIS@"
+	elif [ "${STATISTIC^^}" == "XIPM" ] 
+	then
+	  tpdparams="${tpdparams} xip_set1/bin_${tomo2}_${tomo1}#@BV:NXIPM@ xim_set1/bin_${tomo2}_${tomo1}#@BV:NXIPM@ xip_set2/bin_${tomo2}_${tomo1}#@BV:NXIPM@ xim_set2/bin_${tomo2}_${tomo1}#@BV:NXIPM@"
+	fi
+  done
+done
+#}}}
 #Add the values information #{{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
 [pipeline]
@@ -688,7 +707,7 @@ fi
 #Add the other information #{{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
 likelihoods  = loglike
-extra_output = ${extraparams} ${shifts} ${listparam}
+extra_output = ${extraparams} ${shifts} ${listparam} ${tpdparams}
 quiet = T
 timing = F
 debug = F
