@@ -115,8 +115,7 @@ cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_co
 use_stats = PeeE
 bandpower_e_cosmic_shear_extension_name = PeeE
 bandpower_e_cosmic_shear_section_name = bandpower_shear_e
-keep_ang_peee = @BV:LMINBANDPOWERS@
-keep_ang_peee = @BV:LMAXBANDPOWERS@
+keep_ang_peee = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
 
 EOF
 #}}}
