@@ -205,7 +205,7 @@ git clone https://github.com/rreischke/OneCovariance.git >> gitclone_output.log 
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
 
-#Clone the One Covariance repository {{{
+#Clone the 2ptstats repository {{{
 _message "   >${RED} Cloning the 2ptStats Git repository${DEF}"
 #Clone the repository
 if [ -d ${RUNROOT}/INSTALL/2pt_stats ] 
