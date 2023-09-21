@@ -133,35 +133,37 @@ NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 
 if [ "${SPLITMODE^^}" == "ZBIN" ]
 then
-ZBIN=@BV:ZBIN@
-tomostring=''
-nottomostring=''
-for tomo1 in `seq ${NTOMO}` 
-do
-  for tomo2 in `seq ${tomo1} ${NTOMO}` 
-  do 
-    if [ $tomo1 -ne ${ZBIN} ] && [ $tomo2 -ne ${ZBIN} ]
-    then 
-      tomostring="${tomostring} ${tomo1}+${tomo2}"
-    else 
-      nottomostring="${nottomostring} ${tomo1}+${tomo2}"
-    fi 
-  done
-done
+	ZBIN=@BV:ZBIN@
+	tomostring=''
+	nottomostring=''
+	for tomo1 in `seq ${NTOMO}` 
+	do
+		for tomo2 in `seq ${tomo1} ${NTOMO}` 
+		do 
+			if [ $tomo1 -ne ${ZBIN} ] && [ $tomo2 -ne ${ZBIN} ]
+			then 
+				tomostring="${tomostring} ${tomo1}+${tomo2}"
+			else 
+				nottomostring="${nottomostring} ${tomo1}+${tomo2}"
+			fi 
+		done
+	done
 elif [ "${SPLITMODE^^}" == "ACCC" ]
 then
-for tomo1 in `seq ${NTOMO}` 
-do
-  for tomo2 in `seq ${tomo1} ${NTOMO}` 
-  do 
-    if [ $tomo1 -ne $tomo2 ] 
-    then 
-      tomostring="${tomostring} ${tomo1}+${tomo2}"
-    else 
-      nottomostring="${nottomostring} ${tomo1}+${tomo2}"
-    fi 
-  done
-done
+	tomostring=''
+	nottomostring=''
+	for tomo1 in `seq ${NTOMO}` 
+	do
+		for tomo2 in `seq ${tomo1} ${NTOMO}` 
+		do 
+			if [ $tomo1 -ne $tomo2 ] 
+			then 
+				tomostring="${tomostring} ${tomo1}+${tomo2}"
+			else 
+				nottomostring="${nottomostring} ${tomo1}+${tomo2}"
+			fi 
+		done
+	done
 fi
 
 if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
@@ -259,6 +261,7 @@ cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_co
 use_stats = PeeE
 bandpower_e_cosmic_shear_extension_name = PeeE
 bandpower_e_cosmic_shear_section_name = bandpower_shear_e
+keep_ang_peee = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
 
 EOF
 fi
@@ -266,18 +269,24 @@ if [ "${SPLITMODE^^}" == "ZBIN" ]|| [ "${SPLITMODE^^}" == "ACCC" ]
 then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_1.ini <<- EOF
 cut_pair_PeeE = ${tomostring}
+keep_ang_peee = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
 
 EOF
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_2.ini <<- EOF
 cut_pair_PeeE = ${nottomostring}
+keep_ang_peee = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
 
 EOF
 elif [ "${SPLITMODE^^}" == "ANGULAR" ]
 then
-#ERROR: Angular split only with BPs {{{
-  _message "Split mode ${SPLITMODE^^} not yet implemented!\n"
-  exit 1
-  #}}}
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_1.ini <<- EOF
+keep_ang_peee = @BV:LMINBANDPOWERS@ @BV:LSPLITBANDPOWERS@
+
+EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_2.ini <<- EOF
+keep_ang_peee = @BV:LSPLITBANDPOWERS@ @BV:LMAXBANDPOWERS@
+
+EOF
 fi
 #}}}
 
