@@ -263,8 +263,12 @@ npair_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/
 npair_mm_file = @BV:NPAIRBASE@_Bin?_Bin?.ascii
 cosebi_directory = @RUNROOT@/INSTALL/OneCovariance/input/cosebis/
 wn_log_file = WnLog?.table
+wn_gg_file = W_Psi?-0.50-300.00-lmin-0.5-lmax-1000000.0-lbins-1000000.table
 Tn_plus_file = Tplus?.table
 Tn_minus_file = Tminus?.table
+Qn_file = Q_n?_0.50-300.00
+Un_file = U_n?_0.50-300.00
+
 
 [misc]
 num_cores = @BV:COVNCORES@
