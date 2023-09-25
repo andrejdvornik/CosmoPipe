@@ -87,7 +87,6 @@ mult_shear_bias = ${mbiaslist}
 limber = True
 pixelised_cell = False
 pixel_Nside = 2048
-integration_intervals = 50
 
 EOF
 #}}}
@@ -105,6 +104,7 @@ theta_list = 1, 2, 3
 xi_pp = True
 xi_mm = True
 theta_accuracy = 1e-5
+integration_intervals = 50
 
 mix_term_file_path_catalog = ${input_path}/mixterm/catalog
 mix_term_col_name_weight = weight
