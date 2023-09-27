@@ -96,7 +96,12 @@ parser.add_argument('--filterfoldername', dest="filterfoldername",
 parser.add_argument('--ufilename', dest="ufile", help='name of U file, default is U',default="U",required=False)
 parser.add_argument('--qfilename', dest="qfile", help='name of Q file, default is Q',default="Q",required=False)
 parser.add_argument('--psifoldername', dest="psifoldername", 
-    help='full name and address of the folder for the output files, default is psi_results',default="./psi_results",required=False)
+    help='full name and address of the folder for the output files, default is psi_results',default="./psi_results")
+parser.add_argument("--corr_type", dest="corr_type",
+    help="Type of psi statistic correlation to calculate, choose from gg (galaxy clustering) and gm (galaxy-galaxy lensing)")
+parser.add_argument('--nPsi', dest="nModes_psi", type=int,default=10, nargs='?',
+    help='number of Psi modes to produce, default is 10')
+
 
 args = parser.parse_args()
 # Mode
@@ -137,6 +142,9 @@ ufile=args.ufile
 qfile=args.qfile
 filterfoldername=args.filterfoldername
 psifoldername=args.psifoldername
+corr_type=args.corr_type
+pt_col=args.pt_col
+nModes_psi=args.nModes_psi
 
 print('Input file is '+inputfile+', making '+str(mode)+' for theta in ['+'%.2f' %thetamin+"'," 
     +'%.2f' %thetamax+"'], outputfiles are: "+cfoldername+"/En_"+outputfile+'.ascii and '+cfoldername+'/Bn_'+outputfile+'.ascii')
@@ -305,13 +313,13 @@ elif mode 'psi':
 
     if not os.path.exists(psifoldername):
         os.makedirs(psifoldername)
-    psi=np.zeros(nModes)
+    psi=np.zeros(nModes_psi)
     #Define theta-strings for Tplus/minus filename
     tmin='%.2f' % thetamin
     tmax='%.2f' % thetamax
     thetaRange=tmin+'-'+tmax
 
-    for n in range(1,nModes+1):
+    for n in range(1,nModes_psi+1):
         #define the filter file names for this mode
         filterFileName= filterfoldername+'/'+filename+'_n'+str(n)+'_'+thetaRange
         # read from file if it exists otherwise create new filters and save to file
