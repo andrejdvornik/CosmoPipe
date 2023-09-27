@@ -89,6 +89,15 @@ parser.add_argument('-k','--nbins_bp', dest="nbins_bp", type=int,default=8, narg
 parser.add_argument('--nbins_xipm', dest="nbins_xipm", type=int,default=9, nargs='?',
     help='number of xipm bins to produce, default is 9')
 
+# psi options
+parser.add_argument('--filterfoldername', dest="filterfoldername", 
+    help='name and full address of the folder for the psi filters U_n or Q_n, will make it if it does not exist',
+    default="psi_filters",required=False)
+parser.add_argument('--ufilename', dest="ufile", help='name of U file, default is U',default="U",required=False)
+parser.add_argument('--qfilename', dest="qfile", help='name of Q file, default is Q',default="Q",required=False)
+parser.add_argument('--psifoldername', dest="psifoldername", 
+    help='full name and address of the folder for the output files, default is psi_results',default="./psi_results",required=False)
+
 args = parser.parse_args()
 # Mode
 mode=args.statistic 
@@ -123,6 +132,11 @@ nbins_bp=args.nbins_bp
 save_kernels=args.save_kernels
 # xipm options
 nbins_xipm=args.nbins_xipm
+# psi options
+ufile=args.ufile
+qfile=args.qfile
+filterfoldername=args.filterfoldername
+psifoldername=args.psifoldername
 
 print('Input file is '+inputfile+', making '+str(mode)+' for theta in ['+'%.2f' %thetamin+"'," 
     +'%.2f' %thetamax+"'], outputfiles are: "+cfoldername+"/En_"+outputfile+'.ascii and '+cfoldername+'/Bn_'+outputfile+'.ascii')
@@ -284,6 +298,40 @@ if mode == 'cosebis':
         IntegMinusFileName=cfoldername+"/FilterMinus_"+outputfile+".asc"
         np.savetxt(IntegPlusFileName,filter_plus)
         np.savetxt(IntegMinusFileName,filter_minus)
+
+elif mode 'psi':
+    if not os.path.exists(filterfoldername):
+        os.makedirs(filterfoldername)
+
+    if not os.path.exists(psifoldername):
+        os.makedirs(psifoldername)
+    psi=np.zeros(nModes)
+    #Define theta-strings for Tplus/minus filename
+    tmin='%.2f' % thetamin
+    tmax='%.2f' % thetamax
+    thetaRange=tmin+'-'+tmax
+
+    for n in range(1,nModes+1):
+        #define the filter file names for this mode
+        filterFileName= filterfoldername+'/'+filename+'_n'+str(n)+'_'+thetaRange
+        # read from file if it exists otherwise create new filters and save to file
+        if(os.path.isfile(filterFileName)):
+            file = open(filterFileName)
+            filt=np.loadtxt(file,comments='#')
+        else:
+            filt=psi_filter(thetamin,thetamax,n,corr_type=corr_type,ntheta=1000)
+            np.savetxt(filterFileName,filt)
+
+        filter_func=interp1d(filt[:,0], filt[:,1])
+        # 
+        integ=filter_func(theta_mid)*theta_mid*pt[good_args]
+        # 
+        Integral=sum(integ*delta_theta)
+        psi[n-1] = Integral
+
+
+    psifileName=psifoldername+"/psi_"+corr_type+"_"+outputfile+".asc"
+    np.savetxt(psifileName,psi,header=" theta_min = " + tmin + ", theta_max = "+ tmax)
 
 elif mode == 'bandpowers_ee':
     CE = np.zeros(nbins_bp)
