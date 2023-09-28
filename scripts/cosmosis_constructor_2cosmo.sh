@@ -206,7 +206,7 @@ EOF
 elif [ "${SPLITMODE^^}" == "ANGULAR" ]
 then
 #ERROR: Angular split only with BPs {{{
-  _message "Split mode ${SPLITMODE^^} only possible with BandPowers!\n"
+  _message "Split mode ${SPLITMODE^^} only possible with BandPowers or COSEBIs!\n"
   exit 1
   #}}}
 fi
@@ -359,10 +359,16 @@ cut_pair_xiM = ${nottomostring}
 EOF
 elif [ "${SPLITMODE^^}" == "ANGULAR" ]
 then
-#ERROR: Angular split only with BPs {{{
-  _message "Split mode ${SPLITMODE^^} only possible with BandPowers!\n"
-  exit 1
-  #}}}
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_1.ini <<- EOF
+keep_ang_xiP  = @BV:THETAMINXI@ @BV:XISPLIT@
+keep_ang_xiP  = @BV:THETAMINXI@ @BV:XISPLIT@
+
+EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_2.ini <<- EOF
+keep_ang_xiP  = @BV:XISPLIT@ @BV:THETAMAXXI@
+keep_ang_xiP  = @BV:XISPLIT@ @BV:THETAMAXXI@
+
+EOF
 fi
 
 #}}}
