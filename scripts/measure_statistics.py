@@ -7,6 +7,8 @@ from numpy.polynomial.legendre import legcompanion, legval, legder
 import numpy.linalg as la
 from scipy.integrate import quad
 from scipy.special import jv
+from scipy.special import eval_legendre
+from math import factorial
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -191,4 +193,84 @@ def rebin(r_min, r_max, N_r, lin_not_log, meanr, meanlnr, weight, valueBlock, wg
     binned_wgtBlock   = np.array(binned_wgtBlock).T
     
     return ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock
+
+# calculates U functions for Psi
+def u_filter(tmin,tmax,n,ntheta=1000):
+    theta= np.linspace(tmin,tmax,ntheta)
+    thetaBar = (tmin + tmax)/2.
+    deltaTheta = tmax - tmin
+    # 
+    ufilter=np.zeros((ntheta,2))
+    ufilter[:,0]=theta
+    if (n==1):
+        prefactor = deltaTheta**3 * np.sqrt(2.*deltaTheta**2 + 24.*thetaBar**2)
+        ufilter[:,1] = (12. * thetaBar * (theta - thetaBar) - deltaTheta**2) / prefactor
+    else:
+        prefactor = 1./deltaTheta**2 * np.sqrt(( 2. * n + 1.) / 2.)
+        x = 2.*(theta - thetaBar)/deltaTheta
+        leg = eval_legendre(n, x)
+        ufilter[:,1]= prefactor*leg
+# 
+    return ufilter
+
+
+# This starts breaking at high n 
+def q_filter(tmin,tmax,n,ntheta=1000):
+    theta= np.linspace(tmin,tmax,ntheta)
+    thetaBar = (tmin + tmax)/2.
+    deltaTheta = tmax - tmin
+    # 
+    qfilter=np.zeros((ntheta,2))
+    qfilter[:,0]=theta
+    if (n==1):
+        prefactor =  theta**2 * deltaTheta**3 * np.sqrt(2.*deltaTheta**2 + 24.*thetaBar**2)
+        u1 = u_filter(tmin,tmax,n,ntheta)
+        thetamin_integral = tmin**2  * (4. * thetaBar * tmin  - 6. * thetaBar**2 - deltaTheta**2/2.)
+        theta_integral    = theta**2 * (4. * thetaBar * theta - 6. * thetaBar**2 - deltaTheta**2/2.)
+        qfilter[:,1] = 2./prefactor * (theta_integral - thetamin_integral) - u1[:,1]
+    else:
+        # print("n=",n)
+        # have to use this to have enough accuracy for larger n, still breaks for n>30
+        from mpmath import mp
+        M = int(np.floor(n/2))
+        sum_=0
+        Un = u_filter(tmin,tmax,n,ntheta)
+        # print(Un)
+        for m in range(M+1):
+            factor = mp.power(-1,m) * mp.factorial(2*n-2*m) * mp.power((2./deltaTheta),(n-2*m))/ (mp.power(2,n) * mp.factorial(m) * mp.factorial(n-m) * mp.factorial(n-2*m))
+            nm = (n - 2.*m + 1.)
+            integration_term_theta     = mp.power((theta - thetaBar),nm) * ( (theta - thetaBar)/(nm+1)  + thetaBar/nm)
+            integration_term_theta_min = mp.power((tmin  - thetaBar),nm) * ( (tmin  - thetaBar)/(nm+1)  + thetaBar/nm)
+            sum_ += factor * (integration_term_theta - integration_term_theta_min)
+        qfilter[:,1]  = 2.* mp.sqrt((2.*n + 1.)/2.)/mp.power((theta * deltaTheta), 2) * sum_ - Un[:,1]
+    return qfilter
+
+
+    
+def q_from_integral(tmin,tmax,n,ntheta=1000):
+    thetas = np.linspace(tmin,tmax,ntheta)
+    Q = np.zeros((ntheta,2))
+    Q[:,0] = thetas
+    Un= u_filter(tmin,tmax,n,ntheta)
+    u_filter_func= interp1d(Un[:,0], Un[:,1])
+    for itheta in range(len(thetas)):
+        theta = thetas[itheta]
+        # print(itheta,theta, Un[itheta,1])
+        theta_prime = np.linspace(tmin,theta,ntheta)
+        delta_theta = theta_prime[1]-theta_prime[0]
+        integ = (theta_prime*u_filter_func(theta_prime)) 
+        integral = sum(integ*delta_theta)
+        Q[itheta,1] = 2./theta**2 * integral - Un[itheta,1]
+    return Q
+
+
+
+def psi_filter(tmin,tmax,n,corr_type='gg',ntheta=1000):
+    if (corr_type == 'gg'):
+        return u_filter(tmin,tmax,n,ntheta=ntheta)
+    if (corr_type == 'gm'):
+        return q_from_integral(tmin,tmax,n,ntheta=ntheta)
+    else:
+        print(corr_type+' is not a recognised correlation type, choose between gg and gm. Exiting now ...')
+        exit()
 

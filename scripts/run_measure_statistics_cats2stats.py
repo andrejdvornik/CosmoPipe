@@ -6,7 +6,7 @@ import math, os
 from matplotlib.patches import Rectangle
 from scipy.interpolate import interp1d
 from scipy import pi,sqrt,exp
-from measure_statistics import tminus_quad, tplus, tminus, gplus, gminus, T, str2bool, h, f, rebin
+from measure_statistics import tminus_quad, tplus, tminus, gplus, gminus, T, str2bool, h, f, rebin, psi_filter
 from argparse import ArgumentParser
 import treecorr
 
@@ -23,8 +23,8 @@ import treecorr
 
 # Specify the input arguments
 parser = ArgumentParser(description='Take input 2pcfs files and calculate 2pt statistics')
-parser.add_argument("-d", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis', 'bandpowers_ee', 'bandpowers_ne', 'bandpowers_nn', 'xipm'],
-    help="Desired 2pt statistic, must be either cosebis, bandpowers_ee, bandpowers_ne, bandpowers_nn, or xipm")
+parser.add_argument("-d", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis', 'bandpowers_ee', 'bandpowers_ne', 'bandpowers_nn', 'xipm', 'psi'],
+    help="Desired 2pt statistic, must be either cosebis, bandpowers_ee, bandpowers_ne, bandpowers_nn, xipm, or psi")
 
 # Input file, columns, theta range, and other options
 parser.add_argument("-i", "--inputfile", dest="inputfile", required=True,
@@ -143,8 +143,14 @@ qfile=args.qfile
 filterfoldername=args.filterfoldername
 psifoldername=args.psifoldername
 corr_type=args.corr_type
-pt_col=args.pt_col
+# pt_col=args.pt_col
 nModes_psi=args.nModes_psi
+if(corr_type=='gg'):
+    correlation = " (galaxy clustering)"
+    filename = ufile
+elif(corr_type=='gm'):
+    correlation = " (galaxy-galaxy lensing)"
+    filename = qfile
 
 print('Input file is '+inputfile+', making '+str(mode)+' for theta in ['+'%.2f' %thetamin+"'," 
     +'%.2f' %thetamax+"'], outputfiles are: "+cfoldername+"/En_"+outputfile+'.ascii and '+cfoldername+'/Bn_'+outputfile+'.ascii')
@@ -164,6 +170,7 @@ if xip_col:
     xim=tpcf_data[xim_col]
 if gamma_t_col:
     gamma_t=tpcf_data[gamma_t_col]
+if gamma_x_col:
     gamma_x=tpcf_data[gamma_x_col]
 if w_theta_col:
     w_theta=tpcf_data[w_theta_col]
@@ -307,7 +314,7 @@ if mode == 'cosebis':
         np.savetxt(IntegPlusFileName,filter_plus)
         np.savetxt(IntegMinusFileName,filter_minus)
 
-elif mode 'psi':
+elif mode == 'psi':
     if not os.path.exists(filterfoldername):
         os.makedirs(filterfoldername)
 
@@ -332,7 +339,8 @@ elif mode 'psi':
 
         filter_func=interp1d(filt[:,0], filt[:,1])
         # 
-        integ=filter_func(theta_mid)*theta_mid*pt[good_args]
+        # integ=filter_func(theta_mid)*theta_mid*pt[good_args]
+        integ=filter_func(theta_mid)*theta_mid*gamma_t[good_args]
         # 
         Integral=sum(integ*delta_theta)
         psi[n-1] = Integral
