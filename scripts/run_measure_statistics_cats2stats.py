@@ -23,7 +23,7 @@ import treecorr
 
 # Specify the input arguments
 parser = ArgumentParser(description='Take input 2pcfs files and calculate 2pt statistics')
-parser.add_argument("-d", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis', 'bandpowers_ee', 'bandpowers_ne', 'bandpowers_nn', 'xipm', 'psi'],
+parser.add_argument("-d", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis', 'bandpowers_ee', 'bandpowers_ne', 'bandpowers_nn', 'xipm', 'psi_gg', 'psi_gm'],
     help="Desired 2pt statistic, must be either cosebis, bandpowers_ee, bandpowers_ne, bandpowers_nn, xipm, or psi")
 
 # Input file, columns, theta range, and other options
@@ -97,8 +97,6 @@ parser.add_argument('--ufilename', dest="ufile", help='name of U file, default i
 parser.add_argument('--qfilename', dest="qfile", help='name of Q file, default is Q',default="Q",required=False)
 parser.add_argument('--psifoldername', dest="psifoldername", 
     help='full name and address of the folder for the output files, default is psi_results',default="./psi_results")
-parser.add_argument("--corr_type", dest="corr_type",
-    help="Type of psi statistic correlation to calculate, choose from gg (galaxy clustering) and gm (galaxy-galaxy lensing)")
 parser.add_argument('--nPsi', dest="nModes_psi", type=int,default=10, nargs='?',
     help='number of Psi modes to produce, default is 10')
 
@@ -142,13 +140,13 @@ ufile=args.ufile
 qfile=args.qfile
 filterfoldername=args.filterfoldername
 psifoldername=args.psifoldername
-corr_type=args.corr_type
-# pt_col=args.pt_col
 nModes_psi=args.nModes_psi
-if(corr_type=='gg'):
+if(mode=='psi_gg'):
+    corr_type = 'gg'
     correlation = " (galaxy clustering)"
     filename = ufile
-elif(corr_type=='gm'):
+elif(mode=='psi_gm'):
+    corr_type = 'gm'
     correlation = " (galaxy-galaxy lensing)"
     filename = qfile
 
@@ -314,7 +312,7 @@ if mode == 'cosebis':
         np.savetxt(IntegPlusFileName,filter_plus)
         np.savetxt(IntegMinusFileName,filter_minus)
 
-elif mode == 'psi':
+elif (mode == 'psi_gg') or (mode == 'psi_gm'):
     if not os.path.exists(filterfoldername):
         os.makedirs(filterfoldername)
 
@@ -339,8 +337,10 @@ elif mode == 'psi':
 
         filter_func=interp1d(filt[:,0], filt[:,1])
         # 
-        # integ=filter_func(theta_mid)*theta_mid*pt[good_args]
-        integ=filter_func(theta_mid)*theta_mid*gamma_t[good_args]
+        if corr_type == 'gm':
+            integ=filter_func(theta_mid)*theta_mid*gamma_t[good_args]
+        if corr_type == 'gg':
+            integ=filter_func(theta_mid)*theta_mid*w_theta[good_args]
         # 
         Integral=sum(integ*delta_theta)
         psi[n-1] = Integral
