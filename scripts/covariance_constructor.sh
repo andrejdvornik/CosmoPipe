@@ -73,6 +73,7 @@ save_configs = save_configs.ini
 save_Cells = True
 save_trispectra = False
 save_alms = True
+use_tex = False
 
 [covELLspace settings]
 ell_min = @BV:LMINCOV@
