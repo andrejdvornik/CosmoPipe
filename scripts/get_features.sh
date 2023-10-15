@@ -3,7 +3,7 @@
 # File Name : get_features.sh
 # Created By : awright
 # Creation Date : 06-08-2023
-# Last Modified : Sun Aug  6 22:05:56 2023
+# Last Modified : Fri Sep 29 18:06:12 2023
 #
 #=========================================
 
@@ -14,8 +14,8 @@ maglist="@BV:MAGLIST@"
 feature_types="@BV:FEATURETYPES@"
 
 #Check for colours, mags, or both 
-magnitude=FALSE
-colours=FALSE
+magnitudes=""
+colours=""
 if [[ "${feature_types^^}" =~ "MAG" ]]
 then 
   if [[ "${feature_types^^}" =~ "ALLMAG" ]] 
