@@ -184,6 +184,8 @@ NITER=1000
 OPTIMISE=--optimise
 #What is the minium number of allowed HCs
 MINNHC=2000 
+#SOM dimension 
+SOMDIM="101 101"
 
 #Do we want to normalise (whiten) the feature space before matching?
 MATCHNORMALISE=--norm
@@ -246,6 +248,7 @@ PRIOR_ABARY="2.0 2.6 3.13"
 #Priors: A_IA
 PRIOR_AIA="-6.0 1.0 6.0"
 
-
+#Base block to use for naming the Nz (when running add_nz.sh)
+NZNAME_BASEBLOCK="som_weight_calib_cats"
 
 
