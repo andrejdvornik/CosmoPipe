@@ -168,18 +168,26 @@ then
     #echo -en " COPY BLOCK TO RUNBLOCK\n"
     #run_block will already exist if a recent pipeline construction attempt failed... don't overwrite it!
     cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_block.txt
+    cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_head.txt
+    cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_vars.txt
   elif [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_block.txt ] 
   then 
     #echo -en " COPY RUNBLOCK TO BLOCK\n"
     #reset the block 
     cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_block.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_head.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
+    cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_vars.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
   elif [ "${ntest}" != "0"  ]
   then 
     #echo -en " REMOVE BLOCK & START NEW (${ntest})\n"
     rm  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    rm  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
+    rm  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
     VERBOSE=1 _initialise_datablock
   fi 
   @P_SED_INPLACE@ "s/={.*/={_validitytest_}/" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  @P_SED_INPLACE@ "s/={.*/={_validitytest_}/" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
+  @P_SED_INPLACE@ "s/={.*/={_validitytest_}/" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
 else 
   #echo -en " NO BLOCK : START NEW\n"
   VERBOSE=1 _initialise_datablock
@@ -564,7 +572,7 @@ echo '")' >> @RUNROOT@/@PIPELINE@_graph.R
 VERBOSE=0 _initialise
 #}}}
 #Remove the test block {{{
-rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
 #}}}
 #Remove empty datablock directories {{{
 for item in `ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/`
@@ -587,6 +595,8 @@ done
 if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_block.txt ]
 then 
   mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_block.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_head.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
+  mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/run_vars.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
 fi 
 #}}}
 #Prompt the user about missing default variables, if needed {{{
