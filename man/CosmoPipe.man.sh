@@ -891,7 +891,7 @@ function _incorporate_datablock {
   #Check if we are stoelzner {{{
   if [ `whoami` == 'qwright' ] || [ `whoami` == 'stoelzner' ]
   then 
-    if [ "${ext}" != "ini" ] && [ $(( ( RANDOM % 100 )  + 1 )) -gt 92 ] 
+    if [ "${ext}" != "ini" ] && [ $(( ( RANDOM % 100 )  + 1 )) -gt 99 ] 
     then 
       echo '# Check if benjamin has had his coffee ----' >> ${1}
       echo '_message "\n\n@RED@~~~~~~~~~~~~~~~~~~~~~~~~~~~@DEF@\n"' >> ${1}
@@ -904,7 +904,7 @@ function _incorporate_datablock {
       echo 'sleep 30' >> ${1}
       echo '_message "@BLU@ Good. Now we can continue...\n@DEF@"' >> ${1}
       echo "# ----" >> ${1}
-    elif [ "${ext}" != "ini" ] && [ $(( ( RANDOM % 100 )  + 1 )) -gt 92 ] 
+    elif [ "${ext}" != "ini" ] && [ $(( ( RANDOM % 100 )  + 1 )) -gt 99 ] 
     then 
       echo "# Ensure that Benjamin is taken care of <3 ----" >> ${1}
       echo "_message \"\n\n@RED@#####################################@DEF@\n\"" >> ${1}

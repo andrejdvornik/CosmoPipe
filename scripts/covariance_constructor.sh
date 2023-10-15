@@ -73,6 +73,7 @@ save_configs = save_configs.ini
 save_Cells = True
 save_trispectra = False
 save_alms = True
+use_tex = False
 
 [covELLspace settings]
 ell_min = @BV:LMINCOV@
@@ -87,7 +88,6 @@ mult_shear_bias = ${mbiaslist}
 limber = True
 pixelised_cell = False
 pixel_Nside = 2048
-integration_intervals = 50
 
 EOF
 #}}}
@@ -105,6 +105,7 @@ theta_list = 1, 2, 3
 xi_pp = True
 xi_mm = True
 theta_accuracy = 1e-5
+integration_intervals = 50
 
 mix_term_file_path_catalog = ${input_path}/mixterm/catalog
 mix_term_col_name_weight = weight
@@ -261,13 +262,17 @@ lower_calc_limit = 1e-200
 [tabulated inputs files]
 npair_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/
 npair_mm_file = @BV:NPAIRBASE@_Bin?_Bin?.ascii
-cosebi_directory = @RUNROOT@/INSTALL/covariance/onecov/input/cosebis/
+cosebi_directory = @RUNROOT@/INSTALL/OneCovariance/input/cosebis/
 wn_log_file = WnLog?.table
+wn_gg_file = W_Psi?-0.50-300.00-lmin-0.5-lmax-1000000.0-lbins-1000000.table
 Tn_plus_file = Tplus?.table
 Tn_minus_file = Tminus?.table
+Qn_file = Q_n?_0.50-300.00
+Un_file = U_n?_0.50-300.00
+
 
 [misc]
-num_cores = 8
+num_cores = @BV:COVNCORES@
 
 EOF
 #}}}

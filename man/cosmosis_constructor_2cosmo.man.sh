@@ -1,5 +1,5 @@
 #
-# rebin_xipm.sh Documentation & Housekeeping functions
+# cosmosis_constructor_2cosmo.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@==================================@DEF@\n"
-    _message "@BLU@== @RED@ Running rebin_xipm.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@==================================@DEF@\n"
+    _message "@BLU@===================================================@DEF@\n"
+    _message "@BLU@== @RED@ Running cosmosis_constructor_2cosmo.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@===================================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,7 +17,8 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Create binned xipm from input xipm'
+  echo '# Constructs a cosmosis .ini file with two separate '
+  echo '# cosmologies'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -42,28 +43,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BINNING BLU BV:NXIPM BV:THETAMAXXI BV:THETAMINXI DATABLOCK DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  echo BLINDING BV:APODISATIONWIDTH BV:BLIND BV:BOLTZMAN BV:COSMOSIS_PIPELINE BV:DVLENGTH BV:LIST_INPUT_SAMPLER BV:LMAXBANDPOWERS BV:LMINBANDPOWERS BV:NMAXCOSEBIS BV:NMINCOSEBIS BV:NPAIRBASE BV:NXIPM BV:SAMPLER BV:SPLITMODE BV:STATISTIC BV:THETAMAXXI BV:THETAMAXXIM BV:THETAMINXI BV:THETAMINXIM BV:TOMOLIMS BV:ZBIN CONFIGPATH DATABLOCK P_SED_INPLACE RUNROOT STORAGEPATH SURVEY
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo DATAHEAD
+  echo mcmc_inp nzcov
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo xipm_binned
+  echo mcmc_inp
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/rebin_xipm.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/cosmosis_constructor_2cosmo.sh
 } 
 #}}}
 

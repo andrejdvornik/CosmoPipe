@@ -3,7 +3,7 @@
 # File Name : combine_xi_patches.R
 # Created By : awright
 # Creation Date : 29-03-2023
-# Last Modified : Fri 08 Sep 2023 10:02:23 AM UTC
+# Last Modified : Sun Oct 15 11:31:17 2023
 #
 #=========================================
 
@@ -68,7 +68,8 @@ for (i in 1:length(input.cats)) {
   out$xip_im    = (out$xip_im   + tmp$xip_im  * tmp$npairs_weighted)
   out$xim_im    = (out$xim_im   + tmp$xim_im  * tmp$npairs_weighted)
   out$xim_im_sq = out$xim_im_sq + tmp$xim_im_sq 
-  out$var_xip = out$var_xip+tmp$var_xip 
+  out$var_xip = out$var_xip+tmp$var_xip
+  out$var_xim = out$var_xim+tmp$var_xim 
   out$npairs_sq = out$npairs_sq+tmp$npairs_sq 
   out$weight = out$weight+tmp$weight
   out$npairs_weighted = out$npairs_weighted+tmp$npairs_weighted

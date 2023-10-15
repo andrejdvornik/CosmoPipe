@@ -1,5 +1,5 @@
 #
-# rebin_xipm.sh Documentation & Housekeeping functions
+# generate_mocks.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@==================================@DEF@\n"
-    _message "@BLU@== @RED@ Running rebin_xipm.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@==================================@DEF@\n"
+    _message "@BLU@======================================@DEF@\n"
+    _message "@BLU@== @RED@ Running generate_mocks.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@======================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,7 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Create binned xipm from input xipm'
+  echo '# Generates mock data vectors'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -42,28 +42,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BINNING BLU BV:NXIPM BV:THETAMAXXI BV:THETAMINXI DATABLOCK DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  echo BV:NMOCKS BV:STATISTIC DATABLOCK PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo DATAHEAD
+  echo mcmc_inp_bandpowers mcmc_inp_cosebis mcmc_inp_xipm
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo xipm_binned
+  echo 
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/rebin_xipm.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/generate_mocks.sh
 } 
 #}}}
 
