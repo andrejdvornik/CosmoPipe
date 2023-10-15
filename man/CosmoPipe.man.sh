@@ -7,6 +7,12 @@ function _initialise {
     _message "${RED} - ERROR! Manual file does not exist!"
     exit 1
   fi 
+  #Check that we are in the correct conda environment {{{
+  if [ "$CONDA_DEFAULT_ENV" != "cosmopipe" ]
+  then 
+    echo "ERROR! Configuration and Pipeline must be run from within the 'cosmopipe' conda environment!"
+  fi 
+  #}}}
   #Documentation file 
   source @RUNROOT@/@MANUALPATH@/${_callname//.sh/.man.sh}
   #Startup prompt 
@@ -161,9 +167,9 @@ function _initialise_datablock {
   if [ ! -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt ]
   then 
     #Initialise the datablock txt file 
-    echo "HEAD: " > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-    echo "BLOCK: " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-    echo "VARS: " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    echo "HEAD: " > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
+    echo "BLOCK: " > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    echo "VARS: " > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
     if [ -f @PIPELINE@_defaults.sh ]
     then 
       _add_default_vars 
@@ -208,7 +214,8 @@ function _read_datablock {
   done < @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   #_message "#${_outblock}#"
   #_outblock=`echo ${_outblock} | sed 's/ /\n/g' | sort | uniq | xargs echo`
-  _outblock=`echo ${_outblock} | sed 's/ /\n/g' | xargs echo`
+  #_outblock=`echo ${_outblock} | sed 's/ /\n/g' | xargs echo`
+  _outblock=`echo ${_outblock} | sed 's/ /\n/g'`
   #_message "#${_outblock}#"
   echo ${_outblock}
 }
@@ -216,20 +223,10 @@ function _read_datablock {
 
 #Write the datablock {{{
 function _write_datablock { 
-  _head=`_read_datahead`
   #Get the files in this data
   _block=`_read_datablock`
-  #Get the variables 
-  _vars=`_read_blockvars`
-  #Update the datablock txt file: HEAD
-  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  #Add HEAD items to file 
-  for _file in ${_head} 
-  do 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done 
   #Update the BLOCK items 
-  echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  echo "BLOCK:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   #Add what we want to write
   _filelist="{${2// /,}}"
   echo "${1}=${_filelist}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
@@ -244,13 +241,6 @@ function _write_datablock {
       echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
     fi
   done
-  #Update the datablock txt file: VARS
-  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  #Add HEAD items to file 
-  for _file in ${_vars} 
-  do 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done 
 }
 #}}}
 
@@ -275,15 +265,8 @@ function _rename_blockitem {
     _message "@RED@ - ERROR! The requested data block to rename (${1}) does not exist in the data block!@DEF@\n"
     exit 1 
   fi 
-  #Update the datablock txt file: HEAD
-  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  #Add HEAD items to file 
-  for _file in ${_head} 
-  do 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done 
   #Update the BLOCK items 
-  echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  echo "BLOCK:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   #For each block row:
   for _file in ${_block} 
   do 
@@ -313,13 +296,6 @@ function _rename_blockitem {
       fi 
     fi 
   fi 
-  #Update the datablock txt file: VARS
-  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  #Add HEAD items to file 
-  for _file in ${_vars} 
-  do 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done 
 }
 #}}}
 
@@ -341,10 +317,11 @@ function _read_datahead {
     fi 
     #Add the contents to the output block 
     _outhead="${_outhead} ${item} ${contents}"
-  done < @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  done < @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
   #_message "#${_outhead}#"
   #_outhead=`echo ${_outhead} | sed 's/ /\n/g' | sort | uniq | xargs echo`
-  _outhead=`echo ${_outhead} | sed 's/ /\n/g' | xargs echo`
+  #_outhead=`echo ${_outhead} | sed 's/ /\n/g' | xargs echo`
+  _outhead=`echo ${_outhead} | sed 's/ /\n/g' `
   #_message "#${_outhead}#"
   echo ${_outhead}
 }
@@ -359,7 +336,7 @@ function _add_datahead {
   if [ "${1}" == "" ] 
   then 
     #Clear the datahead {{{
-    echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
     #Remove any datahead files 
     rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*
     #}}}
@@ -433,28 +410,14 @@ function _add_datahead {
       _message " @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD@BLU@ Done!@DEF@\n"
     fi 
     #Update the datablock txt file 
-    echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
     for _file in ${_files} 
     do 
-      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
     done 
     #}}}
     #}}}
   fi 
-  #Output the rest of the block information {{{
-  echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  for _file in ${_block} 
-  do 
-    #_file=`echo $_file`
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done
-  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  for _file in ${_vars} 
-  do 
-    #_file=`echo $_file`
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done
-  #}}}
 }
 #}}}
 
@@ -467,7 +430,7 @@ function _replace_datahead {
   #Current head 
   _head=`_read_datahead`
   #Update the datablock txt file 
-  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
   for _file in ${_head} 
   do 
     #If this is the file we want to update 
@@ -503,25 +466,13 @@ function _replace_datahead {
       for _newfile in ${2} 
       do 
         #Add new file to the data block 
-        echo "${_newfile##*/}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+        echo "${_newfile##*/}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
       done 
     else 
       #Otherwise keep going
-      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
     fi
   done 
-  echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  for _file in ${_block} 
-  do 
-    #_file=`echo $_file`
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done
-  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  for _file in ${_vars} 
-  do 
-    #_file=`echo $_file`
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done
 }
 #}}}
 #
@@ -582,7 +533,7 @@ function _write_datahead {
   if [ "${1}" == "" ] 
   then 
     #Clear the datahead 
-    echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
     #Remove any datahead files 
     rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*
   else 
@@ -601,27 +552,15 @@ function _write_datahead {
       exit 1 
     fi 
     #Update the datablock txt file 
-    echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
     for _file in ${_head} 
     do 
       #Print the existing datahead items 
-      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
     done 
     #Add the new item 
-    echo "${2}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    echo "${2}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
   fi 
-  #Write out the block 
-  echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  for _file in ${_block} 
-  do 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done
-  #Write out the vars 
-  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  for _file in ${_vars} 
-  do 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done
 }
 #}}}
 
@@ -631,24 +570,12 @@ function _writelist_datahead {
   _block=`_read_datablock`
   _vars=`_read_blockvars`
   #Update the datablock txt file 
-  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
   for _file in ${_head} 
   do 
     #Print the existing datahead items 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
   done 
-  #Write out the block 
-  echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  for _file in ${_block} 
-  do 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done
-  #Write out the vars 
-  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  for _file in ${_vars} 
-  do 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done
 }
 #}}}
 
@@ -733,7 +660,7 @@ function _read_blockvars {
       #Add the contents to the output 
       _outvars="${_outvars} ${item}"
     fi 
-  done < @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  done < @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
   echo ${_outvars}
 }
 #}}}
@@ -745,25 +672,11 @@ function _write_blockvars {
   _block=`_read_datablock`
   #Get the variables 
   _vars=`_read_blockvars`
-  #Update the datablock txt file: HEAD
-  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  #Add HEAD items to file 
-  for _file in ${_head} 
-  do 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done 
-  #Update the datablock txt file: BLOCK
-  echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  #Add BLOCK items to file 
-  for _file in ${_block} 
-  do 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done 
   #Update the VARS items 
-  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  echo "VARS:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
   #Add what we want to write
   _filelist="{${2// /,}}"
-  echo "${1}=${_filelist}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  echo "${1}=${_filelist}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
   #For each var row:
   for _file in ${_vars} 
   do 
@@ -772,7 +685,7 @@ function _write_blockvars {
     then 
       #Write it 
       _file=`echo $_file`
-      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
     fi
   done
 }
@@ -785,7 +698,8 @@ function _check_blockvar {
   #Blockvars
   _block=`_read_blockvars`
   #Check whether the requested data object is in the datablock 
-  echo " ${_block} " | grep -c " ${_data}=" | xargs echo || echo 
+  #echo " ${_block} " | grep -c " ${_data}=" | xargs echo || echo 
+  echo " ${_block} " | grep -c " ${_data}=" || echo 
 }
 #}}}
 
@@ -880,12 +794,29 @@ function _incorporate_datablock {
       _itemlist=''
       for _file in ${item}
       do 
+        #2>&1 echo -n "${#_itemlist}    \r "
         #Add full file paths 
         _itemfile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${base}/${_file#*=}
         _itemlist="${_itemlist} ${_itemfile}"
       done 
       #_itemlist=`echo ${_itemlist}`
-      @P_SED_INPLACE@ "s#\\@DB:${item%%=*}\\@#${_itemlist:1}#g" ${1//.${ext}/_prehead.${ext}}
+      _nchunk=50000
+      if [ ${#_itemlist} -gt ${_nchunk} ] 
+      then 
+        #>&2 echo -n "In chunks:"
+        _ccount=0
+        while [ ${_ccount} -lt ${#_itemlist} ]
+        do 
+          #>&2 echo -n '.'
+          @P_SED_INPLACE@ "s#\\@DB:${item%%=*}\\@#${_itemlist:${_ccount}:${_nchunk}}\\@DB:${item%%=*}\\@#g" ${1//.${ext}/_prehead.${ext}}
+          _ccount=$((_ccount+_nchunk))
+        done 
+        @P_SED_INPLACE@ "s#\\@DB:${item%%=*}\\@##g" ${1//.${ext}/_prehead.${ext}}
+        #>&2 echo ' - Done'
+      else 
+        #>&2 echo "All at once"
+        @P_SED_INPLACE@ "s#\\@DB:${item%%=*}\\@#${_itemlist:1}#g" ${1//.${ext}/_prehead.${ext}}
+      fi 
     done 
     #((nloop+=1))
     #if [ ${nloop} -gt 100 ]
@@ -1029,7 +960,25 @@ function _incorporate_datablock {
       _itemlist="${_itemlist} ${_itemfile}"
     done 
     #_itemlist=`echo ${_itemlist}`
-    sed "s#\\@DB:ALLHEAD\\@#${_itemlist}#g" ${1//.${ext}/_prehead.${ext}} >> ${1}
+    #sed "s#\\@DB:ALLHEAD\\@#${_itemlist}#g" ${1//.${ext}/_prehead.${ext}} >> ${1}
+    _nchunk=50000
+    if [ ${#_itemlist} -gt ${_nchunk} ] 
+    then 
+      #>&2 echo -n "In chunks:"
+      _ccount=0
+      cat ${1//.${ext}/_prehead.${ext}} >> ${1} 
+      while [ ${_ccount} -lt ${#_itemlist} ]
+      do 
+        #>&2 echo -n '.'
+        @P_SED_INPLACE@ "s#\\@DB:ALLHEAD\\@#${_itemlist:${_ccount}:${_nchunk}}\\@DB:ALLHEAD\\@#g" ${1}
+        _ccount=$((_ccount+_nchunk))
+      done 
+      @P_SED_INPLACE@ "s#\\@DB:ALLHEAD\\@##g" ${1} 
+      #>&2 echo ' - Done'
+    else 
+      #>&2 echo "All at once"
+      sed "s#\\@DB:ALLHEAD\\@#${_itemlist:1}#g" ${1//.${ext}/_prehead.${ext}} >> ${1}
+    fi 
     #}}}
   else 
     #The code doesn't work on DATAHEAD, so just run it: {{{
@@ -1076,15 +1025,8 @@ function _splitpatch_blockitem {
     _message "@RED@ - ERROR! The requested data block to rename (${1}) does not exist in the data block!"
     exit 1 
   fi 
-  #Update the datablock txt file: HEAD
-  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  #Add HEAD items to file 
-  for _file in ${_head} 
-  do 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done 
   #Update the BLOCK items 
-  echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  echo "BLOCK:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   #For each block row:
   for _file in ${_block} 
   do 
@@ -1145,13 +1087,6 @@ function _splitpatch_blockitem {
       fi 
     fi 
   fi 
-  #Update the datablock txt file: VARS
-  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  #Add HEAD items to file 
-  for _file in ${_vars} 
-  do 
-    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  done 
 }
 #}}}
 
