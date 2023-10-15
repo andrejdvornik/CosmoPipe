@@ -42,7 +42,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo DATABLOCK MBIASCORR MBIASERRORS MBIASVALUES RUNROOT STORAGEPATH
+  echo DATABLOCK BV:MBIASCORR BV:MBIASERRORS BV:MBIASVALUES RUNROOT STORAGEPATH
 } 
 #}}}
 
