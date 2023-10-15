@@ -3,7 +3,7 @@
 # File Name : compute_m_surface.py
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Fri 02 Jun 2023 12:49:40 PM CEST
+# Last Modified : Tue 19 Sep 2023 12:14:52 PM CEST
 #
 #=========================================
 
@@ -66,7 +66,7 @@ m_res = pd.DataFrame(-999., index=np.arange(1),
 m1, m2, m1_err, m2_err, good_id, goodwt = mcf.mCalFunc_from_surface(cata=cata_used, surface=cata_surface, 
                                             col_SNR="SNR", col_R="R", col_weight="weight", 
                                             col_m1=args.col_m12[0], col_m2=args.col_m12[1])
-print(f'{args.input_data}: {(m1+m2)/2.}, {(m1_err+m2_err)/2.}')
+print(f'{args.input_data}: {(m1+m2)/2.}, {np.sqrt(m1_err**2+m2_err**2)}')
 m_res.loc[0, 'm'] = (m1+m2)/2.
 m_res.loc[0, 'm_err'] = np.sqrt(m1_err**2+m2_err**2)
 m_res.loc[0, 'm1'] = m1
