@@ -3,7 +3,7 @@
 # File Name : make_cosmosis_nz.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Fri 07 Jul 2023 08:07:21 PM CEST
+# Last Modified : Thu 07 Sep 2023 06:00:56 PM UTC
 #
 #=========================================
 
@@ -14,6 +14,7 @@ NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 outputlist=''
 for patch in @PATCHLIST@ @ALLPATCH@ 
 do 
+  _message " ->@BLU@ Patch @RED@${patch}@DEF@"
   filelist=''
   #Get the file list {{{
   for ZBIN1 in `seq ${NTOMO}`
@@ -41,6 +42,7 @@ do
   #If filelist is empty, skip {{{
   if [ "${filelist}" == "" ] 
   then 
+    _message "@RED@ - skipping! (No matching Nz files)@DEF@\n"
     continue
   fi 
   #}}}
@@ -50,6 +52,7 @@ do
     mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz_${patch}/
   fi 
   #}}}
+  _message "@RED@ - OK! (`date +'%a %H:%M'`)@DEF@\n"
   #Construct the output base {{{
   file=${filelist##* }
   output_base=${file##*/}
