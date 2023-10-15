@@ -62,6 +62,8 @@ if __name__ == '__main__':
              help='Name of the Dec column in the first catalogue')
     parser.add_argument('--file2dec', dest="cat2decname", type=str,default='DELTA_J2000',
              help='Name of the Dec column in the second catalogue')
+    parser.add_argument('--nthreads', dest="num_threads", type=int,default=None,
+             help='Number of desired parallel threads. If None (default) then uses all available')
     
     args = parser.parse_args()
     
@@ -83,6 +85,28 @@ if __name__ == '__main__':
     cat2wname = args.cat2wname
     cat2raname = args.cat2raname
     cat2decname = args.cat2decname
+    num_threads = args.num_threads
+
+    print("Using the following parameters:") 
+    print(f"nbins = {args.nbins}")
+    print(f"theta_min = {args.theta_min}")
+    print(f"theta_max = {args.theta_max}")
+    print(f"binning = {args.binning}")
+    print(f"fitscat1 = {args.fitscat1}")
+    print(f"fitscat2 = {args.fitscat2}")
+    print(f"outfile = {args.outfile}")
+    print(f"weighted = {args.weighted}")
+    print(f"cat1e1name = {args.cat1e1name}")
+    print(f"cat1e2name = {args.cat1e2name}")
+    print(f"cat1wname = {args.cat1wname}")
+    print(f"cat1raname = {args.cat1raname}")
+    print(f"cat1decname = {args.cat1decname}")
+    print(f"cat2e1name = {args.cat2e1name}")
+    print(f"cat2e2name = {args.cat2e2name}")
+    print(f"cat2wname = {args.cat2wname}")
+    print(f"cat2raname = {args.cat2raname}")
+    print(f"cat2decname = {args.cat2decname}")
+    print(f"num_threads = {args.num_threads}")
 
     #Convert weighted to logical 
     weighted=weighted.lower() in ["true","t","1","y","yes"]
@@ -102,8 +126,10 @@ if __name__ == '__main__':
 
     if nbins > 100: ## Fine-binning
         inbinslop = 1.5
+        print(f"binslop = {inbinslop} (because of fine binning)")
     else: ## Broad bins
         inbinslop = 0.08
+        print(f"binslop = {inbinslop} (because of coarse binning)")
 
     # Define the binning based on command line input
     if(binning=='lin'): 
@@ -115,7 +141,6 @@ if __name__ == '__main__':
         gg = treecorr.GGCorrelation(min_sep=theta_min, max_sep=theta_max, nbins=nbins, sep_units='arcmin', \
             bin_slop=inbinslop)
 
-    num_threads = None
 
     # Calculate the 2pt correlation function
     print("Processing with TreeCorr") 
