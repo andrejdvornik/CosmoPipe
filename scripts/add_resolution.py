@@ -3,7 +3,7 @@
 # File Name : add_Resolution.py
 # Created By : awright
 # Creation Date : 30-05-2023
-# Last Modified : Tue 30 May 2023 01:09:50 PM CEST
+# Last Modified : Fri 01 Sep 2023 08:05:53 AM UTC
 #
 #=========================================
 
@@ -36,7 +36,7 @@ parser.add_argument(
     help="column names for e1_gal, e2_gal.")
 parser.add_argument(
     "--cols_psf_Q", type=str, nargs=3, 
-    help="column names for PSF_Q11, PSF_Q12, PSF_Q22 shape parameters")
+    help="column names for PSF_Q11, PSF_Q22, PSF_Q12 shape parameters")
 
 ## arg parser
 args = parser.parse_args()
