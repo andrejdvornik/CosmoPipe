@@ -3,7 +3,7 @@
 # File Name : prepare_cosmosis.sh
 # Created By : awright
 # Creation Date : 31-03-2023
-# Last Modified : Mon 28 Aug 2023 09:51:25 AM CEST
+# Last Modified : Thu 07 Sep 2023 05:56:22 PM UTC
 #
 #=========================================
 
@@ -69,8 +69,8 @@ do
       stat_file=${file//\/nz\//\/${stat}\/}
       #}}}
       #Find the matching file {{{
-      matchfile=${stat_file//_Nz.${ext}/_*_${stat}.txt}
-      matchfile=${matchfile//_ZB/_*_ZB}
+      matchfile=${stat_file//_Nz.${ext}/*_${stat}.txt}
+      matchfile=${matchfile//_ZB/*_ZB}
       stat_file=`compgen -G ${matchfile} || echo `
       if [ "${stat_file}" == "" ] || [ ! -f ${stat_file} ] 
       then 
