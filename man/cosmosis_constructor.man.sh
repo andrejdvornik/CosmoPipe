@@ -50,14 +50,14 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo mcmc_inp_bandpowers mcmc_inp_cosebis mcmc_inp_xipm nzcov
+  echo mcmc_inp_@BV:STATISTIC@ nzcov
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo mcmc_inp
+  echo mcmc_inp_@BV:STATISTIC@
 } 
 #}}}
 
