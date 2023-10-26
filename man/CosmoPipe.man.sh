@@ -898,7 +898,7 @@ function _incorporate_datablock {
 
   #Update the script to include the blockvars {{{
   nloop=0
-  while [ "`grep -c @BV: ${1//.${ext}/_prehead.${ext}} || echo`" != "0" ]
+  while [ "`grep -v "^#" ${1//.${ext}/_prehead.${ext}} | grep -c @BV: || echo`" != "0" ]
   do 
     for item in ${_vars}
     do 
