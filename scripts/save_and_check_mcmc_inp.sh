@@ -8,9 +8,9 @@
 #=========================================
 
 #If needed, create the output directory 
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_cosebis ]
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@ ]
 then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_cosebis/
+  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/
 fi 
 if [ ! -d @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots ]
 then 
@@ -32,7 +32,8 @@ NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
   --neff @DB:cosmosis_neff@ \
   --sigmae @DB:cosmosis_sigmae@ \
   --covariance @DB:cosebis_cov@ \
-  --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_cosebis/MCMC_input_${cov} \
+  --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${cov} \
   --plotfolder @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
 
-_write_datablock "mcmc_inp_cosebis" "MCMC_input_${cov}"
+_write_datablock "mcmc_inp_@BV:STATISTIC@" "MCMC_input_${cov}"
+
