@@ -82,6 +82,14 @@ def setup(options):
     config['use_stats']   = statsList
     config['use_stats_c'] = statsList_c
     TP_data.choose_data_sets(statsList_c)
+
+    # Infer the order of the two-point statistics in the data vector
+    data_sets = [d.lower() for d in statsList_c]
+    stats_order = []
+    for spectrum in TP_data.spectra:
+        if spectrum.name.lower() in data_sets:
+            stats_order.append(spectrum.name.lower())
+    config['stats_order'] = stats_order
     
     ## Extract the vector & matrix & put in config dict
     config['data']       = TP_data.makeMeanVector()
@@ -114,13 +122,23 @@ def execute(block, config):
     
     ## Don't change the order of this list
     ## Read as: [section_name, extension_name, angle_name, isGGL]
-    sectionNameList = [
-        [config['xi_plus_section_name'],                  config['xi_plus_extension_name'],                  'theta_bin_1_1', False],
-        [config['xi_minus_section_name'],                 config['xi_minus_extension_name'],                 'theta_bin_1_1', False],
-        [config['bandpower_ggl_section_name'],            config['bandpower_ggl_extension_name'],            'ell',           True],
-        [config['bandpower_e_cosmic_shear_section_name'], config['bandpower_e_cosmic_shear_extension_name'], 'ell',           False],
-        [config['cosebis_section_name'],                  config['cosebis_extension_name'],                  'cosebis_n',     False],
-    ]
+    # sectionNameList = [
+    #     [config['xi_plus_section_name'],                  config['xi_plus_extension_name'],                  'theta_bin_1_1', False],
+    #     [config['xi_minus_section_name'],                 config['xi_minus_extension_name'],                 'theta_bin_1_1', False],
+    #     [config['bandpower_ggl_section_name'],            config['bandpower_ggl_extension_name'],            'ell',           True],
+    #     [config['bandpower_e_cosmic_shear_section_name'], config['bandpower_e_cosmic_shear_extension_name'], 'ell',           False],
+    #     [config['cosebis_section_name'],                  config['cosebis_extension_name'],                  'cosebis_n',     False],
+    # ]
+
+    # This makes sure that the order of the two-point statistics in the theory vector is the same as in the data vector
+    sectionNameList_dict = {
+        'xip':[config['xi_plus_section_name'],                  config['xi_plus_extension_name'],                  'theta_bin_1_1', False],
+        'xim':[config['xi_minus_section_name'],                 config['xi_minus_extension_name'],                 'theta_bin_1_1', False],
+        'pnee':[config['bandpower_ggl_section_name'],            config['bandpower_ggl_extension_name'],            'ell',           True],
+        'peee':[config['bandpower_e_cosmic_shear_section_name'], config['bandpower_e_cosmic_shear_extension_name'], 'ell',           False],
+        'en':[config['cosebis_section_name'],                  config['cosebis_extension_name'],                  'cosebis_n',     False],
+    }
+    sectionNameList = [sectionNameList_dict[stat] for stat in config['stats_order']]
     
     for line in sectionNameList:
         section_name, extension_name, angle_name, isGGL = line
