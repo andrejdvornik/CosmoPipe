@@ -672,10 +672,30 @@ function _write_blockvars {
   _block=`_read_datablock`
   #Get the variables 
   _vars=`_read_blockvars`
+  if [ "${2:0:4}" == "@BV:" ] 
+  then 
+    #The variable assignment is a reference: assign the referred value 
+    _target=${2:4}
+    _target=${_target%@}
+    _filelist=`_read_blockvars ${_target}`
+    #Remove variable name and brackets 
+    _filelist=${_filelist#*=}
+    _prompt=${_filelist#\{}
+    _prompt=${_prompt%\}}
+    _prompt=${_prompt//,/ }
+    if [ "${_prompt}" == "" ] 
+    then 
+      _filelist="{${2// /,}}"
+    else 
+      #Prompt about the update
+      echo -n " -> ${_prompt}"
+    fi 
+  else  
+    #Add what we want to write
+    _filelist="{${2// /,}}"
+  fi 
   #Update the VARS items 
   echo "VARS:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
-  #Add what we want to write
-  _filelist="{${2// /,}}"
   echo "${1}=${_filelist}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
   #For each var row:
   for _file in ${_vars} 
@@ -785,9 +805,9 @@ function _incorporate_datablock {
       #Extract the name of the item
       base=${item%%=*}
       #Remove leading and trailing braces
-      item=${item//\{,/}
-      item=${item//\{/}
-      item=${item//\}/}
+      item=${item/\{,/\{}
+      item=${item/\{/}
+      item=${item%\}}
       #Add spaces
       item=${item//,/ }
       #Loop through entries 
@@ -836,9 +856,9 @@ function _incorporate_datablock {
       #Extract the name of the item
       base=${item%%=*}
       #Remove leading and trailing braces
-      item=${item//\{,/}
-      item=${item//\{/}
-      item=${item//\}/}
+      item=${item/\{,/\{}
+      item=${item/\{/}
+      item=${item%\}}
       #Add spaces
       item=${item//,/ }
       #Loop through entries 
