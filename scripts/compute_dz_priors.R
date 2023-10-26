@@ -3,7 +3,7 @@
 # File Name : computs_dz_priors.R
 # Created By : awright
 # Creation Date : 29-03-2023
-# Last Modified : Thu 06 Jul 2023 09:22:09 AM CEST
+# Last Modified : Mon Sep 11 17:24:04 2023
 #
 #=========================================
 
@@ -102,13 +102,17 @@ while (length(inputs)!=0) {
 }
 
 #Number of realisations 
-nreal<-length(input.calib)/length(binstrings)
+nreal<- 0
+for (bin in binstrings) { 
+  nreal<-max(nreal,length(which(grepl(bin,input.calib))))
+}
+#nreal<-length(input.calib)/length(binstrings)
 #Make sure it's an integer! 
-if ( nreal%%1 != 0 ) { 
-  stop("There are a non-integer number of input catalogues per bin?!") 
+if ( nreal==0 ) { 
+  stop("There are a no files which match the bin strings?!") 
 }
 #Initialise the realisation results matrix 
-def<-matrix(NA,ncol=length(binstrings),nrow=length(input.calib)/length(binstrings))
+def<-matrix(NA,ncol=length(binstrings),nrow=nreal)
 colnames(def)<-binstrings
 wtot<-wtot_gold<-ntot<-ntot_gold<-dneff<-
   muzcalib<-muzrefr<-bias<-muzrefr_nogold<-
@@ -124,64 +128,73 @@ count<-0
 for (bin in 1:length(binstrings)) { 
   #Get the list of calibration and reference catalogues 
   calib_cats<-input.calib[grepl(binstrings[bin],input.calib,fixed=T)]
-  refr_cats<-input.refr[grepl(binstrings[bin],input.refr,fixed=T)]
+  if (length(which(grepl(binstrings[bin],input.refr,fixed=T)))==0) { 
+    warning("No reference catalogue binstring matches; assuming catalogues are in order!!")
+    refr_cats<-input.refr[grepl(binstrings[bin],input.calib,fixed=T)]
+  } else {
+    refr_cats<-input.refr[grepl(binstrings[bin],input.refr,fixed=T)]
+  }
   if (length(calib_cats)!=length(refr_cats)) { 
     stop("Mismatch in the reference and calibration catalogue lists?!") 
   } 
-  for (i in 1:length(calib_cats)) { 
-    setTxtProgressBar(pb,count)
-    count<-count+1
-    #Read the calibration file 
-    calib<-helpRfuncs::read.file(calib_cats[i],data.table=FALSE,cols=c(redshift.label,gold.label))
-    if (any(calib[[redshift.label]]<0)) { 
-      cat("WARNING: calibration sources have negative redshift in file",calib_cats[i],"!\n")
-      calib[[redshift.label]][which(calib[[redshift.label]]<0)]<-0
+  if (length(calib_cats)>0) { 
+    for (i in 1:length(calib_cats)) { 
+      setTxtProgressBar(pb,count)
+      count<-count+1
+      #Read the calibration file 
+      calib<-helpRfuncs::read.file(calib_cats[i],data.table=FALSE,cols=c(redshift.label,gold.label))
+      if (any(calib[[redshift.label]]<0)) { 
+        cat("WARNING: calibration sources have negative redshift in file",calib_cats[i],"!\n")
+        calib[[redshift.label]][which(calib[[redshift.label]]<0)]<-0
+      }
+      #Read the reference file 
+      refr<-helpRfuncs::read.file(refr_cats[i],data.table=FALSE,cols=c(redshift.label,gold.label,weight.label))
+      if (any(refr[[redshift.label]]<0)) { 
+        #cat("WARNING: reference sources have negative redshift in file",refr_cats[i],"!\n")
+        refr[[redshift.label]][which(refr[[redshift.label]]<0)]<-0
+      }
+      #Compute the bias: z_est - z_true 
+      wtot[i,bin]<-sum(w=refr[[weight.label]])
+      wtot_gold[i,bin]<-sum(w=refr[[weight.label]]*refr[[gold.label]])
+      ntot[i,bin]<-nrow(refr)
+      ntot_gold[i,bin]<-sum(refr[[gold.label]])
+      dneff[i,bin]<-dneff_calc(w=refr[[weight.label]],S=refr[[gold.label]])
+      muzcalib[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]])
+      muzrefr[i,bin]<-weighted.mean(refr[[redshift.label]],(refr[[weight.label]]*refr[[gold.label]]))
+      muzrefr_nogold[i,bin]<-weighted.mean(refr[[redshift.label]],refr[[weight.label]])
+      bias_nogold[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]]) -
+                   weighted.mean(refr[[redshift.label]],(refr[[weight.label]]))
+      bias[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]]) -
+                   weighted.mean(refr[[redshift.label]],(refr[[weight.label]]*refr[[gold.label]]))
     }
-    #Read the reference file 
-    refr<-helpRfuncs::read.file(refr_cats[i],data.table=FALSE,cols=c(redshift.label,gold.label,weight.label))
-    if (any(refr[[redshift.label]]<0)) { 
-      #cat("WARNING: reference sources have negative redshift in file",refr_cats[i],"!\n")
-      refr[[redshift.label]][which(refr[[redshift.label]]<0)]<-0
-    }
-    #Compute the bias: z_est - z_true 
-    wtot[i,bin]<-sum(w=refr[[weight.label]])
-    wtot_gold[i,bin]<-sum(w=refr[[weight.label]]*refr[[gold.label]])
-    ntot[i,bin]<-nrow(refr)
-    ntot_gold[i,bin]<-sum(refr[[gold.label]])
-    dneff[i,bin]<-dneff_calc(w=refr[[weight.label]],S=refr[[gold.label]])
-    muzcalib[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]])
-    muzrefr[i,bin]<-weighted.mean(refr[[redshift.label]],(refr[[weight.label]]*refr[[gold.label]]))
-    muzrefr_nogold[i,bin]<-weighted.mean(refr[[redshift.label]],refr[[weight.label]])
-    bias_nogold[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]]) -
-                 weighted.mean(refr[[redshift.label]],(refr[[weight.label]]))
-    bias[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]]) -
-                 weighted.mean(refr[[redshift.label]],(refr[[weight.label]]*refr[[gold.label]]))
   }
 }
 close(pb)
 
 for (stat in c("wtot","wtot_gold","ntot","ntot_gold","dneff","muzcalib","muzrefr","muzrefr_nogold","bias_nogold","bias")) { 
   cat(paste(stat,"\n"))
-  print(rbind(means=colMeans(get(stat)),
-              stdev=matrixStats::colSds(get(stat))))
+  print(rbind(means=colMeans(get(stat),na.rm=T),
+              stdev=matrixStats::colSds(get(stat),na.rm=T)))
 }
 
 #Compute the mean biases per bin 
 final_biases<-colMeans(bias)
 final_cov<-orig_cov<-cov(bias)
 #Compute the Nz bias covariance  
-if (sys_error!=0) { 
-  #if needed, include systematic component 
-  diag(final_cov)<-diag(final_cov)+sys_error^2
-  orig_cor<-cov2cor(orig_cov)
-  for (i in 1:ncol(orig_cov)) {
-    for (j in 1:nrow(orig_cov)) {
-      if (i != j) {
-        final_cov[i,j]<-(diag(final_cov)[i]+sys_error)*(diag(final_cov)[j]+sys_error)*orig_cor[i,j]
+if (exists("sys_error")) { 
+  if (sys_error!=0) { 
+    #if needed, include systematic component 
+    diag(final_cov)<-diag(final_cov)+sys_error^2
+    orig_cor<-cov2cor(orig_cov)
+    for (i in 1:ncol(orig_cov)) {
+      for (j in 1:nrow(orig_cov)) {
+        if (i != j) {
+          final_cov[i,j]<-(diag(final_cov)[i]+sys_error)*(diag(final_cov)[j]+sys_error)*orig_cor[i,j]
+        }
       }
     }
-  }
-} 
+  } 
+}
 #Output the bias file 
 helpRfuncs::write.file(bias_oname,final_biases,col.names=FALSE)
 #Output the cov file 

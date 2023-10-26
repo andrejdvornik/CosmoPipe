@@ -3,7 +3,7 @@
 # File Name : save_and_check_mcmc_inp.sh
 # Created By : awright
 # Creation Date : 01-04-2023
-# Last Modified : Fri 07 Jul 2023 08:10:16 PM CEST
+# Last Modified : Thu 07 Sep 2023 07:08:45 PM UTC
 #
 #=========================================
 
@@ -36,3 +36,4 @@ NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
   --plotfolder @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
 
 _write_datablock "mcmc_inp_@BV:STATISTIC@" "MCMC_input_${cov}"
+

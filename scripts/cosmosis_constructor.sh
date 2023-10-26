@@ -430,6 +430,28 @@ nz_background = 6000
 
 EOF
 #}}}
+elif [ "${BOLTZMAN^^}" == "CAMB_HM2020" ] #{{{
+then 
+
+cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_boltzman.ini <<- EOF
+[camb]
+file = %(CSL_PATH)s/boltzmann/camb/camb_interface.py
+do_reionization = F
+mode = power
+nonlinear = pk
+halofit_version = mead2020_feedback
+neutrino_hierarchy = normal
+kmax = 20.0
+zmid = 2.0
+nz_mid = 100
+zmax = 6.0
+nz = 150
+zmax_background = 6.0
+zmin_background = 0.0
+nz_background = 6000
+
+EOF
+#}}}
 elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] #{{{
 then 
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_boltzman.ini <<- EOF

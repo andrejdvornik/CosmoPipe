@@ -3,7 +3,7 @@
 # File Name : inherit.sh
 # Created By : awright
 # Creation Date : 20-08-2023
-# Last Modified : Tue 29 Aug 2023 03:44:05 PM CEST
+# Last Modified : Thu Sep 21 19:56:18 2023
 #
 #=========================================
 
@@ -39,10 +39,52 @@ do
   
   #Make the new block element 
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${block}
+
+  #Read the external datablock {{{
+  function _read_externalblock { 
+    #Read the data block entries 
+    head=1
+    _req=${1}
+    _outblock=''
+    while read item
+    do 
+      #Check if we have reached the BLOCK yet
+      if [ "$item" == "BLOCK:" ] 
+      then 
+        head=0
+        continue
+      fi 
+      if [ "$item" == "VARS:" ] 
+      then 
+        head=1
+        continue
+      fi 
+      #If we're still in the HEAD, go to the next line 
+      if [ "${head}" == 1 ]
+      then 
+        continue 
+      fi 
+      if [ "${_req}" == "" ] 
+      then 
+        #Add the contents to the output block 
+        _outblock="${_outblock} ${item}"
+      elif [ "${item%%=*}" == "${_req}" ]
+      then 
+        #Add the contents to the output block 
+        _outblock="${_outblock} ${item}"
+      fi 
+    done < ${pipepath}/block.txt
+    _outblock=`echo ${_outblock} | sed 's/ /\n/g' | xargs echo`
+    echo ${_outblock}
+  }
+  #}}}
   
   #Loop through the new files 
   filelist=''
-  for file in `ls ${pipepath}/${block}` 
+    #_message "#${_outblock}#"
+  inputlist=`_read_externalblock ${block}`
+  inputlist=`_blockentry_to_filelist ${inputlist}`
+  for file in ${inputlist}
   do 
     #Add the new file to the filelist 
     filelist="${filelist} ${file##*/}"

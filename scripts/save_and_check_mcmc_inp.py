@@ -213,6 +213,8 @@ def saveFitsCOSEBIs(datavec,covariance):
 
     nGalList     = nGal_source#.tolist()
     sigmaEpsList = sigma_e#.tolist()
+
+    print(args.nmaxcosebis)
     
     saveFitsTwoPoint(
         nbTomoN=0, nbTomoG=len(nOfZNameList),
@@ -506,23 +508,23 @@ print(sigma_e)
 for i in range(len(args.DataVector)): 
    saveFitsCOSEBIs(datavec=args.DataVector[i],covariance=args.covarianceFile[i])
 
-FolderPlots=args.plotdir
-mkdir_mine(FolderPlots)
-
-
-filename=args.outputFile
-title='KiDS'
-savename=FolderPlots+'/only_source_Nz.pdf'
-plot_redshift(filename,title,savename)
-
-title='COSEBIs'
-savename=FolderPlots+'/COSEBIs_covariance.pdf'
-plot_covariance(filename,title,savename)
-
-savename=FolderPlots+'/COSEBIs_correlation_matrix.pdf'
-plot_correlation_mat(filename,title,savename)
-
-extname='En'
-savename=FolderPlots+'/COSEBIs_data_'+extname+'.pdf'
-plot_data(filename,title,extname,savename)
+#FolderPlots=args.plotdir
+#mkdir_mine(FolderPlots)
+#
+#
+#filename=args.outputFile
+#title='KiDS'
+#savename=FolderPlots+'/only_source_Nz.pdf'
+#plot_redshift(filename,title,savename)
+#
+#title='COSEBIs'
+#savename=FolderPlots+'/COSEBIs_covariance.pdf'
+#plot_covariance(filename,title,savename)
+#
+#savename=FolderPlots+'/COSEBIs_correlation_matrix.pdf'
+#plot_correlation_mat(filename,title,savename)
+#
+#extname='En'
+#savename=FolderPlots+'/COSEBIs_data_'+extname+'.pdf'
+#plot_data(filename,title,extname,savename)
 

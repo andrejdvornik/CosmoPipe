@@ -1,5 +1,5 @@
 #
-# construct_som.man.sh Documentation & Housekeeping functions
+# add_repr_weights.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@=====================================@DEF@\n"
-    _message "@BLU@== @RED@ Running construct_som.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@=====================================@DEF@\n"
+    _message "@BLU@========================================@DEF@\n"
+    _message "@BLU@== @RED@ Running add_repr_weights.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@========================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,9 +17,10 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Construct a SOM with the SOM_DIR.R code from the '
-  echo '# spectroscopic data in the spec_adapt data block '
-  echo '# entry'
+  echo '# Add representation weights to reference and target'
+  echo '#  catalogues, computed using KNN matching in bins '
+  echo '# defined using the requested variables and matched '
+  echo '# on the provided features'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -44,28 +45,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:ADDITIONALFLAGS BV:NTHREADS BV:NITER BV:REFMAGNAME BV:SOMDIM BV:SOMFEATURES BV:ZPHOTNAME BV:ZSPECNAME DATABLOCK DEF P_RSCRIPT RED RUNROOT STORAGEPATH
+  echo BLU BV:DATAFEATURES BV:NTHREADS BV:SIMFEATURES BV:ZSPECDATA BV:ZSPECSIM DEF P_RSCRIPT RED RUNROOT SCRIPTPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo DATAHEAD
+  echo ALLHEAD match_base
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo DATAHEAD
+  echo ALLHEAD
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/construct_som.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/add_repr_weights.sh
 } 
 #}}}
 

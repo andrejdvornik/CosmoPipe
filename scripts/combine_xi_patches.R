@@ -3,7 +3,7 @@
 # File Name : combine_xi_patches.R
 # Created By : awright
 # Creation Date : 29-03-2023
-# Last Modified : Thu 30 Mar 2023 02:06:46 PM CEST
+# Last Modified : Sun Oct 15 11:31:17 2023
 #
 #=========================================
 
@@ -53,7 +53,7 @@ for (i in 1:length(input.cats)) {
   
   #if we have the first file, use this as a template 
   if (i==1) { 
-    inter_cols<-c('r_nom','meanr','meanlogr','xip','xim','xip_im','xim_im','xim_im_sq','var_xip', 'var_xim', 'npairs_sq', 'weight','npairs_weighted')
+    inter_cols<-c('r_nom','meanr','meanlogr','xip','xim','xip_im','xim_im','xim_im_sq','var_xip','var_xim', 'npairs_sq', 'weight','npairs_weighted')
     #Set up the catalogue, but fill everything with zeros
     out<-tmp[,inter_cols]*0
   } 
