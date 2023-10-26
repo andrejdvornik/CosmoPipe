@@ -107,10 +107,10 @@ xi_mm = True
 theta_accuracy = 1e-5
 integration_intervals = 50
 
-mix_term_file_path_catalog = ${input_path}/mixterm/catalog
-mix_term_col_name_weight = weight
-mix_term_col_name_pos1 = x 
-mix_term_col_name_pos2 = y 
+mix_term_file_path_catalog = @DB:main_all_tomo_gold_recal_cc@
+mix_term_col_name_weight = @BV:WEIGHTNAME@
+mix_term_col_name_pos1 = @BV:RANAME@
+mix_term_col_name_pos2 = @BV:DECNAME@
 mix_term_col_name_zbin = z_bin
 mix_term_isspherical = True
 mix_term_target_patchsize = 10
