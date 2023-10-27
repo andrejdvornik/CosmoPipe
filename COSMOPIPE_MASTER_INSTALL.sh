@@ -143,8 +143,30 @@ if [ -d ${RUNROOT}/INSTALL/CosmoPowerCosmosis ]
 then 
   rm -fr CosmoPowerCosmosis
 fi
-#git clone https://github.com/KiDS-WL/CosmoPowerCosmosis.git >> gitclone_output.log 2>&1
-git clone git@github.com:KiDS-WL/CosmoPowerCosmosis.git >> gitclone_output.log 2>&1
+git clone https://github.com/KiDS-WL/CosmoPowerCosmosis.git >> gitclone_output.log 2>&1
+#git clone git@github.com:KiDS-WL/CosmoPowerCosmosis.git >> gitclone_output.log 2>&1
+_message "${BLU} - Done! ${DEF}\n"
+#}}}
+
+#Clone the One Covariance repository {{{
+_message "   >${RED} Cloning the One Covariance Git repository${DEF}"
+#Clone the repository
+if [ -d ${RUNROOT}/INSTALL/OneCovariance ] 
+then 
+  rm -fr OneCovariance
+fi
+git clone https://github.com/rreischke/OneCovariance.git >> gitclone_output.log 2>&1
+_message "${BLU} - Done! ${DEF}\n"
+#}}}
+
+#Clone the 2ptstats repository {{{
+_message "   >${RED} Cloning the 2ptStats Git repository${DEF}"
+#Clone the repository
+if [ -d ${RUNROOT}/INSTALL/2pt_stats ] 
+then 
+  rm -fr 2pt_stats
+fi
+git clone https://github.com/maricool/2pt_stats.git >> gitclone_output.log 2>&1
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
 
@@ -181,7 +203,7 @@ cd ${RUNROOT}/INSTALL
 
 #Install cosebis functions {{{
 _message "   >${RED} Installing COSEBIs tools${DEF}"
-#rsync -autv ${PACKROOT}/kcap ${RUNROOT}/INSTALL/ > ${RUNROOT}/INSTALL/COSEBIs_rsync.log 2>&1
+rsync -autv ${PACKROOT}/kcap ${RUNROOT}/INSTALL/ > ${RUNROOT}/INSTALL/COSEBIs_rsync.log 2>&1
 #cd ${RUNROOT}/INSTALL/kcap/cosebis/
 cd ${RUNROOT}/INSTALL/2pt_stats/
 cosmosis_src=`conda run -n cosmopipe which cosmosis | sed 's@/bin/cosmosis@/lib/python3.8/site-packages/cosmosis/@'`
@@ -195,25 +217,14 @@ cd ${RUNROOT}/INSTALL/
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
 
-#Clone the One Covariance repository {{{
-_message "   >${RED} Cloning the One Covariance Git repository${DEF}"
-#Clone the repository
-if [ -d ${RUNROOT}/INSTALL/OneCovariance ] 
-then 
-  rm -fr OneCovariance
-fi
-git clone https://github.com/rreischke/OneCovariance.git >> gitclone_output.log 2>&1
-_message "${BLU} - Done! ${DEF}\n"
-#}}}
-
-#Clone the 2ptstats repository {{{
-_message "   >${RED} Cloning the 2ptStats Git repository${DEF}"
-#Clone the repository
-if [ -d ${RUNROOT}/INSTALL/2pt_stats ] 
-then 
-  rm -fr 2pt_stats
-fi
-git clone https://github.com/maricool/2pt_stats.git >> gitclone_output.log 2>&1
+#Install OneCovariance {{{
+_message "   >${RED} Installing OneCovariance ${DEF}"
+cd ${RUNROOT}/INSTALL/OneCovariance/
+cat > OneCovariance_make.sh <<-EOF
+pip install .
+EOF
+conda run -n cosmopipe bash OneCovariance_make.sh > ${RUNROOT}/INSTALL/OneCovariance_install.log 2>&1
+cd ${RUNROOT}/INSTALL/
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
 

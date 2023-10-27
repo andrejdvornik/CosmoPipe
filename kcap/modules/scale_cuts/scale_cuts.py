@@ -132,11 +132,11 @@ def execute(block, config):
 
     # This makes sure that the order of the two-point statistics in the theory vector is the same as in the data vector
     sectionNameList_dict = {
-        'xip':[config['xi_plus_section_name'],                  config['xi_plus_extension_name'],                  'theta_bin_1_1', False],
-        'xim':[config['xi_minus_section_name'],                 config['xi_minus_extension_name'],                 'theta_bin_1_1', False],
-        'pnee':[config['bandpower_ggl_section_name'],            config['bandpower_ggl_extension_name'],            'ell',           True],
+        'xip':[config['xi_plus_section_name'],                  config['xi_plus_extension_name'],                   'theta_bin_1_1', False],
+        'xim':[config['xi_minus_section_name'],                 config['xi_minus_extension_name'],                  'theta_bin_1_1', False],
+        'pnee':[config['bandpower_ggl_section_name'],            config['bandpower_ggl_extension_name'],            'ell',            True],
         'peee':[config['bandpower_e_cosmic_shear_section_name'], config['bandpower_e_cosmic_shear_extension_name'], 'ell',           False],
-        'en':[config['cosebis_section_name'],                  config['cosebis_extension_name'],                  'cosebis_n',     False],
+        'en':[config['cosebis_section_name'],                  config['cosebis_extension_name'],                    'n',             False],
     }
     sectionNameList = [sectionNameList_dict[stat] for stat in config['stats_order']]
     
