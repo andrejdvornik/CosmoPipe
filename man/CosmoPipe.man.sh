@@ -771,8 +771,8 @@ function _check_blockvar {
     then 
       #>&2 echo " - YES!"
       present=0
-    else 
-      #>&2 echo " - No"
+    #else 
+    #  >&2 echo " - No"
     fi 
   fi 
   #>&2 echo "${_data} : ${present} : ${default}"
