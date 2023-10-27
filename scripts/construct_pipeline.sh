@@ -75,6 +75,8 @@ do
       echo "Getting substeps for step: ${step}"
       #Read the substep modes 
       sublist=`VERBOSE=1 _read_pipe $step ${stepnum}` 
+      #Sanitise the sublist 
+      sublist=${sublist//&/\\&}
       #Replace the substep (whole matches only)
       pipeline_steps=`echo " $pipeline_steps " | sed "s/ $step=${stepnum} / ${sublist//\//\\\/} /" | xargs echo `
       echo "  -> ${sublist}"
@@ -399,13 +401,15 @@ do
     fi 
     echo Completed Block-needs runtime variable check.
     #}}}
+    echo Checking inputs 
     #Check inputs and outputs {{{
     inputs=`_inp_data`
-    outputs=`_outputs`
+    echo "Raw inputs: ${inputs}"
+    inputs=`_parse_blockvars ${inputs}` 
+    echo "After variable parse: ${inputs}"
     #}}}
     #Check the data block for these inputs & add graph entries {{{
     nstep=`grep -c ${step} @RUNROOT@/@PIPELINE@_links.R || echo`
-    echo Checking inputs 
     for inp in $inputs
     do 
       echo -n "  ${inp} "
@@ -452,35 +456,39 @@ do
       #}}}
     done 
     #}}}
+    echo Checking outputs 
     #Expand any outputs that are variables {{{
     outlist=''
-    for out in ${outputs} 
-    do 
-      #Check if the output is drawn from a variable {{{
-      if [ "${out:0:4}" == "@BV:" ] 
-      then 
-        #Read the output(s) {{{
-        out=${out//@/}
-        out=${out:3}
-        out=`_read_blockvars ${out}`
-        #Extract the name of the item
-        out=${out#*=}
-        #Remove leading and trailing braces
-        out=${out//\{,/}
-        out=${out//\{/}
-        out=${out//\}/}
-        #Add spaces
-        out=${out//,/ }
-        #}}}
-      fi 
-      #}}}
-      #Add it to the list {{{
-      outlist="${outlist} ${out}"
-      #}}}
-    done 
-    #}}}
+    outputs=`_outputs`
+    echo "Raw outputs: ${outputs}"
+    outputs=`_parse_blockvars ${outputs}` 
+    echo "After variable parse: ${outputs}"
+    #for out in ${outputs} 
+    #do 
+    #  #Check if the output is drawn from a variable {{{
+    #  if [ "${out:0:4}" == "@BV:" ] 
+    #  then 
+    #    #Read the output(s) {{{
+    #    out=${out//@/}
+    #    out=${out:3}
+    #    out=`_read_blockvars ${out}`
+    #    #Extract the name of the item
+    #    out=${out#*=}
+    #    #Remove leading and trailing braces
+    #    out=${out//\{,/}
+    #    out=${out//\{/}
+    #    out=${out//\}/}
+    #    #Add spaces
+    #    out=${out//,/ }
+    #    #}}}
+    #  fi 
+    #  #}}}
+    #  #Add it to the list {{{
+    #  outlist="${outlist} ${out}"
+    #  #}}}
+    #done 
+    ##}}}
     #Save these outputs to the data block  {{{
-    echo Checking outputs 
     for out in $outlist
     do 
       #Check for a DATAHEAD modification

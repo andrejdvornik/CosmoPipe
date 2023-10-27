@@ -665,6 +665,49 @@ function _read_blockvars {
 }
 #}}}
 
+#Parse a block variable in a string {{{
+function _parse_blockvars {
+  _outputlist=''
+  while [ $# -ge 1 ]
+  do 
+    string=$1
+    #If this string contains a block variable reference 
+    count=0
+    while [[ ${string} =~ "@BV:".*."@" ]]
+    do 
+      #Pull out the block variable
+      _var=${string#*@BV:}
+      _var=${_var%%@*}
+      #The variable assignment is a reference: assign the referred value 
+      _filelist=`_read_blockvars ${_var}`
+      #Remove variable name and brackets 
+      _filelist=${_filelist#*=}
+      _prompt=${_filelist#\{}
+      _prompt=${_prompt%\}}
+      _prompt=${_prompt//,/ }
+      if [ "${_prompt}" == "" ] 
+      then 
+        _filelist="@BV:${_var}@"
+      else 
+        _filelist=${_prompt}
+        #Prompt about the update
+        >&2 echo "${_var} -> ${_prompt}" 
+      fi 
+      string=${string/@BV:${_var}@/${_filelist}}
+      count=$((count+1))
+      if [ ${count} -gt 100 ]
+      then 
+        >&2 echo "ERROR: SOMETHING WRONG IN VARIABLE PARSE"
+        exit 1 
+      fi 
+    done 
+    outlist="${outlist} ${string}"
+    shift 
+  done 
+  echo ${outlist}
+}
+#}}}
+
 #Write the blockvars {{{
 function _write_blockvars { 
   _head=`_read_datahead`
