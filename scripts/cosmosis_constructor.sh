@@ -32,6 +32,7 @@ RUN_NAME = %(SAMPLER_NAME)s_%(blind)s
 EOF
 #}}}
 STATISTIC="@BV:STATISTIC@"
+BOLTZMAN="@BV:BOLTZMAN@"
 #Define the data file name {{{ 
 if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 then
@@ -373,9 +374,39 @@ do
 done
 #}}}
 #Add the values information #{{{
+if [  "@BV:COSMOSIS_PIPELINE@" == "default" ]
+then
+	if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] 
+	then
+		boltzmann_pipeline="cosmopower distances"
+	elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ]
+	then
+		boltzmann_pipeline="one_parameter_hmcode cosmopower distances"
+	elif [ "${BOLTZMAN^^}" == "CAMB_HM2020" ] 
+	then
+		boltzmann_pipeline="camb"
+	elif [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
+	then
+		boltzmann_pipeline="one_parameter_hmcode camb"
+	fi
+	if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
+	then
+		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias linear_alignment projection cosebis scale_cuts likelihood"
+	#}}}
+	elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
+	then 
+		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias linear_alignment projection bandpowers scale_cuts likelihood"
+	#}}}
+	elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
+	then 
+		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias linear_alignment projection cl2xi xip_binned xim_binned scale_cuts likelihood"
+	fi
+else
+	COSMOSIS_PIPELINE="@BV:COSMOSIS_PIPELINE@"
+fi
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
 [pipeline]
-modules = @BV:COSMOSIS_PIPELINE@
+modules = ${COSMOSIS_PIPELINE}
 values  = %(CONFIG_FOLDER)s/@SURVEY@_${VALUES}.ini
 EOF
 #}}}
@@ -407,7 +438,6 @@ EOF
 #}}}
 
 #Requested boltzman {{{
-BOLTZMAN="@BV:BOLTZMAN@"
 if [ "${BOLTZMAN^^}" == "CAMB_HM2015" ] #{{{
 then 
 
@@ -551,7 +581,8 @@ fi
 
 #Additional Modules {{{
 echo > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini
-for module in @BV:COSMOSIS_PIPELINE@
+modulelist=`echo ${COSMOSIS_PIPELINE} | sed 's/ /\n/g' | sort | uniq | awk '{printf $0 " "}'`
+for module in ${modulelist}
 do 
   case ${module} in 
     "sample_S8") #{{{
