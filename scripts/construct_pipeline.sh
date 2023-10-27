@@ -489,7 +489,7 @@ do
     #done 
     ##}}}
     #Save these outputs to the data block  {{{
-    for out in $outlist
+    for out in $outputs
     do 
       #Check for a DATAHEAD modification
       if [ "${out}" == "DATAHEAD" ] || [ "${out}" == "ALLHEAD" ] 
