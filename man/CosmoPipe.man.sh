@@ -105,7 +105,7 @@ function _varcheck {
   if [ "${_runerr}" != "0" ]
   then 
     _runmissing=`echo ${_runmissing} | sed 's/ /\n/g' | sort | uniq | sed 's/\n/ /g'` 
-    >&2 echo ${_runmissing}
+    #>&2 echo ${_runmissing}
     echo ${_runmissing}
   fi 
 } 
@@ -765,17 +765,17 @@ function _check_blockvar {
   present=`echo " ${_block} " | grep -c " ${_data}=" || echo` 
   if [ "${present}" == 1 ] 
   then 
-    >&2 echo -n "Check if ${_data}={@BV:${_data}@}"
+    #>&2 echo -n "Check if ${_data}={@BV:${_data}@}"
     _default=`echo " ${_block} " | grep -c " ${_data}={@BV:${_data}@}" || echo`
     if [ "${_default}" == 1 ]
     then 
-      >&2 echo " - YES!"
+      #>&2 echo " - YES!"
       present=0
     else 
-      >&2 echo " - No"
+      #>&2 echo " - No"
     fi 
   fi 
-  >&2 echo "${_data} : ${present} : ${default}"
+  #>&2 echo "${_data} : ${present} : ${default}"
   echo ${present}
 }
 #}}}
