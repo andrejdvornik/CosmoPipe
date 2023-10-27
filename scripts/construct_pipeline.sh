@@ -317,6 +317,10 @@ do
     newname=${names##*-}
     echo BLOCK rename: moving ${oldname} to ${newname}
 		VERBOSE=1 _rename_blockitem "${oldname}" "${newname}" TEST
+    if [ "${lastassign}" == "${oldname}" ] 
+    then 
+      lastassign=${newname}
+    fi 
     #Rewrite all instances of oldname(oldname) in the links file to newname(newname)
     cat @RUNROOT@/@PIPELINE@_links.R | sed "s/${oldname}(${oldname})/${newname}(${newname})/g" > @RUNROOT@/@PIPELINE@_links.R.tmp
     mv @RUNROOT@/@PIPELINE@_links.R.tmp @RUNROOT@/@PIPELINE@_links.R
