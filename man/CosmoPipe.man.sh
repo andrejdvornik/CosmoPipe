@@ -690,8 +690,8 @@ function _parse_blockvars {
         _filelist="@BV:${_var}@"
       else 
         _filelist=${_prompt}
-        #Prompt about the update
-        >&2 echo "${_var} -> ${_prompt}" 
+        ##Prompt about the update
+        #>&2 echo "${_var} -> ${_prompt}" 
       fi 
       string=${string/@BV:${_var}@/${_filelist}}
       count=$((count+1))
