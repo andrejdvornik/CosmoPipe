@@ -181,8 +181,9 @@ cd ${RUNROOT}/INSTALL
 
 #Install cosebis functions {{{
 _message "   >${RED} Installing COSEBIs tools${DEF}"
-rsync -autv ${PACKROOT}/kcap ${RUNROOT}/INSTALL/ > ${RUNROOT}/INSTALL/COSEBIs_rsync.log 2>&1
-cd ${RUNROOT}/INSTALL/kcap/cosebis/
+#rsync -autv ${PACKROOT}/kcap ${RUNROOT}/INSTALL/ > ${RUNROOT}/INSTALL/COSEBIs_rsync.log 2>&1
+#cd ${RUNROOT}/INSTALL/kcap/cosebis/
+cd ${RUNROOT}/INSTALL/2pt_stats/
 cosmosis_src=`conda run -n cosmopipe which cosmosis | sed 's@/bin/cosmosis@/lib/python3.8/site-packages/cosmosis/@'`
 cat > cosebis_make.sh <<-EOF
 source cosmosis-configure
