@@ -3,7 +3,7 @@
 # File Name : add_nz.sh
 # Created By : awright
 # Creation Date : 22-03-2023
-# Last Modified : Mon 11 Sep 2023 09:54:51 AM CEST
+# Last Modified : Thu 26 Oct 2023 01:59:51 PM CEST
 #
 #=========================================
 
@@ -12,18 +12,6 @@ if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz ]
 then 
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz
 fi 
-
-#Define the Nz names expected by the pipeline
-outlist=""
-baseblock=`_read_datablock @BV:NZNAME_BASEBLOCK@`
-basenames=`_blockentry_to_filelist ${baseblock}`
-for input in ${basenames}
-do 
-  #Define the output filename 
-  output=${input%%_DIRsom*}@NZFILESUFFIX@
-  output=${output##*/}
-  outlist="${outlist} ${output}"
-done
 
 #Check that the Nz file(s) exists
 if [ -d "@NZPATH@" ]
@@ -67,6 +55,25 @@ else
   #}}}
 fi 
 
+#Define the Nz names expected by the pipeline
+outlist=""
+baseblock=`_read_datablock @BV:NZNAME_BASEBLOCK@`
+basenames=`_blockentry_to_filelist ${baseblock}`
+if [ "${basenames}" == "" ] 
+then 
+  for input in ${filelist}
+  do 
+    outlist="${outlist} ${input##*/}"
+  done 
+else 
+  for input in ${basenames}
+  do 
+    #Define the output filename 
+    output=${input%%_DIRsom*}@NZFILESUFFIX@
+    output=${output##*/}
+    outlist="${outlist} ${output}"
+  done
+fi 
 #Add the Nz file(s) to the datablock, using the correct naming {{{
 nfile=`echo ${outlist} | awk '{print NF}'`
 newoutlist=''
