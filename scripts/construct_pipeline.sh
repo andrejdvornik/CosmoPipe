@@ -374,18 +374,21 @@ do
             if [ "${exists}" != "0" ]
             then 
               #If so, use the global default 
-              grep -m 1 -B 1 "${var}=" defaults.sh >> @PIPELINE@_defaults.sh 
+              grep -m 1 -B 1 "^${var}=" defaults.sh >> @PIPELINE@_defaults.sh 
+              varstring="`grep -m 1 "^${var}=" defaults.sh | awk -F# '{print $1}'`"
             else 
               allneeds_def="${allneeds_def} ${var}"
               #Otherwise, insert a blank entry 
               echo "#INSERT DEFAULT VALUE HERE:" >> @PIPELINE@_defaults.sh 
               echo ${var}=@BV:${var}@ >> @PIPELINE@_defaults.sh 
+              varstring="${var}=@BV:${var}@"
             fi
           else 
             allneeds_def="${allneeds_def} ${var}"
             #If there is no global defaults, insert a blank entry 
             echo "#INSERT DEFAULT VALUE HERE:" >> @PIPELINE@_defaults.sh 
             echo ${var}=@BV:${var}@ >> @PIPELINE@_defaults.sh 
+            varstring="${var}=@BV:${var}@"
           fi 
         else 
           #Check if the existing default is a blank entry 
@@ -393,8 +396,14 @@ do
           if [ "${exists_isdef}" != "0" ]
           then 
             allneeds_def="${allneeds_def} ${var}"
+            varstring="${var}=@BV:${var}@"
+          else 
+            varstring="`grep -c "^${var}=@BV:${var}@" @PIPELINE@_defaults.sh | awk -F# '{print $1}'`"
           fi 
         fi 
+        #Add the variables to the datablock 
+        #>&2 echo _write_blockvars ${varstring%%=*} ${varstring#*=}
+        _write_blockvars ${varstring%%=*} ${varstring#*=}
       done 
       #sort @PIPELINE@_defaults.sh | uniq > @PIPELINE@_defaults_uniq.sh
       #mv @PIPELINE@_defaults_uniq.sh @PIPELINE@_defaults.sh
@@ -463,30 +472,6 @@ do
     echo "Raw outputs: ${outputs}"
     outputs=`_parse_blockvars ${outputs}` 
     echo "After variable parse: ${outputs}"
-    #for out in ${outputs} 
-    #do 
-    #  #Check if the output is drawn from a variable {{{
-    #  if [ "${out:0:4}" == "@BV:" ] 
-    #  then 
-    #    #Read the output(s) {{{
-    #    out=${out//@/}
-    #    out=${out:3}
-    #    out=`_read_blockvars ${out}`
-    #    #Extract the name of the item
-    #    out=${out#*=}
-    #    #Remove leading and trailing braces
-    #    out=${out//\{,/}
-    #    out=${out//\{/}
-    #    out=${out//\}/}
-    #    #Add spaces
-    #    out=${out//,/ }
-    #    #}}}
-    #  fi 
-    #  #}}}
-    #  #Add it to the list {{{
-    #  outlist="${outlist} ${out}"
-    #  #}}}
-    #done 
     ##}}}
     #Save these outputs to the data block  {{{
     for out in $outputs
