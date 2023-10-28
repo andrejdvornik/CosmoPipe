@@ -3,7 +3,7 @@
 # File Name : add_repr_weights.sh
 # Created By : awright
 # Creation Date : 12-09-2023
-# Last Modified : Fri 15 Sep 2023 11:34:27 AM CEST
+# Last Modified : Sat Oct 28 19:52:47 2023
 #
 #=========================================
 
@@ -81,6 +81,7 @@ do
   #Get the current data catalogue 
   current_data=`echo ${input} | awk -v col=${i} '{print $col}'`
   #Construct the output filename 
+  ext=${current_data##*.}
   output_file=${current_data//.${ext}/_simmatch.${ext}}
   
   #Notify that we are matching these catalogues 
