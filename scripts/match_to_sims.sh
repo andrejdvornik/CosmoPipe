@@ -3,7 +3,7 @@
 # File Name : match_to_sims.sh
 # Created By : awright
 # Creation Date : 15-06-2023
-# Last Modified : Sun Aug  6 22:29:21 2023
+# Last Modified : Sat Oct 28 20:07:55 2023
 #
 #=========================================
 
@@ -48,6 +48,7 @@ nsim=`echo ${sims} | awk '{print NF}'`
 
 #Construct the data-simulation feature list 
 data_features="@BV:DATAFEATURES@"
+data_clones=`echo ${data_features} | sed 's/[+-]/ /g' | sed 's/  / /g' | sed 's/ /\n/g' | sort | uniq`
 nfeat_data=`echo ${data_features} | awk '{print NF}'`
 sim_features="@BV:SIMFEATURES@"
 nfeat_sim=`echo ${sim_features} | awk '{print NF}'`
@@ -93,7 +94,7 @@ do
           -z @BV:ZSPECDATA@ @BV:ZSPECSIM@ \
           ${feature_list} \
           @BV:MATCHNORMALISE@ @BV:MATCHDUPLICATES@ \
-          --clone @BV:ZSPECDATA@ ${data_features} \
+          --clone @BV:ZSPECDATA@ ${data_clones} \
           --idx-interval @BV:MATCH_NIDX@ \
           --z-cut 2>&1 
 
