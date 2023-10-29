@@ -3,7 +3,7 @@
 # File Name : match_to_sims.sh
 # Created By : awright
 # Creation Date : 15-06-2023
-# Last Modified : Sat Oct 28 20:07:55 2023
+# Last Modified : Sun 29 Oct 2023 12:10:05 PM CET
 #
 #=========================================
 
@@ -82,7 +82,14 @@ do
   #Get the current data catalogue 
   current_data=`echo ${input} | awk -v col=${i} '{print $col}'`
   #Construct the output filename 
+  ext=${current_data##*.}
   output_file=${current_data//.${ext}/_simmatch.${ext}}
+
+  #If the output file already exists, remove it (pyFITSIO overwrite causes crash)
+  if [ -f ${output_file} ] 
+  then 
+    rm ${output_file}
+  fi 
   
   #Notify that we are matching these catalogues 
   #_message "   @BLU@@BV:ZSPECDATA@ @BV:ZSPECSIM@@DEF@\n"
