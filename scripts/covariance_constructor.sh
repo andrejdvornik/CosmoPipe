@@ -182,6 +182,10 @@ ell_bins = @BV:NBANDPOWERS@
 ell_type = log
 bandpower_accuracy = 1e-7
 
+[covTHETAspace settings]
+theta_accuracy = 1e-5
+integration_intervals = 50
+
 EOF
 fi
 
