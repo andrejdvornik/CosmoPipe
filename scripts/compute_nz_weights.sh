@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Mon 30 Oct 2023 09:10:55 AM CET
+# Last Modified : Mon 30 Oct 2023 09:19:36 AM CET
 #
 #=========================================
 
@@ -21,7 +21,7 @@ done
 ref_catalogues="@DB:som_weight_reference@"
 train_catalogues="@DB:som_weight_training@"
 som_files="@DB:ALLHEAD@"
-n_sim_files=`echo ${som_files} | awk '{print NF}'`
+n_som_files=`echo ${som_files} | awk '{print NF}'`
 
 #Check if the number of output files is not equal to the number of training files 
 nout=`echo ${output_files} | awk '{print NF}'`
