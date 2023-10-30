@@ -293,7 +293,7 @@ resume = False
 f_live = 0.01
 discard_exploration = True
 verbose = True
-n_eff = 30000
+n_eff = 10000
 
 EOF
 
