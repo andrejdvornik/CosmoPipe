@@ -128,10 +128,10 @@ m_corr_arr = np.concatenate((m_corr_e,m_corr_b))
 print(args.DataFiles)
 input_files = []
 if statistic == 'cosebis':
-    matches_cosebis = np.array([ "En_" in i for i in args.DataFiles_cosebis ])
-    EnDataFiles = np.array(args.DataFiles_cosebis)[matches_cosebis]
-    matches_cosebis_b = np.array([ "Bn_" in i for i in args.DataFiles_cosebis ])
-    BnDataFiles = np.array(args.DataFiles_cosebis)[matches_cosebis_b]
+    matches_cosebis = np.array([ "En_" in i for i in args.DataFiles])
+    EnDataFiles = np.array(args.DataFiles)[matches_cosebis]
+    matches_cosebis_b = np.array([ "Bn_" in i for i in args.DataFiles])
+    BnDataFiles = np.array(args.DataFiles)[matches_cosebis_b]
     #Input file name list: E-modes first, then B-modes. There's probably a smarter way to do this.
     for bin1 in range(nBins_source):
         for bin2 in range(bin1,nBins_source):
@@ -148,10 +148,10 @@ if statistic == 'cosebis':
     datavector_no_m_bias, datavector_with_m_bias  = make_2pt_vector(input_files,m_corr_arr)
 
 elif statistic == 'bandpowers':
-    matches_bandpowers = np.array([ "CEE_" in i for i in args.DataFiles_bandpowers ])
-    CEEDataFiles = np.array(args.DataFiles_bandpowers)[matches_bandpowers]
-    matches_bandpowers_B = np.array([ "CBB_" in i for i in args.DataFiles_bandpowers ])
-    CBBDataFiles = np.array(args.DataFiles_bandpowers)[matches_bandpowers_B]
+    matches_bandpowers = np.array([ "CEE_" in i for i in args.DataFiles])
+    CEEDataFiles = np.array(args.DataFiles)[matches_bandpowers]
+    matches_bandpowers_B = np.array([ "CBB_" in i for i in args.DataFiles])
+    CBBDataFiles = np.array(args.DataFiles)[matches_bandpowers_B]
     #Input file name list: E-modes first, then B-modes. There's probably a smarter way to do this.
     for bin1 in range(nBins_source):
         for bin2 in range(bin1,nBins_source):
@@ -168,8 +168,8 @@ elif statistic == 'bandpowers':
     datavector_no_m_bias, datavector_with_m_bias  = make_2pt_vector(input_files,m_corr_arr)
 
 elif statistic == 'xipm':
-    matches_xipm = np.array([ "xipm_binned_" in i for i in args.DataFiles_xipm ])
-    XipmDataFiles = np.array(args.DataFiles_xipm)[matches_xipm]
+    matches_xipm = np.array([ "xipm_binned_" in i for i in args.DataFiles])
+    XipmDataFiles = np.array(args.DataFiles)[matches_xipm]
     for bin1 in range(nBins_source):
         for bin2 in range(bin1,nBins_source):
             tomoxcorrstr="_"+ZBstr[bin1]+"_"+ZBstr[bin2]+'_xipm_binned.asc'
