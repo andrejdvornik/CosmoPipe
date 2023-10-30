@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Fri Sep 29 12:56:35 2023
+# Last Modified : Mon 30 Oct 2023 09:10:55 AM CET
 #
 #=========================================
 
@@ -21,6 +21,37 @@ done
 ref_catalogues="@DB:som_weight_reference@"
 train_catalogues="@DB:som_weight_training@"
 som_files="@DB:ALLHEAD@"
+n_sim_files=`echo ${som_files} | awk '{print NF}'`
+
+#Check if the number of output files is not equal to the number of training files 
+nout=`echo ${output_files} | awk '{print NF}'`
+ntra=`echo ${train_catalogues} | awk '{print NF}'`
+if [ ${nout} -lt ${ntra} ] 
+then 
+  otemp_files=${output_files}
+  output_files=''
+  count=0
+  #duplicate the reference names for output files into N training chunks 
+  while [ ${nout} -lt ${ntra} ] 
+  do 
+    count=$((count+1))
+    for _file in ${otemp_files}
+    do
+      ext=${_file##*.}
+      output_files="${output_files} ${_file%.*}_${count}.${ext}"
+    done
+    nout=`echo ${output_files} | awk '{print NF}'`
+  done 
+fi 
+if [ ${nout} -ne ${ntra} ]
+then 
+  _message "@RED@ ERROR! Cannot construct output list of correct length?!"
+  echo ${nout} ${ntra} 
+  echo ${output_files}
+  echo ${train_catalogues}
+  exit 1 
+fi 
+
 
 #Distribute the jobs into NTOMO parallel runs {{{
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
@@ -38,6 +69,16 @@ do
   tomo_ref_files=`echo ${ref_catalogues} | sed 's/ /\n/g' | grep ${appendstr} | awk '{printf $0 " "}' || echo `
   tomo_train_files=`echo ${train_catalogues} | sed 's/ /\n/g' | grep ${appendstr} | awk '{printf $0 " "}' || echo `
   tomo_som_files=`echo ${som_files} | sed 's/ /\n/g' | grep ${appendstr} | awk '{printf $0 " "}' || echo `
+  if [ "${tomo_som_files}" == "" ] 
+  then 
+    if [ ${n_som_files} == 1 ]
+    then 
+      tomo_som_files=${som_files}
+    else 
+      _message "@RED@ - ERROR!@BLU@ Cannot distribute the SOM files because they are not length 1 nor tagged with tomographic labels@DEF@\n"
+      exit 1 
+    fi 
+  fi 
   tomo_out_files=`echo ${output_files} | sed 's/ /\n/g' | grep ${appendstr} | awk '{printf $0 " "}' || echo `
   #Launch the Nz weight computation job in a screen 
   screen -L -Logfile @RUNROOT@/@LOGPATH@/CosmoPipe_NzWeight_job${i}_of_${NTOMO}.log \
@@ -45,7 +86,7 @@ do
     @P_RSCRIPT@ @RUNROOT@/INSTALL/SOM_DIR/R/SOM_DIR.R \
       -r ${tomo_ref_files} \
       -t ${tomo_train_files} \
-      -ct "" -cr @BV:WEIGHTNAME@ \
+      -cr @BV:WEIGHTNAME@ \
       --old.som ${tomo_som_files} \
       --factor.nbins Inf @BV:OPTIMISE@ --optimise.minN @BV:MINNHC@ --force \
       -sc @BV:NTHREADS@ \
