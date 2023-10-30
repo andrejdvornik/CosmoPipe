@@ -606,7 +606,7 @@ if statistic == 'cosebis':
     extname='Bn'
     savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
     plot_data(outputfile+'.fits',title,extname,savename)
-elif statistics[i] == 'bandpowers': 
+elif statistic == 'bandpowers': 
     extname='PeeE'
     savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
     plot_data(outputfile+'.fits',title,extname,savename)
@@ -615,10 +615,10 @@ elif statistics[i] == 'bandpowers':
     plot_data(outputfile+'.fits',title,extname,savename)
 elif statistic == 'xipm': 
     extname='xiP'
-    savename=plotdir+'/'+statistics+'_data_'+extname+'.pdf'
+    savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
     plot_data(outputfile+'.fits',title,extname,savename)
     extname='xiM'
-    savename=plotdir+'/'+statistics+'_data_'+extname+'.pdf'
+    savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
     plot_data(outputfile+'.fits',title,extname,savename)
 
 
