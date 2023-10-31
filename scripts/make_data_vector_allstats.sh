@@ -57,7 +57,7 @@ do
     --statistic @BV:STATISTIC@ \
     --mbias   ${biaslist}      \
     --tomobins @BV:TOMOLIMS@  \
-    --outputfile  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/@BV:STATISTIC@_vec_${patch}/combined_vector \
+    --outputfile  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/@BV:STATISTIC@_vec_${patch}/combined_vector 
   _message "@RED@ - Done! (`date +'%a %H:%M'`)@DEF@\n"
   #}}}
 

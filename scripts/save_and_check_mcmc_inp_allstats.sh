@@ -54,7 +54,7 @@ NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
   --sigmae @DB:cosmosis_sigmae@ \
   --covariance ${input_covariance} \
   --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input \
-  --plotfolder @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
+  --plotdir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
 
 _write_datablock "mcmc_inp_@BV:STATISTIC@" "MCMC_input.fits"
 

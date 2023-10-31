@@ -521,12 +521,12 @@ parser.add_argument("--covariance", dest="covarianceFile",nargs=1,
     help="Covariance file",required=True)
 parser.add_argument("-o", "--outputfile", dest="outputFile",
     help="Full Output file name", metavar="outputFile",required=True)
-parser.add_argument("-p", "--plotfolder", dest="plotdir",
+parser.add_argument("-p", "--plotdir", dest="plotdir",
     help="Path for output figures", metavar="plotdir",required=True)
 
 args = parser.parse_args()
 statistic = args.statistic
-plotfolder = args.plotfolder
+plotdir = args.plotdir
 outputfile=args.outputFile
 
 # Folder and file names for nofZ, for the sources it will depend on the blind
@@ -589,36 +589,36 @@ else:
 
 # Plots
 title='KiDS-Legacy'
-savename=plotfolder+'/only_source_Nz.pdf'
+savename=plotdir+'/only_source_Nz.pdf'
 plot_redshift(outputfile+'.fits',title,savename)
 
 title=statistic
-savename=plotfolder+'/'+statistic+'_covariance.pdf'
+savename=plotdir+'/'+statistic+'_covariance.pdf'
 plot_covariance(outputfile+'.fits',title,savename)
 
-savename=plotfolder+'/'+statistic+'_correlation_matrix.pdf'
+savename=plotdir+'/'+statistic+'_correlation_matrix.pdf'
 plot_correlation_mat(outputfile+'.fits',title,savename)
 
 if statistic == 'cosebis': 
     extname='En'
-    savename=plotfolder+'/'+statistic+'_data_'+extname+'.pdf'
+    savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
     plot_data(outputfile+'.fits',title,extname,savename)
     extname='Bn'
-    savename=plotfolder+'/'+statistic+'_data_'+extname+'.pdf'
-    plot_data(filename+'.fits',title,extname,savename)
-elif statistics[i] == 'bandpowers': 
+    savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
+    plot_data(outputfile+'.fits',title,extname,savename)
+elif statistic == 'bandpowers': 
     extname='PeeE'
-    savename=plotfolder+'/'+statistic+'_data_'+extname+'.pdf'
+    savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
     plot_data(outputfile+'.fits',title,extname,savename)
     extname='PeeB'
-    savename=plotfolder+'/'+statistic+'_data_'+extname+'.pdf'
+    savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
     plot_data(outputfile+'.fits',title,extname,savename)
 elif statistic == 'xipm': 
     extname='xiP'
-    savename=plotfolder+'/'+statistics+'_data_'+extname+'.pdf'
+    savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
     plot_data(outputfile+'.fits',title,extname,savename)
     extname='xiM'
-    savename=plotfolder+'/'+statistics+'_data_'+extname+'.pdf'
+    savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
     plot_data(outputfile+'.fits',title,extname,savename)
 
 

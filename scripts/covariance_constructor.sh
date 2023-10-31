@@ -61,13 +61,27 @@ ggl = False
 est_ggl = gamma_t
 clustering = False
 est_clust = w
+cstellar_mf = False
 cross_terms = True
 unbiased_clustering = False
+
+[arbitrary_observables]
+do_arbitrary_obs = False
+
+[csmf settings]
+csmf_log10Mmin = 9.1
+csmf_log10Mmax = 11.3
+csmf_N_log10M_bin = 10
+csmf_directory = ./input/conditional_smf/
+;csmf_log10M_bins = 
+V_max_file = V_max.asc
+f_tomo_file = f_tomo.asc
 
 [output settings]
 directory = ${output_path}
 file = covariance_list.dat, covariance_matrix.mat
 style = list, matrix
+list_style_spatial_first = True
 corrmatrix_plot = False
 save_configs = save_configs.ini
 save_Cells = True
@@ -88,6 +102,23 @@ mult_shear_bias = ${mbiaslist}
 limber = True
 pixelised_cell = False
 pixel_Nside = 2048
+n_spec = 0
+ell_spec_min = 2
+ell_spec_max = 514
+ell_spec_bins = 64
+ell_spec_type = lin
+ell_photo_min = 51
+ell_photo_max = 2952
+ell_photo_bins = 12
+ell_photo_type = log
+
+[covRspace settings]
+projected_radius_min = 0.01
+projected_radius_max = 10
+projected_radius_bins = 24
+projected_radius_type = log
+mean_redshift = 0.51, 0.6
+projection_length_clustering = 100
 
 EOF
 #}}}
@@ -107,6 +138,7 @@ xi_mm = True
 theta_accuracy = 1e-5
 integration_intervals = 50
 
+mix_term_do_mix_for = 
 mix_term_file_path_catalog = @DB:main_all_tomo_gold_recal_cc@
 mix_term_col_name_weight = @BV:WEIGHTNAME@
 mix_term_col_name_pos1 = @BV:RANAME@
@@ -115,13 +147,12 @@ mix_term_col_name_zbin = z_bin
 mix_term_isspherical = True
 mix_term_target_patchsize = 10
 mix_term_do_overlap = True
-mix_term_do_mix_for = xipxip
 mix_term_nbins_phi = 100
 mix_term_nmax = 10
 mix_term_dpix_min = 0.25
 mix_term_do_ec = True
 mix_term_file_path_save_triplets = ${input_path}/mixterm/triplets
-mix_term_file_path_load_triplets = 
+mix_term_file_path_load_triplets = ${input_path}/mixterm/triplets
 
 EOF
 elif [ "${STATISTIC^^}" == "COSEBIS" ]
@@ -149,6 +180,11 @@ ell_min = @BV:LMINBANDPOWERS@
 ell_max = @BV:LMAXBANDPOWERS@
 ell_bins = @BV:NBANDPOWERS@
 ell_type = log
+bandpower_accuracy = 1e-7
+
+[covTHETAspace settings]
+theta_accuracy = 1e-5
+integration_intervals = 50
 
 EOF
 fi
@@ -193,14 +229,15 @@ EOF
 # All kinds of parameters {{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 [cosmo]
-sigma8 = 0.838
-h = 0.767
-omega_m = 0.3
-omega_b = 0.045
-omega_de = 0.7
+sigma8 = 0.83
+; A_s = ? (not implemented at the moment, please speicify sigma8)
+h = 0.674
+omega_m = 0.3075
+omega_b = 0.0486
+omega_de = 0.6925
 w0 = -1.0
 wa = 0.0
-ns = 0.96
+ns = 0.9667
 neff = 3.046
 m_nu = 0.0
 tcmb0 = 2.725
@@ -210,6 +247,7 @@ model = Tinker10
 bias_2h = 1.0
 mc_relation_cen = duffy08
 mc_relation_sat = duffy08
+log10mass_bins = 9.1, 9.95, 11.3
 
 [IA]
 A_IA = 0.264
@@ -219,34 +257,34 @@ z_pivot_IA = 0.3
 [hod]
 model_mor_cen = double_powerlaw
 model_mor_sat = double_powerlaw
-dpow_logm0_cen = 10.6
-dpow_logm1_cen = 11.25
-dpow_a_cen = 3.41
-dpow_b_cen = 0.99
+dpow_logm0_cen = 10.51
+dpow_logm1_cen = 11.38
+dpow_a_cen = 7.096
+dpow_b_cen = 0.2
 dpow_norm_cen = 1.0
 dpow_norm_sat = 0.56
 model_scatter_cen = lognormal
 model_scatter_sat = modschechter
 logn_sigma_c_cen = 0.35
-modsch_logmref_sat = 12.0
-modsch_alpha_s_sat = -1.34
-modsch_b_sat = 0.59
+modsch_logmref_sat = 13.0
+modsch_alpha_s_sat = -0.858
+modsch_b_sat = -0.024, 1.149
 
 [halomodel evaluation]
 m_bins = 900
-log10m_min = 9
+log10m_min = 6
 log10m_max = 18
 hmf_model = Tinker10
 mdef_model = SOMean
 mdef_params = overdensity, 200
 disable_mass_conversion = True
 delta_c = 1.686
-transfer_model = EH
+transfer_model = CAMB
 small_k_damping_for1h = damped
 
 [powspec evaluation]
 non_linear_model = mead2015
-log10k_bins = 200
+log10k_bins = 400
 log10k_min = -3.49
 log10k_max = 2.15
 
@@ -286,12 +324,3 @@ cat \
 
 #}}}
 
-# Not used: {{{
-#[covRspace settings]
-#projected_radius_min = 0.01
-#projected_radius_max = 10
-#projected_radius_bins = 24
-#projected_radius_type = log
-#mean_redshift = 0.51, 0.6
-#projection_length_clustering = 100
-#}}}

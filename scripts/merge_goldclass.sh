@@ -52,7 +52,7 @@ do
   links="FALSE"
   for file in ${input} ${outfile} ${mainfile}
   do 
-    if [ ${#file} -gt 255 ] 
+    if [ ${#file} -gt 251 ] 
     then 
       links="TRUE"
     fi 
