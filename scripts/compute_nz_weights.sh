@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Mon 30 Oct 2023 09:19:36 AM CET
+# Last Modified : Mon 30 Oct 2023 04:04:24 PM CET
 #
 #=========================================
 
@@ -86,6 +86,7 @@ do
     @P_RSCRIPT@ @RUNROOT@/INSTALL/SOM_DIR/R/SOM_DIR.R \
       -r ${tomo_ref_files} \
       -t ${tomo_train_files} \
+      -ct @BV:CALIBWEIGHTNAME@ \
       -cr @BV:WEIGHTNAME@ \
       --old.som ${tomo_som_files} \
       --factor.nbins Inf @BV:OPTIMISE@ --optimise.minN @BV:MINNHC@ --force \
