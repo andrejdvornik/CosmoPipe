@@ -119,7 +119,7 @@ then
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_cats
 fi 
 #Add the new main files to the datablock 
-calibcats=`ls -tr @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_refr_DIRsom*.${ext}`
+calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_refr_DIRsom*.${ext}`
 filenames=''
 for file in $calibcats
 do 
@@ -137,7 +137,7 @@ if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_calib_cats ]
 then 
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_calib_cats
 fi 
-calibcats=`ls -tr @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_DIRsom*.${ext} `
+calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_DIRsom*.${ext} `
 filenames=''
 for file in $calibcats
 do 
@@ -156,7 +156,7 @@ then
     mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_hc_optim/
   fi 
   #Add the new hcoptim files to the datablock 
-  calibcats=`ls -tr @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_HCoptim* `
+  calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_HCoptim* `
   filenames=''
   for file in $calibcats
   do 
