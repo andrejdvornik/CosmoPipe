@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 22-03-2023
-# Last Modified : Tue 18 Jul 2023 11:11:06 AM CEST
+# Last Modified : Wed 01 Nov 2023 01:43:06 PM CET
 #
 #=========================================
 
@@ -15,7 +15,7 @@ fi
 
 #For each of the specz_calib_cats files: 
 outlist=""
-for input in @DB:som_weight_calib_cats@ 
+for input in @DB:som_weight_calib_gold@ 
 do 
   #Define the output filename 
   output=${input%%_DIRsom*}@NZFILESUFFIX@
@@ -23,10 +23,13 @@ do
   outlist="${outlist} ${output}"
 
   #Run the Nz construction 
-  @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/construct_nz.R ${input} \
-    @BV:ZSPECNAME@ \
-    @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz/${output} \
-    @BV:NZSTEP@
+  @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/construct_nz.R \
+    -i ${input} \
+    -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz/${output} \
+    --zname @BV:ZSPECNAME@ \
+    --zstep @BV:NZSTEP@ \
+    --somweightname "SOMweight" \
+    --origweightname "@BV:CALIBWEIGHTNAME" 2>&1 
 
 done
 

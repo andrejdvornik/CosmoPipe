@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Mon 30 Oct 2023 04:04:24 PM CET
+# Last Modified : Tue 31 Oct 2023 02:07:39 PM CET
 #
 #=========================================
 
@@ -120,29 +120,61 @@ then
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_cats
 fi 
 #Add the new main files to the datablock 
-calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_refr_DIRsom*.${ext}`
+calibcats=${outputfiles}`ls -tr @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_refr_DIRsom*.${ext}`
 filenames=''
-for file in $calibcats
-do 
-  filenames="$filenames ${file##*/}"
+for i in `seq -w $NTOMO`
+do
+  #Define the Z_B limits from the TOMOLIMS {{{
+  ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $n}'`
+  ZB_hi=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $(n+1)}'`
+  #}}}
+  #Define the tomographic bin string {{{
+  ZB_lo_str=`echo $ZB_lo | sed 's/\./p/g'`
+  ZB_hi_str=`echo $ZB_hi | sed 's/\./p/g'`
+  appendstr="_ZB${ZB_lo_str}t${ZB_hi_str}"
+  #}}}
+  #Select the files that have this string {{{
+  tomo_calibcats=`echo ${calibcats} | sed 's/ /\n/g' | grep ${appendstr} | awk '{printf $0 " "}' || echo `
+  #}}}
+  #Construct the filenames {{{
+  for file in $tomo_calibcats
+  do 
+    filenames="$filenames ${file##*/}"
+  done
+  #}}}
 done
 #Move the main catalogues 
 mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_refr_DIRsom* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_cats/
 #Add data block element
 _write_datablock som_weight_refr_cats "${filenames}"
 
-
-
 #Make the directory for the calib catalogues 
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_calib_cats ]
 then 
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_calib_cats
 fi 
-calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_DIRsom*.${ext} `
+calibcats=`ls -tr @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_DIRsom*.${ext} `
 filenames=''
-for file in $calibcats
-do 
-  filenames="$filenames ${file##*/}"
+for i in `seq -w $NTOMO`
+do
+  #Define the Z_B limits from the TOMOLIMS {{{
+  ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $n}'`
+  ZB_hi=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $(n+1)}'`
+  #}}}
+  #Define the tomographic bin string {{{
+  ZB_lo_str=`echo $ZB_lo | sed 's/\./p/g'`
+  ZB_hi_str=`echo $ZB_hi | sed 's/\./p/g'`
+  appendstr="_ZB${ZB_lo_str}t${ZB_hi_str}"
+  #}}}
+  #Select the files that have this string {{{
+  tomo_calibcats=`echo ${calibcats} | sed 's/ /\n/g' | grep ${appendstr} | awk '{printf $0 " "}' || echo `
+  #}}}
+  #Construct the filenames {{{
+  for file in $tomo_calibcats
+  do 
+    filenames="$filenames ${file##*/}"
+  done
+  #}}}
 done
 #Move the main catalogues 
 mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_DIRsom* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_calib_cats/
@@ -157,11 +189,28 @@ then
     mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_hc_optim/
   fi 
   #Add the new hcoptim files to the datablock 
-  calibcats=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_HCoptim* `
+  calibcats=`ls -tr @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_HCoptim* `
   filenames=''
-  for file in $calibcats
-  do 
-    filenames="$filenames ${file##*/}"
+  for i in `seq -w $NTOMO`
+  do
+    #Define the Z_B limits from the TOMOLIMS {{{
+    ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $n}'`
+    ZB_hi=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $(n+1)}'`
+    #}}}
+    #Define the tomographic bin string {{{
+    ZB_lo_str=`echo $ZB_lo | sed 's/\./p/g'`
+    ZB_hi_str=`echo $ZB_hi | sed 's/\./p/g'`
+    appendstr="_ZB${ZB_lo_str}t${ZB_hi_str}"
+    #}}}
+    #Select the files that have this string {{{
+    tomo_calibcats=`echo ${calibcats} | sed 's/ /\n/g' | grep ${appendstr} | awk '{printf $0 " "}' || echo `
+    #}}}
+    #Construct the filenames {{{
+    for file in $tomo_calibcats
+    do 
+      filenames="$filenames ${file##*/}"
+    done
+    #}}}
   done
   _write_datablock nz_hc_optim "${filenames}"
   
