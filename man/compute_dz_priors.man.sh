@@ -43,14 +43,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BV:NZSYSERROR BV:TOMOLIMS BV:WEIGHTNAME BV:ZSPECNAME DATABLOCK P_RSCRIPT RUNROOT SCRIPTPATH STORAGEPATH
+  echo BV:CALIBWEIGHTNAME BV:NZSYSERROR BV:TOMOLIMS BV:WEIGHTNAME BV:ZSPECNAME DATABLOCK P_RSCRIPT RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo som_weight_calib_cats som_weight_refr_cats
+  echo som_weight_calib_gold som_weight_refr_gold
 } 
 #}}}
 
