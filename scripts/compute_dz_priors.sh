@@ -3,13 +3,13 @@
 # File Name : compute_m_bias.sh
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Fri 07 Jul 2023 08:06:13 PM CEST
+# Last Modified : Wed 01 Nov 2023 01:51:50 PM CET
 #
 #=========================================
 
 #For each file in the calib and reference catalogue folders, compute the bias
-calib_cats="@DB:som_weight_calib_cats@"
-refr_cats="@DB:som_weight_refr_cats@"
+calib_cats="@DB:som_weight_calib_gold@"
+refr_cats="@DB:som_weight_refr_gold@"
 
 #Construct the dz folders, if needed 
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzbias ]
@@ -39,9 +39,17 @@ do
 done
 #}}}
 
+if [ "@BV:CALIBWEIGHTNAME@" != "" ] 
+then 
+  calibweight="-cw @BV:CALIBWEIGHTNAME@"
+else 
+  calibweight=''
+fi 
+
 #Run the Nz bias construction for each bin {{{
 @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/compute_dz_priors.R -c ${calib_cats} -r ${refr_cats} \
   --binstrings ${binstrings} \
+  ${calibweight} \
   -w @BV:WEIGHTNAME@ \
   --syserr @BV:NZSYSERROR@ \
   -g "SOMweight" \
