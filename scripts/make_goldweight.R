@@ -3,7 +3,7 @@
 # File Name : add_rpr_weights.R
 # Created By : awright
 # Creation Date : 12-09-2023
-# Last Modified : Fri 22 Sep 2023 10:35:27 AM CEST
+# Last Modified : Mon 30 Oct 2023 03:37:53 PM CET
 #
 #=========================================
 
@@ -74,6 +74,10 @@ for (file in class.files) {
 
 #Normalise weight 
 input.catalogue[[weight.name]]<-input.catalogue[[weight.name]]/length(class.files)
+
+#Rename the weight to SOMGoldWeight
+cols<-colnames(input.catalogue)
+colnames(input.catalogue)[which(cols==weight.name)]<-'SOMGoldWeight'
 
 #Output the weighted catalogues {{{
 cat(paste0("Outputting Gold Weight Catalogue [",Sys.time(),"]\n"))
