@@ -55,6 +55,13 @@ function _outputs {
 function _read_pipe { 
   #Pipeline file location 
   _PIPELOC=${RUNROOT}/pipeline.ini
+  cp ${_PIPELOC} ${RUNROOT}/${STORAGEPATH}/pipeline.ini
+  if [ -f ${RUNROOT}/subroutines.ini ] 
+  then 
+    cat ${RUNROOT}/subroutines.ini >> ${RUNROOT}/${STORAGEPATH}/pipeline.ini
+  fi 
+  #Now use the combined pipeline file 
+  _PIPELOC=${RUNROOT}/${STORAGEPATH}/pipeline.ini
   #Step & step number 
   _step=${1}
   _stepnum=''

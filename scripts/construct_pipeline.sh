@@ -221,9 +221,18 @@ do
     #If so, did we find 'RESUME' 
     if [ "${step}" == "RESUME" ] 
     then 
-      #If so, document and continue 
-      found_resume='TRUE'
-      continue
+      #Did we _already_ find resume (multiple in the pipeline?!)
+      if [ "${found_resume}" == "TRUE" ]
+      then 
+        VERBOSE=1 _message " - ERROR!\n\n"
+        VERBOSE=1 _message "   ${RED}ERROR: ${BLU}Multiple ${RED}RESUME${BLU} items are present in the pipeline!${DEF}\n" 
+        exit 1 
+        exit 1 
+      else 
+        #If so, document and continue 
+        found_resume='TRUE'
+        continue
+      fi 
     fi 
   fi
   #}}}
