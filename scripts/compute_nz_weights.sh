@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Tue 31 Oct 2023 02:07:39 PM CET
+# Last Modified : Tue 31 Oct 2023 02:13:15 PM CET
 #
 #=========================================
 
@@ -52,6 +52,13 @@ then
   exit 1 
 fi 
 
+#Define the calib weight name option 
+if [ "@BV:CALIBWEIGHTNAME@" == "" ]
+then 
+  calibweightname=''
+else
+  calibweightname='-ct @BV:CALIBWEIGHTNAME@'
+fi 
 
 #Distribute the jobs into NTOMO parallel runs {{{
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
@@ -86,7 +93,7 @@ do
     @P_RSCRIPT@ @RUNROOT@/INSTALL/SOM_DIR/R/SOM_DIR.R \
       -r ${tomo_ref_files} \
       -t ${tomo_train_files} \
-      -ct @BV:CALIBWEIGHTNAME@ \
+      ${calibweightname} \
       -cr @BV:WEIGHTNAME@ \
       --old.som ${tomo_som_files} \
       --factor.nbins Inf @BV:OPTIMISE@ --optimise.minN @BV:MINNHC@ --force \
