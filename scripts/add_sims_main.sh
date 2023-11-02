@@ -33,3 +33,10 @@ fi
 
 #Update the datablock contents file 
 _add_datablock sims_main "$filelist"
+
+#Get the number of catalogues 
+nsim=`echo ${filelist} | awk '{print NF}'`
+#Add the NSIM variable to the datablock 
+_write_blockvars "NSIM" "${nsim}"
+
+
