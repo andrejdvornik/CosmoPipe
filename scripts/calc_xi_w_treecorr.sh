@@ -3,7 +3,7 @@
 # File Name : calc_xi_w_treecorr.sh
 # Created By : awright
 # Creation Date : 27-03-2023
-# Last Modified : Fri 07 Jul 2023 08:04:44 PM CEST
+# Last Modified : Fri 08 Sep 2023 11:30:32 AM UTC
 #
 #=========================================
 
@@ -81,11 +81,14 @@ do
       then 
         _message "    -> @BLU@Removing previous @RED@Bin $ZBIN1@BLU@ x @RED@Bin $ZBIN2@BLU@ correlation function@DEF@"
         rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipm/${outname}
+        currentblock=`_blockentry_to_filelist ${xipmblock}`
+        currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname} | sed 's/\n/ /g' || echo `
+        _write_datablock xipm "${currentblock}"
         _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       fi 
 
       _message "    -> @BLU@Bin $ZBIN1 ($ZB_lo < Z_B <= $ZB_hi) x Bin $ZBIN2 ($ZB_lo2 < Z_B <= $ZB_hi2)@DEF@"
-      MKL_NUM_THREADS=@BV:NTHREADS@  NUMEXPR_NUM_THREADS=@BV:NTHREADS@ OMP_NUM_THREADS=@BV:NTHREADS@ \
+      MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
         @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_xi_w_treecorr.py \
         --nbins @BV:NTHETABINXI@ --theta_min @BV:THETAMINXI@ --theta_max @BV:THETAMAXXI@ --binning @BINNING@ \
         --fileone ${file_one} \
@@ -93,7 +96,8 @@ do
         --output @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipm/${outname} \
         --weighted True \
         --file1e1 "@BV:E1NAME@" --file1e2 "@BV:E2NAME@" --file1w "@BV:WEIGHTNAME@" --file1ra "@BV:RANAME@" --file1dec "@BV:DECNAME@" \
-        --file2e1 "@BV:E1NAME@" --file2e2 "@BV:E2NAME@" --file2w "@BV:WEIGHTNAME@" --file2ra "@BV:RANAME@" --file2dec "@BV:DECNAME@" 2>&1 
+        --file2e1 "@BV:E1NAME@" --file2e2 "@BV:E2NAME@" --file2w "@BV:WEIGHTNAME@" --file2ra "@BV:RANAME@" --file2dec "@BV:DECNAME@" \
+        --nthreads @BV:NTHREADS@ 2>&1 
       _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       #Add the correlation function to the datablock 
       xipmblock=`_read_datablock xipm`
