@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo 
+  echo BV:CALIBWEIGHTNAME BV:NZSTEP BV:ZSPECNAME DATABLOCK NZFILESUFFIX P_RSCRIPT RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 

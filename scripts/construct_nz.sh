@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 22-03-2023
-# Last Modified : Wed 01 Nov 2023 01:43:06 PM CET
+# Last Modified : Wed 01 Nov 2023 03:41:32 PM CET
 #
 #=========================================
 
@@ -18,7 +18,14 @@ outlist=""
 for input in @DB:som_weight_calib_gold@ 
 do 
   #Define the output filename 
-  output=${input%%_DIRsom*}@NZFILESUFFIX@
+  output=${input%%_DIRsom*}
+  if [ "${output}" == "${input}" ] 
+  then 
+    #We are not using raw calibration catalogues 
+    output=${input%.*}
+  fi 
+  #Add the Nz file suffice
+  output=${output}@NZFILESUFFIX@
   output=${output##*/}
   outlist="${outlist} ${output}"
 
@@ -29,7 +36,7 @@ do
     --zname @BV:ZSPECNAME@ \
     --zstep @BV:NZSTEP@ \
     --somweightname "SOMweight" \
-    --origweightname "@BV:CALIBWEIGHTNAME" 2>&1 
+    --origweightname "@BV:CALIBWEIGHTNAME@" 2>&1 
 
 done
 
