@@ -3,14 +3,13 @@
 # File Name : compute_nz.R
 # Created By : awright
 # Creation Date : 22-03-2023
-# Last Modified : Wed 01 Nov 2023 01:49:15 PM CET
+# Last Modified : Thu 02 Nov 2023 03:51:12 PM CET
 #
 #=========================================
 
-#Get the command line arguments 
-input<-commandArgs(T)
 #Loop through the command arguments /*fold*/ {{{
 inputs<-commandArgs(TRUE)
+original_weight<-NULL
 while (length(inputs)!=0) {
   #Check the options syntax /*fold*/ {{{
   while (length(inputs)!=0 && inputs[1]=='') { inputs<-inputs[-1] }
@@ -24,7 +23,7 @@ while (length(inputs)!=0) {
   if (inputs[1]=='-i') {
     #Read the input reference catalogue(s) /*fold*/ {{{
     inputs<-inputs[-1]
-    input.catalogue<-inputs[1]
+    input.file<-inputs[1]
     inputs<-inputs[-1]
     #/*fold*/}}}
   } else if (inputs[1]=='-o') {
@@ -38,9 +37,6 @@ while (length(inputs)!=0) {
     inputs<-inputs[-1]
     som.weight<-inputs[1]
     inputs<-inputs[-1]
-    #Remove spaces and change to NULL if empty 
-    original.weight<-gsub(" ", "", original.weight)
-    if (original.weight=="") { original.weight<-NULL } 
     #/*fend*/}}}
   } else if (inputs[1]=='--origweightname') {
     #Define the pre-existing weight column /*fold*/ {{{
@@ -73,7 +69,7 @@ while (length(inputs)!=0) {
 cat<-helpRfuncs::read.file(input.file,cols=c(z.label,original.weight,som.weight))
 
 #Construct the Nz {{{
-if (original.weight!="") { 
+if (!is.null(original.weight)) { 
   nzdist<-plotrix::weighted.hist(cat[[z.label]],w=cat[[som.weight]]*cat[[original.weight]]/sum(cat[[som.weight]]*cat[[original.weight]]),
                                 breaks=seq(0,6.001,by=binstep),plot=F)
 } else { 
