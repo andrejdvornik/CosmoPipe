@@ -87,6 +87,9 @@ NMINCOSEBIS=1
 #Maximum Number of modes for COSEBIs
 NMAXCOSEBIS=5
 
+#Name of the calibration weight variable  
+CALIBWEIGHTNAME=
+
 #Name of the lensing weight variable  
 WEIGHTNAME=weight
 
@@ -115,7 +118,7 @@ SIMBLENDCAT=/net/home/fohlen11/awright/SKiLLS/SKiLLS/skills_v07D7p1_lite_blended
 COSEBISBASE=@BV:COSEBISBASE@
 
 #CosmoSIS pipeline specification
-COSMOSIS_PIPELINE=@BV:COSMOSIS_PIPELINE@
+COSMOSIS_PIPELINE="default" 
 
 #Data Vector Length 
 DVLENGTH=@BV:DVLENGTH@
@@ -251,4 +254,9 @@ PRIOR_AIA="-6.0 1.0 6.0"
 #Base block to use for naming the Nz (when running add_nz.sh)
 NZNAME_BASEBLOCK="som_weight_calib_cats"
 
+#Magnitude limits for the wide field sample (effective after weighting)
+MAGLIMITS="20 23.5" 
+
+#Filter for defining the magnitude limits for the wide field sample (effective after weighting)
+MAGLIMIT_FILTER="r" 
 
