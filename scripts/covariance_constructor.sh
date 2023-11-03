@@ -46,6 +46,7 @@ do
   mbiaslist="${mbiaslist} `cat ${file}`"
 done 
 mbiaslist=`echo ${mbiaslist} | sed 's/ /,/g'`
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'` 
 # Base settings {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 [covariance terms]
@@ -299,7 +300,7 @@ lower_calc_limit = 1e-200
 
 [tabulated inputs files]
 npair_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/
-npair_mm_file = @BV:NPAIRBASE@_Bin?_Bin?.ascii
+npair_mm_file = @BV:NPAIRBASE@_nBins_${NTOMO}_Bin?_Bin?.ascii
 cosebi_directory = @RUNROOT@/INSTALL/OneCovariance/input/cosebis/
 wn_log_file = WnLog?.table
 wn_gg_file = W_Psi?-0.50-300.00-lmin-0.5-lmax-1000000.0-lbins-1000000.table
