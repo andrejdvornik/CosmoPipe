@@ -3,7 +3,7 @@
 # File Name : combine_patch.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Wed 14 Jun 2023 01:55:47 PM CEST
+# Last Modified : Fri 03 Nov 2023 04:12:29 PM CET
 #
 #=========================================
 
@@ -72,7 +72,7 @@ do
   fi 
   #add the patch label column 
   _message "   > @BLU@Adding patch @DEF@${patch}@BLU@ identification key to @DEF@${cata##*/}@DEF@ "
-  @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacaddkey -i ${cata} -o ${cata}_tmp -t OBJECTS -k PATCH ${patch} string "patch identifier" 2>&1
+  @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacaddkey -i ${cata} -o ${cata}_tmp -t OBJECTS -k PATCH "${patch}_patch" string "patch identifier" 2>&1
   #move the new catalogue to the original name 
   mv ${cata}_tmp ${cata}
   _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
@@ -131,7 +131,7 @@ do
   fi 
 
   #Combine the catalogues into one 
-  _message "   > @BLU@Constructing patch-combined catalogue @DEF@${outname}@DEF@ "
+  _message "   > @BLU@Constructing patch-combined catalogue @DEF@${outname##*/}@DEF@ "
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacpaste \
     -i ${inplist} \
     -o ${outname} 2>&1 
