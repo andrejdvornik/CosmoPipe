@@ -380,7 +380,7 @@ do
         if [ "${exists}" == "0" ]
         then 
           #If not, check whether the global defaults file exists 
-          if [ -f defaults.sh ]
+          if [ -e defaults.sh ]
           then 
             #If so, check whether this variable is in the global defaults 
             exists=`grep -c "^${var}=" defaults.sh || echo`
