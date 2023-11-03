@@ -235,7 +235,10 @@ class LDACTable(object):
                    raise KeyError(key) 
             else:
                 try:
-                    return self.hdu.data.field(key)
+                    res = self.hdu.data.field(key)
+                    if type(res[0]) == type(b'a'): 
+                        res = res.decode() 
+                    return res 
                 except AttributeError:
                     raise KeyError(key)
 
