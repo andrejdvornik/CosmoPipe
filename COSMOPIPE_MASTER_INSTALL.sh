@@ -505,6 +505,7 @@ THELIPATH=`echo ${RUNROOT}/INSTALL/theli-1.6.1/bin/${MACHINE}*`
 cp ${PACKROOT}/update_configure.sh ${RUNROOT}/
 cp ${PACKROOT}/scripts/configure_raw.sh ${RUNROOT}/configure.sh 
 cp ${PACKROOT}/scripts/variables_raw.sh ${RUNROOT}/variables.sh 
+cp ${PACKROOT}/config/defaults.sh ${RUNROOT}/defaults.sh 
 cp ${PACKROOT}/config/pipeline.ini ${RUNROOT}/pipeline.ini 
 for OPT in $OPTLIST
 do 
