@@ -3,7 +3,7 @@
 # File Name : add_nzbias.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Fri 31 Mar 2023 03:27:22 PM CEST
+# Last Modified : Fri 03 Nov 2023 12:01:35 PM CET
 #
 #=========================================
 
@@ -14,7 +14,7 @@ then
 fi 
 
 #Create the bias file 
-echo @NZBIAS@ > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzbias/nz_bias.txt 
+echo @BV:NZBIAS@ > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzbias/nz_bias.txt 
 
 #Update the datablock contents file 
 _write_datablock nzbias "nz_bias.txt"
