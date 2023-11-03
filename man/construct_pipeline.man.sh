@@ -56,7 +56,7 @@ function _read_pipe {
   #Pipeline file location 
   _PIPELOC=${RUNROOT}/pipeline.ini
   cp ${_PIPELOC} ${RUNROOT}/${STORAGEPATH}/pipeline.ini
-  if [ -f ${RUNROOT}/subroutines.ini ] 
+  if [ -e ${RUNROOT}/subroutines.ini ] 
   then 
     cat ${RUNROOT}/subroutines.ini >> ${RUNROOT}/${STORAGEPATH}/pipeline.ini
   fi 
