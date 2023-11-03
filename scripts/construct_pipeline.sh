@@ -387,7 +387,7 @@ do
             if [ "${exists}" != "0" ]
             then 
               #If so, use the global default 
-              grep -m 1 -B 1 "^${var}=" defaults.sh >> @PIPELINE@_defaults.sh 
+              grep -v "^#${var}" defaults.sh | grep -m 1 -B 1 "^${var}=" >> @PIPELINE@_defaults.sh 
               varstring="`grep -m 1 "^${var}=" defaults.sh | awk -F# '{print $1}'`"
             else 
               allneeds_def="${allneeds_def} ${var}"
@@ -610,6 +610,7 @@ if [ "${allneeds}" != "" ]
 then 
   allneeds=`echo ${allneeds} | sed 's/ /\n/g' | sort | uniq | awk '{printf $0 " "}'`
   allneeds_def=`echo ${allneeds_def} | sed 's/ /\n/g' | sort | uniq | awk '{printf $0 " "}' || echo `
+  allneeds_def=`echo ${allneeds_def}` 
   if [ "${warnings}" == "" ] 
   then 
     warnings="${RED}     WARNINGS:${DEF}\n     ${BLU}The pipeline used the following undeclared runtime variables:${DEF}\n     ${allneeds}\n"
