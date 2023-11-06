@@ -361,6 +361,9 @@ then
     fi 
     #}}}
   done 
+else
+  _message "Boltzmann code not implemented: ${SAMPLER^^}\n"
+  exit 1
 fi
 #}}}
 #Add intrinsic alignment parameters: {{{
