@@ -388,6 +388,9 @@ then
 	elif [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
 	then
 		boltzmann_pipeline="one_parameter_hmcode camb"
+	else
+		_message "Boltzmann code not implemented: ${SAMPLER^^}\n"
+  		exit 1
 	fi
 	if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 	then
