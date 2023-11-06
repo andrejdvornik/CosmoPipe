@@ -3,7 +3,7 @@
 # File Name : add_nz.sh
 # Created By : awright
 # Creation Date : 22-03-2023
-# Last Modified : Thu 26 Oct 2023 01:59:51 PM CEST
+# Last Modified : Fri 03 Nov 2023 09:49:58 PM CET
 #
 #=========================================
 
@@ -69,7 +69,14 @@ else
   for input in ${basenames}
   do 
     #Define the output filename 
-    output=${input%%_DIRsom*}@NZFILESUFFIX@
+    output=${input%%_DIRsom*}
+    if [ "${output}" == "${input}" ] 
+    then 
+      #We are not using raw calibration catalogues 
+      output=${input%.*}
+    fi 
+    #Add the Nz file suffice
+    output=${output}@NZFILESUFFIX@
     output=${output##*/}
     outlist="${outlist} ${output}"
   done
