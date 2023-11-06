@@ -505,9 +505,9 @@ parser.add_argument("--nbandpowers", dest="nbandpowers",type=int,
     help="number of bandpower bins")
 parser.add_argument("--nxipm", dest="nxipm",type=int,
     help="number of xipm bins")
-parser.add_argument("--ellmin", dest="ellmin",type=int,
+parser.add_argument("--ellmin", dest="ellmin",type=float,
     help="bandpower ell_min")
-parser.add_argument("--ellmax", dest="ellmax",type=int,
+parser.add_argument("--ellmax", dest="ellmax",type=float,
     help="bandpower ell_max")
 parser.add_argument("--thetamin", dest="thetamin",type=float,
     help="xipm theta_min")
