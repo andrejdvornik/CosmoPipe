@@ -3,7 +3,7 @@
 # File Name : save_and_check_mcmc_inp.sh
 # Created By : awright
 # Creation Date : 01-04-2023
-# Last Modified : Thu 07 Sep 2023 07:08:45 PM UTC
+# Last Modified : Tue 07 Nov 2023 08:06:55 PM CET
 #
 #=========================================
 
@@ -18,7 +18,7 @@ then
 fi 
 
 #Covar name
-cov="@DB:cosebis_cov@"
+cov="@DB:covariance_cosebis@"
 cov=${cov##*/}
 cov=${cov//.ascii/.fits}
 
@@ -31,7 +31,7 @@ NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
   --ntomo ${NTOMO} \
   --neff @DB:cosmosis_neff@ \
   --sigmae @DB:cosmosis_sigmae@ \
-  --covariance @DB:cosebis_cov@ \
+  --covariance @DB:covariance_cosebis@ \
   --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${cov} \
   --plotfolder @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
 

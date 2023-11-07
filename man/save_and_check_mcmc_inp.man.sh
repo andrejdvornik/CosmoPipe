@@ -43,14 +43,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLINDING BV:BOLTZMAN BV:STATISTIC DATABLOCK PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH SURVEY
+  echo BLINDING BV:BOLTZMAN BV:NMAXCOSEBIS BV:STATISTIC BV:TOMOLIMS DATABLOCK PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH SURVEY
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo cosebis_cov cosebis_vec cosmosis_neff cosmosis_sigmae nz
+  echo cosebis_vec cosmosis_neff cosmosis_sigmae covariance_cosebis nz
 } 
 #}}}
 
