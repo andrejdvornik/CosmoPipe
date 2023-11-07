@@ -115,7 +115,7 @@ function write_sampling_params {
   local cobaya_param=$(translate_to_cobaya $1)
   if [ ! -z "${prefix}" ]
   then
-    cobaya_param="${prefix}___${cobaya_param}"
+    cobaya_param="${prefix}.${cobaya_param}"
   fi
 
   local extras=$4

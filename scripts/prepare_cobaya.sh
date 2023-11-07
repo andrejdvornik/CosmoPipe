@@ -62,10 +62,16 @@ likelihood:
     ini_file: @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_@BV:STATISTIC@.ini
     remove_modules: ["sample_S8", "sigma8toAs", "one_parameter_hmcode", "camb", "cosmopower", "distances"]
 
+    kmax: 20.0
+
     zmid: 2.0
     nz_mid: 100
     zmax: 6.0
     nz: 150
+
+    zmax_background: 6.0
+    zmin_background: 0.0
+    nz_background: 6000
   
     params:
 EOF
@@ -78,7 +84,7 @@ tomoval_all=`cat @DB:nzbias_uncorr@`
 for tomo in `seq ${NTOMO}`
 do
   tomoval=`echo ${tomoval_all} | awk -v n=${tomo} '{print $n}'`
-  echo "      nofz_shifts___uncorr_bias_${tomo}:" >> ${YAML_FILE_NNAME}
+  echo "      nofz_shifts.uncorr_bias_${tomo}:" >> ${YAML_FILE_NNAME}
   echo "        ref: ${tomoval}" >> ${YAML_FILE_NNAME}
   echo "        prior:" >> ${YAML_FILE_NNAME}
   echo "          dist: norm" >> ${YAML_FILE_NNAME}
@@ -106,7 +112,6 @@ theory:
     extra_args:
       halofit_version: ${CAMB_BOLTZMANN}
       neutrino_hierarchy: normal
-      kmax: 20.0
 
 params:
 EOF
