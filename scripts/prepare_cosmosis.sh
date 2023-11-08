@@ -361,7 +361,7 @@ then
     fi 
     #}}}
   done  
-elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
+elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ] || [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ]
 then
   for param in Abary 
   do 
