@@ -378,10 +378,14 @@ if [  "@BV:COSMOSIS_PIPELINE@" == "default" ]
 then
 	if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] 
 	then
-		boltzmann_pipeline="cosmopower distances"
+		#boltzmann_pipeline="cosmopower distances"
+		boltzmann_pipeline="cosmopower camb"
+	elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ]
+	then
+		boltzmann_pipeline="one_parameter_hmcode cosmopower camb"
 	elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ]
 	then
-		boltzmann_pipeline="one_parameter_hmcode cosmopower distances"
+		boltzmann_pipeline="sigma8toAs one_parameter_hmcode cosmopower camb"
 	elif [ "${BOLTZMAN^^}" == "CAMB_HM2020" ] 
 	then
 		boltzmann_pipeline="camb"
@@ -421,6 +425,7 @@ then
 	EOF
 fi 
 #}}}
+
 #Add the other information #{{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
 likelihoods  = loglike
@@ -497,21 +502,21 @@ kmax = 10.0
 kmin = 1e-5
 nk = 200
 
-[distances]
-file = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/cosmosis_modules/camb_distances.py
+[camb]
+file = %(CSL_PATH)s/boltzmann/camb/camb_interface.py
 do_reionization = F
-mode = transfer
+mode = background
 nonlinear = pk
-halofit_version = mead
+halofit_version = original
 neutrino_hierarchy = normal
 kmax = 20.0
 zmid = 2.0
 nz_mid = 100
 zmax = 6.0
 nz = 150
-background_zmax = 6.0
-background_zmin = 0.0
-background_nz = 6000
+zmax_background = 6.0
+zmin_background = 0.0
+nz_background = 6000
 
 EOF
 #}}}
@@ -527,21 +532,21 @@ kmax = 10.0
 kmin = 1e-5
 nk = 200
 
-[distances]
-file = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/cosmosis_modules/camb_distances.py
+[camb]
+file = %(CSL_PATH)s/boltzmann/camb/camb_interface.py
 do_reionization = F
-mode = transfer
+mode = background
 nonlinear = pk
-halofit_version = mead
+halofit_version = original
 neutrino_hierarchy = normal
 kmax = 20.0
 zmid = 2.0
 nz_mid = 100
 zmax = 6.0
 nz = 150
-background_zmax = 6.0
-background_zmin = 0.0
-background_nz = 6000
+zmax_background = 6.0
+zmin_background = 0.0
+nz_background = 6000
 
 EOF
 #}}}
@@ -549,29 +554,29 @@ elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] #{{{
 then 
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_boltzman.ini <<- EOF
 [cosmopower]
-file = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/cosmosis_modules/cosmopower_interface_S8.py
-path_2_trained_emulator = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/S8_input/
+file = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/cosmosis_modules/cosmopower_interface_S8_HM2015.py
+path_2_trained_emulator = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/trained_models/HM2015_S8/
 use_specific_k_modes = F
 ; otherwise it uses the k-modes the emulator is trained on
 kmax = 10.0
 kmin = 1e-5
 nk = 200
 
-[distances]
-file = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/cosmosis_modules/camb_distances.py
+[camb]
+file = %(CSL_PATH)s/boltzmann/camb/camb_interface.py
 do_reionization = F
-mode = transfer
+mode = background
 nonlinear = pk
-halofit_version = mead
+halofit_version = original
 neutrino_hierarchy = normal
 kmax = 20.0
 zmid = 2.0
 nz_mid = 100
 zmax = 6.0
 nz = 150
-background_zmax = 6.0
-background_zmin = 0.0
-background_nz = 6000
+zmax_background = 6.0
+zmin_background = 0.0
+nz_background = 6000
 
 EOF
 #}}}
