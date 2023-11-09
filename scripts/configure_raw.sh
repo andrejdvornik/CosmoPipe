@@ -169,7 +169,7 @@ do
 done 
 
 #Finish 
-_message "   >${RED} Finished! To run the Cosmology pipeline run: ${DEF}\n"
+_message "   >${RED} Finished! To run the Cosmology pipeline, check cosmosis is configured (source cosmosis-configure) and run: ${DEF}\n"
 for pipe in ${PIPELINE}
 do 
   _message "   ${BLU} bash ${pipe}_pipeline.sh ${DEF} (from within the 'cosmopipe' conda env), or:\n"
