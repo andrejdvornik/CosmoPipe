@@ -290,7 +290,8 @@ function _rename_blockitem {
       then 
         mv -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}
       else 
-        rm -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/*
+        #rm -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/*
+        find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/ -maxdepth 1 -print0 | xargs -0 rm -f
         mv -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}/* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/
         rmdir  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}
       fi 
@@ -338,7 +339,8 @@ function _add_datahead {
     #Clear the datahead {{{
     echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
     #Remove any datahead files 
-    rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*
+    #rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*
+    find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ -maxdepth 1 -print0 | xargs -0 rm -f
     #}}}
   else 
     #Copy the requested data to the datahead {{{
@@ -535,7 +537,7 @@ function _write_datahead {
     #Clear the datahead 
     echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
     #Remove any datahead files 
-    rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*
+    find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD -maxdepth 1 -print0 | xargs -0 rm -f
   else 
     #Check if the requested item exists in the datablock
     _found=0
@@ -1158,7 +1160,8 @@ function _splitpatch_blockitem {
       then 
         mv -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}
       else 
-        rm -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/*
+        #rm -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/*
+        find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/ -maxdepth 1 -print0 | xargs -0 rm -f
         mv -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}/* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/
         rmdir  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}
       fi 
