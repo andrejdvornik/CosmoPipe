@@ -3,7 +3,7 @@
 # File Name : calc_xi_w_treecorr.sh
 # Created By : awright
 # Creation Date : 27-03-2023
-# Last Modified : Fri 08 Sep 2023 11:30:32 AM UTC
+# Last Modified : Sun 05 Nov 2023 10:45:36 AM CET
 #
 #=========================================
 
@@ -81,6 +81,7 @@ do
       then 
         _message "    -> @BLU@Removing previous @RED@Bin $ZBIN1@BLU@ x @RED@Bin $ZBIN2@BLU@ correlation function@DEF@"
         rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipm/${outname}
+        xipmblock=`_read_datablock xipm`
         currentblock=`_blockentry_to_filelist ${xipmblock}`
         currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname} | sed 's/\n/ /g' || echo `
         _write_datablock xipm "${currentblock}"
