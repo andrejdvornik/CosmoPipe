@@ -1,5 +1,5 @@
 #
-# compute_m_bias.sh Documentation & Housekeeping functions
+# plot_nz.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@======================================@DEF@\n"
-    _message "@BLU@== @RED@ Running compute_m_bias.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@======================================@DEF@\n"
+    _message "@BLU@===============================@DEF@\n"
+    _message "@BLU@== @RED@ Running plot_nz.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@===============================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,8 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Compute the m bias for each DATAHEAD catalogue and'
-  echo '#  its corresponding m surface'
+  echo '# Plot nz contained in the @DB:nz@ block, split by '
+  echo '# tomographic bin'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,28 +43,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLU BV:M1NAME BV:M2NAME BV:MBIASCORR BV:RNAME BV:SNRNAME BV:TOMOLIMS BV:WEIGHTNAME DATABLOCK DEF PATCHLIST P_RSCRIPT PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  echo BV:TOMOLIMS P_RSCRIPT RUNROOT SCRIPTPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo ALLHEAD m_surface
+  echo nz
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo DATAHEAD mbias
+  echo ''
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/compute_m_bias.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/plot_nz.sh
 } 
 #}}}
 
