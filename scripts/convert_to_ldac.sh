@@ -3,7 +3,7 @@
 # File Name : convert_to_ldac.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Tue 25 Jul 2023 03:38:34 PM CEST
+# Last Modified : Fri 03 Nov 2023 01:39:29 PM CET
 #
 #=========================================
 
@@ -14,9 +14,16 @@ output=${input%.${extn}}.cat
 
 objstr=''
 _message "@BLU@Testing existance of @RED@OBJECTS@BLU@, @RED@FIELDS@BLU@, @RED@FIELD_POS@BLU@, and @RED@SeqNr@BLU@:\n{@DEF@\n"
+#Brackets catch shell messages like segmentation fault and abort 
+{
 @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${input} -t OBJECTS -k FIELD_POS 2>&1 && _message " @BLU@FIELD_POS found!@DEF@\n" || objstr="FAIL"
+} >&1
+{
 @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${input} -t OBJECTS -k SeqNr 2>&1 && _message " @BLU@SeqNr found!@DEF@\n" || objstr="FAIL"
+} >&1
+{
 @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${input} -t FIELDS 2>&1 && _message " @BLU@FIELDS table found!@DEF@\n" || objstr="FAIL"
+} >&1
 _message "@BLU@} - @RED@Done!@DEF@\n"
 
 if [ "${objstr}" == "FAIL" ] 
