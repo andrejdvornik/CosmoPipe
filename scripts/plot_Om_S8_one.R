@@ -24,9 +24,11 @@ p <- add_argument(p, "--ylabel", help="y-axis variable name", default="s_8_input
 # Add an optional argument
 p <- add_argument(p, "--xlim", help="x-axis limits", default=c(0.09,0.52))
 # Add an optional argument
-p <- add_argument(p, "--ylim", help="y-axis limits", default=c(0.59,0.96))
+p <- add_argument(p, "--ylim", help="y-axis limits", default=c(0.63,0.86))
 # Add an optional argument
 p <- add_argument(p, "--title", help="Plot title", default="Chain")
+# Add a flag
+p <- add_argument(p, "--removeh2", help="remove h2 dependence from variables", flag=TRUE)
 ## Add a flag
 #p <- add_argument(p, "--append", help="append to file", flag=TRUE)
 
@@ -43,6 +45,22 @@ cat<-helpRfuncs::read.chain(args$input)
 #Edit the column names for simplicity 
 colnames(cat)<-gsub("cosmological_parameters--","",colnames(cat),ignore.case=T)
 
+#Check for the xlabel and ylabel's in the catalogue 
+if (!args$xlabel%in%colnames(cat)) { 
+  stop(paste("ERROR: the x-axis variable is not in the catalogue?!",args$xlabel))
+}
+if (!args$ylabel%in%colnames(cat)) { 
+  stop(paste("ERROR: the y-axis variable is not in the catalogue?!",args$ylabel))
+}
+
+if (!any(colnames(cat)=='weight')) { 
+  if (any(colnames(cat)=='log_weight')) { 
+    cat$weight<-exp(cat$log_weight)
+  } else { 
+    stop("ERROR: there is no weight or logweight?!")
+  } 
+}
+
 #If we have requested a reference catalogue
 if (args$refr!='none' & file.exists(args$refr)) { 
   #Read the reference file 
@@ -57,6 +75,53 @@ if (args$prior!='none' & file.exists(args$prior)) {
   prior<-helpRfuncs::read.chain(args$prior)
   #Edit the column names for simplicity 
   colnames(prior)<-gsub("cosmological_parameters--","",colnames(prior),ignore.case=T)
+}
+
+if (args$removeh2) { 
+  if (grepl("h2",args$xlabel)) { 
+    if (any(colnames(cat)=='h0')) { 
+      cat[[sub("h2","",args$xlabel)]]<-cat[[args$xlabel]]/cat[['h0']]^2
+    } else { 
+      cat[[sub("h2","",args$xlabel)]]<-cat[[args$xlabel]]/0.7^2
+    } 
+    if (exists("ref")) { 
+      if (any(colnames(ref)=='h0')) { 
+        ref[[sub("h2","",args$xlabel)]]<-ref[[args$xlabel]]/ref[['h0']]^2
+      } else { 
+        ref[[sub("h2","",args$xlabel)]]<-ref[[args$xlabel]]/0.7^2
+      } 
+    }
+    if (exists("prior")) { 
+      if (any(colnames(prior)=='h0')) { 
+        prior[[sub("h2","",args$xlabel)]]<-prior[[args$xlabel]]/prior[['h0']]^2
+      } else { 
+        prior[[sub("h2","",args$xlabel)]]<-prior[[args$xlabel]]/0.7^2
+      } 
+    }
+    args$xlabel<-sub("h2","",args$xlabel)
+  }
+  if (grepl("h2",args$ylabel)) { 
+    if (any(colnames(cat)=='h0')) { 
+      cat[[sub("h2","",args$ylabel)]]<-cat[[args$ylabel]]/cat[['h0']]^2
+    } else { 
+      cat[[sub("h2","",args$ylabel)]]<-cat[[args$ylabel]]/0.7^2
+    } 
+    if (exists("ref")) { 
+      if (any(colnames(ref)=='h0')) { 
+        ref[[sub("h2","",args$ylabel)]]<-ref[[args$ylabel]]/ref[['h0']]^2
+      } else { 
+        ref[[sub("h2","",args$ylabel)]]<-ref[[args$ylabel]]/0.7^2
+      } 
+    }
+    if (exists("prior")) { 
+      if (any(colnames(prior)=='h0')) { 
+        prior[[sub("h2","",args$ylabel)]]<-prior[[args$ylabel]]/prior[['h0']]^2
+      } else { 
+        prior[[sub("h2","",args$ylabel)]]<-prior[[args$ylabel]]/0.7^2
+      } 
+    }
+    args$ylabel<-sub("h2","",args$ylabel)
+  }
 }
 
 #Open the PNG
