@@ -39,21 +39,25 @@ parser.add_argument(
     "-t", "--train", required=True,
     help="path to the training data containing the desired label",
 )
+#parser.add_argument(
+#    "--psf", required=True, type=float,
+#    help="PSF size measurement (PSF_RAD)",
+#)
 parser.add_argument(
-    "--psf", required=True, type=float,
-    help="PSF size measurement (PSF_RAD)",
-)
-parser.add_argument(
-    "--features", nargs="+", default=default_features,
+    "--features","-f", nargs="+", default=default_features,
     help="column names of features to match, must be present in input and training data",
 )
 parser.add_argument(
-    "--label", required=True,
+    "--label","-l", required=True,
     help="column name of the label to match",
 )
 parser.add_argument(
     "--sparse", default=1, type=int,
     help="sparse-sample the training data by taking every n-th data point"
+)
+parser.add_argument(
+    "--extname", default='OBJECTS', type=str,
+    help="open catalogue using this extension name"
 )
 
 
@@ -83,23 +87,23 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     print("reading input data")
-    train_data = apd.read_auto(args.train, columns=[*args.features, args.weight])
+    train_data = apd.read_auto(args.train, columns=[*args.features, args.label],hdu=args.extname)
     train_data = train_data[::args.sparse]
-    data = apd.read_auto(args.input)
+    data = apd.read_auto(args.input,ext=args.extname)
 
     print("running matching")
     test_data = data.copy()
     if "ABgaper" not in test_data:
         test_data["ABgaper"] = test_data["Bgaper"] / test_data["Agaper"]
-    if "PSF_RAD" not in test_data:
-        test_data["PSF_RAD"] = args.psf
+    #if "PSF_RAD" not in test_data:
+    #    test_data["PSF_RAD"] = args.psf
 
     prediction = match_weights(
-        weights=train_data[args.weight],
+        weights=train_data[args.label],
         train_data=train_data[args.features],
         test_data=test_data[args.features],
     )
 
     print("writing output data")
-    data[args.weight] = prediction
+    data[args.label] = prediction
     apd.to_auto(data, args.output)
