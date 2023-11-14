@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Tue 31 Oct 2023 02:13:15 PM CET
+# Last Modified : Tue 14 Nov 2023 10:14:32 PM CET
 #
 #=========================================
 
@@ -87,6 +87,11 @@ do
     fi 
   fi 
   tomo_out_files=`echo ${output_files} | sed 's/ /\n/g' | grep ${appendstr} | awk '{printf $0 " "}' || echo `
+  #Remove pre-existing logfiles 
+  if [ -f @RUNROOT@/@LOGPATH@/CosmoPipe_NzWeight_job${i}_of_${NTOMO}.log ]
+  then 
+    rm -f @RUNROOT@/@LOGPATH@/CosmoPipe_NzWeight_job${i}_of_${NTOMO}.log
+  fi 
   #Launch the Nz weight computation job in a screen 
   screen -L -Logfile @RUNROOT@/@LOGPATH@/CosmoPipe_NzWeight_job${i}_of_${NTOMO}.log \
     -S @PIPELINE@_CosmoPipe_NzWeight_job${i}_of_${NTOMO} -d -m \
