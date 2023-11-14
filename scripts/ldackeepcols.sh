@@ -3,7 +3,7 @@
 # File Name : ldackeepcols.sh
 # Created By : awright
 # Creation Date : 12-06-2023
-# Last Modified : Thu 10 Aug 2023 07:42:07 AM CEST
+# Last Modified : Thu 02 Nov 2023 02:19:55 PM CET
 #
 #=========================================
 
@@ -19,7 +19,7 @@ _message "@DEF@ > @BLU@Keeping only desired columns in catalogue ${input##*/}@DE
 
 #Check if input file lengths are ok 
 links="FALSE"
-for file in ${input} ${outname}
+for file in ${input} ${output}
 do 
   if [ ${#file} -gt 255 ] 
   then 
