@@ -3,18 +3,15 @@
 # File Name : prepare_covariance.sh
 # Created By : awright
 # Creation Date : 05-04-2023
-# Last Modified : Sat 08 Jul 2023 11:29:01 AM CEST
+# Last Modified : Tue 07 Nov 2023 08:11:46 PM CET
 #
 #=========================================
 
 #If needed, create the output directory 
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_cov ]
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_cosebis ]
 then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_cov/
+  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_cosebis/
 fi 
 
-NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
-_write_blockvars "NTOMO" "${NTOMO}"
-
-_write_datablock "cosebis_cov" "Covariance_blind@BV:BLIND@_nMaximum_@BV:NMAXCOSEBIS@_@BV:THETAMINXI@_@BV:THETAMAXXI@_nBins${NTOMO}.ascii"
+_write_datablock "covariance_cosebis" "Covariance_blind@BV:BLIND@_nMaximum_@BV:NMAXCOSEBIS@_@BV:THETAMINXI@_@BV:THETAMAXXI@_nBins@BV:NTOMO@.ascii"
 

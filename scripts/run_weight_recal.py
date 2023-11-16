@@ -133,9 +133,10 @@ for ibin_R in range(args.nbins_R):
     # select catalogue
     mask_binR = (obj_cat['bin_R'] == ibin_R)
 
-    # bin in R
-    obj_cat.loc[mask_binR,'bin_snr'] = pd.qcut(obj_cat.loc[mask_binR,col_snr], args.nbins_SNR, 
-                                                duplicates='drop',labels=False, retbins=False)
+    if any(mask_binR):
+        # bin in R
+        obj_cat.loc[mask_binR,'bin_snr'] = pd.qcut(obj_cat.loc[mask_binR,col_snr], args.nbins_SNR, 
+                                                   duplicates='drop',labels=False, retbins=False)
                                                 
 
 print('Constructing Data Frame')

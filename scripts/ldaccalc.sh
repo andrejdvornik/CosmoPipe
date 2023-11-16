@@ -3,7 +3,7 @@
 # File Name : ldackeepcols.sh
 # Created By : awright
 # Creation Date : 12-06-2023
-# Last Modified : Thu 02 Nov 2023 02:19:55 PM CET
+# Last Modified : Thu 09 Nov 2023 09:33:05 PM CET
 #
 #=========================================
 
@@ -12,10 +12,10 @@ input=@DB:DATAHEAD@
 
 #Define the output catalogue name 
 ext=${input##*.}
-output=${input//.${ext}/_rmcol.${ext}}
+output=${input//.${ext}/_calc.${ext}}
 
 #Notify 
-_message "@DEF@ > @BLU@Keeping only desired columns in catalogue ${input##*/}@DEF@"
+_message "@DEF@ > @BLU@Adding @BV:CALCCOLNAME@ using condition @BV:CALCCOND@ to catalogue ${input##*/}@DEF@"
 
 #Check if input file lengths are ok 
 links="FALSE"
@@ -50,9 +50,10 @@ then
 fi 
 
 #Column strings to match to: 
-keepstr="@BV:KEEPSTRINGS@"
-#Convert the string gaps into "or"
-keepstr="${keepstr// /\\|}"
+calccond="@BV:CALCCOND@;"
+#Column name to add: 
+calccol="@BV:CALCCOLNAME@"
+calccom="@BV:CALCCOMM@"
 
 #Get the list of all columns 
 cols=`@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacdesc -i ${input} -t OBJECTS 2>&1 | grep "Key name" | sed 's@Key name:\(\.\)\{1,\}@@' || echo `
@@ -64,25 +65,26 @@ then
   exit 1 
 fi 
 
-#Select the columns to remove 
-delcols=`echo ${cols} | sed 's/ /\n/g' | grep -iv "${keepstr}" || echo `
+#Check if @BV:CALCCOLNAME@ is one of the columns 
+colcheck=`echo ${cols} | sed 's/ /\n/g' | grep -ci "${calccol}" || echo `
 
-if [ "${delcols}" == "${cols}" ]
+if [ ${colcheck} -ne 0 ]
 then 
-  _message "@RED@ - ERROR! Deletion would remove all columns?!@DEF@\n"
+  _message "@RED@ - ERROR! Column name to add already exists!@DEF@\n"
   _message "@BLU@columns:@DEF@\n"
   _message "${cols}\n"
-  _message "@BLU@delete cols:@DEF@"
-  _message "${delcols}\n"
-  _message "@BLU@keep strings:@DEF@\n"
-  _message "${keepstr}"
+  _message "@BLU@ldaccalc colname:@DEF@"
+  _message "${calccol}\n"
   exit 1
-elif [ "${delcols}" == "" ] 
-then 
-  _message "@RED@ - Skip! There is nothing to delete!@DEF@\n"
 else 
-  #Remove the columns 
-  @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacdelkey -i ${input} -o ${output} -t OBJECTS -k ${delcols} 2>&1
+  #Calculate the new column 
+  @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldaccalc \
+    -i ${input} \
+    -o ${output} \
+    -t OBJECTS \
+    -c "${calccond}" \
+    -n "${calccol}" "${calccom}" \
+    -k FLOAT 2>&1
 
   _message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
   

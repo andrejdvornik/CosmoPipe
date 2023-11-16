@@ -3,7 +3,7 @@
 # File Name : merge_goldweight.sh
 # Created By : awright
 # Creation Date : 21-09-2023
-# Last Modified : Wed 01 Nov 2023 03:44:25 PM CET
+# Last Modified : Sun 12 Nov 2023 11:21:05 PM CET
 #
 #=========================================
 
@@ -187,10 +187,15 @@ do
     -i ${outfile}_tmp \
     -o ${outfile}     \
     -t OBJECTS \
-    -c "SOMGoldWeight/(SOMGoldWeight+0.000000000000001);" -n "SOMweight" "Binary GoldWeight (for use with gold-weighted @BV:WEIGHTNAME@)" -k SHORT 2>&1
+    -c "1-SOMGoldWeight/(SOMGoldWeight+0.000000000000001);" -n "SOMnonGold" "Inverse selection of Binary GoldWeight" -k SHORT 2>&1
+  @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldaccalc \
+    -i ${outfile} \
+    -o ${outfile}_tmp     \
+    -t OBJECTS \
+    -c "1-SOMnonGold;" -n "SOMweight" "Binary GoldWeight (for use with gold-weighted @BV:WEIGHTNAME@)" -k SHORT 2>&1
   _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
   #Delete the temporary output file
-  rm ${outfile}_tmp 
+  mv ${outfile}_tmp ${outfile}
   #}}}
   #Save the output file to the list {{{
   outlist="$outlist $outname"

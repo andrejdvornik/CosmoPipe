@@ -1,5 +1,5 @@
 #
-# add_covariance_cosebis.sh Documentation & Housekeeping functions
+# stat_from_map.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@==============================================@DEF@\n"
-    _message "@BLU@== @RED@ Running add_covariance_cosebis.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@==============================================@DEF@\n"
+    _message "@BLU@=====================================@DEF@\n"
+    _message "@BLU@== @RED@ Running stat_from_map.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@=====================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,8 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Add an existing cosebis covariance to the '
-  echo '# datablock'
+  echo '# Inherit a statistic into a catalogue from a '
+  echo '# healpix map'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,28 +43,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo COSEBICOVFILE DATABLOCK RUNROOT STORAGEPATH
+  echo BLU BV:DECNAME BV:HPMAPFILE BV:RANAME BV:STATFUNC BV:STATNAME DEF PYTHON3BIN RED RUNROOT SCRIPTPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo 
+  echo DATAHEAD
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo covariance_cosebis
+  echo DATAHEAD
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/add_covariance_cosebis.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/stat_from_map.sh
 } 
 #}}}
 

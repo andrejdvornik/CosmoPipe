@@ -1,5 +1,5 @@
 #
-# add_covariance_cosebis.sh Documentation & Housekeeping functions
+# plot_nz.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@==============================================@DEF@\n"
-    _message "@BLU@== @RED@ Running add_covariance_cosebis.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@==============================================@DEF@\n"
+    _message "@BLU@===============================@DEF@\n"
+    _message "@BLU@== @RED@ Running plot_nz.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@===============================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,8 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Add an existing cosebis covariance to the '
-  echo '# datablock'
+  echo '# Plot nz contained in the @DB:nz@ block, split by '
+  echo '# tomographic bin'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,28 +43,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo COSEBICOVFILE DATABLOCK RUNROOT STORAGEPATH
+  echo BV:TOMOLIMS P_RSCRIPT RUNROOT SCRIPTPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo 
+  echo nz
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo covariance_cosebis
+  echo ''
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/add_covariance_cosebis.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/plot_nz.sh
 } 
 #}}}
 

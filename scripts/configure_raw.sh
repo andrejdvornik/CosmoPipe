@@ -103,7 +103,7 @@ then
   
   #Make and populate the runtime scripts directory {{{
   _message "   >${RED} Copying Provided Data Products to Storage Path${DEF}" 
-  mkdir -p ${RUNROOT}/${STORAGEPATH}
+  mkdir -p ${RUNROOT}/${STORAGEPATH}/DATAHEAD
   rsync -autv ${PACKROOT}/data/* ${RUNROOT}/${STORAGEPATH}/ > ${RUNROOT}/INSTALL/datatranfer.log 2>&1 
   _message "${BLU} - Done! ${DEF}\n"
   _message "   >${RED} Copying scripts & configs to Run directory${DEF}" 

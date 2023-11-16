@@ -1,5 +1,5 @@
 #
-# add_covariance_cosebis.sh Documentation & Housekeeping functions
+# assign_matching_label.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@==============================================@DEF@\n"
-    _message "@BLU@== @RED@ Running add_covariance_cosebis.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@==============================================@DEF@\n"
+    _message "@BLU@=============================================@DEF@\n"
+    _message "@BLU@== @RED@ Running assign_matching_label.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@=============================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,9 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Add an existing cosebis covariance to the '
-  echo '# datablock'
+  echo '# assign a column from DB:match_base to DATAHEAD '
+  echo '# using a nearest neighbour match in '
+  echo '# BV:DATAFEATURES'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,28 +44,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo COSEBICOVFILE DATABLOCK RUNROOT STORAGEPATH
+  echo BLU BV:DATAFEATURES BV:LABELNAME DEF PYTHON3BIN RED RUNROOT SCRIPTPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo 
+  echo ALLHEAD match_base
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo covariance_cosebis
+  echo ALLHEAD
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/add_covariance_cosebis.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/assign_matching_label.sh
 } 
 #}}}
 

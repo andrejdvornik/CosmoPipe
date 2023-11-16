@@ -84,7 +84,7 @@ do
   	-o ${outputname} \
   	-t OBJECTS \
     -c "((@BV:TOMOVAR@>${TV_lo})AND(@BV:TOMOVAR@<=${TV_hi}));" 2>&1 || ldacpass=FALSE
-  } >&1
+  } 2>&1
   #}}}
 
   #If used, undo the links {{{

@@ -3,18 +3,21 @@
 # File Name : computs_dz_priors.R
 # Created By : awright
 # Creation Date : 29-03-2023
-# Last Modified : Mon Sep 11 17:24:04 2023
+# Last Modified : Wed 01 Nov 2023 03:35:37 PM CET
 #
 #=========================================
 
 #Get the input files 
 inputs<-commandArgs(TRUE) 
 
-#Interpret the command line options 
+calib.weight.label<-NULL
+
+#Interpret the command line options {{{
 while (length(inputs)!=0) {
   while (length(inputs)!=0 && inputs[1]=='') { inputs<-inputs[-1] }  
+  #Check the options {{{ 
   if (!grepl('^-',inputs[1])) {
-    print(inputs)
+    print(inputs[1:4])
     stop(paste("Incorrect options provided!"))
   }
   #/*fend*/}}}
@@ -78,6 +81,12 @@ while (length(inputs)!=0) {
     gold.label<-inputs[1]
     inputs<-inputs[-1]
     #/*fold*/}}}
+  } else if (inputs[1]=='-cw') { 
+    #Define the weight label /*fold*/ {{{
+    inputs<-inputs[-1]
+    calib.weight.label<-inputs[1]
+    inputs<-inputs[-1]
+    #/*fold*/}}}
   } else if (inputs[1]=='-w') { 
     #Define the weight label /*fold*/ {{{
     inputs<-inputs[-1]
@@ -100,6 +109,7 @@ while (length(inputs)!=0) {
     stop(paste("Unknown option",inputs[1]))
   }
 }
+#}}}
 
 #Number of realisations 
 nreal<- 0
@@ -115,8 +125,8 @@ if ( nreal==0 ) {
 def<-matrix(NA,ncol=length(binstrings),nrow=nreal)
 colnames(def)<-binstrings
 wtot<-wtot_gold<-ntot<-ntot_gold<-dneff<-
-  muzcalib<-muzrefr<-bias<-muzrefr_nogold<-
-    bias_nogold<-def
+  muzcalib_base<-muzcalib_raw<-muzcalib<-muzrefr<-bias<-muzrefr_nogold<-
+    bias_base<-bias_raw<-bias_nogold<-def
 
 #Delta n_eff calculation 
 dneff_calc<-function(w,S) return=(sum(w*S)^2/sum(w^2*S)) / (sum(w)^2/sum(w^2))
@@ -130,11 +140,22 @@ for (bin in 1:length(binstrings)) {
   calib_cats<-input.calib[grepl(binstrings[bin],input.calib,fixed=T)]
   if (length(which(grepl(binstrings[bin],input.refr,fixed=T)))==0) { 
     warning("No reference catalogue binstring matches; assuming catalogues are in order!!")
+    print(length(which(grepl(binstrings[bin],input.refr,fixed=T))))
+    print(length(input.refr))
+    print(bin)
+    print(binstrings[bin])
     refr_cats<-input.refr[grepl(binstrings[bin],input.calib,fixed=T)]
   } else {
     refr_cats<-input.refr[grepl(binstrings[bin],input.refr,fixed=T)]
   }
   if (length(calib_cats)!=length(refr_cats)) { 
+    print(input.calib)
+    print(input.refr)
+    print(c(length(input.calib),length(input.refr)))
+    print(binstrings[bin])
+    print(calib_cats)
+    print(refr_cats)
+    print(c(length(calib_cats),length(refr_cats)))
     stop("Mismatch in the reference and calibration catalogue lists?!") 
   } 
   if (length(calib_cats)>0) { 
@@ -142,7 +163,7 @@ for (bin in 1:length(binstrings)) {
       setTxtProgressBar(pb,count)
       count<-count+1
       #Read the calibration file 
-      calib<-helpRfuncs::read.file(calib_cats[i],data.table=FALSE,cols=c(redshift.label,gold.label))
+      calib<-helpRfuncs::read.file(calib_cats[i],data.table=FALSE,cols=c(redshift.label,gold.label,calib.weight.label))
       if (any(calib[[redshift.label]]<0)) { 
         cat("WARNING: calibration sources have negative redshift in file",calib_cats[i],"!\n")
         calib[[redshift.label]][which(calib[[redshift.label]]<0)]<-0
@@ -150,7 +171,7 @@ for (bin in 1:length(binstrings)) {
       #Read the reference file 
       refr<-helpRfuncs::read.file(refr_cats[i],data.table=FALSE,cols=c(redshift.label,gold.label,weight.label))
       if (any(refr[[redshift.label]]<0)) { 
-        #cat("WARNING: reference sources have negative redshift in file",refr_cats[i],"!\n")
+        cat("WARNING: reference sources have negative redshift in file",refr_cats[i],"!\n")
         refr[[redshift.label]][which(refr[[redshift.label]]<0)]<-0
       }
       #Compute the bias: z_est - z_true 
@@ -158,23 +179,37 @@ for (bin in 1:length(binstrings)) {
       wtot_gold[i,bin]<-sum(w=refr[[weight.label]]*refr[[gold.label]])
       ntot[i,bin]<-nrow(refr)
       ntot_gold[i,bin]<-sum(refr[[gold.label]])
-      dneff[i,bin]<-dneff_calc(w=refr[[weight.label]],S=refr[[gold.label]])
-      muzcalib[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]])
       muzrefr[i,bin]<-weighted.mean(refr[[redshift.label]],(refr[[weight.label]]*refr[[gold.label]]))
       muzrefr_nogold[i,bin]<-weighted.mean(refr[[redshift.label]],refr[[weight.label]])
-      bias_nogold[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]]) -
+      dneff[i,bin]<-dneff_calc(w=refr[[weight.label]],S=refr[[gold.label]])
+      muzcalib_raw[i,bin]<-weighted.mean(calib[[redshift.label]])
+      bias_raw[i,bin]<-weighted.mean(calib[[redshift.label]]) -
                    weighted.mean(refr[[redshift.label]],(refr[[weight.label]]))
-      bias[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]]) -
-                   weighted.mean(refr[[redshift.label]],(refr[[weight.label]]*refr[[gold.label]]))
+      if (!is.null(calib.weight.label)) { 
+        muzcalib_base[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[calib.weight.label]])
+        muzcalib[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]]*calib[[calib.weight.label]])
+        bias_base[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[calib.weight.label]]) -
+                     weighted.mean(refr[[redshift.label]],(refr[[weight.label]]))
+        bias_nogold[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]]*calib[[calib.weight.label]]) -
+                     weighted.mean(refr[[redshift.label]],(refr[[weight.label]]))
+        bias[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]]*calib[[calib.weight.label]]) -
+                     weighted.mean(refr[[redshift.label]],(refr[[weight.label]]*refr[[gold.label]]))
+      } else { 
+        muzcalib[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]])
+        bias_nogold[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]]) -
+                     weighted.mean(refr[[redshift.label]],(refr[[weight.label]]))
+        bias[i,bin]<-weighted.mean(calib[[redshift.label]],calib[[gold.label]]) -
+                     weighted.mean(refr[[redshift.label]],(refr[[weight.label]]*refr[[gold.label]]))
+      }
     }
   }
 }
 close(pb)
 
-for (stat in c("wtot","wtot_gold","ntot","ntot_gold","dneff","muzcalib","muzrefr","muzrefr_nogold","bias_nogold","bias")) { 
+for (stat in c("wtot","wtot_gold","ntot","ntot_gold","dneff","muzcalib_raw",'muzcalib_base',"muzcalib","muzrefr","muzrefr_nogold","bias_raw",'bias_base',"bias_nogold","bias")) { 
   cat(paste(stat,"\n"))
-  print(rbind(means=colMeans(get(stat),na.rm=T),
-              stdev=matrixStats::colSds(get(stat),na.rm=T)))
+  try(print(rbind(means=colMeans(get(stat),na.rm=T),
+              stdev=matrixStats::colSds(get(stat),na.rm=T))))
 }
 
 #Compute the mean biases per bin 

@@ -160,9 +160,9 @@ function _add_default_vars {
 #Initialise the datablock {{{
 function _initialise_datablock { 
   #Make the datablock directory, if needed
-  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/ ]
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD ]
   then 
-    mkdir -p @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/
+    mkdir -p @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD
   fi 
   if [ ! -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt ]
   then 
@@ -290,7 +290,8 @@ function _rename_blockitem {
       then 
         mv -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}
       else 
-        rm -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/*
+        #rm -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/*
+        find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/ -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
         mv -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}/* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/
         rmdir  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}
       fi 
@@ -338,7 +339,8 @@ function _add_datahead {
     #Clear the datahead {{{
     echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
     #Remove any datahead files 
-    rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*
+    #rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*
+    find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
     #}}}
   else 
     #Copy the requested data to the datahead {{{
@@ -399,15 +401,21 @@ function _add_datahead {
       _message " @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD:\n"
       #Copy the files one-by-one (to ensure that there isn't accidental use of datablock waste...)
       #For each file in the block element {{{
+      count=0
+      nfiles=`echo ${_files} | awk '{print NF}'`
+      _printstr=''
       for file in ${_files}
       do 
-        _message " @BLU@  -->@DEF@ ${file}"
-        #Copy the file (will skip if file is unchanged)
-        rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${file} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ >> @RUNROOT@/@LOGPATH@/datahead_write.log
-        _message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
+        count=$((count+1))
+        #Notify 
+        _message "\r${_printstr//?/ }\r"
+        _printstr=" @RED@  (`date +'%a %H:%M'`)@BLU@ -->@DEF@ ${file##*/}@BLU@ (${count}/${nfiles})"
+        _message "${_printstr}"
+        #Copy the file (will skip if file exists and is unchanged)
+        rsync -atv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${file} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ >> @RUNROOT@/@LOGPATH@/datahead_write.log
       done 
       #}}}
-      _message " @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD@BLU@ Done!@DEF@\n"
+      _message "\n @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD@BLU@ Done!@DEF@\n"
     fi 
     #Update the datablock txt file 
     echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
@@ -457,7 +465,7 @@ function _replace_datahead {
         #Replace this file in the datahead
         >&2 echo "replace ${1##*/} -> ${_newfile##*/}"
         #Remove the old file(s)
-        rm -f ${_delete_list}
+        rm -f ${1} 
       else 
         >&2 echo "_delete variable in _replace_datahead has invalid value: ${_delete}?!"
         exit 1
@@ -535,7 +543,7 @@ function _write_datahead {
     #Clear the datahead 
     echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
     #Remove any datahead files 
-    rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*
+    find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
   else 
     #Check if the requested item exists in the datablock
     _found=0
@@ -598,15 +606,23 @@ function _add_datablock {
   #Copy the data to the block 
   if [ "$_filelist" != "" ] 
   then 
+    count=0
+    nfiles=`echo $2 | awk '{print NF}'`
+    _printstr=''
     for _file in $2
     do 
+      count=$((count+1))
       if [ -e "$_file" ]
       then 
-        _message " @BLU@>@DEF@ ${_file##*/} @BLU@-->@DEF@ ${1}"
-        rsync -atvL $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${_file##*/} >> @RUNROOT@/@LOGPATH@/datablock_add.log
-        _message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
+        #_message " @BLU@>@DEF@ ${_file##*/} @BLU@-->@DEF@ ${1}"
+        _message "\r${_printstr//?/ }\r"
+        _printstr=" @RED@  (`date +'%a %H:%M'`)@BLU@ -->@DEF@ ${_file##*/}@BLU@ (${count}/${nfiles})"
+        _message "${_printstr}"
+        rsync -atv $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${_file##*/} >> @RUNROOT@/@LOGPATH@/datablock_add.log
+        #_message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       fi 
     done 
+    _message "\n @BLU@>@DEF@ DATAHEAD @BLU@-->@DEF@ ${1}@BLU@ Done!@DEF@\n"
   fi 
   #Add item to datablock list 
   #_datablock=`echo "$_datablock $1=${_file}"`
@@ -1158,7 +1174,8 @@ function _splitpatch_blockitem {
       then 
         mv -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}
       else 
-        rm -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/*
+        #rm -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/*
+        find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/ -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
         mv -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}/* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/
         rmdir  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}
       fi 

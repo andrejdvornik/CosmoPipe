@@ -3,7 +3,7 @@
 # File Name : covariance_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Mon 28 Aug 2023 11:17:16 AM CEST
+# Last Modified : Fri 10 Nov 2023 04:02:25 PM CET
 #
 #=========================================
 
@@ -258,11 +258,16 @@ do
   sigmaelist="${sigmaelist} `cat ${file}`"
 done 
 sigmaelist=`echo ${sigmaelist} | sed 's/ /,/g'`
+surveymask=@SURVEYMASKFILE@
+surveymaskfile=${surveymask##*/}
+surveymaskdir=${surveymask%/*}
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 [survey specs]
 survey_area_lensing_in_deg2 = @SURVEYAREADEG@
 ellipticity_dispersion = ${sigmaelist}
 n_eff_lensing = ${nefflist}
+mask_directory = ${surveymaskdir}
+mask_file_lensing = ${surveymaskfile}
 
 EOF
 #}}}
