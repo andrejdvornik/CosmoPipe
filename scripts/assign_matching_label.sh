@@ -3,7 +3,7 @@
 # File Name : match_to_sims.sh
 # Created By : awright
 # Creation Date : 15-06-2023
-# Last Modified : Tue 14 Nov 2023 09:47:07 PM CET
+# Last Modified : Wed 15 Nov 2023 05:23:38 PM CET
 #
 #=========================================
 
@@ -24,7 +24,7 @@ then
   exit 1
 elif [ ${ntrain} -ne ${ninp} ]
 then 
-  if [ ${ntrain} -ne 1 ] 
+  if [ ${ninp} -ne 1 ] 
   then 
     outlist=''
     for i in `seq ${ninp}` 
@@ -32,7 +32,7 @@ then
       outlist="${outlist} ${train}"
     done
     train="${outlist}"
-  elif [ ${ninp} -ne 1 ]
+  elif [ ${ntrain} -ne 1 ]
   then 
     outlist=''
     for i in `seq ${ntrain}` 
@@ -69,15 +69,29 @@ do
   
   #Notify that we are matching these catalogues 
   _message " > @BLU@Matching label @BV:LABELNAME@ from training catalogue @RED@${current_train##*/}@BLU@ to target catalogue @RED@${current_target##*/}@DEF@"
-    @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/assign_matching_label.py \
-       -t ${current_train} \
-       -i ${current_target} \
-       -o ${output_file} \
-       -l @BV:LABELNAME@ \
-       -f ${target_features} 
-
+  @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/assign_matching_label.R \
+     -t ${current_train} \
+     -i ${current_target} \
+     -o ${output_file} \
+     -l @BV:LABELNAME@ \
+     -f ${target_features} 2>&1
   #Notify 
-  _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
+  _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
+
+  #Merge the new column {{{
+  _message "   -> @BLU@Merging new @BV:LABELNAME@ column @DEF@"
+  @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacjoinkey \
+    -i ${current_target} \
+    -p ${output_file} \
+    -o ${output_file}_tmp \
+    -k @BV:LABELNAME@ \
+    2>&1
+  #Notify 
+  _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
+  #Delete the temporary output file 
+  mv ${output_file}_tmp ${output_file}
+  #}}}
+
   #Update the DATAHEAD 
   _replace_datahead "${current_target}" "${output_file}"
 
