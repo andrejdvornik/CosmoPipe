@@ -3,7 +3,7 @@
 # File Name : add_prior_weights.sh
 # Created By : awright
 # Creation Date : 12-09-2023
-# Last Modified : Sat Oct 28 20:01:45 2023
+# Last Modified : Sun 19 Nov 2023 10:21:42 PM CET
 #
 #=========================================
 
@@ -17,6 +17,8 @@ _message " > @BLU@Computing prior volume correction weights for @RED@${input##*/
         --weightname "@BV:WEIGHTNAME@" \
         --zname @BV:ZSPECNAME@ \
         --maglim @BV:MAGLIMITS@ \
+        --magcut @BV:MAGTHRESH@ \
+        --magname @BV:REFMAGNAME@ \
         --filter @BV:MAGLIMIT_FILTER@ \
         2>&1 
 #Notify 

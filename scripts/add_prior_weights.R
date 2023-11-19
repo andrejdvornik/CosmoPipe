@@ -3,13 +3,13 @@
 # File Name : add_prior_weights.R
 # Created By : awright
 # Creation Date : 18-10-2023
-# Last Modified : Sat Oct 28 20:02:31 2023
+# Last Modified : Sun 19 Nov 2023 10:19:38 PM CET
 #
 #=========================================
 
 #Loop through the command arguments /*fold*/ {{{
 bw=0.01
-original.weight<-""
+mag.label<-original.weight<-""
 inputs<-commandArgs(TRUE)
 while (length(inputs)!=0) {
   #Check the options syntax /*fold*/ {{{
@@ -45,6 +45,19 @@ while (length(inputs)!=0) {
     z.label<-inputs[1]
     inputs<-inputs[-1]
     #/*fend*/}}}
+  } else if (inputs[1]=='--magcut') {
+    #Define the magnitude range to cut the data on /*fold*/ {{{
+    inputs<-inputs[-1]
+    magcut_lo<-as.numeric(inputs[1])
+    inputs<-inputs[-1]
+    if (!grepl("-",inputs[1])) { 
+      magcut_hi<-as.numeric(inputs[1])
+      inputs<-inputs[-1]
+    } else { 
+      magcut_hi<-magcut_lo
+      magcut_lo<-0 
+    } 
+    #/*fend*/}}}
   } else if (inputs[1]=='--maglim') {
     #Define the analytic magnitude limits /*fold*/ {{{
     inputs<-inputs[-1]
@@ -58,35 +71,68 @@ while (length(inputs)!=0) {
       maglim_lo<-0 
     } 
     #/*fend*/}}}
+  } else if (inputs[1]=='--magname') {
+    #Define the analytic magnitude limits /*fold*/ {{{
+    inputs<-inputs[-1]
+    mag.label<-inputs[1]
+    #/*fend*/}}}
   } else {
     stop(paste("Unknown option",inputs[1]))
   }
 }
 #}}}
 
-
 #Read the input catalogue 
 cat<-helpRfuncs::read.file(input.catalogue)
 
-#Compute the data Nz 
-nz_data<-density(cat[[z.label]],bw=bw/sqrt(12),kern='rect',from=0,to=max(cat[[z.label]]),n=1e4)
+#If the magnitude label is provided 
+if (mag.label!="") { 
+  #If magcut isn't defined, use the maglim values {{{ 
+  if (!exists("magcut_lo")) { 
+    magcut_lo<-maglim_lo
+    magcut_hi<-maglim_hi
+    warning("No --magcut was supplied, but --magname was: sample will be cut to --maglim range!")
+  }
+  #}}}
+  #Apply the magnitude limits to the data catalogue
+  cat.ind<-which(cat[[mag.label]]>=magcut_lo & cat[[mag.label]]<=magcut_hi)
+} else { 
+  #Otherwise use all sources 
+  cat.ind<-1:nrow(cat)
+}
+
+if (original.weight!="") { 
+  #Compute the data Nz using weights 
+  nz_data<-density(cat[[z.label]][cat.ind],weight=cat[[original.weight]][cat.ind],bw=bw/sqrt(12),kern='rect',from=0,to=max(cat[[z.label]]),n=1e4)
+} else { 
+  #Compute the data Nz using weights 
+  nz_data<-density(cat[[z.label]][cat.ind],bw=bw/sqrt(12),kern='rect',from=0,to=max(cat[[z.label]]),n=1e4)
+}
 
 #Compute the analytic Nz 
 nz_lo<-helpRfuncs::analytic_nz(filter=filter,maglim=maglim_lo)
 nz_hi<-helpRfuncs::analytic_nz(filter=filter,maglim=maglim_hi) 
 nz_eff<-nz_hi(nz_data$x)-nz_lo(nz_data$x)
+#Normalise to unit area 
 nz_eff<-nz_eff/sum(nz_eff)
 
 #Compute the prior weights function 
 ratio<-nz_eff/nz_data$y
+#Catch numerical noise in denominator 
 test<-nz_eff/zapsmall(nz_data$y)
+#Catch limiting cases 
 ratio[nz_eff==0]<-0
 ratio[!is.finite(ratio)|!is.finite(test)]<-NA
+#Define the weight function 
 weight_func<-approxfun(nz_data$x,ratio)
 
-#Output the weight 
-cat$PriorWeight<-weight_func(cat[[z.label]])
+#Assign the weight to each source within the magnitude limits 
+cat$PriorWeight<-NA 
+cat$PriorWeight[cat.ind]<-weight_func(cat[[z.label]][cat.ind])
+#Catch non-finite values 
 cat$PriorWeight[which(!is.finite(cat$PriorWeight))]<-0
+#Normalise the weights 
 cat$PriorWeight<-cat$PriorWeight/sum(cat$PriorWeight)
+#Output the weights 
 helpRfuncs::write.file(file=input.catalogue,cat)
 
