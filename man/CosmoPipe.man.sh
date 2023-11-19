@@ -300,6 +300,52 @@ function _rename_blockitem {
 }
 #}}}
 
+#Delete a datablock element {{{
+function _delete_blockitem { 
+  _head=`_read_datahead`
+  #Get the files in this data
+  _block=`_read_datablock`
+  #Get the variables
+  _vars=`_read_blockvars`
+  _seen=0
+  for _file in ${_block} 
+  do 
+    #If the item isn't what we want to add/write
+    if [ "${_file%%=*}" == "${1%%=*}" ]
+    then 
+      _seen=1
+    fi 
+  done 
+  if [ "${_seen}" != 1 ]
+  then 
+    _message "@RED@ - ERROR! The requested data block to delete (${1}) does not exist in the data block!@DEF@\n"
+    exit 1 
+  fi 
+  #Update the BLOCK items 
+  echo "BLOCK:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  #For each block row:
+  for _file in ${_block} 
+  do 
+    #If the item is't what we want to delete
+    if [ "${_file%%=*}" != "${1%%=*}" ]
+    then 
+      #Write it 
+      _file=`echo $_file`
+      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+    fi
+  done
+  #If this isn't a test, delete the folder 
+  if [ "$2" == "" ]
+  then 
+    if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} ]
+    then 
+      find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}/ -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
+      rmdir  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}
+    fi 
+  fi 
+}
+#}}}
+
 #Read the datahead {{{
 function _read_datahead { 
   #Read the data head entries 

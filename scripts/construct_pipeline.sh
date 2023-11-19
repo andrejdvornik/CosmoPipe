@@ -318,9 +318,16 @@ do
       lastassign=${step:1}
     fi 
     #}}}
+  elif [ "${step:0:1}" == "-" ]
+  then 
+    #Delete an item from the datablock  {{{
+    name=${step:1}
+    echo BLOCK deletion: removing ${name} 
+		VERBOSE=1 _delete_blockitem "${name}" TEST
+    #}}}
   elif [ "${step:0:1}" == "%" ]
   then 
-    #Modify the datablock with the current HEAD {{{
+    #Rename an item from in datablock  {{{
     names=${step:1}
     oldname=${names%%-*}
     newname=${names##*-}
@@ -334,11 +341,6 @@ do
     cat @RUNROOT@/@PIPELINE@_links.R | sed "s/${oldname}(${oldname})/${newname}(${newname})/g" > @RUNROOT@/@PIPELINE@_links.R.tmp
     mv @RUNROOT@/@PIPELINE@_links.R.tmp @RUNROOT@/@PIPELINE@_links.R
     #}}}
-  elif [ "${step:0:1}" == "-" ]
-  then 
-    VERBOSE=1 _message "${RED} - ERROR${DEF}\n\n"
-    VERBOSE=1 _message "${RED}ERROR: requested an unimplemented special operator: '-'\n   ${step}${DEF}\n"
-    exit 1 
   elif [ "${step:0:1}" == "~" ]
   then 
     VERBOSE=1 _message "${RED} - ERROR${DEF}\n\n"
