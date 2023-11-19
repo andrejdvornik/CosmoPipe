@@ -336,10 +336,14 @@ do
     #}}}
   elif [ "${step:0:1}" == "-" ]
   then 
-    echo UNIMPLEMENTED
+    VERBOSE=1 _message "${RED} - ERROR${DEF}\n\n"
+    VERBOSE=1 _message "${RED}ERROR: requested an unimplemented special operator: '-'\n   ${step}${DEF}\n"
+    exit 1 
   elif [ "${step:0:1}" == "~" ]
   then 
-    echo UNIMPLEMENTED
+    VERBOSE=1 _message "${RED} - ERROR${DEF}\n\n"
+    VERBOSE=1 _message "${RED}ERROR: requested an unimplemented special operator: '~'\n   ${step}${DEF}\n"
+    exit 1 
   elif [ "${step:0:1}" == "+" ]
   then 
     #Add the new variable to the datablock {{{
