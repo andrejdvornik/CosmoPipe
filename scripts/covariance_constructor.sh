@@ -17,6 +17,7 @@ fi
 
 # Infer statistic {{{
 STATISTIC="@BV:STATISTIC@"
+SECONDSTATISTIC="@BV:SECONDSTATISTIC@"
 if [ "${STATISTIC^^}" == "XIPM" ]
 then
 est_shear=xi_pm
@@ -27,17 +28,59 @@ elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
 then
 est_shear=bandpowers
 else 
-  #ERROR: unknown statistic {{{
-  _message "Statistic Unknown: ${STATISTIC^^}\n"
+  #ERROR: nknown statistic {{{
+  _message "Unknown statistic: ${STATISTIC^^}\n"
   exit 1
   #}}}
 fi
+if [ "${SECONDSTATISTIC^^}" == "XIPM" ] || [ "${SECONDSTATISTIC^^}" == "COSEBIS" ] || [ "${SECONDSTATISTIC^^}" == "BANDPOWERS" ]
+then
+  if [ "${STATISTIC^^}" == "${SECONDSTATISTIC^^}" ]
+  then
+    _message "You requested the OneCovariance to compute the correlation between two statistics, but both were set to ${STATISTIC^^}! Computing the covariance for this statistic only!\n"
+    cov_between_stats=False
+  else
+    _message "You requested the OneCovariance to compute the correlation between ${STATISTIC^^} and ${SECONDSTATISTIC^^}!\n"
+    cov_between_stats=True
+  fi
+fi
 #}}}
+
+# Infer central values of the prior for cosmological and nuisance parameters
+central_value () {
+  n=`echo $1 | awk '{print NF}'`
+  if [ $n == 1 ]
+  then
+    value=`echo $1`
+  elif [ $n == 3 ]
+  then
+    value=`echo $1 | awk '{print $2}'`
+  fi
+  echo $value
+}
+AIA=`central_value "@BV:PRIOR_AIA@"`
+H0=`central_value "@BV:PRIOR_H0@"`
+omega_b=`central_value "@BV:PRIOR_OMBH2@"`
+omega_c=`central_value "@BV:PRIOR_OMCH2@"`
+w0=`central_value "@BV:PRIOR_W@"`
+wa=`central_value "@BV:PRIOR_WA@"` 
+ns=`central_value "@BV:PRIOR_NS@"`
+mnu=`central_value "@BV:PRIOR_MNU@"`
+S8=`central_value "@BV:PRIOR_S8INPUT@"`
+Omega_m=`echo "$omega_b $omega_c $H0" | awk '{printf "%f", ($1 + $2) /$3 /$3}'`
+Omega_b=`echo "$omega_b $H0" | awk '{printf "%f", $1 /$2 /$2}'`
+Omega_de=`echo "$Omega_m $H0" | awk '{printf "%f", 1 - $1}'`
+sigma8=`echo "$S8 $Omega_m" | awk '{printf "%f", $1 / sqrt($2/0.3)}'`
 
 # Covariance input path (just pointing to a inputs folder in the datablock) 
 input_path="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs"
 # Output path
-output_path=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_@BV:STATISTIC@
+if [ "${cov_between_stats}" == "True" ]
+then
+  output_path=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_@BV:STATISTIC@_@BV:SECONDSTATISTIC@
+else
+  output_path=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_@BV:STATISTIC@
+fi
 # COSEBIs basis function path
 COSEBISLOC=@RUNROOT@/@CONFIGPATH@/cosebis/
 mbiaslist=""
@@ -64,16 +107,13 @@ clustering = False
 est_clust = w
 cstellar_mf = False
 cross_terms = True
-unbiased_clustering = False
-
-[arbitrary_observables]
-do_arbitrary_obs = False
+unbiased_clustering = True
 
 [csmf settings]
 csmf_log10Mmin = 9.1
 csmf_log10Mmax = 11.3
 csmf_N_log10M_bin = 10
-csmf_directory = ./input/conditional_smf/
+csmf_directory = @RUNROOT@/INSTALL/OneCovariance/input/conditional_smf/
 ;csmf_log10M_bins = 
 V_max_file = V_max.asc
 f_tomo_file = f_tomo.asc
@@ -83,7 +123,7 @@ directory = ${output_path}
 file = covariance_list.dat, covariance_matrix.mat
 style = list, matrix
 list_style_spatial_first = True
-corrmatrix_plot = False
+corrmatrix_plot = correlation_coefficient.pdf
 save_configs = save_configs.ini
 save_Cells = True
 save_trispectra = False
@@ -125,9 +165,13 @@ EOF
 #}}}
 
 # Statistic {{{
-if [ "${STATISTIC^^}" == "XIPM" ]
-then
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+
+EOF
+
+if [ "${STATISTIC^^}" == "XIPM" ] || [ "${SECONDSTATISTIC^^}" == "XIPM" ]
+then
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covTHETAspace settings]
 theta_min = @BV:THETAMINXI@
 theta_max = @BV:THETAMAXXI@
@@ -156,9 +200,18 @@ mix_term_file_path_save_triplets = ${input_path}/mixterm/triplets
 mix_term_file_path_load_triplets = ${input_path}/mixterm/triplets
 
 EOF
-elif [ "${STATISTIC^^}" == "COSEBIS" ]
+else
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+[covTHETAspace settings]
+theta_accuracy = 1e-5
+integration_intervals = 50
+
+EOF
+fi
+
+if [ "${STATISTIC^^}" == "COSEBIS" ]  || [ "${SECONDSTATISTIC^^}" == "COSEBIS" ]
 then
-cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covCOSEBI settings]
 En_modes = @BV:NMAXCOSEBIS@
 theta_min = @BV:THETAMINXI@
@@ -167,11 +220,13 @@ En_accuracy = 1e-4
 Wn_style = log
 
 EOF
-elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
+fi
+
+if [ "${STATISTIC^^}" == "BANDPOWERS" ]  || [ "${SECONDSTATISTIC^^}" == "BANDPOWERS" ]
 then
 theta_lo=`echo 'e(l(@BV:THETAMINXI@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
 theta_up=`echo 'e(l(@BV:THETAMAXXI@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covbandpowers settings]
 apodisation_log_width = @BV:APODISATIONWIDTH@
 theta_lo = ${theta_lo}
@@ -182,10 +237,6 @@ ell_max = @BV:LMAXBANDPOWERS@
 ell_bins = @BV:NBANDPOWERS@
 ell_type = log
 bandpower_accuracy = 1e-7
-
-[covTHETAspace settings]
-theta_accuracy = 1e-5
-integration_intervals = 50
 
 EOF
 fi
@@ -235,17 +286,16 @@ EOF
 # All kinds of parameters {{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 [cosmo]
-sigma8 = 0.83
-; A_s = ? (not implemented at the moment, please speicify sigma8)
-h = 0.674
-omega_m = 0.3075
-omega_b = 0.0486
-omega_de = 0.6925
-w0 = -1.0
-wa = 0.0
-ns = 0.9667
+sigma8 = $sigma8
+h = $H0
+omega_m = $Omega_m
+omega_b = $Omega_b
+omega_de = $Omega_de
+w0 = $w0
+wa = $wa
+ns = $ns
 neff = 3.046
-m_nu = 0.0
+m_nu = $mnu
 tcmb0 = 2.725
 
 [bias]
@@ -253,10 +303,10 @@ model = Tinker10
 bias_2h = 1.0
 mc_relation_cen = duffy08
 mc_relation_sat = duffy08
-log10mass_bins = 9.1, 9.95, 11.3
+log10mass_bins = 9.1, 11.3
 
 [IA]
-A_IA = 0.264
+A_IA = $AIA
 eta_IA = 0.0
 z_pivot_IA = 0.3
 
@@ -303,6 +353,9 @@ matter_mulim = 0.001
 small_k_damping_for1h = damped
 lower_calc_limit = 1e-200
 
+[misc]
+num_cores = @BV:COVNCORES@
+
 [tabulated inputs files]
 npair_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/
 npair_mm_file = @BV:NPAIRBASE@_nBins_${NTOMO}_Bin?_Bin?.ascii
@@ -313,13 +366,46 @@ Tn_plus_file = Tplus?.table
 Tn_minus_file = Tminus?.table
 Qn_file = Q_n?_0.50-300.00
 Un_file = U_n?_0.50-300.00
-
-
-[misc]
-num_cores = @BV:COVNCORES@
+Cell_directory = ${output_path}
 
 EOF
 #}}}
+
+# Covariance between summary statistics {{{
+if [ "${cov_between_stats}" == "True" ]
+then
+    arb_fourier_filter_mmE_file_xipm="fourier_weight_realspace_cf_mm_p_?.table"
+    arb_fourier_filter_mmB_file_xipm="fourier_weight_realspace_cf_mm_m_?.table"
+    arb_real_filter_mm_p_file_xipm="real_weight_realspace_cf_mm_p_?.table"
+    arb_real_filter_mm_m_file_xipm="real_weight_realspace_cf_mm_m_?.table"
+
+    arb_fourier_filter_mmE_file_cosebis="WnLog?-0.50-300.00.table"
+    arb_fourier_filter_mmB_file_cosebis="WnLog?-0.50-300.00.table"
+    arb_real_filter_mm_p_file_cosebis="Tplus?_0.50-300.00.table"
+    arb_real_filter_mm_m_file_cosebis="Tminus?_0.50-300.00.table"
+
+    arb_fourier_filter_mmE_file_bandpowers="fourier_weight_bandpowers_mmE_?.table"
+    arb_fourier_filter_mmB_file_bandpowers="fourier_weight_bandpowers_mmB_?.table"
+    arb_real_filter_mm_p_file_bandpowers="real_weight_bandpowers_mmE_?.table"
+    arb_real_filter_mm_m_file_bandpowers="real_weight_bandpowers_mmB_?.table"
+
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+arb_summary_directory = @RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/
+arb_fourier_filter_mmE_file = ${arb_fourier_filter_mmE_file_@BV:STATISTIC@}, ${arb_fourier_filter_mmE_file_@BV:SECONDSTATISTIC@}
+arb_fourier_filter_mmB_file = ${arb_fourier_filter_mmB_file_@BV:STATISTIC@}, ${arb_fourier_filter_mmB_file_@BV:SECONDSTATISTIC@}
+arb_real_filter_mm_p_file = ${arb_real_filter_mm_p_file_@BV:STATISTIC@}, ${arb_real_filter_mm_p_file_@BV:SECONDSTATISTIC@}
+arb_real_filter_mm_m_file = ${arb_real_filter_mm_m_file_@BV:STATISTIC@}, ${arb_real_filter_mm_m_file_@BV:SECONDSTATISTIC@}
+
+[arbitrary_summary]
+do_arbitrary_obs = True
+oscillations_straddle = 50
+arbitrary_accuracy = 1e-5
+
+EOF
+
+fi
+#}}}
+
 
 #Construct the .ini file {{{
 cat \

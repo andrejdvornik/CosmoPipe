@@ -8,14 +8,29 @@
 #=========================================
 
 #Create the covariance output directory
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_@BV:STATISTIC@ ]
-then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_@BV:STATISTIC@/
-fi 
+SECONDSTATISTIC="@BV:SECONDSTATISTIC@"
+if [ "${SECONDSTATISTIC^^}" == "XIPM" ] || [ "${SECONDSTATISTIC^^}" == "COSEBIS" ] || [ "${SECONDSTATISTIC^^}" == "BANDPOWERS" ]
+then
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_@BV:STATISTIC@_@BV:SECONDSTATISTIC@ ]
+  then 
+    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_@BV:STATISTIC@_@BV:SECONDSTATISTIC@/
+  fi 
+else
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_@BV:STATISTIC@ ]
+  then 
+    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_@BV:STATISTIC@/
+  fi 
+fi
 # @BV:NTHREADS@ 
 #Run cosmosis for a constructed ini file 
 _message " >@BLU@ Running covariance!\n   Start time:@DEF@ `date +'%a %H:%M'`@BLU@)\n@DEF@"
+_message " >@BLU@ Status can be monitored in the logfile located here:\n@RED@ `ls -tr @RUNROOT@/@LOGPATH@/step_*_run_covariance.log | tail -n 1` @DEF@\n"
 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=@BV:COVNTHREADS@ @PYTHON3BIN@ @RUNROOT@/INSTALL/OneCovariance/covariance.py @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@BV:STATISTIC@_@SURVEY@_CosmoPipe_constructed.ini 2>&1 
 _message " >@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
 
-_write_datablock "covariance_@BV:STATISTIC@" "covariance_matrix.mat"
+if [ "${SECONDSTATISTIC^^}" == "XIPM" ] || [ "${SECONDSTATISTIC^^}" == "COSEBIS" ] || [ "${SECONDSTATISTIC^^}" == "BANDPOWERS" ]
+then
+  _write_datablock "covariance_@BV:STATISTIC@_@BV:SECONDSTATISTIC@" "covariance_matrix.mat"
+else
+  _write_datablock "covariance_@BV:STATISTIC@" "covariance_matrix.mat"
+fi
