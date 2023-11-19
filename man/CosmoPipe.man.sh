@@ -300,6 +300,56 @@ function _rename_blockitem {
 }
 #}}}
 
+#Export a datablock element {{{
+function _export_blockitem { 
+  _head=`_read_datahead`
+  #Get the files in this data
+  _block=`_read_datablock`
+  #Get the variables
+  _vars=`_read_blockvars`
+  _seen=0
+  for _file in ${_block} 
+  do 
+    #If the item is what we want to export 
+    if [ "${_file%%=*}" == "${1%%=*}" ]
+    then 
+      _seen=1
+    fi 
+  done 
+  if [ "${_seen}" != 1 ]
+  then 
+    _message "@RED@ - ERROR! The requested data block to export (${1}) does not exist in the data block?!@DEF@\n"
+    exit 1 
+  fi 
+  #If this is not a test 
+  if [ "$3" == "" ]
+  then 
+    if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} ]
+    then 
+      if [ ! -d @RUNROOT@/@STORAGEPATH@/${2%%=*} ] 
+      then 
+        rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/${2%%=*}
+      else 
+        #Try to add a number to the end of the folder name... 
+        copied=FALSE
+        for i in `seq 100`
+        do 
+          if [ ! -d @RUNROOT@/@STORAGEPATH@/${2%%=*}_${i} ] 
+          then 
+            rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/${2%%=*}_${i}
+            copied=TRUE
+          fi 
+        done 
+        if [ "${copied}" == "FALSE" ]
+        then 
+          _message "@RED@ - ERROR! The requested data block to export (@DEF@${1%%=*}@RED@) could not be exported because the requested folder (@DEF@${2%%=*}@RED@) could not be created (even with 100 attempts at unique endings)?!@DEF@\n"
+           exit 1 
+        fi 
+      fi 
+    fi 
+  fi 
+}
+#}}}
 #Delete a datablock element {{{
 function _delete_blockitem { 
   _head=`_read_datahead`

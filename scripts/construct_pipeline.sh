@@ -327,7 +327,7 @@ do
     #}}}
   elif [ "${step:0:1}" == "%" ]
   then 
-    #Rename an item from in datablock  {{{
+    #Rename an item in the datablock  {{{
     names=${step:1}
     oldname=${names%%-*}
     newname=${names##*-}
@@ -343,9 +343,13 @@ do
     #}}}
   elif [ "${step:0:1}" == "~" ]
   then 
-    VERBOSE=1 _message "${RED} - ERROR${DEF}\n\n"
-    VERBOSE=1 _message "${RED}ERROR: requested an unimplemented special operator: '~'\n   ${step}${DEF}\n"
-    exit 1 
+    #Export an item from the datablock  {{{
+    names=${step:1}
+    blockname=${names%%-*}
+    outname=${names##*-}
+    echo BLOCK export: copying ${blockname} to external folder ${outname}
+		VERBOSE=1 _export_blockitem "${blockname}" "${outname}" TEST
+    #}}}
   elif [ "${step:0:1}" == "+" ]
   then 
     #Add the new variable to the datablock {{{
@@ -747,12 +751,28 @@ do
 
 		EOF
     #}}}
+  elif [ "${step:0:1}" == "-" ]
+  then 
+    #If this is a datablock deletion: {{{
+    cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
+		
+		#Intermediate Step: delete the block item ${step:1} {{{
+		#Notify
+		_message "@BLU@Deleting block item ${step:1} from the datablock@DEF@ {\n"
+		#Delete the requested block item ${step:1} 
+    _delete_blockitem ${step:1} 
+		#Notify
+		_message "} - @RED@Done!@DEF@\n"
+		#}}}
+
+		EOF
+    #}}}
   elif [ "${step:0:1}" == "%" ]
   then 
+    #If this is a datablock rename: {{{
     names=${step:1}
     oldname=${names%%-*}
     newname=${names##*-}
-    #If this is a datablock rename: {{{
     cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
 		
 		#Intermediate Step: rename block item ${oldname} to ${newname} {{{
@@ -768,8 +788,8 @@ do
     #}}}
   elif [ "${step:0:1}" == "+" ]
   then 
-    echo "ASSIGNMENT TIME: ${step}"
     #If this is a blockvariable assignment: {{{
+    echo "ASSIGNMENT TIME: ${step}"
     _var=${step:1}
     _varval=${_var#*=}
     _var=${_var%%=*}
@@ -790,14 +810,17 @@ do
     #}}}
   elif [ "${step:0:1}" == "~" ]
   then 
-    #If this is a datablock split: {{{
+    #If this is a datablock item export: {{{
+    names=${step:1}
+    blockname=${names%%-*}
+    outname=${names##*-}
     cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
 		
-		#Intermediate Step: split the requested block item by patch: ${step:1} {{{
+		#Intermediate Step: export the block item ${blockname} to external storage {{{
 		#Notify
-		_message "@BLU@Splitting block element ${step:1} into patchwise block elements@DEF@ {\n"
-		#Modify the datablock with the current HEAD
-		_splitpatch_blockitem ${step:1} 
+		_message "@BLU@Exporting block element ${blockname} into external storage ${outname} @DEF@ {\n"
+		#Export the requested block item ${blockname} to external storage ${outname}
+		_export_blockitem ${blockname} ${outname}
 		#Notify
 		_message "} - @RED@Done!@DEF@\n"
 		#}}}
