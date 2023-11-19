@@ -3,7 +3,7 @@
 # File Name : replicate_datahead.sh
 # Created By : awright
 # Creation Date : 25-04-2023
-# Last Modified : Tue 14 Nov 2023 02:03:26 PM CET
+# Last Modified : Wed 15 Nov 2023 10:59:02 PM CET
 #
 #=========================================
 
@@ -42,7 +42,7 @@ do
       fi 
     else 
       #duplicate the file 
-      rsync -atv ${file} ${file//.${ext}/_${i}.${ext}}
+      rsync -atvL ${file} ${file//.${ext}/_${i}.${ext}}
     fi 
     #Add duplicate to output list 
     outlist="$outlist $ofile"
