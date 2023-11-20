@@ -328,7 +328,7 @@ function _export_blockitem {
     then 
       if [ ! -d @RUNROOT@/@STORAGEPATH@/${2%%=*} ] 
       then 
-        rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/${2%%=*}
+        rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/${2%%=*} 2>&1 
       else 
         #Try to add a number to the end of the folder name... 
         copied=FALSE
@@ -336,7 +336,7 @@ function _export_blockitem {
         do 
           if [ ! -d @RUNROOT@/@STORAGEPATH@/${2%%=*}_${i} ] 
           then 
-            rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/${2%%=*}_${i}
+            rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/${2%%=*}_${i} 2>&1 
             copied=TRUE
           fi 
         done 
@@ -350,6 +350,7 @@ function _export_blockitem {
   fi 
 }
 #}}}
+
 #Delete a datablock element {{{
 function _delete_blockitem { 
   _head=`_read_datahead`
@@ -508,7 +509,7 @@ function _add_datahead {
         _printstr=" @RED@  (`date +'%a %H:%M'`)@BLU@ -->@DEF@ ${file##*/}@BLU@ (${count}/${nfiles})"
         _message "${_printstr}"
         #Copy the file (will skip if file exists and is unchanged)
-        rsync -atv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${file} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ >> @RUNROOT@/@LOGPATH@/datahead_write.log
+        rsync -atv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${file} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ 2>&1 
       done 
       #}}}
       _message "\n @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD@BLU@ Done!@DEF@\n"
@@ -714,7 +715,7 @@ function _add_datablock {
         _message "\r${_printstr//?/ }\r"
         _printstr=" @RED@  (`date +'%a %H:%M'`)@BLU@ -->@DEF@ ${_file##*/}@BLU@ (${count}/${nfiles})"
         _message "${_printstr}"
-        rsync -atv $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${_file##*/} >> @RUNROOT@/@LOGPATH@/datablock_add.log
+        rsync -atv $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${_file##*/} 2>&1 
         #_message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       fi 
     done 
@@ -1190,93 +1191,6 @@ function _incorporate_datablock {
   fi
   #}}}
 
-}
-#}}}
-
-#Split a block element by patch {{{
-function _splitpatch_blockitem { 
-  _head=`_read_datahead`
-  #Get the files in this data
-  _block=`_read_datablock`
-  #Get the variables
-  _vars=`_read_blockvars`
-  _seen=0
-  for _file in ${_block} 
-  do 
-    #If the item isn't what we want to add/write
-    if [ "${_file%%=*}" == "${1}" ]
-    then 
-      _seen=1
-    fi 
-  done 
-  if [ "${_seen}" != 1 ]
-  then 
-    _message "@RED@ - ERROR! The requested data block to rename (${1}) does not exist in the data block!"
-    exit 1 
-  fi 
-  #Update the BLOCK items 
-  echo "BLOCK:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  #For each block row:
-  for _file in ${_block} 
-  do 
-    #If the item is what we want to split
-    if [ "${_file%%=*}" == "${1}" ]
-    then 
-      #Get the item list 
-      _files=`_blockentry_to_filelist ${_files}`
-      #Loop over patches 
-      for _patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
-      do 
-        #Loop over files 
-        outputlist=''
-        outputpaths=''
-        for input in ${_files} 
-        do 
-          #If the input file matches the patch 
-          if  [[ "$input" =~ .*"_${_patch}_".* ]] 
-          then 
-            #Add the file to the output list 
-            outputlist="${outputlist},${input}"
-            outputpaths="${outputpaths} @RUNROOT@/@STORAGEDIR@/@DATABLOCK@/${1}/${input}"
-          fi 
-        done 
-        #If there are matches 
-        if [ "${outputlist}" != "" ] 
-        then 
-          >&2 echo "@BLU@ Splitting catalogues into @DEF@${1}_${_patch} "
-          #Check the directory exists 
-          if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}_${_patch} ]
-          then 
-            mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}_${_patch}
-          fi 
-          #Move the files 
-          mv ${outputpaths} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}_${_patch}/
-          #Write the new entry to the datablock (without the leading comma)
-          echo "${1}_${_patch}={${outputlist:1}}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-          >&2 echo "@RED@- Done!@DEF@\n"
-        fi 
-      done 
-    else 
-      #Write it 
-      _file=`echo $_file`
-      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-    fi
-  done
-  if [ "$3" == "" ]
-  then 
-    if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} ]
-    then 
-      if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*} ] 
-      then 
-        mv -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}
-      else 
-        #rm -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/*
-        find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/ -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
-        mv -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}/* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/
-        rmdir  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}
-      fi 
-    fi 
-  fi 
 }
 #}}}
 
