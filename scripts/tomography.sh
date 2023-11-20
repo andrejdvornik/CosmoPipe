@@ -45,7 +45,7 @@ do
   links="FALSE"
   for file in ${inputfile} ${outputname}
   do 
-    if [ ${#file} -gt 255 ] 
+    if [ ${#file} -gt 250 ] 
     then 
       links="TRUE"
     fi 
@@ -112,6 +112,61 @@ do
     #}}}
   fi 
   #}}}
+
+  #Check if input file lengths are ok {{{
+  links="FALSE"
+  for file in ${outputname}
+  do 
+    if [ ${#file} -gt 250 ] 
+    then 
+      links="TRUE"
+    fi 
+  done 
+  
+  if [ "${links}" == "TRUE" ] 
+  then
+    #Remove existing outfile links 
+    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    then 
+      rm outfile.lnk
+    fi
+    #Create output links 
+    ln -s ${outputname} outfile.lnk
+    origout=${outputname}
+    outputname=outfile.lnk
+  fi 
+  #}}}
+  #Check if the patch label exists {{{
+  cleared=1
+  _message "   > @BLU@Testing existence of Tomographic ID column in @DEF@${outputname##*/}@DEF@ "
+  @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${outputname} -t OBJECTS -k TOMOBIN 2>&1 || cleared=0
+  _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
+  #}}}
+  #If exists, delete it {{{
+  if [ "${cleared}" == "1" ] 
+  then 
+    _message "   > @BLU@Removing existing patch ID key from @DEF@${outputname##*/}@DEF@ "
+    @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacdelkey -i ${outputname} -o ${outputname}_tmp -t OBJECTS -k TOMOBIN 2>&1 
+    mv ${outputname}_tmp ${outputname}
+    _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
+  fi 
+  #}}}
+  #add the patch label column {{{
+  _message "   > @BLU@Adding Tomographic Bin label @DEF@${i}@BLU@ to @DEF@${outputname##*/}@DEF@ "
+  @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacaddkey -i ${outputname} -o ${outputname}_tmp -t OBJECTS -k TOMOBIN ${i} SHORT "tomographic bin identifier" 2>&1
+  #move the new catalogue to the original name 
+  mv ${outputname}_tmp ${outputname}
+  _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
+  #}}}
+
+  #If used, undo the links {{{
+  if [ "${links}" == "TRUE" ] 
+  then 
+    rm ${outputname}
+    outputname=${origout}
+  fi 
+  #}}}
+
 done
 #}}}
 
