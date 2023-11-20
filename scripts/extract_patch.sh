@@ -108,9 +108,9 @@ do
   #If using links, replace them {{{
   if [ "${links}" == "TRUE" ] 
   then 
-    rm ${input} ${output}
-    input=${originp}
-    output=${origout}
+    rm ${inputfile} ${outputname}
+    inputfile=${originp}
+    outputname=${origout}
   fi 
   #}}}
   
