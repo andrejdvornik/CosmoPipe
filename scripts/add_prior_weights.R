@@ -3,7 +3,7 @@
 # File Name : add_prior_weights.R
 # Created By : awright
 # Creation Date : 18-10-2023
-# Last Modified : Sun 19 Nov 2023 10:19:38 PM CET
+# Last Modified : Mon 20 Nov 2023 09:53:26 AM CET
 #
 #=========================================
 
@@ -75,6 +75,7 @@ while (length(inputs)!=0) {
     #Define the analytic magnitude limits /*fold*/ {{{
     inputs<-inputs[-1]
     mag.label<-inputs[1]
+    inputs<-inputs[-1]
     #/*fend*/}}}
   } else {
     stop(paste("Unknown option",inputs[1]))
