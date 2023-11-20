@@ -291,7 +291,7 @@ function _rename_blockitem {
         mv -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}
       else 
         #rm -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/*
-        find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/ -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
+        find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/ -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
         mv -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}/* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/
         rmdir  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}
       fi 
@@ -390,7 +390,7 @@ function _delete_blockitem {
   then 
     if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} ]
     then 
-      find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}/ -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
+      find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}/ -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
       rmdir  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}
     fi 
   fi 
@@ -437,7 +437,7 @@ function _add_datahead {
     echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
     #Remove any datahead files 
     #rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*
-    find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
+    find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
     #}}}
   else 
     #Copy the requested data to the datahead {{{
