@@ -338,6 +338,7 @@ function _export_blockitem {
           then 
             rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/${2%%=*}_${i} 2>&1 
             copied=TRUE
+            break
           fi 
         done 
         if [ "${copied}" == "FALSE" ]
