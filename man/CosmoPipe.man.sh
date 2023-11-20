@@ -328,7 +328,7 @@ function _export_blockitem {
     then 
       if [ ! -d @RUNROOT@/@STORAGEPATH@/${2%%=*} ] 
       then 
-        rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/${2%%=*} 2>&1 
+        rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/${2%%=*} 2>&1 > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IOlog.txt
       else 
         #Try to add a number to the end of the folder name... 
         copied=FALSE
@@ -336,7 +336,7 @@ function _export_blockitem {
         do 
           if [ ! -d @RUNROOT@/@STORAGEPATH@/${2%%=*}_${i} ] 
           then 
-            rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/${2%%=*}_${i} 2>&1 
+            rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/${2%%=*}_${i} 2>&1 > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IOlog.txt
             copied=TRUE
             break
           fi 
@@ -510,7 +510,7 @@ function _add_datahead {
         _printstr=" @RED@  (`date +'%a %H:%M'`)@BLU@ -->@DEF@ ${file##*/}@BLU@ (${count}/${nfiles})"
         _message "${_printstr}"
         #Copy the file (will skip if file exists and is unchanged)
-        rsync -atv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${file} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ 2>&1 
+        rsync -atv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${file} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ 2>&1 > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IOlog.txt
       done 
       #}}}
       _message "\n @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD@BLU@ Done!@DEF@\n"
@@ -716,7 +716,7 @@ function _add_datablock {
         _message "\r${_printstr//?/ }\r"
         _printstr=" @RED@  (`date +'%a %H:%M'`)@BLU@ -->@DEF@ ${_file##*/}@BLU@ (${count}/${nfiles})"
         _message "${_printstr}"
-        rsync -atv $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${_file##*/} 2>&1 
+        rsync -atv $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${_file##*/} 2>&1 > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IOlog.txt
         #_message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       fi 
     done 
