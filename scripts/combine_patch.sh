@@ -3,7 +3,7 @@
 # File Name : combine_patch.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Fri 03 Nov 2023 04:12:29 PM CET
+# Last Modified : Mon 20 Nov 2023 08:58:15 AM CET
 #
 #=========================================
 
@@ -23,7 +23,7 @@ then
   _message "@RED@There are no input files with the patch ${basepatch}?!@DEF@\n"
   exit 1 
 fi 
-#Add a patch label to each catalogue (for subsequent patch extraction, if needed)
+#Add a patch label to each catalogue (for subsequent patch extraction, if needed) {{{
 for cata in ${inputcats}
 do 
   for patch in ${patches}
@@ -57,12 +57,14 @@ do
     ln -s ${cata} infile.lnk
     cata="infile.lnk"
   fi 
-  #Check if the patch label exists
+  #}}}
+  #Check if the patch label exists {{{
   cleared=1
   _message "   > @BLU@Testing existence of Patch ID column in @DEF@${cata##*/}@DEF@ "
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${cata} -t OBJECTS -k PATCH 2>&1 || cleared=0
   _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
-  #If exists, delete it 
+  #}}}
+  #If exists, delete it {{{
   if [ "${cleared}" == "1" ] 
   then 
     _message "   > @BLU@Removing existing patch ID key from @DEF@${cata##*/}@DEF@ "
@@ -70,13 +72,16 @@ do
     mv ${cata}_tmp ${cata}
     _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
   fi 
-  #add the patch label column 
+  #}}}
+  #add the patch label column {{{
   _message "   > @BLU@Adding patch @DEF@${patch}@BLU@ identification key to @DEF@${cata##*/}@DEF@ "
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacaddkey -i ${cata} -o ${cata}_tmp -t OBJECTS -k PATCH "${patch}_patch" string "patch identifier" 2>&1
   #move the new catalogue to the original name 
   mv ${cata}_tmp ${cata}
   _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
+  #}}}
 done 
+#}}}
 
 
 #Loop through files 
