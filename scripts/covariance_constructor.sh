@@ -345,7 +345,7 @@ transfer_model = CAMB
 small_k_damping_for1h = damped
 
 [powspec evaluation]
-non_linear_model = mead2015
+non_linear_model = mead2020_feedback
 log10k_bins = 400
 log10k_min = -3.49
 log10k_max = 2.15
