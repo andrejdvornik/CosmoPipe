@@ -33,6 +33,12 @@ else
   exit 1
   #}}}
 fi
+if [ "@BV:MIXTERM@" == "True" ]
+then 
+  mix_term="xipxip"
+else
+  mix_term=""
+fi
 if [ "${SECONDSTATISTIC^^}" == "XIPM" ] || [ "${SECONDSTATISTIC^^}" == "COSEBIS" ] || [ "${SECONDSTATISTIC^^}" == "BANDPOWERS" ]
 then
   if [ "${STATISTIC^^}" == "${SECONDSTATISTIC^^}" ]
@@ -183,7 +189,7 @@ xi_mm = True
 theta_accuracy = 1e-5
 integration_intervals = 50
 
-mix_term_do_mix_for = xipxip
+mix_term_do_mix_for = ${mix_term}
 mix_term_file_path_catalog = @DB:main_all_gold_recal_cc@
 mix_term_col_name_weight = @BV:WEIGHTNAME@
 mix_term_col_name_pos1 = @BV:RANAME@
