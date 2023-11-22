@@ -13,5 +13,7 @@ then
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_cosebis/
 fi 
 
-_write_datablock "covariance_cosebis" "Covariance_blind@BV:BLIND@_nMaximum_@BV:NMAXCOSEBIS@_@BV:THETAMINXI@_@BV:THETAMAXXI@_nBins@BV:NTOMO@.ascii"
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
+
+_write_datablock "covariance_cosebis" "Covariance_blind@BV:BLIND@_nMaximum_@BV:NMAXCOSEBIS@_@BV:THETAMINXI@_@BV:THETAMAXXI@_nBins${NTOMO}.ascii"
 
