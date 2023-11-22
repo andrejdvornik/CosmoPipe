@@ -3,7 +3,7 @@
 # File Name : ldackeepcols.sh
 # Created By : awright
 # Creation Date : 12-06-2023
-# Last Modified : Thu 02 Nov 2023 02:19:55 PM CET
+# Last Modified : Wed 22 Nov 2023 08:38:51 AM CET
 #
 #=========================================
 
@@ -55,7 +55,7 @@ keepstr="@BV:KEEPSTRINGS@"
 keepstr="${keepstr// /\\|}"
 
 #Get the list of all columns 
-cols=`@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacdesc -i ${input} -t OBJECTS 2>&1 | grep "Key name" | sed 's@Key name:\(\.\)\{1,\}@@' || echo `
+cols=`@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacdesc -i ${input} -t OBJECTS 2>/dev/null | grep "Key name" | sed 's@Key name:\(\.\)\{1,\}@@' || echo `
 
 if [ "${cols}" == "" ] 
 then 
