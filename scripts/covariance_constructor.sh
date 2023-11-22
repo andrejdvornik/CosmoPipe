@@ -28,7 +28,7 @@ elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
 then
 est_shear=bandpowers
 else 
-  #ERROR: nknown statistic {{{
+  #ERROR: Unknown statistic {{{
   _message "Unknown statistic: ${STATISTIC^^}\n"
   exit 1
   #}}}
@@ -183,12 +183,12 @@ xi_mm = True
 theta_accuracy = 1e-5
 integration_intervals = 50
 
-mix_term_do_mix_for = 
-mix_term_file_path_catalog = @DB:main_all_tomo_gold_recal_cc@
+mix_term_do_mix_for = xipxip
+mix_term_file_path_catalog = @DB:main_all_gold_recal_cc@
 mix_term_col_name_weight = @BV:WEIGHTNAME@
 mix_term_col_name_pos1 = @BV:RANAME@
 mix_term_col_name_pos2 = @BV:DECNAME@
-mix_term_col_name_zbin = z_bin
+mix_term_col_name_zbin = TOMOBIN
 mix_term_isspherical = True
 mix_term_target_patchsize = 10
 mix_term_do_overlap = True
