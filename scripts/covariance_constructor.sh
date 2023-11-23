@@ -17,9 +17,9 @@ fi
 #Create the mixterm directory
 if [ "@BV:MIXTERM@" == "True" ]
 then 
-  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/mixterm/triplets ]
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/mixterm ]
   then 
-    mkdir -p @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/mixterm/triplets/
+    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/mixterm/
   fi 
 fi
 
