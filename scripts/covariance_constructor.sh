@@ -15,10 +15,13 @@ then
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/
 fi 
 #Create the mixterm directory
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/mixterm/triplets ]
+if [ "@BV:MIXTERM@" == "True" ]
 then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/mixterm/triplets
-fi 
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/mixterm/triplets ]
+  then 
+    mkdir -p @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/mixterm/triplets/
+  fi 
+fi
 
 # Infer statistic {{{
 STATISTIC="@BV:STATISTIC@"
