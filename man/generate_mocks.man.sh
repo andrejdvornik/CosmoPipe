@@ -49,7 +49,7 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo mcmc_inp_bandpowers mcmc_inp_cosebis mcmc_inp_xipm
+  echo mcmc_inp_@BV:STATISTIC@
 } 
 #}}}
 
