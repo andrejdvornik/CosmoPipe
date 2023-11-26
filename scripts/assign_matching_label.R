@@ -47,7 +47,7 @@ if (args$sparse>1) {
 }
 test_data = helpRfuncs::read.file(args$input,cols=c(args$features))
 
-print("running matching\n")
+cat("running matching\n")
 
 #Whiten the data consistently (using test data as a base) 
 test_white=kohonen::kohwhiten(test_data,train.expr=args$features,data.missing=NA,data.threshold=c(-Inf,Inf))
@@ -56,8 +56,11 @@ train_white=kohonen::kohwhiten(train_data,train.expr=args$features,data.missing=
 
 idx = RANN::nn2(query=test_white$data.white, 
                 data=train_white$data.white, k=1)$nn.idx[,1]
+cat(paste0("There are ",length(which(idx!=0))," matches (out of ",nrow(train_data),")"))
+
 prediction = train_data[[args$label]][idx]
 
-print("writing output data")
+cat("writing output data\n")
 test_data[[args$label]] = prediction
 helpRfuncs::write.file(test_data,file=args$output)
+
