@@ -3,7 +3,7 @@
 # File Name : spatial_split.R
 # Created By : awright
 # Creation Date : 10-07-2023
-# Last Modified : Wed Nov  1 18:48:33 2023
+# Last Modified : Wed 22 Nov 2023 04:10:32 PM CET
 #
 #=========================================
 
@@ -121,6 +121,9 @@ for (i in seq(1,nsplit)) {
   #Select the relevant sources {{{
   out<-cat[which(bins==i),]
   #}}}
+  cat(paste('bin',i,x.name,'stats:\n'))
+  print(summary(out[[x.name]]))
+
   if (nrow(out)==0) { 
     cat(paste("WARNING: split",i,"contains no sources?!\n"))
   } else { 
