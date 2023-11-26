@@ -1,5 +1,5 @@
 #
-# generate_mocks.sh Documentation & Housekeeping functions
+# add_mcmc_input.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -8,7 +8,7 @@ function _prompt {
   if [ "$1" != "0" ] 
   then
     _message "@BLU@======================================@DEF@\n"
-    _message "@BLU@== @RED@ Running generate_mocks.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@== @RED@ Running add_mcmc_input.sh Mode @BLU@ ==@DEF@\n"
     _message "@BLU@======================================@DEF@\n"
   fi 
 }
@@ -17,7 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Generates mock data vectors'
+  echo '# Add an existing MCMC input file to the datablock'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -42,28 +42,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BV:NMOCKS BV:STATISTIC DATABLOCK PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH
+  echo MCMCINPUTFILE BV:STATISTIC DATABLOCK RUNROOT STORAGEPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo mcmc_inp_@BV:STATISTIC@
+  echo 
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo 
+  echo mcmc_inp_@BV:STATISTIC@
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/generate_mocks.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/add_mcmc_input.sh
 } 
 #}}}
 

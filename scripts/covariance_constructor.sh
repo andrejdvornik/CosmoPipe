@@ -14,6 +14,14 @@ if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs ]
 then 
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/
 fi 
+#Create the mixterm directory
+if [ "@BV:MIXTERM@" == "True" ]
+then 
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/mixterm ]
+  then 
+    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/mixterm/
+  fi 
+fi
 
 # Infer statistic {{{
 STATISTIC="@BV:STATISTIC@"
