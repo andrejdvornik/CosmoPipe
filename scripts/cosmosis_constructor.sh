@@ -337,7 +337,17 @@ then
 #}}}
 elif [ "${SAMPLER^^}" == "LIST" ] #{{{
 then 
-  ndof="@BV:DVLENGTH@"
+  ncombinations=`echo "$NTOMO" | awk '{printf "%u", $1*($1+1)/2 }'`
+  if [ "${STATISTIC^^}" == "COSEBIS" ]
+  then
+    ndof=`echo "$ncombinations @BV:NMAXCOSEBIS@" | awk '{printf "%u", $1*$2 }'`
+  elif [ "${STATISTIC^^}" == "BANDPOWERS" ] 
+  then 
+	ndof=`echo "$ncombinations @BV:NBANDPOWERS@" | awk '{printf "%u", $1*$2 }'`
+  elif [ "${STATISTIC^^}" == "XIPM" ]
+  then 
+	ndof=`echo "$ncombinations @BV:NXIPM@" | awk '{printf "%u", $1*$2 }'`
+  fi
   listparam="scale_cuts_output/theory#${ndof}"
   list_input="@BV:LIST_INPUT_SAMPLER@"
 
@@ -367,7 +377,6 @@ fi
 extraparams="cosmological_parameters/S_8 cosmological_parameters/sigma_8 cosmological_parameters/A_s cosmological_parameters/omega_m cosmological_parameters/omega_nu cosmological_parameters/omega_lambda cosmological_parameters/cosmomc_theta"
 #Add nz shift values to outputs {{{
 shifts=""
-NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 for i in `seq ${NTOMO}`
 do 
    shifts="${shifts} nofz_shifts/bias_${i}"
