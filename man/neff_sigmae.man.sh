@@ -57,7 +57,12 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo cov_inp neff sigmae
+  outlist=''
+  for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+  do 
+    outlist="${outlist} cov_inp_${patch} neff_${patch} sigmae_${patch}" 
+  done 
+  echo ${outlist}
 } 
 #}}}
 

@@ -3,7 +3,7 @@
 # File Name : match_to_sims.sh
 # Created By : awright
 # Creation Date : 15-06-2023
-# Last Modified : Wed 15 Nov 2023 05:23:38 PM CET
+# Last Modified : Wed 22 Nov 2023 03:11:36 PM CET
 #
 #=========================================
 
@@ -78,6 +78,21 @@ do
   #Notify 
   _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
 
+  #Check if the patch label exists {{{
+  cleared=1
+  _message "   > @BLU@Testing pre-existence of @BV:LABELNAME@ column@DEF@ "
+  @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${current_target} -t OBJECTS -k @BV:LABELNAME@ 2>&1 || cleared=0
+  _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
+  #}}}
+  #If exists, delete it {{{
+  if [ "${cleared}" == "1" ] 
+  then 
+    _message "   > @BLU@Removing pre-existing @BV:LABELNAME@ column@DEF@ "
+    @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacdelkey -i ${current_target} -o ${current_target}_tmp -t OBJECTS -k @BV:LABELNAME@ 2>&1 
+    mv ${current_target}_tmp ${current_target}
+    _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
+  fi 
+  #}}}
   #Merge the new column {{{
   _message "   -> @BLU@Merging new @BV:LABELNAME@ column @DEF@"
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacjoinkey \

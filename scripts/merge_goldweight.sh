@@ -3,7 +3,7 @@
 # File Name : merge_goldweight.sh
 # Created By : awright
 # Creation Date : 21-09-2023
-# Last Modified : Sun 12 Nov 2023 11:21:05 PM CET
+# Last Modified : Tue 21 Nov 2023 09:43:00 AM CET
 #
 #=========================================
 
@@ -153,47 +153,218 @@ do
   #}}}
   #Merge the goldweight column {{{
   _message "   -> @BLU@Merging goldweight column @DEF@"
+  #Check if input file lengths are ok {{{
+  links="FALSE"
+  for file in ${input} ${outfile}
+  do 
+    if [ ${#file} -gt 250 ] 
+    then 
+      links="TRUE"
+    fi 
+  done 
+
+  if [ "${links}" == "TRUE" ] 
+  then
+    #Remove existing infile links 
+    if [ -e infile.lnk ] || [ -h infile.lnk ]
+    then 
+      rm infile.lnk
+    fi 
+    #Remove existing outfile links 
+    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    then 
+      rm outfile.lnk
+    fi
+    #Create input link
+    originp=${input}
+    ln -s ${input}_tmp infile.lnk_tmp
+    input="infile.lnk"
+    #Create outfile links 
+    ln -s ${outfile} outfile.lnk
+    origout=${outfile}
+    outfile=outfile.lnk
+  fi 
+  #}}}
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacjoinkey \
     -i ${input}_tmp \
     -p ${outfile} \
     -o ${outfile}_tmp \
     -k SOMGoldWeight -t OBJECTS 2>&1
   _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
+  #Undo linking {{{
+  if [ "${links}" == "TRUE" ] 
+  then 
+    #Remove old links {{{
+    rm ${input}_tmp ${outfile}
+    mv ${outfile}_tmp ${origout}_tmp 
+    input=${originp}
+    outfile=${origout}
+    #}}}
+  fi 
+  #}}}
   #Delete the temporary input file 
-  rm ${input}_tmp 
+  rm -f ${input}_tmp 
   #}}}
   #Rename the original weight column {{{
   _message "   -> @BLU@Changing original @BV:WEIGHTNAME@ column to @BV:WEIGHTNAME@_nogoldwt@DEF@"
+  #Check if input file lengths are ok {{{
+  links="FALSE"
+  for file in ${outfile}
+  do 
+    if [ ${#file} -gt 250 ] 
+    then 
+      links="TRUE"
+    fi 
+  done 
+  if [ "${links}" == "TRUE" ] 
+  then
+    #Remove existing outfile links 
+    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    then 
+      rm outfile.lnk
+    fi
+    #Create outfile links 
+    ln -s ${outfile}_tmp outfile.lnk_tmp
+    origout=${outfile}
+    outfile=outfile.lnk
+  fi 
+  #}}}
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacrenkey \
     -i ${outfile}_tmp \
     -o ${outfile} \
     -k @BV:WEIGHTNAME@ @BV:WEIGHTNAME@_nogoldwt 2>&1
+  #Undo linking {{{
+  if [ "${links}" == "TRUE" ] 
+  then 
+    #Remove old links {{{
+    rm ${outfile}_tmp
+    mv ${outfile} ${origout} 
+    outfile=${origout}
+    #}}}
+  fi 
+  #}}}
   _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
   #remove the temporary output file 
   rm ${outfile}_tmp 
   #}}}
   #Incorporate the goldweight column into the shape weight {{{
   _message "   -> @BLU@Incorporating goldweight into @BV:WEIGHTNAME@ column@DEF@"
+  #Check if input file lengths are ok {{{
+  links="FALSE"
+  for file in ${outfile}
+  do 
+    if [ ${#file} -gt 250 ] 
+    then 
+      links="TRUE"
+    fi 
+  done 
+  if [ "${links}" == "TRUE" ] 
+  then
+    #Remove existing outfile links 
+    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    then 
+      rm outfile.lnk
+    fi
+    #Create outfile links 
+    ln -s ${outfile} outfile.lnk
+    origout=${outfile}
+    outfile=outfile.lnk
+  fi 
+  #}}}
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldaccalc \
     -i ${outfile} \
     -o ${outfile}_tmp \
     -t OBJECTS \
     -c "SOMGoldWeight*@BV:WEIGHTNAME@_nogoldwt;" -n "@BV:WEIGHTNAME@" "Shape measurement weight including gold weight" -k FLOAT 2>&1
+  #Undo linking {{{
+  if [ "${links}" == "TRUE" ] 
+  then 
+    #Remove old links {{{
+    rm ${outfile}
+    mv ${outfile}_tmp ${origout}_tmp
+    outfile=${origout}
+    #}}}
+  fi 
+  #}}}
   _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
   #}}}
   #Convert the SOMGoldWeight into a binary Goldclass {{{
   _message "   -> @BLU@Constructing binary goldclass@DEF@"
+  #Check if input file lengths are ok {{{
+  links="FALSE"
+  for file in ${outfile}
+  do 
+    if [ ${#file} -gt 250 ] 
+    then 
+      links="TRUE"
+    fi 
+  done 
+  if [ "${links}" == "TRUE" ] 
+  then
+    #Remove existing outfile links 
+    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    then 
+      rm outfile.lnk
+    fi
+    #Create outfile links 
+    ln -s ${outfile}_tmp outfile.lnk_tmp
+    origout=${outfile}
+    outfile=outfile.lnk
+  fi 
+  #}}}
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldaccalc \
     -i ${outfile}_tmp \
     -o ${outfile}     \
     -t OBJECTS \
     -c "1-SOMGoldWeight/(SOMGoldWeight+0.000000000000001);" -n "SOMnonGold" "Inverse selection of Binary GoldWeight" -k SHORT 2>&1
+  #Undo linking {{{
+  if [ "${links}" == "TRUE" ] 
+  then 
+    #Remove old links {{{
+    rm ${outfile}_tmp
+    mv ${outfile} ${origout}
+    outfile=${origout}
+    #}}}
+  fi 
+  #}}}
+  #Check if input file lengths are ok {{{
+  links="FALSE"
+  for file in ${outfile}
+  do 
+    if [ ${#file} -gt 250 ] 
+    then 
+      links="TRUE"
+    fi 
+  done 
+  if [ "${links}" == "TRUE" ] 
+  then
+    #Remove existing outfile links 
+    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    then 
+      rm outfile.lnk
+    fi
+    #Create outfile links 
+    ln -s ${outfile} outfile.lnk
+    origout=${outfile}
+    outfile=outfile.lnk
+  fi 
+  #}}}
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldaccalc \
     -i ${outfile} \
     -o ${outfile}_tmp     \
     -t OBJECTS \
     -c "1-SOMnonGold;" -n "SOMweight" "Binary GoldWeight (for use with gold-weighted @BV:WEIGHTNAME@)" -k SHORT 2>&1
   _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
+  #Undo linking {{{
+  if [ "${links}" == "TRUE" ] 
+  then 
+    #Remove old links {{{
+    rm ${outfile}
+    mv ${outfile}_tmp ${origout}_tmp
+    outfile=${origout}
+    #}}}
+  fi 
+  #}}}
   #Delete the temporary output file
   mv ${outfile}_tmp ${outfile}
   #}}}

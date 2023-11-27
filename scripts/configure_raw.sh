@@ -131,10 +131,17 @@ then
   ##}}}
   
   #Update the runtime scripts with the relevant paths & variables {{{
-  _message "   >${RED} Modify Runtime Scripts ${DEF}" 
+  scripts=`find ${RUNROOT}/${SCRIPTPATH} -mindepth 1 -maxdepth 1 -type f`
+  configs=`find ${RUNROOT}/${CONFIGPATH} -mindepth 1 -type f`
+  manuals=`find ${RUNROOT}/${MANUALPATH} -mindepth 1 -maxdepth 1 -type f`
+  nscript=`echo ${scripts} | awk '{print NF}'`
+  nconf=`echo ${configs} | awk '{print NF}'`
+  nman=`echo ${manuals} | awk '{print NF}'`
+  nfile=$((nscript+nconf+nman))
+  _message "   >${RED} Modify Runtime Scripts for ${nfile} files (${nscript}+${nconf}+${nman})${DEF}" 
   for OPT in $OPTLIST
   do 
-    ${P_SED_INPLACE} "s#\\@${OPT}\\@#${!OPT//\\/\\\\}#g" ${RUNROOT}/${SCRIPTPATH}/*.* ${RUNROOT}/${CONFIGPATH}/{.,*}/*.*  ${RUNROOT}/${MANUALPATH}/*.*
+    ${P_SED_INPLACE} "s#\\@${OPT}\\@#${!OPT//\\/\\\\}#g" ${scripts} ${configs} ${manuals} 
   done 
   _message "${BLU} - Done! ${DEF}\n"
   #}}}

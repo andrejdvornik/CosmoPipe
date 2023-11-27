@@ -138,7 +138,7 @@ do
   #}}}
   #Check if the patch label exists {{{
   cleared=1
-  _message "   > @BLU@Testing existence of Tomographic ID column in @DEF@${outputname##*/}@DEF@ "
+  _message "   > @BLU@Testing existence of Tomographic ID column@DEF@ "
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${outputname} -t OBJECTS -k TOMOBIN 2>&1 || cleared=0
   _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
   #}}}
