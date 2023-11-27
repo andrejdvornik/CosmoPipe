@@ -290,8 +290,7 @@ EOF
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 [redshift]
 z_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz/
-zlens_file =@DB:cosmosis_nz@
-value_loc_in_lensbin = mid
+zlens_file = @DB:cosmosis_nz@
 zlens_extension = NZ_SOURCE
 
 EOF
