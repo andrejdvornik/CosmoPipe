@@ -3,7 +3,7 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Mon 28 Aug 2023 11:21:07 AM CEST
+# Last Modified : Tue 28 Nov 2023 09:44:18 PM CET
 #
 #=========================================
 
@@ -64,6 +64,8 @@ simulate_with_noise = T
 mock_filename =
 EOF
 #}}}
+
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'` 
 
 #Requested statistic {{{
 if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
@@ -157,7 +159,6 @@ keep_ang_xiM  = @BV:THETAMINXIM@ @BV:THETAMAXXIM@
 EOF
 #}}}
 
-NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'` 
 #statistic {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [xip_binned]
