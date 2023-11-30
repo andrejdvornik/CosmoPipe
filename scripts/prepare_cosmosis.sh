@@ -407,7 +407,7 @@ then
     #}}}
   done 
 else
-  _message "Boltzmann code not implemented: ${SAMPLER^^}\n"
+  _message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
   exit 1
 fi
 #}}}

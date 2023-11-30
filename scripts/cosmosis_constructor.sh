@@ -8,7 +8,7 @@
 #=========================================
 
 #Script to generate a cosmosis .ini, values, & priors file 
-
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'` 
 #Prepare the starting items {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 [DEFAULT]
@@ -34,19 +34,18 @@ EOF
 STATISTIC="@BV:STATISTIC@"
 BOLTZMAN="@BV:BOLTZMAN@"
 #Define the data file name {{{ 
-if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
+if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
 then
-  datafile=@DB:mcmc_inp_cosebis@
-#}}}
-elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
-then 
-  datafile=@DB:mcmc_inp_bandpowers@
-#}}}
-elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
-then 
-  datafile=@DB:mcmc_inp_xipm@
+  non_linear_model=mead2020_feedback
+elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] || [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
+then
+  non_linear_model=mead2015
+else
+  _message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
+  exit 1
 fi
-#}}}
+datafile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}.fits
+
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 data_file = ${datafile}
 
@@ -120,7 +119,8 @@ keep_ang_peee = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
 
 EOF
 #}}}
-
+theta_lo=`echo 'e(l(@BV:THETAMINXI@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+theta_up=`echo 'e(l(@BV:THETAMAXXI@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
 #Statistic {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [bandpowers]
@@ -134,8 +134,8 @@ l_max = @BV:LMAXBANDPOWERS@
 nbands = @BV:NBANDPOWERS@
 apodise = 1
 delta_x = @BV:APODISATIONWIDTH@
-theta_min = @BV:THETAMINXI@
-theta_max = @BV:THETAMAXXI@
+theta_min =${theta_lo}
+theta_max = ${theta_up}
 output_foldername = %(2PT_STATS_PATH)s/bandpowers_window/
 
 EOF
@@ -157,7 +157,6 @@ keep_ang_xiM  = @BV:THETAMINXIM@ @BV:THETAMAXXIM@
 EOF
 #}}}
 
-NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'` 
 #statistic {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [xip_binned]
@@ -331,7 +330,7 @@ then
   #}}}
   cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini <<- EOF
 	[grid]
-	nsample_dimension=35
+	nsample_dimension=36
 	EOF
 
 #}}}
@@ -402,7 +401,7 @@ then
 	then
 		boltzmann_pipeline="one_parameter_hmcode camb"
 	else
-		_message "Boltzmann code not implemented: ${SAMPLER^^}\n"
+		_message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
   		exit 1
 	fi
 	if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
@@ -434,11 +433,33 @@ then
 	EOF
 fi 
 #}}}
+#Add tpds to outputs {{{
+tpdparams=""
+if [ "@BV:SAVE_TPDS@" == "True" ]
+then
+for tomo1 in `seq ${NTOMO}` 
+do
+    for tomo2 in `seq ${tomo1} ${NTOMO}` 
+    do 
+        if [ "${STATISTIC^^}" == "BANDPOWERS" ] 
+        then
+            tpdparams="${tpdparams} bandpower_shear_e/bin_${tomo2}_${tomo1}#@BV:NBANDPOWERS@"
+        elif [ "${STATISTIC^^}" == "COSEBIS" ] 
+        then
+            tpdparams="${tpdparams} cosebis/bin_${tomo2}_${tomo1}#@BV:NMAXCOSEBIS@"
+        elif [ "${STATISTIC^^}" == "XIPM" ] 
+        then
+            tpdparams="${tpdparams} shear_xi_plus_binned/bin_${tomo2}_${tomo1}#@BV:NXIPM@ shear_xi_minus_binned/bin_${tomo2}_${tomo1}#@BV:NXIPM@"
+        fi
+    done
+done
+fi
+#}}}
 
 #Add the other information #{{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
 likelihoods  = loglike
-extra_output = ${extraparams} ${shifts} ${listparam}
+extra_output = ${extraparams} ${shifts} ${listparam} ${tpdparams}
 quiet = T
 timing = F
 debug = F
