@@ -8,7 +8,6 @@
 #=========================================
 
 #Script to generate a cosmosis .ini, values, & priors file 
-NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'` 
 #Prepare the starting items {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 [DEFAULT]
