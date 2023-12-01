@@ -3,7 +3,7 @@
 # File Name : ldackeepcols.sh
 # Created By : awright
 # Creation Date : 12-06-2023
-# Last Modified : Thu 09 Nov 2023 09:33:05 PM CET
+# Last Modified : Tue 21 Nov 2023 09:25:53 AM CET
 #
 #=========================================
 
@@ -17,7 +17,7 @@ output=${input//.${ext}/_calc.${ext}}
 #Notify 
 _message "@DEF@ > @BLU@Adding @BV:CALCCOLNAME@ using condition @BV:CALCCOND@ to catalogue ${input##*/}@DEF@"
 
-#Check if input file lengths are ok 
+#Check if input file lengths are ok {{{
 links="FALSE"
 for file in ${input} ${output}
 do 
@@ -48,6 +48,7 @@ then
   origout=${output}
   output=outfile.lnk
 fi 
+#}}}
 
 #Column strings to match to: 
 calccond="@BV:CALCCOND@;"
