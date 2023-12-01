@@ -3,7 +3,7 @@
 # File Name : plot_TPD.sh
 # Created By : awright
 # Creation Date : 18-04-2023
-# Last Modified : Sun 26 Nov 2023 08:28:13 PM CET
+# Last Modified : Wed 29 Nov 2023 11:46:50 AM CET
 #
 #=========================================
 
@@ -16,20 +16,20 @@ then
     "cosebis") 
       xlabel="COSEBIs n" 
       ylabel="E[n]" 
-      datavec=@DB:cosebis_vec@
-      covariance=@DB:cosebis_cov@
+      datavec=`echo @DB:cosebis_vec@ | awk '{print $1}'`
+      covariance=@DB:covariance_cosebis@
       ;; 
     "bandpowers")
       xlabel="Bandpower n" 
       ylabel="PeeE" 
-      datavec=@DB:bandpower_vec@
-      covariance=@DB:bandpower_cov@
+      datavec=`echo @DB:bandpowers_vec@ | awk '{print $1}'`
+      covariance=@DB:covariance_bandpowers@
       ;;
     "xipm") 
       xlabel="Radial Bin i" 
       ylabel="Xi[pm]" 
-      datavec=@DB:xipm_vec@
-      covariance=@DB:xipm_cov@
+      datavec=`echo @DB:xipm_vec@ | awk '{print $1}'`
+      covariance=@DB:covariance_xipm@
       ;;
     *)
       _message "Unknown statistic @BV:STATISTIC@"

@@ -3,7 +3,7 @@
 # File Name : plot_TPD.R
 # Created By : awright
 # Creation Date : 18-04-2023
-# Last Modified : Thu 04 May 2023 11:37:04 PM CEST
+# Last Modified : Wed 29 Nov 2023 12:09:12 PM CET
 #
 #=========================================
 
@@ -47,11 +47,16 @@ if (is.na(args$datavec)) {
 #Read in the data vector 
 dat<-helpRfuncs::read.file(file=args$datavec)
 #Get the number of data elements 
+
+#Remove the B-modes/xim 
+dat<-dat[1:(nrow(dat)/2),]
 ndata<-nrow(dat)/ncorr
 
 #Read the covariance matrix 
-cov<-helpRfuncs::read.file(file=args$covariance)
+cov<-helpRfuncs::read.file(file=args$covariance,type='text')
 cov<-as.matrix(cov)
+#Remove the B-modes/xim 
+cov<-cov[1:nrow(dat),1:nrow(dat)]
 
 #Read the theory predictive distributions 
 tpd<-helpRfuncs::read.chain(file=args$tpds)
@@ -59,6 +64,14 @@ tpd<-helpRfuncs::read.chain(file=args$tpds)
 samps<-helpRfuncs::read.chain(file=sub("_list_","_",args$tpds))
 #Assign the weights to the theory predictions 
 tpdweight<-samps$weight
+if (length(tpdweight)==0) { 
+  tpdweight<-exp(samps$log_weight)
+}
+if (length(tpdweight)==0) { 
+  tpdweight<-samps$post
+  tpdweight[which(tpdweight<quantile(tpdweight,prob=0.01))]<-quantile(tpdweight,prob=0.01)
+  tpdweight<-tpdweight/min(tpdweight,na.rm=T)
+}
 #Check sizes match 
 if (length(tpdweight)!=nrow(tpd)) { 
   stop(paste("TPD sample weights are not of the same length as the sample?!\n",length(tpdweight),"!=",nrow(tpd)))
@@ -67,6 +80,7 @@ if (length(tpdweight)!=nrow(tpd)) {
 cols<-colnames(tpd)
 cols<-cols[which(grepl("scale_cuts_output",cols,ignore.case=T))]
 tpd<-as.matrix(tpd[,cols,with=F])
+
 
 #Define the layout matrix for the figure 
 #upper triangle 
@@ -145,4 +159,6 @@ mtext(side=2,text=bquote((.(parse(text=args$ylabel)[[1]])^dat-
                           sigma[.(parse(text=args$ylabel)[[1]])*",dat"]),line=2.5,outer=T)
 
 dev.off()
+
+print('Done!')
 
