@@ -59,6 +59,17 @@ then
   fi
 fi
 #}}}
+BOLTZMAN="@BV:BOLTZMAN@"
+if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
+then
+  non_linear_model=mead2020_feedback
+elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] || [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
+then
+  non_linear_model=mead2015
+else
+  _message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
+    exit 1
+fi
 
 # Infer central values of the prior for cosmological and nuisance parameters
 central_value () {
@@ -134,7 +145,7 @@ f_tomo_file = f_tomo.asc
 
 [output settings]
 directory = ${output_path}
-file = covariance_list.dat, covariance_matrix.mat
+file = covariance_list_${non_linear_model}.dat, covariance_matrix_${non_linear_model}.mat
 style = list, matrix
 list_style_spatial_first = True
 corrmatrix_plot = correlation_coefficient.pdf
@@ -352,7 +363,7 @@ transfer_model = CAMB
 small_k_damping_for1h = damped
 
 [powspec evaluation]
-non_linear_model = mead2020_feedback
+non_linear_model = ${non_linear_model}
 log10k_bins = 400
 log10k_min = -3.49
 log10k_max = 2.15

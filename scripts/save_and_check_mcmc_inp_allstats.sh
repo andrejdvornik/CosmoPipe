@@ -8,22 +8,33 @@
 #=========================================
 
 #Statistic
-STATISTIC="@BV:STATISTIC@"
+BOLTZMAN="@BV:BOLTZMAN@"
+if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
+then
+  non_linear_model=mead2020_feedback
+elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] || [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
+then
+  non_linear_model=mead2015
+else
+  _message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
+  exit 1
+fi
 #Input data vector
+STATISTIC="@BV:STATISTIC@"
 if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 then
   input_datavector="@DB:cosebis_vec@"
-  input_covariance="@DB:covariance_cosebis@"
+  input_covariance="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_cosebis/covariance_matrix_${non_linear_model}.mat"
 #}}}
 elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
 then 
   input_datavector="@DB:bandpowers_vec@"
-  input_covariance="@DB:covariance_bandpowers@"
+  input_covariance="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_bandpowers/covariance_matrix_${non_linear_model}.mat"
 #}}}
 elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
 then 
   input_datavector="@DB:xipm_vec@"
-  input_covariance="@DB:covariance_xipm@"
+  input_covariance="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_xipm/covariance_matrix_${non_linear_model}.mat"
 fi
 #If needed, create the output directory {{{
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@ ]
@@ -53,9 +64,9 @@ NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
   --neff @DB:cosmosis_neff@ \
   --sigmae @DB:cosmosis_sigmae@ \
   --covariance ${input_covariance} \
-  --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input \
+  --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model} \
   --plotdir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
 
-_write_datablock "mcmc_inp_@BV:STATISTIC@" "MCMC_input.fits"
+_write_datablock "mcmc_inp_@BV:STATISTIC@" "MCMC_input_${non_linear_model}.fits"
 
 

@@ -21,7 +21,18 @@ else
     mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_@BV:STATISTIC@/
   fi 
 fi
-# @BV:NTHREADS@ 
+BOLTZMAN="@BV:BOLTZMAN@"
+if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
+then
+  non_linear_model=mead2020_feedback
+elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] || [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
+then
+  non_linear_model=mead2015
+else
+  _message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
+  exit 1
+fi
+
 #Run cosmosis for a constructed ini file 
 _message " >@BLU@ Running covariance!\n   Start time:@DEF@ `date +'%a %H:%M'`@BLU@)\n@DEF@"
 _message " >@BLU@ Status can be monitored in the logfile located here:\n@RED@ `ls -tr @RUNROOT@/@LOGPATH@/step_*_run_covariance.log | tail -n 1` @DEF@\n"
@@ -30,7 +41,7 @@ _message " >@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 if [ "${SECONDSTATISTIC^^}" == "XIPM" ] || [ "${SECONDSTATISTIC^^}" == "COSEBIS" ] || [ "${SECONDSTATISTIC^^}" == "BANDPOWERS" ]
 then
-  _write_datablock "covariance_@BV:STATISTIC@_@BV:SECONDSTATISTIC@" "covariance_matrix.mat"
+  _write_datablock "covariance_@BV:STATISTIC@_@BV:SECONDSTATISTIC@" "covariance_matrix_${non_linear_model}.mat"
 else
-  _write_datablock "covariance_@BV:STATISTIC@" "covariance_matrix.mat"
+  _write_datablock "covariance_@BV:STATISTIC@" "covariance_matrix_${non_linear_model}.mat"
 fi
