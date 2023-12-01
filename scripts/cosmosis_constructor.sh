@@ -708,7 +708,7 @@ do
 			[$module]
 			file = %(CSL_PATH)s/structure/projection/project_2d.py
 			ell_min_logspaced = 1.0
-			ell_max_logspaced = 1.0e4
+			ell_max_logspaced = 1.0e5
 			n_ell_logspaced = 50
 			position-shear = F
 			fast-shear-shear-ia = %(redshift_name)s-%(redshift_name)s
