@@ -43,14 +43,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLU BV:BOLTZMAN BV:PRIOR_ABARY BV:PRIOR_AIA BV:PRIOR_H0 BV:PRIOR_LOGTAGN BV:PRIOR_MNU BV:PRIOR_NS BV:PRIOR_OMBH2 BV:PRIOR_OMCH2 BV:PRIOR_OMEGAK BV:PRIOR_S8INPUT BV:PRIOR_W BV:PRIOR_WA BV:TOMOLIMS DATABLOCK DEF PATCHLIST RED RUNROOT STORAGEPATH SURVEY
+  echo ALLPATCH BLU BV:BOLTZMAN BV:COSMOSIS_PATCHLIST BV:PRIOR_ABARY BV:PRIOR_AIA BV:PRIOR_H0 BV:PRIOR_LOGTAGN BV:PRIOR_MNU BV:PRIOR_NS BV:PRIOR_OMBH2 BV:PRIOR_OMCH2 BV:PRIOR_OMEGAK BV:PRIOR_S8INPUT BV:PRIOR_W BV:PRIOR_WA BV:TOMOLIMS DATABLOCK DEF PATCHLIST RED RUNROOT STORAGEPATH SURVEY
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo ALLHEAD nz nzbias_uncorr
+  echo ALLHEAD nzbias_uncorr
 } 
 #}}}
 
@@ -58,7 +58,18 @@ function _inp_data {
 function _outputs { 
   #Data outputs (leave blank if none)
   outlist=''
-  for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+  #Output is dynamic, depending on the value of BV:COSMOSIS_PATCHLIST
+  patchvar="@BV:COSMOSIS_PATCHLIST@"
+  patchvar=`_parse_blockvars ${patchvar}`
+  #Define the patches to loop over {{{
+  if [ "${patchvar}" == "ALL" ]
+  then 
+    patchlist=`echo @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb` 
+  else 
+    patchlist="${patchvar}"
+  fi 
+  #}}}
+  for patch in ${patchlist}
   do 
     outlist="${outlist} cosmosis_neff_${patch} cosmosis_sigmae_${patch} cosmosis_xipm_${patch}"
   done 
