@@ -752,29 +752,32 @@ function _read_blockvars {
   vars=0
   _req=${1}
   _outvars=''
-  while read item
-  do 
-    #Check if we have reached the VARS yet
-    if [ "$item" == "VARS:" ] 
-    then 
-      vars=1
-      continue
-    fi 
-    #If we're still in the HEAD or BLOCK, go to the next line 
-    if [ "${vars}" == 0 ]
-    then 
-      continue 
-    fi 
-    if [ "${_req}" == "" ] 
-    then 
-      #Add the contents to the output 
-      _outvars="${_outvars} ${item}"
-    elif [ "${item%%=*}" == "${_req}" ]
-    then 
-      #Add the contents to the output 
-      _outvars="${_outvars} ${item}"
-    fi 
-  done < @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
+  if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt ]
+  then 
+    while read item
+    do 
+      #Check if we have reached the VARS yet
+      if [ "$item" == "VARS:" ] 
+      then 
+        vars=1
+        continue
+      fi 
+      #If we're still in the HEAD or BLOCK, go to the next line 
+      if [ "${vars}" == 0 ]
+      then 
+        continue 
+      fi 
+      if [ "${_req}" == "" ] 
+      then 
+        #Add the contents to the output 
+        _outvars="${_outvars} ${item}"
+      elif [ "${item%%=*}" == "${_req}" ]
+      then 
+        #Add the contents to the output 
+        _outvars="${_outvars} ${item}"
+      fi 
+    done < @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
+  fi 
   echo ${_outvars}
 }
 #}}}
@@ -789,6 +792,7 @@ function _parse_blockvars {
     count=0
     while [[ ${string} =~ "@BV:".*."@" ]]
     do 
+      #>&2 echo ${string}
       #Pull out the block variable
       _var=${string#*@BV:}
       _var=${_var%%@*}
@@ -799,20 +803,31 @@ function _parse_blockvars {
       _prompt=${_filelist#\{}
       _prompt=${_prompt%\}}
       _prompt=${_prompt//,/ }
+      #Incorporate the block variable 
       if [ "${_prompt}" == "" ] 
       then 
+        #If not defined, maintain the BV string
         _filelist="@BV:${_var}@"
       else 
-        _filelist=${_prompt}
+        #If defined, maintain the BV string
+        _filelist=`echo ${_prompt}`
         ##Prompt about the update
         #>&2 echo "${_var} -> ${_prompt}" 
       fi 
-      string=${string/@BV:${_var}@/${_filelist}}
+      #Loop over variable values (i.e. allow for block variable to contain multiple entries)
+      outstring=''
+      for _value in ${_filelist}
+      do 
+        outstring="${outstring} ${string/@BV:${_var}@/${_value}}"
+      done 
+      string=`echo ${outstring//\"/}`
+      string=`echo ${string//\'/}`
       count=$((count+1))
       if [ ${count} -gt 100 ]
       then 
-        >&2 echo "ERROR: SOMETHING WRONG IN VARIABLE PARSE"
-        exit 1 
+        #>&2 echo "ERROR: SOMETHING WRONG IN VARIABLE PARSE"
+        #exit 1 
+        break
       fi 
     done 
     outlist="${outlist} ${string}"

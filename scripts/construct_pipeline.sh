@@ -507,7 +507,14 @@ do
       elif [ "${out:0:3}" == "BV:" ] 
       then 
         #Add it to the datablock 
-        _write_blockvars ${out:3} "__validitytest__"
+        if [[ "${out:3}" =~ .*"PATCH".* ]]
+        then 
+          str="@PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb"
+          str=${str//\"/}
+          _write_blockvars ${out:3} "${str//\'/}"
+        else 
+          _write_blockvars ${out:3} "__validitytest__"
+        fi 
       else 
         #Update the datablock 
         _write_datablock $out "_validitytest_"

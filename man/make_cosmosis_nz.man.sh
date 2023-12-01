@@ -50,7 +50,24 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo cosmosis_neff nz
+  outlist=''
+  #input is dynamic, depending on the value of BV:COSMOSIS_PATCHLIST
+  patchvar="@BV:COSMOSIS_PATCHLIST@"
+  patchvar=`_parse_blockvars ${patchvar}`
+  #Define the patches to loop over {{{
+  if [ "${patchvar}" == "ALL" ]
+  then 
+    patchlist=`echo @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb` 
+  else 
+    patchlist="${patchvar}"
+  fi 
+  #}}}
+  for patch in ${patchlist}
+  do 
+    #>&2 echo ${patch}
+    outlist="${outlist} cosmosis_neff_${patch} nz_${patch} cosmosis_xipm_${patch}"
+  done 
+  echo ${outlist}
 } 
 #}}}
 

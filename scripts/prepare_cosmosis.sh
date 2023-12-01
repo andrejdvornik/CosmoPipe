@@ -3,12 +3,11 @@
 # File Name : prepare_cosmosis.sh
 # Created By : awright
 # Creation Date : 31-03-2023
-# Last Modified : Thu 07 Sep 2023 05:56:22 PM UTC
+# Last Modified : Sun 26 Nov 2023 09:49:34 PM CET
 #
 #=========================================
 
 #For each of the files in the nz directory 
-inputs="@DB:nz@"
 headfiles="@DB:ALLHEAD@"
 
 #Number of tomographic bins 
@@ -31,64 +30,50 @@ PRIOR_MNU="@BV:PRIOR_MNU@"
 #BOLTZMANN code
 BOLTZMAN=@BV:BOLTZMAN@
 
+#Define the patches to loop over {{{
+if [ "@BV:COSMOSIS_PATCHLIST@" == "ALL" ]
+then 
+  patchlist=`echo @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb` 
+else 
+  patchlist="@BV:COSMOSIS_PATCHLIST@"
+fi 
+#}}}
+
 #N_effective & sigmae {{{
 for stat in neff sigmae
 do 
-  outlist=''
+  found="FALSE"
+  foundlist=""
   _message " >@BLU@ Compiling ${stat} files {@DEF@\n"
-  for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+  for patch in ${patchlist}
   do 
     _message " ->@BLU@ Patch @RED@${patch}@DEF@"
-    #Get all the files in this patch {{{
-    patchinputs=''
-    for file in ${inputs}
-    do 
-      #Find files with matching patch strings 
-      if [[ "$file" =~ .*"_${patch}_".* ]]
-      then 
-        patchinputs="${patchinputs} ${file}"
-      fi 
-    done 
+    #Get all the files in this stat and patch {{{
+    patchinputs=`_read_datablock "${stat}_${patch}"`
+    patchinputs=`_blockentry_to_filelist ${patchinputs}`
     #}}}
     #If there are no files in this patch, skip {{{
     if [ "${patchinputs}" == "" ] 
     then 
-      _message "@RED@ - skipping! (No matching Nz files)@DEF@\n"
+      _message "@RED@ - skipping! (No matching ${stat} files)@DEF@\n"
       continue
     fi 
     #}}}
+    found="TRUE"
+    foundlist="${foundlist} ${patch}"
     #Create the ${stat} directory {{{
     if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_${stat}_${patch} ]
     then 
       mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_${stat}_${patch}/
     fi 
     #}}}
-    #Get all the ${stat} files for this patch {{{
-    stat_list=''
+    #Create the output statistic file name {{{
+    stat_list=""
     for file in ${patchinputs} 
     do 
-      #Get the file extension and names {{{
-      ext=${file##*.}
-      stat_file=${file//\/nz\//\/${stat}\/}
-      #}}}
-      #Find the matching file {{{
-      matchfile=${stat_file//_Nz.${ext}/*_${stat}.txt}
-      matchfile=${matchfile//_ZB/*_ZB}
-      stat_file=`compgen -G ${matchfile} || echo `
-      if [ "${stat_file}" == "" ] || [ ! -f ${stat_file} ] 
-      then 
-        _message "@RED@ ERROR!\n@DEF@"
-        _message "@RED@ There is no ${stat} file:\n@DEF@"
-        _message "${matchfile} -> ${stat_file}\n"
-        _message "@BLU@ ==> You probably need to run the @DEF@neff_sigmae@BLU@ mode when these catalogues are in the DATAHEAD!\n"
-        _message "@BLU@ ==> Or you didn't merge the goldclasses with the main catalogue?!\n"
-        exit 1
-      fi 
-      #}}}
-      #Add file to the stat list {{{
-      stat_list="${stat_list} ${stat_file}"
-      #}}}
-    done 
+      stat_list="${stat_list} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${stat}_${patch}/${file}"
+    done
+    stat_file=`echo ${patchinputs} | awk '{print $1}'`
     #}}}
     #Define the output stat file {{{
     stat_file=${stat_file##*/}
@@ -102,7 +87,6 @@ do
       _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
     fi 
     #}}}
-  
     #Construct the output file, maintaining order {{{
     paste ${stat_list} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_${stat}_${patch}/${stat_file}
     #}}}
@@ -111,6 +95,25 @@ do
     #}}}
     _message "@RED@ - Done! (`date +'%a %H:%M'`)@DEF@\n"
   done 
+  #Error if no stat files found {{{ 
+  if [ "${found}" == "FALSE" ] 
+  then 
+    if [ "@BV:COSMOSIS_PATCHLIST@" == "ALL" ]
+    then 
+      #If not found, error 
+      _message " - @RED@ERROR!@DEF@\n"
+      _message "@RED@There are no ${stat} files in any patch?!@DEF@\n"
+      _message "@BLU@You probably didn't run the neff_sigmae processing function?!@DEF@\n"
+      exit 1
+    else 
+      #If not found, error 
+      _message " - @RED@ERROR!@DEF@\n"
+      _message "@RED@There are no ${stat} files in found in the requested BV:COSMOSIS_PATCHLIST @BLU@${patchlist}@DEF@\n"
+      _message "@BLU@Either this list was incorrectly set, or you didn't run the neff_sigmae processing function for your patch?@DEF@\n"
+      exit 1
+    fi 
+  fi 
+  #}}}
 done 
 #}}}
 
@@ -120,7 +123,7 @@ then
   _message "Copying XIpm catalogues from datahead into cosmosis_xipm {\n"
   #Loop over patches {{{
   outall=''
-  for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+  for patch in ${patchlist}
   do 
     outlist=''
     #Loop over tomographic bins in this patch {{{
