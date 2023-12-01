@@ -3,18 +3,20 @@
 # File Name : make_cosmosis_nz.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Thu 07 Sep 2023 06:00:56 PM UTC
+# Last Modified : Tue 21 Nov 2023 12:55:58 AM CET
 #
 #=========================================
 
-
-inputs="@DB:nz@"
-
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 outputlist=''
+found="FALSE"
 for patch in @PATCHLIST@ @ALLPATCH@ 
 do 
   _message " ->@BLU@ Patch @RED@${patch}@DEF@"
+  #Get all the files in this stat and patch {{{
+  inputs=`_read_datablock "nz_${patch}"`
+  inputs=`_blockentry_to_filelist ${inputs}`
+  #}}}
   filelist=''
   #Get the file list {{{
   for ZBIN1 in `seq ${NTOMO}`
@@ -28,7 +30,8 @@ do
     ZB_hi_str=`echo $ZB_hi | sed 's/\./p/g'`
     appendstr="_ZB${ZB_lo_str}t${ZB_hi_str}"
     #}}}
-    file=`echo ${inputs} | sed 's/ /\n/g' | grep "_${patch}_" | grep ${appendstr} || echo `
+    #file=`echo ${inputs} | sed 's/ /\n/g' | grep "_${patch}_" | grep ${appendstr} || echo `
+    file=`echo ${inputs} | sed 's/ /\n/g' | grep ${appendstr} || echo `
     #Check if the output file exists {{{
     if [ "${file}" == "" ] 
     then 
@@ -36,7 +39,7 @@ do
       continue
     fi 
     #}}}
-    filelist="${filelist} ${file}"
+    filelist="${filelist} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_${patch}/${file}"
   done 
   #}}}
   #If filelist is empty, skip {{{
@@ -46,6 +49,7 @@ do
     continue
   fi 
   #}}}
+  found='TRUE'
   #Construct the output directory {{{
   if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz_${patch} ]
   then 
@@ -80,4 +84,15 @@ do
   #Update the datablock 
   _write_datablock cosmosis_nz_${patch} "${output_base##*/}_comb_Nz.fits"
 done 
+
+#Error if no stat files found {{{ 
+if [ "${found}" == "FALSE" ] 
+then 
+  #If not found, error 
+  _message " - @RED@ERROR!@DEF@\n"
+  _message "@RED@There are no nz files in any patch?!@DEF@\n"
+  _message "@BLU@You probably didn't run rename an 'nz' block for a particular patch?!@DEF@\n"
+  exit 1
+fi 
+#}}}
 
