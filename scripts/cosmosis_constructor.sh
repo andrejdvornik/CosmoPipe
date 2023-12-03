@@ -280,14 +280,14 @@ EOF
 #}}}
 elif [ "${SAMPLER^^}" == "NAUTILUS" ] #{{{
 then 
-
+n_batch=`echo "@BV:NTHREADS@" | awk '{printf "%d", 4*$1}'`
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini <<- EOF
 [nautilus]
 live_points = 2000
 enlarge_per_dim = 1.1
 split_threshold = 100
 n_networks = 8
-n_batch = 128
+n_batch = $n_batch
 filepath = %(OUTPUT_FOLDER)s/run_nautilus.hdf5
 resume = False
 f_live = 0.01
@@ -708,7 +708,7 @@ do
 			[$module]
 			file = %(CSL_PATH)s/structure/projection/project_2d.py
 			ell_min_logspaced = 1.0
-			ell_max_logspaced = 1.0e4
+			ell_max_logspaced = 1.0e5
 			n_ell_logspaced = 50
 			position-shear = F
 			fast-shear-shear-ia = %(redshift_name)s-%(redshift_name)s
