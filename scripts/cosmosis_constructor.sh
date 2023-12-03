@@ -3,7 +3,7 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Tue 28 Nov 2023 09:44:18 PM CET
+# Last Modified : Sun Dec  3 20:25:13 2023
 #
 #=========================================
 
@@ -340,15 +340,15 @@ then
   ncombinations=`echo "$NTOMO" | awk '{printf "%u", $1*($1+1)/2 }'`
   if [ "${STATISTIC^^}" == "COSEBIS" ]
   then
-    ndof=`echo "$ncombinations @BV:NMAXCOSEBIS@" | awk '{printf "%u", $1*$2 }'`
+    ndat=`echo "$ncombinations @BV:NMAXCOSEBIS@" | awk '{printf "%u", $1*$2 }'`
   elif [ "${STATISTIC^^}" == "BANDPOWERS" ] 
   then 
-	ndof=`echo "$ncombinations @BV:NBANDPOWERS@" | awk '{printf "%u", $1*$2 }'`
+	ndat=`echo "$ncombinations @BV:NBANDPOWERS@" | awk '{printf "%u", $1*$2 }'`
   elif [ "${STATISTIC^^}" == "XIPM" ]
   then 
-	ndof=`echo "$ncombinations @BV:NXIPM@" | awk '{printf "%u", $1*$2 }'`
+	ndat=`echo "$ncombinations @BV:NXIPM@" | awk '{printf "%u", $1*$2*2 }'`
   fi
-  listparam="scale_cuts_output/theory#${ndof}"
+  listparam="scale_cuts_output/theory#${ndat}"
   list_input="@BV:LIST_INPUT_SAMPLER@"
 
 	cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini <<- EOF
