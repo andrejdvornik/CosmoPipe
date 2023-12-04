@@ -466,10 +466,11 @@ done
 #Update the values with the uncorrelated Dz priors {{{
 echo "[nofz_shifts]" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini 
 #Add the uncorrelated tomographic bin shifts 
+#Note: we multiply the bin shift by -1 because cosmosis defines the shifts with a relative minus sign!
 tomoval_all=`cat @DB:nzbias_uncorr@`
 for tomo in `seq ${NTOMO}`
 do 
-  tomoval=`echo ${tomoval_all} | awk -v n=${tomo} '{print $n}'`
+  tomoval=`echo ${tomoval_all} | awk -v n=${tomo} '{print -1*$n}'`
   tomolo=`echo $tomoval | awk '{print $1-5.00}'`
   tomohi=`echo $tomoval | awk '{print $1+5.00}'`
   echo "uncorr_bias_${tomo} = ${tomolo} ${tomoval} ${tomohi} " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
@@ -480,7 +481,7 @@ echo "[nofz_shifts]" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SUR
 #Add the uncorrelated tomographic bin shifts 
 for tomo in `seq ${NTOMO}`
 do 
-  tomoval=`echo ${tomoval_all} | awk -v n=${tomo} '{print $n}'`
+  tomoval=`echo ${tomoval_all} | awk -v n=${tomo} '{print -1*$n}'`
   echo "uncorr_bias_${tomo} = gaussian ${tomoval} 1.0 " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
 done
 #}}}
