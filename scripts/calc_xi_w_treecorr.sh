@@ -3,7 +3,7 @@
 # File Name : calc_xi_w_treecorr.sh
 # Created By : awright
 # Creation Date : 27-03-2023
-# Last Modified : Sun 05 Nov 2023 10:45:36 AM CET
+# Last Modified : Mon 04 Dec 2023 01:59:40 PM CET
 #
 #=========================================
 
@@ -83,7 +83,7 @@ do
         rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipm/${outname}
         xipmblock=`_read_datablock xipm`
         currentblock=`_blockentry_to_filelist ${xipmblock}`
-        currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname} | sed 's/\n/ /g' || echo `
+        currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname} | awk '{printf $0 " "}' || echo `
         _write_datablock xipm "${currentblock}"
         _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       fi 

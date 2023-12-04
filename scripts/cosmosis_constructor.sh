@@ -3,7 +3,7 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Tue 28 Nov 2023 09:44:18 PM CET
+# Last Modified : Mon 04 Dec 2023 11:42:45 AM CET
 #
 #=========================================
 
@@ -36,9 +36,12 @@ BOLTZMAN="@BV:BOLTZMAN@"
 if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
 then
   non_linear_model=mead2020_feedback
-elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] || [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
+elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
 then
   non_linear_model=mead2015
+elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] 
+  _message "The ${BOLTZMAN^^} Emulator is broken: it produces S_8 constraints that are systematically high.\nUse 'COSMOPOWER_HM2015_S8'\n"
+  exit 1
 else
   _message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
   exit 1
@@ -340,15 +343,15 @@ then
   ncombinations=`echo "$NTOMO" | awk '{printf "%u", $1*($1+1)/2 }'`
   if [ "${STATISTIC^^}" == "COSEBIS" ]
   then
-    ndof=`echo "$ncombinations @BV:NMAXCOSEBIS@" | awk '{printf "%u", $1*$2 }'`
+    ndat=`echo "$ncombinations @BV:NMAXCOSEBIS@" | awk '{printf "%u", $1*$2 }'`
   elif [ "${STATISTIC^^}" == "BANDPOWERS" ] 
   then 
-	ndof=`echo "$ncombinations @BV:NBANDPOWERS@" | awk '{printf "%u", $1*$2 }'`
+	ndat=`echo "$ncombinations @BV:NBANDPOWERS@" | awk '{printf "%u", $1*$2 }'`
   elif [ "${STATISTIC^^}" == "XIPM" ]
   then 
-	ndof=`echo "$ncombinations @BV:NXIPM@" | awk '{printf "%u", $1*$2 }'`
+	ndat=`echo "$ncombinations @BV:NXIPM@" | awk '{printf "%u", $1*$2*2 }'`
   fi
-  listparam="scale_cuts_output/theory#${ndof}"
+  listparam="scale_cuts_output/theory#${ndat}"
   list_input="@BV:LIST_INPUT_SAMPLER@"
 
 	cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini <<- EOF

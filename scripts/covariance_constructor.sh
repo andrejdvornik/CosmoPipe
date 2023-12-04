@@ -3,7 +3,7 @@
 # File Name : covariance_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Fri 10 Nov 2023 04:02:25 PM CET
+# Last Modified : Sun Dec  3 09:31:48 2023
 #
 #=========================================
 
@@ -222,7 +222,9 @@ mix_term_nmax = 10
 mix_term_dpix_min = 0.25
 mix_term_do_ec = True
 mix_term_file_path_save_triplets = ${input_path}/mixterm/triplets
-#mix_term_file_path_load_triplets = ${input_path}/mixterm/triplets
+mix_term_subsample = 10 
+mix_term_nsubr = 5 
+mix_term_file_path_load_triplets = ${input_path}/mixterm/triplets
 
 EOF
 else
