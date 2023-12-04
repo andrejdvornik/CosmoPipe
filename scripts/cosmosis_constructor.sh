@@ -3,7 +3,7 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Sun Dec  3 20:25:13 2023
+# Last Modified : Mon 04 Dec 2023 11:42:45 AM CET
 #
 #=========================================
 
@@ -36,9 +36,12 @@ BOLTZMAN="@BV:BOLTZMAN@"
 if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
 then
   non_linear_model=mead2020_feedback
-elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] || [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
+elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
 then
   non_linear_model=mead2015
+elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] 
+  _message "The ${BOLTZMAN^^} Emulator is broken: it produces S_8 constraints that are systematically high.\nUse 'COSMOPOWER_HM2015_S8'\n"
+  exit 1
 else
   _message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
   exit 1
