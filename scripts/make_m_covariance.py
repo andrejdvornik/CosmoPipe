@@ -61,10 +61,10 @@ np.savetxt(args.output_base+'_correl.ascii',m_corr,fmt='%.4e')
 # based on Hoyle et al.2018, appendix A: https://arxiv.org/pdf/1708.01532.pdf
 #For the input m uncertainties {{{
 m_cov = np.diag(len(sigma_m)*sigma_m**2)
-np.savetxt(args.output_base+'uncorrelated_inflated.ascii',m_cov,fmt='%.4e')
+np.savetxt(args.output_base+'_uncorrelated_inflated.ascii',m_cov,fmt='%.4e')
 #}}}
 #For the 2% m uncertainties {{{
 m_cov = np.diag(len(sigma_m)*sigma_m_0p02**2)
-np.savetxt(args.output_base+'uncorrelated_inflated_0p02.ascii',m_cov,fmt='%.4e')
+np.savetxt(args.output_base+'_uncorrelated_inflated_0p02.ascii',m_cov,fmt='%.4e')
 #}}}
 

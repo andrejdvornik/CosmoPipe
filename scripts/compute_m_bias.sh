@@ -3,7 +3,7 @@
 # File Name : compute_m_bias.sh
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Fri 07 Jul 2023 08:06:32 PM CEST
+# Last Modified : Sat 09 Dec 2023 11:37:39 AM CET
 #
 #=========================================
 
@@ -101,11 +101,10 @@ for _head in ${allhead}
 do 
   _replace_datahead ${_head} ""
 done 
-_writelist_datahead "${outputlist}" 
+_writelist_datahead "${outputlistbase}" 
 #}}}
 
 #Loop over patches 
-mfiles=''
 for patch in @PATCHLIST@ @ALLPATCH@
 do 
   #Get the m-bias files for this patch (there should be NTOMO*NREALISATION files)
@@ -120,9 +119,9 @@ do
   #}}}
 
   #If needed, create the output directory {{{
-  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias ]
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${patch}_@BV:BLIND@ ]
   then 
-    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias 
+    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${patch}_@BV:BLIND@ 
   fi 
   #}}}
 
@@ -150,32 +149,32 @@ do
   then 
     #If there are multiple realisations {{{
     #If needed, create the output cov directory {{{
-    if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov_${patch} ]
+    if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov_${patch}_@BV:BLIND@ ]
     then 
-      mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov_${patch} 
+      mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov_${patch}_@BV:BLIND@ 
     fi 
     #}}}
     #Run the m prior construction for each bin {{{
     @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/compute_m_priors.R -i ${filelist} \
       --binstrings ${binstrings} \
       --corr @BV:MBIASCORR@ \
-      --biasout @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias/m_${patch}_biases.txt \
-      --uncout @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias/m_${patch}_uncertainty.txt \
-      --covout @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov_${patch}/m_${patch}_covariance.txt 2>&1
+      --biasout @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${patch}_@BV:BLIND@/m_${patch}_@BV:BLIND@_biases.txt \
+      --uncout @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${patch}_@BV:BLIND@/m_${patch}_@BV:BLIND@_uncertainty.txt \
+      --covout @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov_${patch}_@BV:BLIND@/m_${patch}_@BV:BLIND@_covariance.txt 2>&1
     #}}}
     #Create the correlation file {{{
-    echo "@BV:MBIASCORR@" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias/m_${patch}_correlation.txt 
+    echo "@BV:MBIASCORR@" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${patch}_@BV:BLIND@/m_${patch}_@BV:BLIND@_correlation.txt 
     #}}}
     #Add covariance file to the data block {{{
-    _write_datablock mcov_${patch} "m_${patch}_covariance.txt"
+    _write_datablock mcov_${patch}_@BV:BLIND@ "m_${patch}_@BV:BLIND@_covariance.txt"
     #}}}
     #}}}
   elif [ ${nfile} -eq ${NTOMO} ]
   then 
     #Output the m-bias values for this patch into the mbias block {{{
-    tail -qn 1 ${filelist} | awk -F, '{printf $1" "}' > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias/m_${patch}_biases.txt
-    tail -qn 1 ${filelist} | awk -F, '{printf $2" "}' > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias/m_${patch}_uncertainty.txt
-    echo "@BV:MBIASCORR@" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias/m_${patch}_correlation.txt 
+    tail -qn 1 ${filelist} | awk -F, '{printf $1" "}' > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${patch}_@BV:BLIND@/m_${patch}_@BV:BLIND@_biases.txt
+    tail -qn 1 ${filelist} | awk -F, '{printf $2" "}' > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${patch}_@BV:BLIND@/m_${patch}_@BV:BLIND@_uncertainty.txt
+    echo "@BV:MBIASCORR@" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${patch}_@BV:BLIND@/m_${patch}_@BV:BLIND@_correlation.txt 
     #}}}
   else 
     #There are fewer m files than tomographic bins?! {{{
@@ -186,10 +185,10 @@ do
   #}}}
 
   #Add files to output list
-  mfiles="${mfiles} m_${patch}_biases.txt m_${patch}_uncertainty.txt m_${patch}_correlation.txt"
+  mfiles="m_${patch}_@BV:BLIND@_biases.txt m_${patch}_@BV:BLIND@_uncertainty.txt m_${patch}_@BV:BLIND@_correlation.txt"
+
+  #Update the datablock contents file 
+  _write_datablock mbias_${patch}_@BV:BLIND@ "${mfiles}"
+
 done
-
-
-#Update the datablock contents file 
-_write_datablock mbias "${mfiles}"
 
