@@ -3,7 +3,7 @@
 # File Name : covariance_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Sun Dec  3 09:31:48 2023
+# Last Modified : Fri 08 Dec 2023 10:48:51 AM CET
 #
 #=========================================
 
@@ -209,7 +209,7 @@ theta_accuracy = 1e-5
 integration_intervals = 50
 
 mix_term_do_mix_for = ${mix_term}
-mix_term_file_path_catalog = @DB:main_all_gold_recal_cc@
+mix_term_file_path_catalog = @BV:MIXTERM_BASEFILE@ 
 mix_term_col_name_weight = @BV:WEIGHTNAME@
 mix_term_col_name_pos1 = @BV:RANAME@
 mix_term_col_name_pos2 = @BV:DECNAME@
@@ -285,12 +285,12 @@ do
   sigmaelist="${sigmaelist} `cat ${file}`"
 done 
 sigmaelist=`echo ${sigmaelist} | sed 's/ /,/g'`
-surveymask=@SURVEYMASKFILE@
+surveymask=@BV:SURVEYMASKFILE@
 surveymaskfile=${surveymask##*/}
 surveymaskdir=${surveymask%/*}
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 [survey specs]
-survey_area_lensing_in_deg2 = @SURVEYAREADEG@
+survey_area_lensing_in_deg2 = @BV:SURVEYAREADEG@
 ellipticity_dispersion = ${sigmaelist}
 n_eff_lensing = ${nefflist}
 mask_directory = ${surveymaskdir}

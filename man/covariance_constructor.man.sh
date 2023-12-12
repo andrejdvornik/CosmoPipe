@@ -49,7 +49,8 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo cosmosis_mbias cosmosis_neff cosmosis_nz cosmosis_sigmae main_all_gold_recal_cc
+  mixtermbase=`_parse_blockvars @BV:MIXTERM_BASEFILE@`
+  echo cosmosis_mbias cosmosis_neff cosmosis_nz cosmosis_sigmae ${mixtermbase}
 } 
 #}}}
 
