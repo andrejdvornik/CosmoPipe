@@ -3,7 +3,7 @@
 # File Name : run_chain.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Sat 08 Jul 2023 01:36:57 PM CEST
+# Last Modified : Wed 06 Dec 2023 11:29:39 AM CET
 #
 #=========================================
 
@@ -36,7 +36,7 @@ fi
 #Run cosmosis for a constructed ini file 
 _message " >@BLU@ Running covariance!\n   Start time:@DEF@ `date +'%a %H:%M'`@BLU@)\n@DEF@"
 _message " >@BLU@ Status can be monitored in the logfile located here:\n@RED@ `ls -tr @RUNROOT@/@LOGPATH@/step_*_run_covariance.log | tail -n 1` @DEF@\n"
-MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=@BV:COVNTHREADS@ @PYTHON3BIN@ @RUNROOT@/INSTALL/OneCovariance/covariance.py @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@BV:STATISTIC@_@SURVEY@_CosmoPipe_constructed.ini 2>&1 
+MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 @PYTHON3BIN@ @RUNROOT@/INSTALL/OneCovariance/covariance.py @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@BV:STATISTIC@_@SURVEY@_CosmoPipe_constructed.ini 2>&1 
 _message " >@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 if [ "${SECONDSTATISTIC^^}" == "XIPM" ] || [ "${SECONDSTATISTIC^^}" == "COSEBIS" ] || [ "${SECONDSTATISTIC^^}" == "BANDPOWERS" ]
