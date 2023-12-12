@@ -65,7 +65,7 @@ function _inp_data {
   for patch in ${patchlist}
   do 
     #>&2 echo ${patch}
-    outlist="${outlist} cosmosis_neff_${patch} nz_${patch} cosmosis_xipm_${patch}"
+    outlist="${outlist} cosmosis_neff nz_${patch}"
   done 
   echo ${outlist}
 } 
