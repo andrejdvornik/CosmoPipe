@@ -15,6 +15,8 @@ parser.add_argument('--wname', dest="wname", type=str,default='weight',
          help='Name of the weight in the catalogue')
 parser.add_argument('--area', dest="area", type=float,required=True,
          help='Area of the survey in square arcmin')
+parser.add_argument('--mbias', dest="mbias",type=float,default=0.0,
+         help='multiplicative bias for this catalogue')
 
 args = parser.parse_args()
 try:
@@ -31,15 +33,10 @@ except Exception:
 
 area=args.area
 
-# NOTE: currently the m-bias is not used in the calculation
-##m-bias values per tomographic bin
-#mbias="@MBIASVALUES@"
-#mbias_p1=[float(s) + 1.0 for s in mbias.split()]
-##estimate of m-bias for full sample
-#mbias_p1.append(sum(mbias_p1)/len(mbias_p1))
-mbias_p1 = 1.0 
+#m-bias values per tomographic bin
+mbias_p1=args.mbias + 1.0
 
-print("# n_obj n_eff[1/arcmin^2] sigma_e1 sigma_e2 sigma_e1_wsq sigma_e2_wsq sigma_e")
+print("# n_obj n_eff[1/arcmin^2] sigma_e1 sigma_e2 sigma_e1_wsq sigma_e2_wsq sigma_e sigma_e")
 
 number = len(e1)
 
@@ -51,8 +48,12 @@ n_eff = (
   np.sum((weight * mbias_p1)**2) /
   area)
 
+
 mean_e1 = np.average(e1, weights=weight)
 mean_e2 = np.average(e2, weights=weight)
+
+K_0 = (mbias_p1)**2 * np.sum(weight_sq)
+sigma_eps = np.sqrt((1/K_0)*np.sum((weight_sq)*(e1**2 + e2**2)))/np.sqrt(2)
 
 sigma_e1 = np.sqrt((  # standard error of the mean
     np.sum(weight * e1**2   ) /
@@ -89,5 +90,5 @@ sigma_e = (  # geometric mean
     np.sum((weight * mbias_p1)**2)
   ) / 2.0)
 
-print(number, n_eff, sigma_e1, sigma_e2, sigma_e1_wsq, sigma_e2_wsq, sigma_e)
+print(number, n_eff, sigma_e1, sigma_e2, sigma_e1_wsq, sigma_e2_wsq, sigma_eps, sigma_e)
 

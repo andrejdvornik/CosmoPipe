@@ -43,14 +43,19 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:E1NAME BV:E2NAME BV:TOMOLIMS BV:WEIGHTNAME DATABLOCK DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH SURVEYAREA
+  echo ALLPATCH BLU BV:BLIND BV:E1NAME BV:E2NAME BV:WEIGHTNAME DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo DATAHEAD
+  outlist=''
+  for patch in @PATCHLIST@ @ALLPATCH@ 
+  do 
+    outlist="${outlist} mbias_${patch}_@BV:BLIND@"
+  done 
+  echo ALLHEAD ${outlist}
 } 
 #}}}
 
@@ -60,7 +65,7 @@ function _outputs {
   outlist=''
   for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
   do 
-    outlist="${outlist} cov_inp_${patch} neff_${patch} sigmae_${patch}" 
+    outlist="${outlist} cov_inp_${patch}_@BV:BLIND@ neff_${patch}_@BV:BLIND@ sigmae_${patch}_@BV:BLIND@" 
   done 
   echo ${outlist}
 } 
