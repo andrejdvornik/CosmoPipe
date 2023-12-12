@@ -296,32 +296,37 @@ do
   then 
     echo HEAD assignment: writing ${step:1} to datahead 
     #Modify the HEAD to the request value {{{
-    VERBOSE=1 _write_datahead "${step:1}" "_validitytest_"
+    _target=${step:1}
+    _target=`_parse_blockvars ${_target}`
+    VERBOSE=1 _write_datahead "${_target}" "_validitytest_"
     #Set the "laststep" to be this block element
-    laststep=${step:1}
+    laststep=${_target}
     #If resuming and haven't found the "RESUME" entry, save this assignment
     if [ "${resume}" == "TRUE" ] && [ "${found_resume}" == "FALSE" ]
     then 
-      lastassign=${step:1}
+      lastassign=${_target}
     fi 
     #}}}
   elif [ "${step:0:1}" == "!" ]
   then 
     echo BLOCK assignment: writing datahead to ${step:1} 
     #Modify the datablock with the current HEAD {{{
-		VERBOSE=1 _write_datablock ${step:1} "`_read_datahead`"
+    _target=${step:1}
+    _target=`_parse_blockvars ${_target}`
+		VERBOSE=1 _write_datablock ${_target} "`_read_datahead`"
     #Write the link between the previous processing function and this block element
-    echo "${laststep} -.-> ${step:1}(${step:1})" >> @RUNROOT@/@PIPELINE@_links.R
+    echo "${laststep} -.-> ${_target}(${_target})" >> @RUNROOT@/@PIPELINE@_links.R
     #If resuming and haven't found the "RESUME" entry, save this assignment
     if [ "${resume}" == "TRUE" ] && [ "${found_resume}" == "FALSE" ]
     then 
-      lastassign=${step:1}
+      lastassign=${_target}
     fi 
     #}}}
   elif [ "${step:0:1}" == "-" ]
   then 
     #Delete an item from the datablock  {{{
     name=${step:1}
+    name=`_parse_blockvars ${name}`
     echo BLOCK deletion: removing ${name} 
 		VERBOSE=1 _delete_blockitem "${name}" TEST
     #}}}
@@ -330,7 +335,9 @@ do
     #Rename an item in the datablock  {{{
     names=${step:1}
     oldname=${names%%-*}
+    oldname=`_parse_blockvars ${oldname}`
     newname=${names##*-}
+    newname=`_parse_blockvars ${newname}`
     echo BLOCK rename: moving ${oldname} to ${newname}
 		VERBOSE=1 _rename_blockitem "${oldname}" "${newname}" TEST
     if [ "${lastassign}" == "${oldname}" ] 
@@ -346,7 +353,9 @@ do
     #Export an item from the datablock  {{{
     names=${step:1}
     blockname=${names%%-*}
+    blockname=`_parse_blockvars ${blockname}`
     outname=${names##*-}
+    outname=`_parse_blockvars ${outname}`
     echo BLOCK export: copying ${blockname} to external folder ${outname}
 		VERBOSE=1 _export_blockitem "${blockname}" "${outname}" TEST
     #}}}
@@ -666,7 +675,7 @@ then
 	#Modify the HEAD to the request value
 	#Intermediate Step: write block item ${lastassign} to current DATAHEAD {{{
 	#Notify
-	_message "@BLU@Copying requested elements of ${lastassign} to DATAHEAD @DEF@ {\n"
+	_message "@BLU@Copying requested elements of \`_parse_blockvars ${lastassign}\` to DATAHEAD @DEF@ {\n"
 	#Modify the current HEAD to requested block element
 	_add_datahead "${lastassign}"
 	#Notify
@@ -706,7 +715,9 @@ do
   #Write each step of the pipeline 
   if [ "${step:0:1}" == "@" ]
   then 
-    if [ "${step:1}" == "" ] 
+    _name=${step:1}
+    #_name=`_parse_blockvars ${_name}`
+    if [ "${_name}" == "" ] 
     then 
     	#If this is a datahead clearing: {{{
     	cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
@@ -716,11 +727,10 @@ do
 			#Notify
 			_message "@BLU@Clearing the current DATAHEAD @DEF@ {\n"
 			#Erase the datahead by doing a NULL assignment 
-			_write_datahead "${step:1}"
+			_write_datahead "${_name}"
 			#Notify
 			_message "} - @RED@Done!@DEF@\n"
 			#}}}
-
 
 			EOF
     	#}}}
@@ -729,11 +739,11 @@ do
     	cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
 			
 			#Modify the HEAD to the request value
-			#Intermediate Step: write block item ${step:1} to current DATAHEAD {{{
+			#Intermediate Step: write block item ${_name} to current DATAHEAD {{{
 			#Notify
-			_message "@BLU@Copying requested elements of ${step:1} to DATAHEAD @DEF@ {\n"
+			_message "@BLU@Copying requested elements of \`_parse_blockvars ${_name}\` to DATAHEAD @DEF@ {\n"
 			#Modify the current HEAD to requested block element
-			_add_datahead "${step:1}"
+			_add_datahead "${_name}"
 			#Notify
 			_message "} - @RED@Done!@DEF@\n"
 			#}}}
@@ -744,14 +754,16 @@ do
     fi
   elif [ "${step:0:1}" == "!" ]
   then 
+    _name=${step:1}
+    #_name=`_parse_blockvars ${_name}` 
     #If this is a datablock assignment: {{{
     cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
 		
-		#Intermediate Step: write current DATAHEAD to block item: ${step:1} {{{
+		#Intermediate Step: write current DATAHEAD to block item: ${_name} {{{
 		#Notify
-		_message "@BLU@Copying current DATAHEAD items to ${step:1}@DEF@ {\n"
+    _message "@BLU@Copying current DATAHEAD items to \`_parse_blockvars ${_name}\`@DEF@ {\n"
 		#Modify the datablock with the current HEAD
-		_add_head_to_block ${step:1} 
+		_add_head_to_block ${_name} 
 		#Notify
 		_message "} - @RED@Done!@DEF@\n"
 		#}}}
@@ -760,14 +772,16 @@ do
     #}}}
   elif [ "${step:0:1}" == "-" ]
   then 
+    _name=${step:1}
+    #_name=`_parse_blockvars ${_name}` 
     #If this is a datablock deletion: {{{
     cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
 		
-		#Intermediate Step: delete the block item ${step:1} {{{
+		#Intermediate Step: delete the block item ${_name} {{{
 		#Notify
-		_message "@BLU@Deleting block item ${step:1} from the datablock@DEF@ {\n"
-		#Delete the requested block item ${step:1} 
-    _delete_blockitem ${step:1} 
+    _message "@BLU@Deleting block item \`_parse_blockvars ${_name}\` from the datablock@DEF@ {\n"
+		#Delete the requested block item ${_name} 
+    _delete_blockitem ${_name} 
 		#Notify
 		_message "} - @RED@Done!@DEF@\n"
 		#}}}
@@ -779,12 +793,14 @@ do
     #If this is a datablock rename: {{{
     names=${step:1}
     oldname=${names%%-*}
+    #oldname=`_parse_blockvars ${oldname}` 
     newname=${names##*-}
+    #newname=`_parse_blockvars ${newname}` 
     cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
 		
 		#Intermediate Step: rename block item ${oldname} to ${newname} {{{
 		#Notify
-		_message "@BLU@Renaming block item ${oldname} to ${newname}@DEF@"
+		_message "@BLU@Renaming block item \`_parse_blockvars ${oldname}\` to \`_parse_blockvars ${newname}\`@DEF@"
 		#Rename block item
 		_rename_blockitem "${oldname}" "${newname}"
 		#Notify
@@ -800,6 +816,7 @@ do
     _var=${step:1}
     _varval=${_var#*=}
     _var=${_var%%=*}
+    #_var=`_parse_blockvars ${_var}`
     cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
 		
 		#Modify the block variable to the request value
@@ -811,7 +828,6 @@ do
 		#Notify
 		_message " @BLU@- @RED@Done!@DEF@\n"
 		#}}}
-
 
 		EOF
     #}}}
@@ -825,7 +841,7 @@ do
 		
 		#Intermediate Step: export the block item ${blockname} to external storage {{{
 		#Notify
-		_message "@BLU@Exporting block element ${blockname} into external storage ${outname} @DEF@ {\n"
+		_message "@BLU@Exporting block element \`_parse_blockvars ${blockname}\` into external storage \`_parse_blockvars ${outname}\` @DEF@ {\n"
 		#Export the requested block item ${blockname} to external storage ${outname}
 		_export_blockitem ${blockname} ${outname}
 		#Notify
