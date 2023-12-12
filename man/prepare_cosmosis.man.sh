@@ -71,7 +71,7 @@ function _outputs {
   #}}}
   for patch in ${patchlist}
   do 
-    outlist="${outlist} cosmosis_neff_${patch} cosmosis_sigmae_${patch} cosmosis_xipm_${patch}"
+    outlist="${outlist} cosmosis_neff_${patch}_@BV:BLIND@ cosmosis_sigmae_${patch}_@BV:BLIND@ cosmosis_xipm_${patch}_@BV:BLIND@"
   done 
   echo ${outlist} cosmosis_inputs
 } 

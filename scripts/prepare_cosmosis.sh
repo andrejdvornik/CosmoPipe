@@ -3,7 +3,7 @@
 # File Name : prepare_cosmosis.sh
 # Created By : awright
 # Creation Date : 31-03-2023
-# Last Modified : Sun 26 Nov 2023 09:49:34 PM CET
+# Last Modified : Mon 04 Dec 2023 09:20:24 PM CET
 #
 #=========================================
 
@@ -49,7 +49,7 @@ do
   do 
     _message " ->@BLU@ Patch @RED@${patch}@DEF@"
     #Get all the files in this stat and patch {{{
-    patchinputs=`_read_datablock "${stat}_${patch}"`
+    patchinputs=`_read_datablock "${stat}_${patch}_@BV:BLIND@"`
     patchinputs=`_blockentry_to_filelist ${patchinputs}`
     #}}}
     #If there are no files in this patch, skip {{{
@@ -62,16 +62,16 @@ do
     found="TRUE"
     foundlist="${foundlist} ${patch}"
     #Create the ${stat} directory {{{
-    if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_${stat}_${patch} ]
+    if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_${stat}_${patch}_@BV:BLIND@ ]
     then 
-      mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_${stat}_${patch}/
+      mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_${stat}_${patch}_@BV:BLIND@/
     fi 
     #}}}
     #Create the output statistic file name {{{
     stat_list=""
     for file in ${patchinputs} 
     do 
-      stat_list="${stat_list} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${stat}_${patch}/${file}"
+      stat_list="${stat_list} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${stat}_${patch}_@BV:BLIND@/${file}"
     done
     stat_file=`echo ${patchinputs} | awk '{print $1}'`
     #}}}
@@ -80,18 +80,18 @@ do
     stat_file=${stat_file%_ZB*}_${stat}.txt 
     #}}}
     #Remove preexisting files {{{
-    if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_${stat}_${patch}/${stat_file} ]
+    if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_${stat}_${patch}_@BV:BLIND@/${stat_file} ]
     then 
       _message " > @BLU@Removing previous cosmosis ${stat} file@DEF@"
-      rm @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_${stat}_${patch}/${stat_file}
+      rm @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_${stat}_${patch}_@BV:BLIND@/${stat_file}
       _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
     fi 
     #}}}
     #Construct the output file, maintaining order {{{
-    paste ${stat_list} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_${stat}_${patch}/${stat_file}
+    paste ${stat_list} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_${stat}_${patch}_@BV:BLIND@/${stat_file}
     #}}}
     #Add the stat file to the datablock {{{
-    _write_datablock "cosmosis_${stat}_${patch}" "${stat_file}"
+    _write_datablock "cosmosis_${stat}_${patch}_@BV:BLIND@" "${stat_file}"
     #}}}
     _message "@RED@ - Done! (`date +'%a %H:%M'`)@DEF@\n"
   done 
@@ -163,15 +163,15 @@ then
         fi 
         #}}}
         #Create the xipm directory {{{
-        if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm_${patch} ]
+        if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm_${patch}_@BV:BLIND@ ]
         then 
-          mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm_${patch}/
+          mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm_${patch}_@BV:BLIND@/
         fi 
         #}}}
         #Copy the file {{{
         _message " > @BLU@ Patch @DEF@${patch}@BLU@ ZBIN @DEF@${ZBIN1}@BLU@x@DEF@${ZBIN2}"
         cp ${file} \
-          @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm_${patch}/XI_@SURVEY@_${patch}_nBins_${NTOMO}_Bin${ZBIN1}_Bin${ZBIN2}.ascii
+          @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm_${patch}_@BV:BLIND@/XI_@SURVEY@_${patch}_nBins_${NTOMO}_Bin${ZBIN1}_Bin${ZBIN2}.ascii
         _message " - @RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
         #}}}
         #Save the file to the output list {{{
@@ -181,7 +181,7 @@ then
       #}}}
     done
     #Update the datablock {{{
-    _write_datablock "cosmosis_xipm_${patch}" "${outlist}"
+    _write_datablock "cosmosis_xipm_${patch}_@BV:BLIND@" "${outlist}"
     outall="${outall} ${outlist}"
     #}}}
     #}}}
