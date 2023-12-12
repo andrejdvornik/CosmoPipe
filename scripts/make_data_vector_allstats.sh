@@ -3,7 +3,7 @@
 # File Name : make_data_vector_allstats.sh
 # Created By : stoelzner
 # Creation Date : 01-04-2023
-# Last Modified : Mon 19 Jun 2023 08:31:03 PM CEST
+# Last Modified : Fri 08 Dec 2023 01:10:28 PM CET
 #
 #=========================================
 
@@ -32,7 +32,7 @@ do
   #Get the input files for this patch (there should be NTOMO catalogues)
   filelist=`echo ${inputs} | sed 's/ /\n/g' | grep "_${patch}_" || echo `
   #Get the m-bias file for this patch (there should be one, with NTOMO entries)
-  biaslist=`echo ${mfiles} | sed 's/ /\n/g' | grep "_${patchuse}_" | grep "_biases" || echo `
+  biaslist=`echo ${mfiles} | sed 's/ /\n/g' | grep "_biases" || echo `
   
   #Check if there are any matching files {{{
   if [ "${filelist}" == "" ] 

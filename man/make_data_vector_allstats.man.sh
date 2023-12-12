@@ -46,6 +46,7 @@ function _inp_var {
   echo ALLPATCH BLU BV:STATISTIC BV:TOMOLIMS DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
+
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
@@ -63,6 +64,7 @@ function _inp_data {
   then 
     input="xipm_binned"
   fi
+  #}}}
   echo ${input} mbias
 } 
 #}}}
