@@ -3,7 +3,7 @@
 # File Name : inherit_external.sh
 # Created By : awright
 # Creation Date : 20-08-2023
-# Last Modified : Tue 12 Sep 2023 07:10:47 AM UTC
+# Last Modified : Wed 06 Dec 2023 10:54:04 AM CET
 #
 #=========================================
 
@@ -31,10 +31,16 @@ do
   fi 
 
   #Test that the target item does not exist
-  if [  -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${block} ] 
+  if [  -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${block} ] && [ "@BV:INHERIT_OVERWRITE@" != "TRUE" ]
   then 
-    _message "@RED@ - ERROR! Inheritence would overwrite existing block element!" 
+    _message "@RED@ - ERROR! Inheritance would overwrite existing block element!" 
     exit 1 
+  elif [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${block} ] 
+  then 
+    _message " > @BLU@Erasing existing block item @DEF@${block}@BLU@ "
+    rm -fr @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${block}
+    #Notify 
+    _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
   fi 
 
   #Notify

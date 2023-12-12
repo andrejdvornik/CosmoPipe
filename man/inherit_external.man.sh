@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:INHERIT_BLOCK BV:INHERIT_EXTPATH DATABLOCK DEF RED RUNROOT STORAGEPATH
+  echo BLU BV:INHERIT_BLOCK BV:INHERIT_EXTPATH BV:INHERIT_OVERWRITE DATABLOCK DEF RED RUNROOT STORAGEPATH
 } 
 #}}}
 
