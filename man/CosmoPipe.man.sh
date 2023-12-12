@@ -181,37 +181,14 @@ function _initialise_datablock {
 #Read the datablock {{{
 function _read_datablock { 
   #Read the data block entries 
-  head=1
   _req=${1}
   _outblock=''
-  while read item
-  do 
-    #Check if we have reached the BLOCK yet
-    if [ "$item" == "BLOCK:" ] 
-    then 
-      head=0
-      continue
-    fi 
-    if [ "$item" == "VARS:" ] 
-    then 
-      head=1
-      continue
-    fi 
-    #If we're still in the HEAD, go to the next line 
-    if [ "${head}" == 1 ]
-    then 
-      continue 
-    fi 
-    if [ "${_req}" == "" ] 
-    then 
-      #Add the contents to the output block 
-      _outblock="${_outblock} ${item}"
-    elif [ "${item%%=*}" == "${_req}" ]
-    then 
-      #Add the contents to the output block 
-      _outblock="${_outblock} ${item}"
-    fi 
-  done < @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+  if [ "${_req}" == "" ] 
+  then 
+    _outblock=`grep -v "^BLOCK:" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt `
+  else 
+    _outblock=`grep "^${_req}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt || echo `
+  fi 
   #_message "#${_outblock}#"
   #_outblock=`echo ${_outblock} | sed 's/ /\n/g' | sort | uniq | xargs echo`
   #_outblock=`echo ${_outblock} | sed 's/ /\n/g' | xargs echo`
@@ -223,77 +200,53 @@ function _read_datablock {
 
 #Write the datablock {{{
 function _write_datablock { 
-  #Get the files in this data
-  _block=`_read_datablock`
   #Update the BLOCK items 
-  echo "BLOCK:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  #Add what we want to write
-  _filelist="{${2// /,}}"
-  echo "${1}=${_filelist}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  #For each block row:
-  for _file in ${_block} 
-  do 
-    #If the item isn't what we want to add/write
-    if [ "${_file%%=*}" != "${1%%=*}" ]
-    then 
-      #Write it 
-      _file=`echo $_file`
-      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-    fi
-  done
+  _filelist="${2// /,}"
+  _filelist="{${_filelist/^,/}}"
+  grep -v "^${1}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt | \
+    awk -v name="${1}" -v list="${_filelist}" '{ print $0 } END { print name "=" list }' \
+    > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
+  mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
 }
 #}}}
 
 #Rename a datablock element {{{
 function _rename_blockitem { 
-  _head=`_read_datahead`
-  #Get the files in this data
-  _block=`_read_datablock`
   #Get the variables
-  _vars=`_read_blockvars`
   _seen=0
-  for _file in ${_block} 
-  do 
-    #If the item isn't what we want to add/write
-    if [ "${_file%%=*}" == "${1%%=*}" ]
-    then 
-      _seen=1
-    fi 
-  done 
-  if [ "${_seen}" != 1 ]
+  #Parse the oldname 
+  oldname=${1%%=*}
+  oldname=`_parse_blockvars ${oldname}`
+  #Check if the oldname is in the block 
+  _val=`_read_datablock ${oldname}`
+  #If the item is there 
+  if [ "${_val}" == "" ]
   then 
-    _message "@RED@ - ERROR! The requested data block to rename (${1}) does not exist in the data block!@DEF@\n"
+    _message "@RED@ - ERROR! The requested data block to rename (${oldname}) does not exist in the data block!@DEF@\n"
     exit 1 
   fi 
-  #Update the BLOCK items 
-  echo "BLOCK:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  #For each block row:
-  for _file in ${_block} 
-  do 
-    #If the item isn't what we want to add/write
-    if [ "${_file%%=*}" == "${1%%=*}" ]
-    then 
-      #Write it the item with a new name 
-      _fileend=${_file##*=}
-      echo "${2%%=*}=${_fileend}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-    else 
-      #Write it 
-      _file=`echo $_file`
-      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-    fi
-  done
+  #Write it the item with a new name 
+  _fileend=${_val##*=}
+  newname=${2%%=*}
+  newname=`_parse_blockvars ${newname}`
+  #Add the new name and remove the oldname elements 
+  grep -v "^${oldname}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt | \
+    awk -v name="${newname}" -v list="${_fileend}" '{ print $0 } END { print name "=" list }' \
+    > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
+  mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   if [ "$3" == "" ]
   then 
-    if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} ]
+    #Move the actual block contents 
+    if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${oldname} ]
     then 
-      if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*} ] 
+      if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${newname} ] 
       then 
-        mv -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}
+        mv -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${oldname} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${newname}
       else 
-        #rm -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/*
-        find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/ -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
-        mv -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}/* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${2%%=*}/
-        rmdir  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}
+        #rm -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${newname}/*
+        find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${newname}/ -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
+        mv -f  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${oldname}/* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${newname}/
+        rmdir  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${oldname}
       fi 
     fi 
   fi 
@@ -302,48 +255,42 @@ function _rename_blockitem {
 
 #Export a datablock element {{{
 function _export_blockitem { 
-  _head=`_read_datahead`
-  #Get the files in this data
-  _block=`_read_datablock`
-  #Get the variables
-  _vars=`_read_blockvars`
-  _seen=0
-  for _file in ${_block} 
-  do 
-    #If the item is what we want to export 
-    if [ "${_file%%=*}" == "${1%%=*}" ]
-    then 
-      _seen=1
-    fi 
-  done 
-  if [ "${_seen}" != 1 ]
+  #Get the block and target names 
+  oldname=${1%%=*}
+  oldname=`_parse_blockvars ${oldname}`
+  newname=${2%%=*}
+  newname=`_parse_blockvars ${newname}`
+  #Check if the oldname is in the block 
+  _val=`_read_datablock ${oldname}`
+  if [ "${_val}" == "" ]
   then 
-    _message "@RED@ - ERROR! The requested data block to export (${1}) does not exist in the data block?!@DEF@\n"
+    _message "@RED@ - ERROR! The requested data block to export (${oldname}) does not exist in the data block?!@DEF@\n"
     exit 1 
   fi 
   #If this is not a test 
   if [ "$3" == "" ]
   then 
-    if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} ]
+    #Copy the contents 
+    if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${oldname} ]
     then 
-      if [ ! -d @RUNROOT@/@STORAGEPATH@/${2%%=*} ] 
+      if [ ! -d @RUNROOT@/@STORAGEPATH@/${newname} ] 
       then 
-        rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/${2%%=*} 2>&1 > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IOlog.txt
+        rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${oldname} @RUNROOT@/@STORAGEPATH@/${newname} 2>&1 > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IOlog.txt
       else 
         #Try to add a number to the end of the folder name... 
         copied=FALSE
         for i in `seq 100`
         do 
-          if [ ! -d @RUNROOT@/@STORAGEPATH@/${2%%=*}_${i} ] 
+          if [ ! -d @RUNROOT@/@STORAGEPATH@/${newname}_${i} ] 
           then 
-            rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} @RUNROOT@/@STORAGEPATH@/${2%%=*}_${i} 2>&1 > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IOlog.txt
+            rsync -atvL @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${oldname} @RUNROOT@/@STORAGEPATH@/${newname}_${i} 2>&1 > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IOlog.txt
             copied=TRUE
             break
           fi 
         done 
         if [ "${copied}" == "FALSE" ]
         then 
-          _message "@RED@ - ERROR! The requested data block to export (@DEF@${1%%=*}@RED@) could not be exported because the requested folder (@DEF@${2%%=*}@RED@) could not be created (even with 100 attempts at unique endings)?!@DEF@\n"
+          _message "@RED@ - ERROR! The requested data block to export (@DEF@${oldname}@RED@) could not be exported because the requested folder (@DEF@${newname}@RED@) could not be created (even with 100 attempts at unique endings)?!@DEF@\n"
            exit 1 
         fi 
       fi 
@@ -354,45 +301,28 @@ function _export_blockitem {
 
 #Delete a datablock element {{{
 function _delete_blockitem { 
-  _head=`_read_datahead`
-  #Get the files in this data
-  _block=`_read_datablock`
-  #Get the variables
-  _vars=`_read_blockvars`
-  _seen=0
-  for _file in ${_block} 
-  do 
-    #If the item isn't what we want to add/write
-    if [ "${_file%%=*}" == "${1%%=*}" ]
-    then 
-      _seen=1
-    fi 
-  done 
-  if [ "${_seen}" != 1 ]
+  #Get the block element name 
+  oldname=${1%%=*}
+  oldname=`_parse_blockvars ${oldname}`
+  #Check if the oldname is in the block 
+  _val=`_read_datablock ${oldname}`
+  if [ "${_val}" == "" ]
   then 
-    _message "@RED@ - ERROR! The requested data block to delete (${1}) does not exist in the data block!@DEF@\n"
+    _message "@RED@ - ERROR! The requested data block to delete (${oldname}) does not exist in the data block!@DEF@\n"
     exit 1 
   fi 
-  #Update the BLOCK items 
-  echo "BLOCK:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-  #For each block row:
-  for _file in ${_block} 
-  do 
-    #If the item is't what we want to delete
-    if [ "${_file%%=*}" != "${1%%=*}" ]
-    then 
-      #Write it 
-      _file=`echo $_file`
-      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-    fi
-  done
+  #update the block file 
+  grep -v "^${oldname}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt | \
+    awk '{ print $0 }' \
+    > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
+  mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   #If this isn't a test, delete the folder 
   if [ "$2" == "" ]
   then 
-    if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*} ]
+    if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${oldname} ]
     then 
-      find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}/ -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
-      rmdir  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1%%=*}
+      find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${oldname}/ -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
+      rmdir  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${oldname}
     fi 
   fi 
 }
@@ -429,10 +359,9 @@ function _read_datahead {
 #Write the datahead {{{
 #function _add_datahead { 
 function _add_datahead { 
-  _block=`_read_datablock`
-  _vars=`_read_blockvars`
+  _name=`_parse_blockvars ${1}`
   #If the request is for nothing
-  if [ "${1}" == "" ] 
+  if [ "${_name}" == "" ] 
   then 
     #Clear the datahead {{{
     echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
@@ -442,20 +371,20 @@ function _add_datahead {
     #}}}
   else 
     #Copy the requested data to the datahead {{{
-    if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/ ] 
+    if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${_name}/ ] 
     then 
-      _message "@RED@ - ERROR! The requested data block component ${1} does not have a folder in the data block?!"
+      _message "@RED@ - ERROR! The requested data block component ${_name} does not have a folder in the data block?!"
       exit 1 
     fi 
     #If the directory is empty {{{
-    if [ ! "$(ls -A @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1})" ]
+    if [ ! "$(ls -A @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${_name})" ]
     then 
-      _message "@RED@ - ERROR! The requested data block component ${1} is empty?!"
+      _message "@RED@ - ERROR! The requested data block component ${_name} is empty?!"
       exit 1 
     fi 
     #}}}
     #Get the files in this data{{{
-    _files=`_read_datablock ${1}`
+    _files=`_read_datablock ${_name}`
     _files=`_blockentry_to_filelist ${_files}`
     #}}}
     #remove the data in the datahead that we aren't going to use {{{
@@ -494,9 +423,9 @@ function _add_datahead {
     fi 
     #}}}
     #Copy the requested data to the datahead, if the directory contains anything {{{
-    if [ "$(ls -A @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1})" ] 
+    if [ "$(ls -A @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${_name})" ] 
     then 
-      _message " @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD:\n"
+      _message " @BLU@>@DEF@ ${_name} @BLU@-->@DEF@ DATAHEAD:\n"
       #Copy the files one-by-one (to ensure that there isn't accidental use of datablock waste...)
       #For each file in the block element {{{
       count=0
@@ -510,10 +439,10 @@ function _add_datahead {
         _printstr=" @RED@  (`date +'%a %H:%M'`)@BLU@ -->@DEF@ ${file##*/}@BLU@ (${count}/${nfiles})"
         _message "${_printstr}"
         #Copy the file (will skip if file exists and is unchanged)
-        rsync -atv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${file} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ 2>&1 > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IOlog.txt
+        rsync -atv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${_name}/${file} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ 2>&1 > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IOlog.txt
       done 
       #}}}
-      _message "\n @BLU@>@DEF@ ${1} @BLU@-->@DEF@ DATAHEAD@BLU@ Done!@DEF@\n"
+      _message "\n @BLU@>@DEF@ ${_name} @BLU@-->@DEF@ DATAHEAD@BLU@ Done!@DEF@\n"
     fi 
     #Update the datablock txt file 
     echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
@@ -529,10 +458,6 @@ function _add_datahead {
 
 #Replace an item in the datahead {{{
 function _replace_datahead { 
-  #Current block
-  _block=`_read_datablock`
-  #Current vars
-  _vars=`_read_blockvars`
   #Current head 
   _head=`_read_datahead`
   #Update the datablock txt file 
@@ -581,89 +506,23 @@ function _replace_datahead {
   done 
 }
 #}}}
-#
-##Write item to the datahead {{{
-#function _write_datahead { 
-#  #Current block
-#  _block=`_read_datablock`
-#  #Current vars
-#  _vars=`_read_blockvars`
-#  #Current head 
-#  _head=`_read_datahead`
-#  #Check if the requested item exists in the datablock
-#  _found=0
-#  for _file in ${_block} 
-#  do 
-#    if [ "${_file%%=*}" == "${1}" ]
-#    then 
-#      _found=1
-#    fi 
-#  done
-#  if [ "${_found}" != "1" ]
-#  then 
-#    _message "@RED@ - ERROR! The requested data block component ${1} does not have a folder in the data block?!"
-#    exit 1 
-#  fi 
-#  #Update the datablock txt file 
-#  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-#  for _file in ${_head} 
-#  do 
-#    #Print the existing datahead items 
-#    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-#  done 
-#  #Add the new item 
-#  echo "${2}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-#  #Write out the block 
-#  echo "BLOCK:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-#  for _file in ${_block} 
-#  do 
-#    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-#  done
-#  #Write out the vars 
-#  echo "VARS:" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-#  for _file in ${_vars} 
-#  do 
-#    echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
-#  done
-#}
-##}}}
-#
+
 #Write an item (including NULL/clear) to the datahead {{{
 function _write_datahead { 
-  #Current block
-  _block=`_read_datablock`
-  #Current vars
-  _vars=`_read_blockvars`
-  #Current head 
-  _head=`_read_datahead`
   if [ "${1}" == "" ] 
   then 
     #Clear the datahead 
     echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
     #Remove any datahead files 
-    find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
+    find @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -f 2> /dev/null || echo "Ignoring attempted directory removal"
   else 
     #Check if the requested item exists in the datablock
-    _found=0
-    for _file in ${_block} 
-    do 
-      if [ "${_file%%=*}" == "${1}" ]
-      then 
-        _found=1
-      fi 
-    done
-    if [ "${_found}" != "1" ]
+    _val=`_read_datablock ${1}`
+    if [ "${_val}" == "" ]
     then 
       _message "@RED@ - ERROR! The requested data block component ${1} does not have a folder in the data block?!"
       exit 1 
     fi 
-    #Update the datablock txt file 
-    echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
-    for _file in ${_head} 
-    do 
-      #Print the existing datahead items 
-      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
-    done 
     #Add the new item 
     echo "${2}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
   fi 
@@ -673,8 +532,6 @@ function _write_datahead {
 #Write a list of items to the datahead {{{
 function _writelist_datahead { 
   _head="${1}"
-  _block=`_read_datablock`
-  _vars=`_read_blockvars`
   #Update the datablock txt file 
   echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
   for _file in ${_head} 
@@ -687,12 +544,12 @@ function _writelist_datahead {
 
 #Add item to datablock {{{
 function _add_datablock { 
-  #Read the current datablock 
-  _datablock=`_read_datablock`
+  #Check if the folder name contains a block variable 
+  _targetblock=`_parse_blockvars ${1}`
   #Add the folder to the datablock 
-  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/ ] 
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${_targetblock}/ ] 
   then 
-    mkdir -p @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/
+    mkdir -p @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${_targetblock}/
   fi 
   #Get the file designation 
   _filelist=""
@@ -712,18 +569,17 @@ function _add_datablock {
       count=$((count+1))
       if [ -e "$_file" ]
       then 
-        #_message " @BLU@>@DEF@ ${_file##*/} @BLU@-->@DEF@ ${1}"
+        #_message " @BLU@>@DEF@ ${_file##*/} @BLU@-->@DEF@ ${_targetblock}"
         _message "\r${_printstr//?/ }\r"
         _printstr=" @RED@  (`date +'%a %H:%M'`)@BLU@ -->@DEF@ ${_file##*/}@BLU@ (${count}/${nfiles})"
         _message "${_printstr}"
-        rsync -atv $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${1}/${_file##*/} 2>&1 > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IOlog.txt
+        rsync -atv $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${_targetblock}/${_file##*/} 2>&1 > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IOlog.txt
         #_message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       fi 
     done 
-    _message "\n @BLU@>@DEF@ DATAHEAD @BLU@-->@DEF@ ${1}@BLU@ Done!@DEF@\n"
+    _message "\n @BLU@>@DEF@ DATAHEAD @BLU@-->@DEF@ ${_targetblock}@BLU@ Done!@DEF@\n"
   fi 
   #Add item to datablock list 
-  #_datablock=`echo "$_datablock $1=${_file}"`
   _write_datablock $1 "`echo ${_filelist}`"
 }
 #}}}
@@ -732,6 +588,8 @@ function _add_datablock {
 function _add_head_to_block {
   #Get the requested block name 
   _name=${1}
+  #Check if the folder name contains a block variable 
+  _name=`_parse_blockvars ${_name}`
   #Get the current datahead 
   _head=`_read_datahead` 
   _itemlist=""
@@ -742,7 +600,7 @@ function _add_head_to_block {
   done 
   #>&2 echo ${_itemlist}
   #Add the datahead entries to the block 
-  _add_datablock ${1} "${_itemlist}"
+  _add_datablock ${_name} "${_itemlist}"
 }
 #}}}
 
@@ -751,6 +609,13 @@ function _read_blockvars {
   #Read the data block variables
   vars=0
   _req=${1}
+  #Check if the folder name contains a block variable 
+  if [ "${_req}" != "" ] 
+  then 
+    #>&2 echo "read req: ${_req}"
+    _req=`_parse_blockvars ${_req}`
+    #>&2 echo "after parse: ${_req}"
+  fi 
   _outvars=''
   if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt ]
   then 
@@ -784,7 +649,7 @@ function _read_blockvars {
 
 #Parse a block variable in a string {{{
 function _parse_blockvars {
-  _outputlist=''
+  _outlist=''
   while [ $# -ge 1 ]
   do 
     string=$1
@@ -798,6 +663,7 @@ function _parse_blockvars {
       _var=${_var%%@*}
       #The variable assignment is a reference: assign the referred value 
       _filelist=`_read_blockvars ${_var}`
+      _baklist=${_filelist}
       #Remove variable name and brackets 
       _filelist=${_filelist#*=}
       _prompt=${_filelist#\{}
@@ -807,7 +673,12 @@ function _parse_blockvars {
       if [ "${_prompt}" == "" ] 
       then 
         #If not defined, maintain the BV string
+        #>&2 echo "!${_var} NOT FOUND IN BLOCK!" 
+        #>&2 echo "(${string})" 
+        #>&2 echo "[${_baklist}]" 
+        #>&2 echo "{${_filelist}}" 
         _filelist="@BV:${_var}@"
+        exit 1 
       else 
         #If defined, maintain the BV string
         _filelist=`echo ${_prompt}`
@@ -823,25 +694,56 @@ function _parse_blockvars {
       string=`echo ${outstring//\"/}`
       string=`echo ${string//\'/}`
       count=$((count+1))
-      if [ ${count} -gt 100 ]
+      if [ ${count} -gt 10 ]
       then 
-        #>&2 echo "ERROR: SOMETHING WRONG IN VARIABLE PARSE"
+        >&2 echo "ERROR: SOMETHING WRONG IN VARIABLE PARSE"
         #exit 1 
         break
       fi 
     done 
-    outlist="${outlist} ${string}"
+    _outlist="${_outlist} ${string}"
     shift 
   done 
-  echo ${outlist}
+  echo ${_outlist}
 }
 #}}}
 
 #Write the blockvars {{{
 function _write_blockvars { 
-  _head=`_read_datahead`
-  #Get the files in this data
-  _block=`_read_datablock`
+  #Get the variables 
+  if [ "${2:0:4}" == "@BV:" ] 
+  then 
+    #The variable assignment is a reference: assign the referred value 
+    _target=${2:4}
+    _target=${_target%@}
+    _filelist=`_read_blockvars ${_target}`
+    #Remove variable name and brackets 
+    _filelist=${_filelist#*=}
+    _prompt=${_filelist#\{}
+    _prompt=${_prompt%\}}
+    _prompt=${_prompt//,/ }
+    if [ "${_prompt}" == "" ] || [ "${_prompt}" == "@BV:${target}@" ]
+    then 
+      _filelist="{${2// /,}}"
+    else 
+      #Prompt about the update
+      echo -n " -> #${_prompt}#"
+    fi 
+  else  
+    #Add what we want to write
+    _filelist="${2// /,}"
+    _filelist="{${_filelist/^,/}}"
+  fi 
+  #Update the VARS items 
+  grep -v "^${1}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt | \
+    awk -v name="${1}" -v list="${_filelist}" '{ print $0 } END { print name "=" list }' \
+    > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars_$$.txt
+  mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars_$$.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
+}
+#}}}
+
+#Write the blockvars {{{
+function _write_blockvars_old { 
   #Get the variables 
   _vars=`_read_blockvars`
   if [ "${2:0:4}" == "@BV:" ] 
