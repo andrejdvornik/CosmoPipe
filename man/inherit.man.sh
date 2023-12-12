@@ -42,7 +42,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BV:INHERIT_BLOCK BV:INHERIT_PIPE DATABLOCK PIPELINE RED RUNROOT STORAGEPATH
+  echo BV:INHERIT_BLOCK BV:INHERIT_OVERWRITE BV:INHERIT_PIPE DATABLOCK PIPELINE RED RUNROOT STORAGEPATH
 } 
 #}}}
 
