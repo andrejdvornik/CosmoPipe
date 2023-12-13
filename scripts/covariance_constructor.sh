@@ -41,11 +41,15 @@ else
   exit 1
   #}}}
 fi
-if [ "@BV:MIXTERM@" == "True" ]
+mix_term=@BV:MIXTERM@
+if [ "${mix_term^^}" == "TRUE" ]
 then 
-  mix_term="xipxip"
+  mixterm="xipxip"
+  mixterm_basefile=`_read_datablock @BV:MIXTERM_BASEFILE@`
+  mixterm_basefile=`_blockentry_to_filelist ${mixterm_basefile}`
+  mixterm_basefile="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/@BV:MIXTERM_BASEFILE@/${mixterm_basefile}"
 else
-  mix_term=""
+  mixterm=""
 fi
 if [ "${SECONDSTATISTIC^^}" == "XIPM" ] || [ "${SECONDSTATISTIC^^}" == "COSEBIS" ] || [ "${SECONDSTATISTIC^^}" == "BANDPOWERS" ]
 then
@@ -208,8 +212,8 @@ xi_mm = True
 theta_accuracy = 1e-5
 integration_intervals = 50
 
-mix_term_do_mix_for = ${mix_term}
-mix_term_file_path_catalog = @BV:MIXTERM_BASEFILE@ 
+mix_term_do_mix_for = ${mixterm}
+mix_term_file_path_catalog = ${mixterm_basefile}
 mix_term_col_name_weight = @BV:WEIGHTNAME@
 mix_term_col_name_pos1 = @BV:RANAME@
 mix_term_col_name_pos2 = @BV:DECNAME@
