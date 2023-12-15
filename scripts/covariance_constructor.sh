@@ -41,11 +41,15 @@ else
   exit 1
   #}}}
 fi
-if [ "@BV:MIXTERM@" == "True" ]
+mix_term=@BV:MIXTERM@
+if [ "${mix_term^^}" == "TRUE" ]
 then 
-  mix_term="xipxip"
+  mixterm="xipxip"
+  mixterm_basefile=`_read_datablock @BV:MIXTERM_BASEFILE@`
+  mixterm_basefile=`_blockentry_to_filelist ${mixterm_basefile}`
+  mixterm_basefile="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/@BV:MIXTERM_BASEFILE@/${mixterm_basefile}"
 else
-  mix_term=""
+  mixterm=""
 fi
 if [ "${SECONDSTATISTIC^^}" == "XIPM" ] || [ "${SECONDSTATISTIC^^}" == "COSEBIS" ] || [ "${SECONDSTATISTIC^^}" == "BANDPOWERS" ]
 then
@@ -208,8 +212,8 @@ xi_mm = True
 theta_accuracy = 1e-5
 integration_intervals = 50
 
-mix_term_do_mix_for = ${mix_term}
-mix_term_file_path_catalog = @BV:MIXTERM_BASEFILE@ 
+mix_term_do_mix_for = ${mixterm}
+mix_term_file_path_catalog = ${mixterm_basefile}
 mix_term_col_name_weight = @BV:WEIGHTNAME@
 mix_term_col_name_pos1 = @BV:RANAME@
 mix_term_col_name_pos2 = @BV:DECNAME@
@@ -385,13 +389,13 @@ num_cores = @BV:COVNCORES@
 [tabulated inputs files]
 npair_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/
 npair_mm_file = @BV:NPAIRBASE@_nBins_${NTOMO}_Bin?_Bin?.ascii
-cosebi_directory = @RUNROOT@/INSTALL/OneCovariance/input/cosebis/
-wn_log_file = WnLog?.table
-wn_gg_file = W_Psi?-0.50-300.00-lmin-0.5-lmax-1000000.0-lbins-1000000.table
-Tn_plus_file = Tplus?.table
-Tn_minus_file = Tminus?.table
-Qn_file = Q_n?_0.50-300.00
-Un_file = U_n?_0.50-300.00
+cosebi_directory = @RUNROOT@/@CONFIGPATH@/cosebis/
+wn_log_file = WnLog/WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table
+# wn_gg_file = W_Psi-@BV:THETAMINXI@-@BV:THETAMAXXI@-lmin-0.5-lmax-1000000.0-lbins-1000000.table
+Tn_plus_file = Tplus/Tp_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table
+Tn_minus_file = Tminus/Tm_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table
+Qn_file = Qn/Q_n_@BV:THETAMINXI@-@BV:THETAMAXXI@_?
+Un_file = Un/U_n_@BV:THETAMINXI@-@BV:THETAMAXXI@_?
 Cell_directory = ${output_path}
 
 EOF
@@ -405,10 +409,10 @@ then
     arb_real_filter_mm_p_file_xipm="real_weight_realspace_cf_mm_p_?.table"
     arb_real_filter_mm_m_file_xipm="real_weight_realspace_cf_mm_m_?.table"
 
-    arb_fourier_filter_mmE_file_cosebis="WnLog?-0.50-300.00.table"
-    arb_fourier_filter_mmB_file_cosebis="WnLog?-0.50-300.00.table"
-    arb_real_filter_mm_p_file_cosebis="Tplus?_0.50-300.00.table"
-    arb_real_filter_mm_m_file_cosebis="Tminus?_0.50-300.00.table"
+    arb_fourier_filter_mmE_file_cosebis="WnLog?-@BV:THETAMINXI@-@BV:THETAMAXXI@.table"
+    arb_fourier_filter_mmB_file_cosebis="WnLog?-@BV:THETAMINXI@-@BV:THETAMAXXI@.table"
+    arb_real_filter_mm_p_file_cosebis="Tplus?_@BV:THETAMINXI@-@BV:THETAMAXXI@.table"
+    arb_real_filter_mm_m_file_cosebis="Tminus?_@BV:THETAMINXI@-@BV:THETAMAXXI@.table"
 
     arb_fourier_filter_mmE_file_bandpowers="fourier_weight_bandpowers_mmE_?.table"
     arb_fourier_filter_mmB_file_bandpowers="fourier_weight_bandpowers_mmB_?.table"

@@ -73,6 +73,7 @@ NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 #Requested statistic {{{
 if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 then 
+cosebis_configpath=@RUNROOT@/@CONFIGPATH@/cosebis/
   #Scalecuts {{{
   lo=`echo @BV:NMINCOSEBIS@ | awk '{print $1-0.5}'`
   hi=`echo @BV:NMAXCOSEBIS@ | awk '{print $1+0.5}'`
@@ -91,7 +92,7 @@ cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_co
 tmin_cosebis = @BV:THETAMINXI@
 tmax_cosebis = @BV:THETAMAXXI@
 nmax_cosebis = @BV:NMAXCOSEBIS@
-WnLogPath = @RUNROOT@/@CONFIGPATH@/cosebis/WnLog/
+WnLogPath = ${cosebis_configpath}/WnLog/
 
 EOF
 #}}}
@@ -103,7 +104,7 @@ file = %(2PT_STATS_PATH)s/cl_to_cosebis/cl_to_cosebis_interface.so
 theta_min = %(tmin_cosebis)s
 theta_max = %(tmax_cosebis)s
 n_max = %(nmax_cosebis)s
-Roots_n_Norms_FolderName = %(2PT_STATS_PATH)s/TLogsRootsAndNorms/
+Roots_n_Norms_FolderName = ${cosebis_configpath}/TLogsRootsAndNorms/
 Wn_Output_FolderName = %(WnLogPath)s
 Tn_Output_FolderName = %(2PT_STATS_PATH)s/TpnLog/
 output_section_name =  cosebis
@@ -297,7 +298,7 @@ then
 n_batch=`echo "@BV:NTHREADS@" | awk '{printf "%d", 4*$1}'`
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini <<- EOF
 [nautilus]
-live_points = 2000
+live_points = 4000
 enlarge_per_dim = 1.1
 split_threshold = 100
 n_networks = 8
