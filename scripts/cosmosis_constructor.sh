@@ -3,7 +3,7 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Wed Dec  6 05:58:26 2023
+# Last Modified : Thu 14 Dec 2023 03:31:51 PM UTC
 #
 #=========================================
 
@@ -31,6 +31,7 @@ RUN_NAME = %(SAMPLER_NAME)s_%(blind)s
 EOF
 #}}}
 STATISTIC="@BV:STATISTIC@"
+SAMPLER="@BV:SAMPLER@"
 BOLTZMAN="@BV:BOLTZMAN@"
 #Define the data file name {{{ 
 if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
@@ -150,6 +151,16 @@ EOF
 elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
 then 
   #scale cut {{{
+  if [ "${SAMPLER^^}" == "list" ]
+  then 
+    #Keep consistency between plus and minus 
+    ximinus_min=@BV:THETAMINXI@
+    ximinus_max=@BV:THETAMAXXI@
+  else 
+    #Use the appropriate scale cut  
+    ximinus_min=@BV:THETAMINXIM@
+    ximinus_max=@BV:THETAMAXXIM@
+  fi 
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 use_stats = xiP xiM
 xi_plus_extension_name = xiP
@@ -157,7 +168,7 @@ xi_minus_extension_name = xiM
 xi_plus_section_name = shear_xi_plus_binned
 xi_minus_section_name = shear_xi_minus_binned
 keep_ang_xiP  = @BV:THETAMINXI@ @BV:THETAMAXXI@ 
-keep_ang_xiM  = @BV:THETAMINXIM@ @BV:THETAMAXXIM@
+keep_ang_xiM  = ${ximinus_min}  ${ximinus_max}
 
 EOF
 #}}}
@@ -219,7 +230,6 @@ fi
 
 #Requested sampler {{{
 OUTPUTNAME="%(OUTPUT_FOLDER)s/output_%(RUN_NAME)s.txt"
-SAMPLER="@BV:SAMPLER@"
 VALUES=values
 PRIORS=priors
 listparam=''
