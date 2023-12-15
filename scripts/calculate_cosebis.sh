@@ -23,18 +23,22 @@ SRCLOC=@RUNROOT@/@CONFIGPATH@/cosebis
 normfile=${SRCLOC}/TLogsRootsAndNorms/Normalization_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
 rootfile=${SRCLOC}/TLogsRootsAndNorms/Root_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
 
-if [ ! -f ${normfile} ] 
+if [ ! -f ${normfile} ] || [ ! -f ${rootfile} ]
 then 
-  _message "- ERROR!\n"
-  _message "COSEBIS pre-computed table ${normfile} is missing. Download from gitrepo!"
-  exit 1
-fi
-
-if [ ! -f ${rootfile} ] 
-then 
-  _message "- ERROR!\n"
-  _message "COSEBIS pre-computed table ${rootfile} is missing. Download from gitrepo!"
-  exit 1
+  if [ "@BINNING@" == "log" ] 
+  then 
+    _message "    -> @BLU@Computing COSEBIs root and norm files@DEF@"
+    @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/cosebis_compute_log_weight.py \
+      --thetamin @BV:THETAMINXI@ \
+      --thetamax @BV:THETAMAXXI@ \
+      --nmax @BV:NMAXCOSEBIS@ \
+      --outputbase ${SRCLOC}/TLogsRootsAndNorms/ 2>&1
+    _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
+  else 
+    _message "- ERROR!\n"
+    _message "COSEBIS pre-computed table ${normfile} or ${rootfile} is missing, and pipeline cannot compute them for linear binning. Download from gitrepo!"
+    exit 1
+  fi 
 fi
 
 # Now Integrate output from treecorr with COSEBIS filter functions
