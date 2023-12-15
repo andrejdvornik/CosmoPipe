@@ -389,13 +389,13 @@ num_cores = @BV:COVNCORES@
 [tabulated inputs files]
 npair_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/
 npair_mm_file = @BV:NPAIRBASE@_nBins_${NTOMO}_Bin?_Bin?.ascii
-cosebi_directory = @RUNROOT@/INSTALL/OneCovariance/input/cosebis/
-wn_log_file = WnLog?-@BV:THETAMINXI@-@BV:THETAMAXXI@.table
-wn_gg_file = W_Psi?-@BV:THETAMINXI@-@BV:THETAMAXXI@-lmin-0.5-lmax-1000000.0-lbins-1000000.table
-Tn_plus_file = Tplus?_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
-Tn_minus_file = Tminus?_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
-Qn_file = Q_n?_@BV:THETAMINXI@-@BV:THETAMAXXI@
-Un_file = U_n?_@BV:THETAMINXI@-@BV:THETAMAXXI@
+cosebi_directory = @RUNROOT@/@CONFIGPATH@/cosebis/
+wn_log_file = WnLog/WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table
+# wn_gg_file = W_Psi-@BV:THETAMINXI@-@BV:THETAMAXXI@-lmin-0.5-lmax-1000000.0-lbins-1000000.table
+Tn_plus_file = Tplus/Tp_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table
+Tn_minus_file = Tminus/Tm_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table
+Qn_file = Qn/Q_n_@BV:THETAMINXI@-@BV:THETAMAXXI@_?
+Un_file = Un/U_n_@BV:THETAMINXI@-@BV:THETAMAXXI@_?
 Cell_directory = ${output_path}
 
 EOF
