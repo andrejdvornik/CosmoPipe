@@ -41,9 +41,9 @@ parser.add_argument('-q','--gamma_x_col', dest="gamma_x_col", type=str, nargs='?
     help='column for gamma_x')
 parser.add_argument('-j','--w_theta_col', dest="w_theta_col", type=str, nargs='?', required=False,
     help='column for clustering correlation function')
-parser.add_argument('-s','--thetamin', dest="thetamin", type=float, default=0.5, nargs='?', 
+parser.add_argument('-s','--thetamin', dest="thetamin", type=str, default=0.5, nargs='?', 
     help='value of thetamin in arcmins, default is 0.5')
-parser.add_argument('-l','--thetamax', dest="thetamax", type=float, default=300.0, nargs='?', 
+parser.add_argument('-l','--thetamax', dest="thetamax", type=str, default=300.0, nargs='?', 
     help='value of thetamax, in arcmins, default is 300')
 parser.add_argument('--cfoldername', dest="cfoldername", default="./2pt_results",required=False,
     help='full name and address of the folder for output files, default is 2pt_results')
@@ -74,9 +74,9 @@ parser.add_argument('-r','--root', dest="rootfile", metavar="root",required=Fals
 # Bandpowers options
 parser.add_argument('-w','--logwidth', dest="logwidth", type=float,default=0.5, nargs='?', 
     help='width of apodisation window for bandpowers')
-parser.add_argument('--thetamin_apod', dest="thetamin_apod", type=float, nargs='?', 
+parser.add_argument('--thetamin_apod', dest="thetamin_apod", type=str, nargs='?', 
     help='value of apodisation thetamin in arcmins. By default the apodisation window will go to zero at thetamin and thetamax. This can be overruled by setting thetaminbp and thetamaxbp')
-parser.add_argument('--thetamax_apod', dest="thetamax_apod", type=float, nargs='?', 
+parser.add_argument('--thetamax_apod', dest="thetamax_apod", type=str, nargs='?', 
     help='value of apodisation thetamax, in arcmins. By default the apodisation window will go to zero at thetamin and thetamax. This can be overruled by setting thetaminbp and thetamaxbp')
 parser.add_argument('-z','--ellmin', dest="ellmin", type=float,default=100, nargs='?', 
     help='value of ellmin for bandpowers')
@@ -112,8 +112,8 @@ xim_col=args.xim_col
 gamma_t_col=args.gamma_t_col
 gamma_x_col=args.gamma_x_col
 w_theta_col=args.w_theta_col
-thetamin=args.thetamin
-thetamax=args.thetamax
+thetamin=float(args.thetamin)
+thetamax=float(args.thetamax)
 cfoldername=args.cfoldername
 outputfile=args.outputfile
 binning=args.binning
@@ -127,8 +127,8 @@ normfile=args.normfile
 rootfile=args.rootfile
 # Bandpower options
 logwidth=args.logwidth
-thetamin_apod=args.thetamin_apod
-thetamax_apod=args.thetamax_apod
+thetamin_apod=float(args.thetamin_apod)
+thetamax_apod=float(args.thetamax_apod)
 ellmin=args.ellmin
 ellmax=args.ellmax
 nbins_bp=args.nbins_bp
@@ -249,7 +249,7 @@ if mode == 'cosebis':
     #Define theta-strings for Tplus/minus filename
     tmin='%.2f' % thetamin
     tmax='%.2f' % thetamax
-    thetaRange=tmin+'-'+tmax
+    thetaRange=args.thetamin+'-'+args.thetamax
 
     for n in range(1,nModes+1):
         #define Tplus and Tminus file names for this mode
@@ -322,7 +322,7 @@ elif (mode == 'psi_gg') or (mode == 'psi_gm'):
     #Define theta-strings for Tplus/minus filename
     tmin='%.2f' % thetamin
     tmax='%.2f' % thetamax
-    thetaRange=tmin+'-'+tmax
+    thetaRange=args.thetamin+'-'+args.thetamax
 
     for n in range(1,nModes_psi+1):
         #define the filter file names for this mode
@@ -360,8 +360,8 @@ elif mode == 'bandpowers_ee':
         filter_plus[i]=gplus(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin_apod, thetamax_apod, logwidth)
         filter_minus[i]=gminus(theta_mid*arcmin2rad, ell[i], ell[i+1])*theta_mid*arcmin2rad*T(theta_mid, thetamin_apod, thetamax_apod, logwidth)
         N = np.log(ell[i+1]/ell[i])
-        Integral_plus=sum(filter_plus[i]*xip*delta_theta)
-        Integral_minus=sum(filter_minus[i]*xim*delta_theta)
+        Integral_plus=sum(filter_plus[i]*xip[good_args]*delta_theta)
+        Integral_minus=sum(filter_minus[i]*xim[good_args]*delta_theta)
         CE[i]=(Integral_plus+Integral_minus)*np.pi/N*arcmin2rad
         CB[i]=(Integral_plus-Integral_minus)*np.pi/N*arcmin2rad
 
