@@ -75,9 +75,9 @@ parser.add_argument('-r','--root', dest="rootfile", metavar="root",required=Fals
 parser.add_argument('-w','--logwidth', dest="logwidth", type=float,default=0.5, nargs='?', 
     help='width of apodisation window for bandpowers')
 parser.add_argument('--thetamin_apod', dest="thetamin_apod", type=str, nargs='?', 
-    help='value of apodisation thetamin in arcmins. By default the apodisation window will go to zero at thetamin and thetamax. This can be overruled by setting thetaminbp and thetamaxbp')
+    help='value of apodisation thetamin in arcmins. By default the apodisation window will go to zero at thetamin and thetamax.')
 parser.add_argument('--thetamax_apod', dest="thetamax_apod", type=str, nargs='?', 
-    help='value of apodisation thetamax, in arcmins. By default the apodisation window will go to zero at thetamin and thetamax. This can be overruled by setting thetaminbp and thetamaxbp')
+    help='value of apodisation thetamax, in arcmins. By default the apodisation window will go to zero at thetamin and thetamax.')
 parser.add_argument('-z','--ellmin', dest="ellmin", type=float,default=100, nargs='?', 
     help='value of ellmin for bandpowers')
 parser.add_argument('-x','--ellmax', dest="ellmax", type=float,default=1500, nargs='?', 
