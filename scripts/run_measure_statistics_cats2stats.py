@@ -127,8 +127,8 @@ normfile=args.normfile
 rootfile=args.rootfile
 # Bandpower options
 logwidth=args.logwidth
-thetamin_apod=float(args.thetamin_apod)
-thetamax_apod=float(args.thetamax_apod)
+thetamin_apod=args.thetamin_apod
+thetamax_apod=args.thetamax_apod
 ellmin=args.ellmin
 ellmax=args.ellmax
 nbins_bp=args.nbins_bp
@@ -181,8 +181,8 @@ if mode.startswith('bandpowers'):
     if ellmin>ellmax:
         raise Exception('ell_min must be smaller than ell_max!')
     try:
-        thetamin_apod
-        thetamax_apod
+        thetamin_apod=float(args.thetamin_apod)
+        thetamax_apod=float(args.thetamax_apod)
         print('You have set explicitly set thetamin_apod = %.2f and thetamax_apod = %.2f. This means that scales outside this range will leak into the apodisation window. You have been warned!'%(thetamin_apod, thetamax_apod))
     except: 
         thetamin_apod = np.exp(np.log(thetamin)+logwidth/2)
