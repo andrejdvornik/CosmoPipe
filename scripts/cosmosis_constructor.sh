@@ -644,6 +644,7 @@ do
 			[$module]
 			file = %(KCAP_PATH)s/utils/sample_S8.py
 			s8_name = s_8_input
+			sigma8_name = sigma_8
 			
 			EOF
 			;;#}}}
