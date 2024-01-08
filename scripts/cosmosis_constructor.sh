@@ -33,6 +33,7 @@ EOF
 STATISTIC="@BV:STATISTIC@"
 SAMPLER="@BV:SAMPLER@"
 BOLTZMAN="@BV:BOLTZMAN@"
+IAMODEL="@BV:IAMODEL@"
 #Define the data file name {{{ 
 if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
 then
@@ -400,6 +401,7 @@ done
 #Add the values information #{{{
 if [  "@BV:COSMOSIS_PIPELINE@" == "default" ]
 then
+	# Set up boltzmann code blocks
 	if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] 
 	then
 		#boltzmann_pipeline="cosmopower distances"
@@ -420,17 +422,26 @@ then
 		_message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
   		exit 1
 	fi
+	# Set up intrinsic alignment pipeline blocks
+	if [ "${IAMODEL^^}" == "LINEAR" ] 
+	then
+		iamodel_pipeline="linear_alignment"
+	else
+		_message "Intrinsic alignment model not implemented: ${IAMODEL^^}\n"
+  		exit 1
+	fi
+
 	if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 	then
-		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias linear_alignment projection cosebis scale_cuts likelihood"
+		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} projection cosebis scale_cuts likelihood"
 	#}}}
 	elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
 	then 
-		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias linear_alignment projection bandpowers scale_cuts likelihood"
+		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} projection bandpowers scale_cuts likelihood"
 	#}}}
 	elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
 	then 
-		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias linear_alignment projection cl2xi xip_binned xim_binned scale_cuts likelihood"
+		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} projection cl2xi xip_binned xim_binned scale_cuts likelihood"
 	fi
 else
 	COSMOSIS_PIPELINE="@BV:COSMOSIS_PIPELINE@"
