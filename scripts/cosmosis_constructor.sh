@@ -6,9 +6,15 @@
 # Last Modified : Thu 14 Dec 2023 03:31:51 PM UTC
 #
 #=========================================
-
 #Script to generate a cosmosis .ini, values, & priors file 
 #Prepare the starting items {{{
+IAMODEL="@BV:IAMODEL@"
+if [ "${IAMODEL^^}" == "TATT" ] 
+then
+	ia_dir="tatt"
+else
+	ia_dir=""
+fi
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 [DEFAULT]
 MY_PATH      = @RUNROOT@/
@@ -17,7 +23,7 @@ stats_name    = @BV:STATISTIC@
 CSL_PATH      = %(MY_PATH)s/INSTALL/cosmosis-standard-library/
 KCAP_PATH     = %(MY_PATH)s/INSTALL/kcap/
 
-OUTPUT_FOLDER = %(MY_PATH)s/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/%(stats_name)s/chain/
+OUTPUT_FOLDER = %(MY_PATH)s/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/%(stats_name)s/chain/${ia_dir}/
 CONFIG_FOLDER = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/
 
 blind         = @BV:BLIND@
@@ -33,7 +39,6 @@ EOF
 STATISTIC="@BV:STATISTIC@"
 SAMPLER="@BV:SAMPLER@"
 BOLTZMAN="@BV:BOLTZMAN@"
-IAMODEL="@BV:IAMODEL@"
 #Define the data file name {{{ 
 if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
 then
@@ -425,7 +430,10 @@ then
 	# Set up intrinsic alignment pipeline blocks
 	if [ "${IAMODEL^^}" == "LINEAR" ] 
 	then
-		iamodel_pipeline="linear_alignment"
+		iamodel_pipeline="linear_alignment projection"
+	elif [ "${IAMODEL^^}" == "TATT" ] 
+	then
+		iamodel_pipeline="fast_pt tatt projection add_intrinsic"
 	else
 		_message "Intrinsic alignment model not implemented: ${IAMODEL^^}\n"
   		exit 1
@@ -433,15 +441,15 @@ then
 
 	if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 	then
-		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} projection cosebis scale_cuts likelihood"
+		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} cosebis scale_cuts likelihood"
 	#}}}
 	elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
 	then 
-		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} projection bandpowers scale_cuts likelihood"
+		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} bandpowers scale_cuts likelihood"
 	#}}}
 	elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
 	then 
-		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} projection cl2xi xip_binned xim_binned scale_cuts likelihood"
+		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} cl2xi xip_binned xim_binned scale_cuts likelihood"
 	fi
 else
 	COSMOSIS_PIPELINE="@BV:COSMOSIS_PIPELINE@"
@@ -730,6 +738,37 @@ do
 			
 			EOF
 			;; #}}}
+	"tatt") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(CSL_PATH)s/intrinsic_alignments/tatt/tatt_interface.py
+			sub_lowk=F
+			do_galaxy_intrinsic=F
+			ia_model=tatt
+			
+			EOF
+			;; #}}}
+	"fast_pt") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(CSL_PATH)s/structure/fast_pt/fast_pt_interface.py
+			do_ia = T
+			k_res_fac = 0.5
+			verbose = F
+			
+			EOF
+			;; #}}}
+	"add_intrinsic") #{{{
+			add_intrinsic=True
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file=%(CSL_PATH)s/shear/add_intrinsic/add_intrinsic.py
+			shear-shear=T
+			position-shear=F
+			perbin=F
+			
+			EOF
+			;; #}}}
     "projection") #{{{
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
@@ -738,11 +777,24 @@ do
 			ell_max_logspaced = 1.0e5
 			n_ell_logspaced = 50
 			position-shear = F
-			fast-shear-shear-ia = %(redshift_name)s-%(redshift_name)s
 			verbose = F
 			get_kernel_peaks = F
-			
 			EOF
+			if [ "$add_intrinsic" == "True" ]
+			then
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			shear-shear = %(redshift_name)s-%(redshift_name)s
+			shear-intrinsic = %(redshift_name)s-%(redshift_name)s
+			intrinsic-intrinsic = %(redshift_name)s-%(redshift_name)s
+			intrinsicb-intrinsicb = %(redshift_name)s-%(redshift_name)s
+
+			EOF
+			else
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			fast-shear-shear-ia = %(redshift_name)s-%(redshift_name)s
+
+			EOF
+			fi
 			;; #}}}
     "likelihood") #{{{
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
