@@ -312,7 +312,15 @@ zlens_extension = NZ_SOURCE
 
 EOF
 #}}}
-
+WnLog_filelist=""
+Tplus_filelist=""
+Tminus_filelist=""
+for i in  `seq @BV:NMAXCOSEBIS@`
+do
+  WnLog_filelist="${WnLog_filelist} WnLog/WnLog${i}-@BV:THETAMINXI@-@BV:THETAMAXXI@.table,"
+  Tplus_filelist="${Tplus_filelist} Tplus/Tp_@BV:THETAMINXI@-@BV:THETAMAXXI@_${i}.table,"
+  Tminus_filelist="${Tminus_filelist} Tminus/Tm_@BV:THETAMINXI@-@BV:THETAMAXXI@_${i}.table,"
+done
 # All kinds of parameters {{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 [cosmo]
@@ -390,10 +398,10 @@ num_cores = @BV:COVNCORES@
 npair_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/
 npair_mm_file = @BV:NPAIRBASE@_nBins_${NTOMO}_Bin?_Bin?.ascii
 cosebi_directory = @RUNROOT@/@CONFIGPATH@/cosebis/
-wn_log_file = WnLog/WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table
+wn_log_file = ${WnLog_filelist}
 # wn_gg_file = W_Psi-@BV:THETAMINXI@-@BV:THETAMAXXI@-lmin-0.5-lmax-1000000.0-lbins-1000000.table
-Tn_plus_file = Tplus/Tp_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table
-Tn_minus_file = Tminus/Tm_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table
+Tn_plus_file = ${Tplus_filelist}
+Tn_minus_file = ${Tminus_filelist}
 Qn_file = Qn/Q_n_@BV:THETAMINXI@-@BV:THETAMAXXI@_?
 Un_file = Un/U_n_@BV:THETAMINXI@-@BV:THETAMAXXI@_?
 Cell_directory = ${output_path}
