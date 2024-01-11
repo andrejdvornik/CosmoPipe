@@ -17,6 +17,18 @@ then
   mkdir -p @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
 fi 
 
+BOLTZMAN="@BV:BOLTZMAN@"
+if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
+then
+  non_linear_model=mead2020_feedback
+elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] || [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
+then
+  non_linear_model=mead2015
+else
+  _message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
+  exit 1
+fi
+
 #Covar name
 cov="@DB:covariance_cosebis@"
 cov=${cov##*/}
@@ -32,8 +44,8 @@ NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
   --neff @DB:cosmosis_neff@ \
   --sigmae @DB:cosmosis_sigmae@ \
   --covariance @DB:covariance_cosebis@ \
-  --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${cov} \
+  --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}.fits \
   --plotfolder @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
 
-_write_datablock "mcmc_inp_@BV:STATISTIC@" "MCMC_input_${cov}"
+_write_datablock "mcmc_inp_@BV:STATISTIC@" "MCMC_input_${non_linear_model}.fits"
 
