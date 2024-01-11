@@ -56,7 +56,12 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo mbias
+  outlist=''
+  for patch in @ALLPATCH@ @PATCHLIST@ 
+  do 
+    outlist="${outlist} mbias_${patch}_@BV:BLIND@"
+  done 
+  echo ${outlist}
 } 
 #}}}
 
