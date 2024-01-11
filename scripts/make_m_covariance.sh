@@ -8,17 +8,16 @@
 #=========================================
 
 #Loop over the patch list
-outputlist=''
 for patch in @PATCHLIST@ @ALLPATCH@
 do 
-
   #m-bias files 
   mfiles="`_read_datablock mbias_${patch}_@BV:BLIND@`"
   mfiles="`_blockentry_to_filelist ${mfiles}`"
 
   #Check if the full covariance was constructed from simulation realisations 
   if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov_${patch}_@BV:BLIND@/ ] || [ "@BV:ANALYTIC_MCOV@" == "TRUE" ]
-  then 
+  then
+    outputlist='' 
     #Make the mcov directory if needed
     if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov_${patch}_@BV:BLIND@ ]
     then 
@@ -51,7 +50,12 @@ do
     fi 
 
     cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov_${patch}_@BV:BLIND@/m_corr_${patch}_@BV:BLIND@_r.ascii @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_mcov_${patch}_@BV:BLIND@/m_corr_${patch}_@BV:BLIND@_r.ascii
-    _write_datablock cosmosis_mcov_${patch}_@BV:BLIND@ "m_corr_${patch}_@BV:BLIND@_r.ascii" 
+    _write_datablock cosmosis_mcov_${patch}_@BV:BLIND@ "m_corr_${patch}_@BV:BLIND@_r.ascii"
+    if [ "${outputlist}" != "" ] 
+    then 
+      #Add the new files to the block
+      _write_datablock mcov_${patch}_@BV:BLIND@ "${outputlist}"
+    fi  
 
   else 
     #Use the existing covariance 
@@ -79,9 +83,4 @@ do
 
 done
 
-if [ "${outputlist}" != "" ] 
-then 
-  #Add the new files to the block
-  _write_datablock mcov "${outputlist}"
-fi 
 
