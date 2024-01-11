@@ -7,12 +7,6 @@
 #
 #=========================================
 
-#Make the mcov directory if needed
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov ]
-then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov
-fi 
-
 #Loop over the patch list
 outputlist=''
 for patch in @PATCHLIST@ @ALLPATCH@
@@ -25,6 +19,11 @@ do
   #Check if the full covariance was constructed from simulation realisations 
   if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov_${patch}_@BV:BLIND@/ ] || [ "@BV:ANALYTIC_MCOV@" == "TRUE" ]
   then 
+    #Make the mcov directory if needed
+    if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov_${patch}_@BV:BLIND@ ]
+    then 
+      mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcov_${patch}_@BV:BLIND@
+    fi 
     #Construct a new covariance 
     #Get the m-bias files for this patch (there should be one, with NTOMO entries)
     mbias=`echo ${mfiles} | sed 's/ /\n/g' | grep "_biases" || echo `
