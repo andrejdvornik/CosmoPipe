@@ -79,7 +79,17 @@ do
   mbias=`echo ${mfiles} | sed 's/ /\n/g' | grep "_biases" || echo `
   mbias=${mbias##*/}
   cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${patch}_@BV:BLIND@/${mbias} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_mbias_${patch}_@BV:BLIND@/${mbias}
-  _write_datablock cosmosis_mbias_${patch}_@BV:BLIND@ "${mbias}" 
+  _write_datablock cosmosis_mbias_${patch}_@BV:BLIND@ "${mbias}"
+
+  #Make the cosmosis mbias directory (split per patch) 
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_msigma_${patch}_@BV:BLIND@ ]
+    then 
+      mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_msigma_${patch}_@BV:BLIND@
+  fi
+  msigma=`echo ${mfiles} | sed 's/ /\n/g' | grep "_uncertainty" || echo `
+  msigma=${msigma##*/}
+  cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${patch}_@BV:BLIND@/${mbias} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_msigmas_${patch}_@BV:BLIND@/${msigma}
+  _write_datablock cosmosis_msigma_${patch}_@BV:BLIND@ "${msigma}" 
 
 done
 
