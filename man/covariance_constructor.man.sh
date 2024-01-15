@@ -50,7 +50,7 @@ function _inp_var {
 function _inp_data { 
   #Data inputs (leave blank if none)
   mixtermbase=`_parse_blockvars @BV:MIXTERM_BASEFILE@`
-  echo cosmosis_mbias cosmosis_neff cosmosis_nz cosmosis_sigmae ${mixtermbase}
+  echo cosmosis_msigma cosmosis_neff cosmosis_nz cosmosis_sigmae ${mixtermbase}
 } 
 #}}}
 
