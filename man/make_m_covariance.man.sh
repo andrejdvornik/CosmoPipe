@@ -65,7 +65,7 @@ function _outputs {
   outlist=''
   for patch in @PATCHLIST@ @ALLPATCH@ 
   do 
-    outlist="${outlist} cosmosis_mcov_${patch}_@BV:BLIND@ cosmosis_mbias_${patch}_@BV:BLIND@ mcov_${patch}_@BV:BLIND@"
+    outlist="${outlist} cosmosis_mcov_${patch}_@BV:BLIND@ cosmosis_mbias_${patch}_@BV:BLIND@ cosmosis_msigma_${patch}_@BV:BLIND@ mcov_${patch}_@BV:BLIND@"
   done 
   echo ${outlist}
 } 
