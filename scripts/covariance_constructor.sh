@@ -3,7 +3,7 @@
 # File Name : covariance_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Fri 08 Dec 2023 10:48:51 AM CET
+# Last Modified : Mon 15 Jan 2024 09:57:00 AM CET
 #
 #=========================================
 
@@ -112,12 +112,12 @@ else
 fi
 # COSEBIs basis function path
 COSEBISLOC=@RUNROOT@/@CONFIGPATH@/cosebis/
-mbiaslist=""
-for file in @DB:cosmosis_mbias@
+msigmalist=""
+for file in @DB:cosmosis_msigma@
 do 
-  mbiaslist="${mbiaslist} `cat ${file}`"
+  msigmalist="${msigmalist} `cat ${file}`"
 done 
-mbiaslist=`echo ${mbiaslist} | sed 's/ /,/g'`
+msigmalist=`echo ${msigmalist} | sed 's/ /,/g'`
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'` 
 # Base settings {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
@@ -168,7 +168,7 @@ delta_z = 0.08
 tri_delta_z = 0.5
 integration_steps = 500
 nz_interpolation_polynom_order = 1
-mult_shear_bias = ${mbiaslist}
+mult_shear_bias = ${msigmalist}
 limber = True
 pixelised_cell = False
 pixel_Nside = 2048
