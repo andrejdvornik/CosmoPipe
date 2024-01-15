@@ -3,7 +3,7 @@
 # File Name : make_m_covariance.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Sat 09 Dec 2023 11:44:57 AM CET
+# Last Modified : Mon 15 Jan 2024 06:39:37 PM CET
 #
 #=========================================
 
@@ -88,7 +88,7 @@ do
   fi
   msigma=`echo ${mfiles} | sed 's/ /\n/g' | grep "_uncertainty" || echo `
   msigma=${msigma##*/}
-  cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${patch}_@BV:BLIND@/${mbias} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_msigmas_${patch}_@BV:BLIND@/${msigma}
+  cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${patch}_@BV:BLIND@/${mbias} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_msigma_${patch}_@BV:BLIND@/${msigma}
   _write_datablock cosmosis_msigma_${patch}_@BV:BLIND@ "${msigma}" 
 
 done
