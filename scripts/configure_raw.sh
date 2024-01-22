@@ -134,6 +134,11 @@ then
   scripts=`find ${RUNROOT}/${SCRIPTPATH} -mindepth 1 -maxdepth 1 -type f`
   configs=`find ${RUNROOT}/${CONFIGPATH} -mindepth 1 -type f`
   manuals=`find ${RUNROOT}/${MANUALPATH} -mindepth 1 -maxdepth 1 -type f`
+  #Only update files that contain varables 
+  scripts=`grep -c "@" ${scripts} | grep -v ":0" | awk -F: '{print $1}'` 
+  configs=`grep -c "@" ${configs} | grep -v ":0" | awk -F: '{print $1}'` 
+  manuals=`grep -c "@" ${manuals} | grep -v ":0" | awk -F: '{print $1}'` 
+  #Get the number of files 
   nscript=`echo ${scripts} | awk '{print NF}'`
   nconf=`echo ${configs} | awk '{print NF}'`
   nman=`echo ${manuals} | awk '{print NF}'`
