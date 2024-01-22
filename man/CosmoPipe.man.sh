@@ -205,8 +205,15 @@ function _write_datablock {
   _filelist="{${_filelist/^,/}}"
   if [ ${#_filelist} -gt 100000 ] 
   then 
-    _message "${RED} - ERROR! File list is too long!"
-    exit 1
+    grep -v "^${1}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
+    _nchunk=50000
+    _ccount=0 
+    echo -n "${1}=" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
+    while [ ${ccount} -lt ${#_filelist} ]
+    do 
+      echo -n "${_filelist:${_ccount}:${_nchunk}}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
+      _ccount=$(_ccount+_nchunk)
+    done 
   else 
     grep -v "^${1}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt | \
       awk -v name="${1}" -v list="${_filelist}" '{ print $0 } END { print name "=" list }' \
