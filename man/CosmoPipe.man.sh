@@ -209,7 +209,7 @@ function _write_datablock {
     _nchunk=50000
     _ccount=0 
     echo -n "${1}=" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
-    while [ ${ccount} -lt ${#_filelist} ]
+    while [ ${_ccount} -lt ${#_filelist} ]
     do 
       echo -n "${_filelist:${_ccount}:${_nchunk}}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
       _ccount=$(_ccount+_nchunk)
