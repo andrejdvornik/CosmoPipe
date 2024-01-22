@@ -203,9 +203,15 @@ function _write_datablock {
   #Update the BLOCK items 
   _filelist="${2// /,}"
   _filelist="{${_filelist/^,/}}"
-  grep -v "^${1}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt | \
-    awk -v name="${1}" -v list="${_filelist}" '{ print $0 } END { print name "=" list }' \
-    > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
+  if [ ${#_filelist} -gt 100000 ] 
+  then 
+    _message "${RED} - ERROR! File list is too long!"
+    exit 1
+  else 
+    grep -v "^${1}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt | \
+      awk -v name="${1}" -v list="${_filelist}" '{ print $0 } END { print name "=" list }' \
+      > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
+  fi 
   mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
 }
 #}}}
