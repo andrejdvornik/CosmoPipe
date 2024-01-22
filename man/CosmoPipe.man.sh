@@ -212,7 +212,7 @@ function _write_datablock {
     while [ ${_ccount} -lt ${#_filelist} ]
     do 
       echo -n "${_filelist:${_ccount}:${_nchunk}}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
-      _ccount=$(_ccount+_nchunk)
+      _ccount=$((_ccount+_nchunk))
     done 
   else 
     grep -v "^${1}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt | \
