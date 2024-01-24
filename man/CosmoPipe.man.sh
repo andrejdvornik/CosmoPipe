@@ -242,10 +242,23 @@ function _rename_blockitem {
   _fileend=${_val##*=}
   newname=${2%%=*}
   newname=`_parse_blockvars ${newname}`
-  #Add the new name and remove the oldname elements 
-  grep -v "^${oldname}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt | \
-    awk -v name="${newname}" -v list="${_fileend}" '{ print $0 } END { print name "=" list }' \
-    > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
+  #Add the new name and remove the oldname elements
+  if [ ${#_fileend} -gt 100000 ] 
+  then 
+    grep -v "^${oldname}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
+    _nchunk=50000
+    _ccount=0 
+    echo -n "${newname}=" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
+    while [ ${_ccount} -lt ${#_fileend} ]
+    do 
+      echo -n "${_fileend:${_ccount}:${_nchunk}}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
+      _ccount=$((_ccount+_nchunk))
+    done 
+  else 
+    grep -v "^${oldname}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt | \
+      awk -v name="${newname}" -v list="${_fileend}" '{ print $0 } END { print name "=" list }' \
+      > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
+  fi
   mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
   if [ "$3" == "" ]
   then 
