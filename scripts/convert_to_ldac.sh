@@ -3,7 +3,7 @@
 # File Name : convert_to_ldac.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Fri 03 Nov 2023 01:39:29 PM CET
+# Last Modified : Wed Jan 10 05:12:04 2024
 #
 #=========================================
 
@@ -52,14 +52,14 @@ then
   _message " @BLU@- @RED@Done! (`date +'%a %H:%M'`)\n@DEF@"
 
   #Update the datahead 
-  _replace_datahead ${input##*/} ${output##*/}
+  _replace_datahead ${input} ${output}
 else 
   #Notify 
   _message "   > @BLU@Catalogue @DEF@${input##*/}@BLU@ already appears LDAC compatible!@DEF@\n"
   #Check if we need to rename 
   if [ "${input}" != "${output}" ]
   then 
-    _replace_datahead ${input##*/} ${output##*/}
+    _replace_datahead ${input} ${output}
   fi 
 fi 
 

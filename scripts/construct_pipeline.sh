@@ -46,6 +46,8 @@ blockneeds=`_varcheck $0`
 pipeline_steps=`VERBOSE=1 _read_pipe @PIPELINE@`
 echo ${pipeline_steps}
 count=0
+echo "Expanding pipeline items"
+echo "Starting:\n${pipeline_steps}"
 #If there are any substeps 
 while [[ " ${pipeline_steps} " =~ " ." ]]
 do 
@@ -91,8 +93,9 @@ do
     exit 1
   fi 
 done
+echo "Ending:\n${pipeline_steps}"
+echo "Done!"
 #}}}
-
 #If running resume, and RESUME not found, create it explicitly {{{
 
 #}}}
@@ -120,6 +123,8 @@ do
   if [ "${step:0:1}" != "@" ] && [ "${step:0:1}" != "!" ] && [ "${step:0:1}" != "~" ] \
     && [ "${step:0:1}" != "%" ] && [ "${step:0:1}" != "+" ] && [ "${step:0:1}" != "-" ]
   then 
+    ##Parse block variables 
+    #step=`_parse_blockvars ${step}`
     #If the step has no script 
     if [ ! -f @RUNROOT@/@SCRIPTPATH@/${step}.sh ] && [ ! -f @RUNROOT@/@CONFIGPATH@/${step}.ini ]
     then 

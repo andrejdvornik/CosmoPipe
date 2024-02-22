@@ -3,7 +3,7 @@
 # File Name : ldackeepcols.sh
 # Created By : awright
 # Creation Date : 12-06-2023
-# Last Modified : Tue 21 Nov 2023 09:25:53 AM CET
+# Last Modified : Wed Jan 10 05:12:52 2024
 #
 #=========================================
 
@@ -97,6 +97,6 @@ else
   fi 
   
   #Update the datahead
-  _replace_datahead "${input##*/}" "${output##*/}"
+  _replace_datahead "${input}" "${output}"
 fi 
 

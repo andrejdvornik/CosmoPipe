@@ -137,3 +137,6 @@ SSCMATRIX=@SSCMATRIX@
 #Super Sample Covariance Matrix: ell bins 
 SSCELLVEC=@SSCELLVEC@
 
+#Name of the conda environment that cosmopipe installs 
+CONDAPIPENAME=cosmopipe
+

@@ -40,7 +40,7 @@ _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 #}}}
 
 #Update the datahead {{{
-_replace_datahead ${current##*/} ${outputname##*/}
+_replace_datahead ${current} ${outputname}
 #}}}
 
 #Add the cterm catalogue to the datablock {{{

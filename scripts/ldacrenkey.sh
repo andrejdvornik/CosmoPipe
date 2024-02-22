@@ -3,7 +3,7 @@
 # File Name : ldacrenkey.sh
 # Created By : awright
 # Creation Date : 16-06-2023
-# Last Modified : Wed 02 Aug 2023 09:49:09 PM CEST
+# Last Modified : Wed Jan 10 05:13:10 2024
 #
 #=========================================
 
@@ -49,5 +49,5 @@ _message "   > @BLU@Renaming FITS Column@RED@ @BV:OLDKEY@ @BLU@to@RED@ @BV:NEWKE
 _message " @BLU@- @RED@Done! (`date +'%a %H:%M'`)\n@DEF@"
 
 #Update the data block 
-_replace_datahead "${input##*/}" "${output##*/}"
+_replace_datahead "${input}" "${output}"
 

@@ -3,7 +3,7 @@
 # File Name : combine_cats.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Tue 25 Jul 2023 09:37:09 AM CEST
+# Last Modified : Wed Jan 10 05:10:34 2024
 #
 #=========================================
 
@@ -61,7 +61,7 @@ then
   for _file in ${input}
   do 
     #Replace the first file with the output name, then clear the rest
-    _replace_datahead ${_file##*/} "${outname}"
+    _replace_datahead ${_file} "${outname}"
     outname=""
   done 
 else 

@@ -3,7 +3,7 @@
 # File Name : prepare_treecorr.sh
 # Created By : awright
 # Creation Date : 28-03-2023
-# Last Modified : Fri 19 May 2023 11:31:13 AM CEST
+# Last Modified : Wed Jan 10 05:13:23 2024
 #
 #=========================================
 
@@ -50,7 +50,7 @@ _message " - @RED@Done!@DEF@\n"
 #}}}
 
 #Update the datahead {{{
-_replace_datahead "${current##*/}" "${outputname##*/}"
+_replace_datahead "${current}" "${outputname}"
 #}}}
 
 ##Add the catalogue to the datablock {{{

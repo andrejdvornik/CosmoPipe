@@ -3,7 +3,7 @@
 # File Name : fitskeepcols.sh
 # Created By : awright
 # Creation Date : 12-06-2023
-# Last Modified : Tue 13 Jun 2023 12:58:19 PM CEST
+# Last Modified : Wed Jan 10 05:12:36 2024
 #
 #=========================================
 
@@ -28,6 +28,6 @@ _message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 #Update the datahead
 if [ -f ${output} ] 
 then 
-  _replace_datahead "${input##*/}" "${output##*/}"
+  _replace_datahead "${input}" "${output}"
 fi 
 

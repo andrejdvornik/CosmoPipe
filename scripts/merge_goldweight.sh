@@ -3,7 +3,7 @@
 # File Name : merge_goldweight.sh
 # Created By : awright
 # Creation Date : 21-09-2023
-# Last Modified : Tue 21 Nov 2023 09:43:00 AM CET
+# Last Modified : Wed 07 Feb 2024 12:48:50 AM CET
 #
 #=========================================
 
@@ -115,7 +115,7 @@ do
   #}}}
   #Notify {{{ 
   _message " > @BLU@Working on Catalogue @DEF@${outname} {\n"
-  _message "   -> @BLU@Constructing Gold Weight @DEF@"
+  _message "   -> @BLU@Constructing Gold Weight from ${nmain} files@DEF@"
   #}}}
   #Compute and Merge the Gold weights {{{
   echo "mainlist: ${mainlist}"
@@ -499,7 +499,7 @@ do
   #}}}
   #Notify {{{ 
   _message " > @BLU@Working on Catalogue @DEF@${outname} {\n"
-  _message "   -> @BLU@Constructing Gold Weight @DEF@"
+  _message "   -> @BLU@Constructing Gold Weight from ${nmain} files@DEF@"
   #}}}
   #Compute and Merge the Gold weights {{{
   echo "mainlist: ${mainlist}"
