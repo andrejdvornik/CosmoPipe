@@ -33,6 +33,25 @@ PRIOR_A2="@BV:PRIOR_A2@"
 PRIOR_ALPHA1="@BV:PRIOR_ALPHA1@"
 PRIOR_ALPHA2="@BV:PRIOR_ALPHA2@"
 PRIOR_BIASTA="@BV:PRIOR_BIAS_TA@"
+#Linear z IA model
+PRIOR_A_IA="@BV:PRIOR_A_IA@"
+PRIOR_B_IA="@BV:PRIOR_B_IA@"
+PRIOR_A_PIV="@BV:PRIOR_A_PIV@"
+#Mass dependent IA model
+PRIOR_BETA="@BV:PRIOR_BETA@"
+PRIOR_LOG10_M_PIV="@BV:PRIOR_LOG10_M_PIV@"
+PRIOR_LOG10_M_MEAN_1="@BV:PRIOR_LOG10_M_MEAN_1@"
+PRIOR_LOG10_M_MEAN_2="@BV:PRIOR_LOG10_M_MEAN_2@"
+PRIOR_LOG10_M_MEAN_3="@BV:PRIOR_LOG10_M_MEAN_3@"
+PRIOR_LOG10_M_MEAN_4="@BV:PRIOR_LOG10_M_MEAN_4@"
+PRIOR_LOG10_M_MEAN_5="@BV:PRIOR_LOG10_M_MEAN_5@"
+PRIOR_LOG10_M_MEAN_6="@BV:PRIOR_LOG10_M_MEAN_6@"
+PRIOR_F_R_1="@BV:PRIOR_F_R_1@"
+PRIOR_F_R_2="@BV:PRIOR_F_R_2@"
+PRIOR_F_R_3="@BV:PRIOR_F_R_3@"
+PRIOR_F_R_4="@BV:PRIOR_F_R_4@"
+PRIOR_F_R_5="@BV:PRIOR_F_R_5@"
+PRIOR_F_R_6="@BV:PRIOR_F_R_6@"
 
 #BOLTZMANN code
 BOLTZMAN=@BV:BOLTZMAN@
@@ -517,6 +536,98 @@ then
     fi 
     #}}}
   done 
+elif [ "${IAMODEL^^}" == "LINEAR_Z" ] 
+then
+  for param in a_ia b_ia a_piv
+  do 
+    #Load the prior variable name {{{
+    pvar=${param^^}
+    pvar=PRIOR_${pvar}
+    #}}}
+    #get the prior value {{{
+    pprior=`echo ${!pvar}`
+    #}}}
+    #Check the prior is correctly specified {{{
+    nprior=`echo ${pprior} | awk '{print NF}'` 
+    if [ ${nprior} -ne 3 ] && [ ${nprior} -ne 1 ] 
+    then 
+      _message "@RED@ ERROR - prior @DEF@${pvar}@RED@ does not have 3 values! Must be tophat ('lo start hi') or gaussian ('gaussian mean sd')@DEF@\n"
+      _message "@RED@         it is: @DEF@${pprior}\n"
+      exit 1 
+    fi 
+    #}}}
+    #Write the prior {{{   
+    if [ "${pprior%% *}" == "gaussian" ]
+    then 
+      #Prior is a gaussian {{{
+      #Construct the tophat prior: [-10 sigma, +10 sigma ] {{{
+      pstring=`echo ${pprior} | awk '{print $2-10*$3,$2,$2+10*$3}'`
+      echo "${param} = ${pstring}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+      #}}}
+      #Add the gaussian prior to the priors.ini file  {{{
+      if [ "${found_gauss}" == "FALSE" ]
+      then 
+        echo "${blockname}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+        found_gauss=TRUE
+      fi 
+      #Write the gaussian prior to the priors file 
+      echo "${param} = ${pprior}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+      #}}}
+      #}}}
+    else 
+      #Write the tophat prior to the priors file {{{
+      echo "${param} = ${pprior}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+      #}}}
+    fi 
+    #}}}
+  done 
+  # This model requires the NLA IA parameter to be set to 1
+  echo "A = 1.0" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+elif [ "${IAMODEL^^}" == "MASSDEP" ] 
+then
+  for param in AIA beta log10_M_piv log10_M_mean_1 log10_M_mean_2 log10_M_mean_3 log10_M_mean_4 log10_M_mean_5 log10_M_mean_6 f_r_1 f_r_2 f_r_3 f_r_4 f_r_5 f_r_6
+  do 
+    #Load the prior variable name {{{
+    pvar=${param^^}
+    pvar=PRIOR_${pvar}
+    #}}}
+    #get the prior value {{{
+    pprior=`echo ${!pvar}`
+    #}}}
+    #Check the prior is correctly specified {{{
+    nprior=`echo ${pprior} | awk '{print NF}'` 
+    if [ ${nprior} -ne 3 ] && [ ${nprior} -ne 1 ] 
+    then 
+      _message "@RED@ ERROR - prior @DEF@${pvar}@RED@ does not have 3 values! Must be tophat ('lo start hi') or gaussian ('gaussian mean sd')@DEF@\n"
+      _message "@RED@         it is: @DEF@${pprior}\n"
+      exit 1 
+    fi 
+    #}}}
+    #Write the prior {{{   
+    if [ "${pprior%% *}" == "gaussian" ]
+    then 
+      #Prior is a gaussian {{{
+      #Construct the tophat prior: [-10 sigma, +10 sigma ] {{{
+      pstring=`echo ${pprior} | awk '{print $2-10*$3,$2,$2+10*$3}'`
+      echo "${param//IA/} = ${pstring}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+      #}}}
+      #Add the gaussian prior to the priors.ini file  {{{
+      if [ "${found_gauss}" == "FALSE" ]
+      then 
+        echo "${blockname}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+        found_gauss=TRUE
+      fi 
+      #Write the gaussian prior to the priors file 
+      echo "${param//IA/} = ${pprior}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+      #}}}
+      #}}}
+    else 
+      #Write the tophat prior to the priors file {{{
+      echo "${param//IA/} = ${pprior}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+      #}}}
+    fi 
+    #}}}
+  done
 else
 	_message "Intrinsic alignment model not implemented: ${IAMODEL^^}\n"
   exit 1
