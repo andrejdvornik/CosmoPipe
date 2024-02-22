@@ -9,12 +9,8 @@
 #Script to generate a cosmosis .ini, values, & priors file 
 #Prepare the starting items {{{
 IAMODEL="@BV:IAMODEL@"
-if [ "${IAMODEL^^}" == "TATT" ] 
-then
-	ia_dir="tatt"
-else
-	ia_dir=""
-fi
+CHAINSUFFIX=@BV:CHAINSUFFIX@
+
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 [DEFAULT]
 MY_PATH      = @RUNROOT@/
@@ -23,14 +19,14 @@ stats_name    = @BV:STATISTIC@
 CSL_PATH      = %(MY_PATH)s/INSTALL/cosmosis-standard-library/
 KCAP_PATH     = %(MY_PATH)s/INSTALL/kcap/
 
-OUTPUT_FOLDER = %(MY_PATH)s/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/%(stats_name)s/chain/${ia_dir}/
+OUTPUT_FOLDER = %(MY_PATH)s/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/%(stats_name)s/chain/
 CONFIG_FOLDER = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/
 
 blind         = @BV:BLIND@
 redshift_name = source
 
 SAMPLER_NAME = @BV:SAMPLER@
-RUN_NAME = %(SAMPLER_NAME)s_%(blind)s
+RUN_NAME = %(SAMPLER_NAME)s_%(blind)s${CHAINSUFFIX}
 
 2PT_STATS_PATH = %(MY_PATH)s/INSTALL/2pt_stats/
 
@@ -54,7 +50,8 @@ else
   _message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
   exit 1
 fi
-datafile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}.fits
+
+datafile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}${iteration}.fits
 
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 data_file = ${datafile}
@@ -72,12 +69,42 @@ simulate = F
 simulate_with_noise = T
 mock_filename =
 EOF
+if [ "${STATISTIC^^}" == "COSEBIS_B" ] || [ "${STATISTIC^^}" == "BANDPOWERS_B" ]
+then
+cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini <<- EOF
+[scale_cuts_b]
+file = %(KCAP_PATH)s/modules/scale_cuts/scale_cuts.py
+output_section_name = scale_cuts_output_b
+data_and_covariance_fits_filename = %(data_file)s
+simulate = F
+simulate_with_noise = T
+mock_filename =
+EOF
+fi
 #}}}
 
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'` 
-
+NHALF=`echo "$NTOMO" | awk '{printf "%d", $1/2}'`
+SPLITMODE=@BV:SPLITMODE@
+if [ "${SPLITMODE^^}" == "REDBLUE" ] 
+then
+  tomostring=""
+  nottomostring=""
+  for tomo1 in `seq ${NTOMO}` 
+  do
+    for tomo2 in `seq ${tomo1} ${NTOMO}` 
+    do 
+      if ([ $tomo1 -le ${NHALF} ] && [ $tomo2 -le ${NHALF} ]) || ([ $tomo1 -gt ${NHALF} ] && [ $tomo2 -gt ${NHALF} ])
+	  then 
+	    tomostring="${tomostring} ${tomo1}+${tomo2}"
+	  else
+	    nottomostring="${nottomostring} ${tomo1}+${tomo2}"
+	  fi
+    done
+  done
+fi
 #Requested statistic {{{
-if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
+if [ "${STATISTIC^^}" == "COSEBIS" ] || [ "${STATISTIC^^}" == "COSEBIS_B" ] #{{{
 then 
 cosebis_configpath=@RUNROOT@/@CONFIGPATH@/cosebis/
   #Scalecuts {{{
@@ -90,6 +117,34 @@ cosebis_extension_name = En
 cosebis_section_name = cosebis
 
 EOF
+if [ "${SPLITMODE^^}" == "REDBLUE" ] 
+then
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
+cut_pair_En = $nottomostring
+
+EOF
+fi
+if [ "${STATISTIC^^}" == "COSEBIS_B" ]
+then 
+cosebis_configpath=@RUNROOT@/@CONFIGPATH@/cosebis/
+  #Scalecuts {{{
+  lo=`echo @BV:NMINCOSEBIS@ | awk '{print $1-0.5}'`
+  hi=`echo @BV:NMAXCOSEBIS@ | awk '{print $1+0.5}'`
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini <<- EOF
+use_stats = Bn
+keep_ang_En   = ${lo} ${hi} 
+cosebis_extension_name = Bn
+cosebis_section_name = cosebis_b
+
+EOF
+if [ "${SPLITMODE^^}" == "REDBLUE" ] 
+then
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini <<- EOF
+cut_pair_En = $nottomostring
+
+EOF
+fi
+fi
 #}}}
 
 #Base variables {{{
@@ -116,25 +171,70 @@ Tn_Output_FolderName = %(2PT_STATS_PATH)s/TpnLog/
 output_section_name =  cosebis
 add_2D_cterm = 0 ; (optional) DEFAULT is 0: don't add it
 add_c_term = 0
+input_section_name = shear_cl
 
 EOF
+if [ "${STATISTIC^^}" == "COSEBIS_B" ]
+then 
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+[cosebis_b]
+file = %(2PT_STATS_PATH)s/cl_to_cosebis/cl_to_cosebis_interface.so
+theta_min = %(tmin_cosebis)s
+theta_max = %(tmax_cosebis)s
+n_max = %(nmax_cosebis)s
+Roots_n_Norms_FolderName = ${cosebis_configpath}/TLogsRootsAndNorms/
+Wn_Output_FolderName = %(WnLogPath)s
+Tn_Output_FolderName = %(2PT_STATS_PATH)s/TpnLog/
+output_section_name =  cosebis_b
+add_2D_cterm = 0 ; (optional) DEFAULT is 0: don't add it
+add_c_term = 0
+input_section_name = shear_cl_bb
+
+EOF
+fi
 #}}}
 
 #}}}
-elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
+elif [ "${STATISTIC^^}" == "BANDPOWERS" ] || [ "${STATISTIC^^}" == "BANDPOWERS_B" ] #{{{
 then 
   #scale cut {{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 use_stats = PeeE
 bandpower_e_cosmic_shear_extension_name = PeeE
 bandpower_e_cosmic_shear_section_name = bandpower_shear_e
-keep_ang_peee = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
+keep_ang_PeeE = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
 
 EOF
+if [ "${SPLITMODE^^}" == "REDBLUE" ] 
+then
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
+cut_pair_PeeE = $nottomostring
+
+EOF
+fi
+if [ "${STATISTIC^^}" == "BANDPOWERS_B" ]
+then 
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini <<- EOF
+use_stats = PeeB
+bandpower_b_cosmic_shear_extension_name = PeeB
+bandpower_b_cosmic_shear_section_name = bandpower_shear_b
+keep_ang_PeeE = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
+
+EOF
+if [ "${SPLITMODE^^}" == "REDBLUE" ] 
+then
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini <<- EOF
+cut_pair_PeeB = $nottomostring
+
+EOF
+fi
+fi
 #}}}
 theta_lo=`echo 'e(l(@BV:THETAMINXI@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
 theta_up=`echo 'e(l(@BV:THETAMAXXI@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
 #Statistic {{{
+if [ "${STATISTIC^^}" == "BANDPOWERS" ]
+then 
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [bandpowers]
 file = %(2PT_STATS_PATH)s/band_powers/band_powers_interface.so
@@ -152,6 +252,45 @@ theta_max = ${theta_up}
 output_foldername = %(2PT_STATS_PATH)s/bandpowers_window/
 
 EOF
+elif [ "${STATISTIC^^}" == "BANDPOWERS_B" ]
+then 
+cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+[bandpowers]
+file = %(2PT_STATS_PATH)s/band_powers/band_powers_interface.so
+type = cosmic_shear_e
+response_function_type = tophat
+analytic = 1
+output_section_name = bandpower_shear_e
+l_min = @BV:LMINBANDPOWERS@
+l_max = @BV:LMAXBANDPOWERS@
+nbands = @BV:NBANDPOWERS@
+apodise = 1
+delta_x = @BV:APODISATIONWIDTH@
+theta_min =${theta_lo}
+theta_max = ${theta_up}
+output_foldername = %(2PT_STATS_PATH)s/bandpowers_window/
+
+EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+[bandpowers_b]
+file = %(2PT_STATS_PATH)s/band_powers/band_powers_interface.so
+type = cosmic_shear_b
+response_function_type = tophat
+analytic = 1
+output_section_name = bandpower_shear_b
+l_min = @BV:LMINBANDPOWERS@
+l_max = @BV:LMAXBANDPOWERS@
+nbands = @BV:NBANDPOWERS@
+apodise = 1
+delta_x = @BV:APODISATIONWIDTH@
+theta_min =${theta_lo}
+theta_max = ${theta_up}
+output_foldername = %(2PT_STATS_PATH)s/bandpowers_window/
+input_section_name = shear_cl
+input_section_name_bmode = shear_cl_bb
+
+EOF
+fi
 #}}}
 
 #}}}
@@ -178,6 +317,15 @@ keep_ang_xiP  = @BV:THETAMINXI@ @BV:THETAMAXXI@
 keep_ang_xiM  = ${ximinus_min}  ${ximinus_max}
 
 EOF
+if [ "${SPLITMODE^^}" == "REDBLUE" ] 
+then
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
+cut_pair_xiP = $nottomostring
+cut_pair_xiM = $nottomostring
+
+
+EOF
+fi
 #}}}
 
 #statistic {{{
@@ -434,6 +582,12 @@ then
 	elif [ "${IAMODEL^^}" == "TATT" ] 
 	then
 		iamodel_pipeline="fast_pt tatt projection add_intrinsic"
+	elif [ "${IAMODEL^^}" == "LINEAR_Z" ] 
+	then
+		iamodel_pipeline="linear_alignment projection lin_z_dependence_for_ia add_intrinsic"
+	elif [ "${IAMODEL^^}" == "MASSDEP" ] 
+	then
+		iamodel_pipeline="linear_alignment projection mass_dependence_for_ia add_intrinsic"
 	else
 		_message "Intrinsic alignment model not implemented: ${IAMODEL^^}\n"
   		exit 1
@@ -443,10 +597,17 @@ then
 	then
 		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} cosebis scale_cuts likelihood"
 	#}}}
+	elif [ "${STATISTIC^^}" == "COSEBIS_B" ] #{{{
+	then
+		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} cosebis scale_cuts cosebis_b scale_cuts_b likelihood likelihood_b"
+	#}}}
 	elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
 	then 
 		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} bandpowers scale_cuts likelihood"
 	#}}}
+	elif [ "${STATISTIC^^}" == "BANDPOWERS_B" ] #{{{
+	then 
+		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} bandpowers scale_cuts bandpowers_b scale_cuts_b likelihood likelihood_b"
 	elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
 	then 
 		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} cl2xi xip_binned xim_binned scale_cuts likelihood"
@@ -492,8 +653,17 @@ fi
 #}}}
 
 #Add the other information #{{{
+if [ "${STATISTIC^^}" == "COSEBIS_B" ] || [ "${STATISTIC^^}" == "BANDPOWERS_B" ]
+then
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
+likelihoods  = loglike loglike_b
+EOF
+else
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
 likelihoods  = loglike
+EOF
+fi
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
 extra_output = ${extraparams} ${shifts} ${listparam} ${tpdparams}
 quiet = T
 timing = F
@@ -552,6 +722,7 @@ nz = 150
 zmax_background = 6.0
 zmin_background = 0.0
 nz_background = 6000
+use_ppf_w = True
 
 EOF
 #}}}
@@ -748,6 +919,21 @@ do
 			
 			EOF
 			;; #}}}
+	"lin_z_dependence_for_ia") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = @RUNROOT@/INSTALL/ia_models/lin_z_dependent_ia/lin_z_dependent_ia_model.py
+			sample = %(redshift_name)s
+			
+			EOF
+			;; #}}}
+	"mass_dependence_for_ia") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = @RUNROOT@/INSTALL/ia_models/mass_dependent_ia/mass_dependent_ia_model.py
+			
+			EOF
+			;; #}}}		
 	"fast_pt") #{{{
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
@@ -786,7 +972,7 @@ do
 			shear-shear = %(redshift_name)s-%(redshift_name)s
 			shear-intrinsic = %(redshift_name)s-%(redshift_name)s
 			intrinsic-intrinsic = %(redshift_name)s-%(redshift_name)s
-			intrinsicb-intrinsicb = %(redshift_name)s-%(redshift_name)s
+			#intrinsicb-intrinsicb = %(redshift_name)s-%(redshift_name)s
 
 			EOF
 			else
@@ -805,6 +991,15 @@ do
 
 			EOF
     	;; #}}}
+	"likelihood_b") #{{{
+		cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+		[$module]
+		file = %(KCAP_PATH)s/utils/mini_like.py
+		input_section_name = scale_cuts_output_b
+		like_name = loglike_b
+
+		EOF
+	;; #}}}
 	"cl2xi") #{{{
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
@@ -816,7 +1011,12 @@ do
   esac
 done
 #}}}
-
+if [ "${STATISTIC^^}" == "COSEBIS_B" ] || [ "${STATISTIC^^}" == "BANDPOWERS_B" ]
+then
+cat \
+  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini >> \
+  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini
+fi
 #Construct the .ini file {{{
 cat \
   @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini \

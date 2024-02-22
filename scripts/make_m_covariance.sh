@@ -88,7 +88,7 @@ do
   fi
   msigma=`echo ${mfiles} | sed 's/ /\n/g' | grep "_uncertainty" || echo `
   msigma=${msigma##*/}
-  cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${patch}_@BV:BLIND@/${mbias} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_msigma_${patch}_@BV:BLIND@/${msigma}
+  cp @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${patch}_@BV:BLIND@/${msigma} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_msigma_${patch}_@BV:BLIND@/${msigma}
   _write_datablock cosmosis_msigma_${patch}_@BV:BLIND@ "${msigma}" 
 
 done

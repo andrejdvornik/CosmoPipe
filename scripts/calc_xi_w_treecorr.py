@@ -167,7 +167,7 @@ if __name__ == '__main__':
 
         # Calculate the weighted square 2pt correlation function
         print("Processing with TreeCorr (wsq)") 
-        gg_wsq.process(cat1_wsq,cat2_wsq)
+        gg_wsq.process(cat1_wsq,cat2_wsq, num_threads=num_threads)
 
         # Calculate the weighted Npairs = sum(weight_a*weight_b)^2 / sum(weight_a^2*weight_b^2)
 
