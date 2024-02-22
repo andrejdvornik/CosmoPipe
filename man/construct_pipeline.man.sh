@@ -88,11 +88,11 @@ function _read_pipe {
     exit 1
   fi
   #Create the steps with numbering 
-  grep -v "^#" ${_PIPELOC} | awk -v S="${_stepnum}" -v pipe="${_step}:" -v seen="F" -v count=0 '{
+  grep -v "^#" ${_PIPELOC} | awk -v S="${_stepnum}" -v pipe="${_step}:" -v seen="F" -v count=0 -v SQ="'" -v DQ='"' '{
     if ($1 == "" ) next
-      if ($1 != pipe && seen == "F") {
-        next
-      } else if ($1 == pipe) {
+    if ($1 != pipe && seen == "F") {
+      next
+    } else if ($1 == pipe) {
       seen="T"
     }
     #If we arrive at the next block, break
@@ -100,33 +100,65 @@ function _read_pipe {
       seen="F"
       next
     }
+    #Here we are at a line in our desired pipeline
     inquote="F"
+    #For each element in the line 
     for(i=1; i<=NF; i++) {
+      #gsub(SQ,DQ,$i)
+      #If we are inside a quotation: 
       if (inquote=="T") { 
-        res=match($i,"\"")
+        #Check for the ending quotation mark 
+        res=match($i,quotemark)
         if (res==0) { 
+          #If not found, add this item to the quote string
           quotestring=quotestring "," $i 
         } else { 
+          #If found, add this item to the quote string, print
           print quotestring "," $i "=_"
+          #End the quotation mode 
           inquote="F"
         }
       } else { 
+        #We are not in a quotation 
+        #If we are processing further entries on a line (i!=1) or are not at the pipeline ID ($ != :)
+        #(this allows pipelines to be specified on a single line) 
         if (i!=1 || substr($i,length($i),1)!=":") {
+          #Check for leading activation characters 
           if (substr($i,1,1) == "@" || substr($i,1,1) == "!" || substr($i,1,1) == "%" ) {
-            #Step has no number
+            #Block manipulations: Step has no number; print and continue 
             print $i "=_"
           } else if ( $i == "RESUME") {
             print $i 
           } else if (substr($i,1,1) == "+") {
             #Step is a variable assignment 
-            match($i,"=")
-            if (substr($i,RSTART+1,1)=="\"") { 
-              inquote="T"
-              quotestring=$i
+            #Check for the quotation mark type 
+            res=match($i,SQ)
+            if (res==0) { 
+              quotemark=DQ
             } else { 
+              quotemark=SQ
+            }
+            #Move RSTART to beginning of variable content
+            match($i,"=")
+            #Check for the number of quotation marks 
+            match($i,quotemark)
+            if (substr($i,RSTART,1)==quotemark) { 
+              #Is there another quotemark 
+              res=match(substr($i,RSTART+1),quotemark)
+              if (res==0) { 
+                #This is a list: activate quotation mode and continue
+                inquote="T"
+                quotestring=$i
+              } else { 
+                #This is a single item in quotes 
+                print $i "=_"
+              }
+            } else { 
+              #This is a single element:print and continue
               print $i "=_"
             }
           } else if (substr($i,1,1) == "#") {
+            #This is a comment 
             next
           } else {
             #Add (sub)step number
@@ -136,7 +168,7 @@ function _read_pipe {
         }
       }
     }
-  }' | xargs echo
+  }' | awk '{printf "%s ", $0}' 
   #grep -v "^#" ${_PIPELOC} | grep --ignore-case "${1}:" | awk -F: '{print $2}' | \
   #  awk -v S=${_stepnum} '{
   #    count=0 
