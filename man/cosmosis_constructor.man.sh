@@ -50,7 +50,7 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo echo mcmc_inp_@BV:STATISTIC@ nzcov
+  echo mcmc_inp_@BV:STATISTIC@ nzcov
 } 
 #}}}
 
