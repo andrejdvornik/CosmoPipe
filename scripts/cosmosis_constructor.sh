@@ -3,7 +3,7 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Thu 14 Dec 2023 03:31:51 PM UTC
+# Last Modified : Fri Feb 23 10:54:22 2024
 #
 #=========================================
 #Script to generate a cosmosis .ini, values, & priors file 
@@ -297,7 +297,7 @@ fi
 elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
 then 
   #scale cut {{{
-  if [ "${SAMPLER^^}" == "list" ]
+  if [ "${SAMPLER^^}" == "LIST" ]
   then 
     #Keep consistency between plus and minus 
     ximinus_min=@BV:THETAMINXI@
