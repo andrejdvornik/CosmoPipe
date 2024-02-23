@@ -3,7 +3,7 @@
 # File Name : spatial_split.R
 # Created By : awright
 # Creation Date : 10-07-2023
-# Last Modified : Mon Aug 21 06:00:46 2023
+# Last Modified : Thu Feb  8 16:41:32 2024
 #
 #=========================================
 
@@ -50,6 +50,17 @@ while (length(inputs)!=0) {
     }
     inputs<-inputs[-1]
     #/*fold*/}}}
+  } else if (inputs[1]=='-k') { 
+    #Read the number of splits /*fold*/ {{{
+    inputs<-inputs[-1]
+    nsplitkeep<-as.integer(inputs[1])
+    if (!is.finite(nsplitkeep)) { 
+      stop(paste("Provided number of splits-to-keep is not a finite integer:",inputs[1]))
+    } else if (nsplitkeep==0) { 
+      stop(paste("Provided number of splits-to-keep is zero?!"))
+    }
+    inputs<-inputs[-1]
+    #/*fold*/}}}
   } else if (inputs[1]=='-a') { 
     #Read the target aspect-ratio /*fold*/ {{{
     inputs<-inputs[-1]
@@ -80,9 +91,13 @@ while (length(inputs)!=0) {
 }
 #}}}
 
+if (!exists("nsplitkeep")) { 
+  nsplitkeep<-nsplit
+}
+
 #Check that length of the output files is correct {{{
-if (length(output.cats)!=nsplit) { 
-  stop("Output file list must be of length nsplit") 
+if (length(output.cats)!=nsplitkeep) { 
+  stop("Output file list must be of length nsplitkeep") 
 } 
 #}}}
 
@@ -229,21 +244,24 @@ cat(paste0("asp=",nsplit.y/nsplit.x/data_asp," n=",nsplit.y*nsplit.x,'\n'))
 
 
 #For each split, output the catalogue {{{
-written<-FALSE
-for (i in seq(1,nsplit.x*nsplit.y)) { 
+nwritten<-0
+for (i in sample(seq(1,nsplit.x*nsplit.y))) { #Sample randomises the order 
   #Select the relevant sources {{{
   out<-cat[which(bins==i),]
   #}}}
   if (nrow(out)==0) { 
     cat(paste("WARNING: split",i,"contains no sources?!\n"))
   } else { 
+    nwritten<-nwritten+1
     #Write the file {{{
-    helpRfuncs::write.file(file=output.cats[i],out)
+    helpRfuncs::write.file(file=output.cats[nwritten],out)
     #}}}
-    written<-TRUE
+  }
+  if (nwritten==nsplitkeep) { 
+    break
   }
 } 
-if (!written) { 
+if (nwritten==0) { 
   stop("Nothing was written to disk?!") 
 }
 #}}}

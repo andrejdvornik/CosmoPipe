@@ -599,7 +599,7 @@ function _add_datablock {
         _message "\r${_printstr//?/ }\r"
         _printstr=" @RED@  (`date +'%a %H:%M'`)@BLU@ -->@DEF@ ${_file##*/}@BLU@ (${count}/${nfiles})"
         _message "${_printstr}"
-        rsync -atv $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${_targetblock}/${_file##*/} 2>&1 > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IOlog.txt
+        rsync -atv --copy-unsafe-links $_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${_targetblock}/${_file##*/} 2>&1 > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IOlog.txt
         #_message "@BLU@ - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       fi 
     done 

@@ -45,7 +45,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BV:DECNAME BV:NSPLIT BV:RANAME BV:SPLITASP P_RSCRIPT
+  echo BV:DECNAME BV:NSPLIT BV:NSPLITKEEP BV:RANAME BV:SPLITASP P_RSCRIPT RUNROOT SCRIPTPATH
 } 
 #}}}
 

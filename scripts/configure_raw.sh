@@ -185,7 +185,7 @@ _message "   >${RED} Finished! To run the Cosmology pipeline, check cosmosis is 
 for pipe in ${PIPELINE}
 do 
   _message "   ${BLU} bash ${pipe}_pipeline.sh ${DEF} (from within the 'cosmopipe' conda env), or:\n"
-  _message "   ${BLU} conda run -n cosmopipe --no-capture-output bash ${pipe}_pipeline.sh ${DEF} (from anywhere).\n"
+  _message "   ${BLU} conda run -n ${CONDAPIPENAME} --no-capture-output bash ${pipe}_pipeline.sh ${DEF} (from anywhere).\n"
 done
 
 trap : 0

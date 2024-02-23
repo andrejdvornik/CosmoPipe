@@ -3,7 +3,7 @@
 # File Name : spatial_split.sh
 # Created By : awright
 # Creation Date : 04-07-2023
-# Last Modified : Wed Jan 10 05:13:54 2024
+# Last Modified : Thu Feb  8 16:27:49 2024
 #
 #=========================================
 
@@ -15,7 +15,7 @@ outbase=${output//.${outext}/}
 #Construct the list of output names 
 outlist=''
 outlist_trunc=''
-for i in `seq @BV:NSPLIT@`
+for i in `seq @BV:NSPLITKEEP@`
 do 
   outlist="${outlist} ${outbase}_${i}.${outext}"
   outlist_trunc="${outlist_trunc} ${outbase##*/}_${i}.${outext}"
@@ -25,6 +25,7 @@ done
 @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/spatial_split.R \
   -i @DB:DATAHEAD@ \
   -n @BV:NSPLIT@ \
+  -k @BV:NSPLITKEEP@ \
   -a @BV:SPLITASP@ \
   -v @BV:RANAME@ @BV:DECNAME@ \
   --sphere \
