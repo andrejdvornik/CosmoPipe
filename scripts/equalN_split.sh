@@ -3,7 +3,7 @@
 # File Name : equalN_split.sh
 # Created By : awright
 # Creation Date : 04-07-2023
-# Last Modified : Mon 30 Oct 2023 09:59:43 AM CET
+# Last Modified : Wed Jan 10 05:12:21 2024
 #
 #=========================================
 
@@ -29,5 +29,5 @@ done
   -o ${outlist} 2>&1
 
 #Update the datahead 
-_replace_datahead "${input##*/}" "${outlist_trunc}"
+_replace_datahead "${input}" "${outlist_trunc}"
 

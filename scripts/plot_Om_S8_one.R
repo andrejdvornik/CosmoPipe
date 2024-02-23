@@ -56,6 +56,8 @@ if (args$sampler=='list' || args$sampler=='test') {
 cat<-helpRfuncs::read.chain(args$input)
 #Edit the column names for simplicity 
 colnames(cat)<-gsub("cosmological_parameters--","",colnames(cat),ignore.case=T)
+colnames(cat)<-gsub("intrinsic_alignment_parameters--","IA_",colnames(cat),ignore.case=T)
+colnames(cat)<-gsub("halo_model_parameters--","HM_",colnames(cat),ignore.case=T)
 #}}}
 
 #Check for the xlabel and ylabel's in the catalogue {{{
@@ -89,6 +91,8 @@ if (args$refr!='none' & file.exists(args$refr)) {
   ref<-helpRfuncs::read.chain(args$refr)
   #Edit the column names for simplicity 
   colnames(ref)<-gsub("cosmological_parameters--","",colnames(ref),ignore.case=T)
+  colnames(ref)<-gsub("intrinsic_alignment_parameters--","IA_",colnames(ref),ignore.case=T)
+  colnames(ref)<-gsub("halo_model_parameters--","HM_",colnames(ref),ignore.case=T)
   #If there is no weight column (multinest/polychord)
   if (!any(colnames(ref)=='weight')) { 
     #If there is also no log_weight column (nautilus) 
@@ -109,6 +113,8 @@ if (args$prior!='none' & file.exists(args$prior)) {
   prior<-helpRfuncs::read.chain(args$prior)
   #Edit the column names for simplicity 
   colnames(prior)<-gsub("cosmological_parameters--","",colnames(prior),ignore.case=T)
+  colnames(prior)<-gsub("intrinsic_alignment_parameters--","IA_",colnames(prior),ignore.case=T)
+  colnames(prior)<-gsub("halo_model_parameters--","HM_",colnames(prior),ignore.case=T)
 }
 #}}}
 

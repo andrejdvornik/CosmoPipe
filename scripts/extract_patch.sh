@@ -3,7 +3,7 @@
 # File Name : extract_patch.sh
 # Created By : awright
 # Creation Date : 28-03-2023
-# Last Modified : Fri 03 Nov 2023 03:55:58 PM CET
+# Last Modified : Wed Jan 10 05:12:25 2024
 #
 #=========================================
 
@@ -135,5 +135,5 @@ done
 #}}}
 
 #Update the datahead 
-_replace_datahead ${inputfile##*/} "${outputlist}"
+_replace_datahead ${inputfile} "${outputlist}"
 

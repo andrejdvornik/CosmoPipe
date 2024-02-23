@@ -3,7 +3,7 @@
 # File Name : combine_xi_patches.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Fri 07 Jul 2023 08:06:00 PM CEST
+# Last Modified : Wed Jan 10 05:11:12 2024
 #
 #=========================================
 
@@ -71,10 +71,10 @@ do
       if [ $count -gt 0 ]
       then 
         #Don't replace with anything 
-        _replace_datahead "${file##*/}" ""
+        _replace_datahead "${file}" ""
       else 
         #Replace with new file 
-        _replace_datahead "${file##*/}" "${outname##*/}"
+        _replace_datahead "${file}" "${outname}"
         count=1
       fi 
     done 

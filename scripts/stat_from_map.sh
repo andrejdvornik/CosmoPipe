@@ -3,7 +3,7 @@
 # File Name : stat_from_map.sh
 # Created By : awright
 # Creation Date : 30-10-2023
-# Last Modified : Mon 30 Oct 2023 09:53:20 AM CET
+# Last Modified : Wed Jan 10 05:14:09 2024
 #
 #=========================================
 
@@ -40,7 +40,7 @@ fi
     --col_Dec @BV:DECNAME@ \
     ${statfun} 2>&1 
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
-_replace_datahead ${input##*/} ${output##*/}
+_replace_datahead ${input} ${output}
 
 
 

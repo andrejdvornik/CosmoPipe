@@ -3,7 +3,7 @@
 # File Name : run_weight_recal.sh
 # Created By : awright
 # Creation Date : 26-05-2023
-# Last Modified : Fri 02 Jun 2023 10:46:13 PM CEST
+# Last Modified : Wed Jan 10 05:13:48 2024
 #
 #=========================================
 
@@ -46,7 +46,7 @@ _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 #}}}
 
 #Update the datahead {{{
-_replace_datahead ${current##*/} ${outputname##*/}
+_replace_datahead ${current} ${outputname}
 #}}}
 
 

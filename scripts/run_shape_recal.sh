@@ -3,7 +3,7 @@
 # File Name : run_shape_recal.sh
 # Created By : awright
 # Creation Date : 26-05-2023
-# Last Modified : Sat 10 Jun 2023 07:05:30 AM CEST
+# Last Modified : Wed Jan 10 05:13:39 2024
 #
 #=========================================
 
@@ -46,7 +46,7 @@ _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 #}}}
 
 #Update the datahead {{{
-_replace_datahead ${current##*/} ${outputname##*/}
+_replace_datahead ${current} ${outputname}
 #}}}
 
 

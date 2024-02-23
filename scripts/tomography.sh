@@ -171,5 +171,5 @@ done
 #}}}
 
 #Update the datahead 
-_replace_datahead ${inputfile##*/} "${outputlist}"
+_replace_datahead ${inputfile} "${outputlist}"
 

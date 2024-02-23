@@ -3,7 +3,7 @@
 # File Name : gaapflag_selection.sh
 # Created By : awright
 # Creation Date : 27-03-2023
-# Last Modified : Mon 15 May 2023 09:05:52 AM CEST
+# Last Modified : Wed Jan 10 05:12:42 2024
 #
 #=========================================
 
@@ -21,6 +21,6 @@ do
     > @RUNROOT@/@LOGPATH@/${logfile} 2>&1 
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
   output=${input//.cat/_filt.cat}
-  _replace_datahead ${input##*/} ${output##*/}
+  _replace_datahead ${input} ${output}
 done 
 

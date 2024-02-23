@@ -3,7 +3,7 @@
 # File Name : spatial_split.sh
 # Created By : awright
 # Creation Date : 04-07-2023
-# Last Modified : Mon 24 Jul 2023 08:54:04 AM CEST
+# Last Modified : Wed Jan 10 05:13:54 2024
 #
 #=========================================
 
@@ -31,5 +31,5 @@ done
   -o ${outlist} 2>&1
 
 #Update the datahead 
-_replace_datahead "${input##*/}" "${outlist_trunc}"
+_replace_datahead "${input}" "${outlist_trunc}"
 

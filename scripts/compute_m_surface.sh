@@ -3,7 +3,7 @@
 # File Name : compute_m_surface.sh
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Wed 31 May 2023 11:45:59 PM CEST
+# Last Modified : Wed Jan 10 05:11:33 2024
 #
 #=========================================
 
@@ -43,7 +43,7 @@ _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 #}}}
 
 #Update the datahead {{{
-_replace_datahead "${current##*/}" "${outputname##*/}"
+_replace_datahead "${current}" "${outputname}"
 #}}}
 
 

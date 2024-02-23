@@ -3,7 +3,7 @@
 # File Name : ldacfilter.sh
 # Created By : awright
 # Creation Date : 16-05-2023
-# Last Modified : Fri 03 Nov 2023 11:45:30 AM CET
+# Last Modified : Wed Jan 10 05:12:58 2024
 #
 #=========================================
 
@@ -128,5 +128,5 @@ else
   _message " @BLU@- @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 fi 
 #output=${input//.${ext}/_filt.${ext}}
-_replace_datahead ${input##*/} ${output##*/}
+_replace_datahead ${input} ${output}
 

@@ -18,5 +18,5 @@ _message "  > @BLU@Constructing Adapt catalogue for file: @DEF@${input##*/}"
 _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 #Update the datahead 
-_replace_datahead "${input##*/}" "${output##*/}" 
+_replace_datahead "${input}" "${output}" 
 

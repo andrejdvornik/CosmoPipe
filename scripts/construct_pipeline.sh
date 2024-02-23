@@ -120,6 +120,8 @@ do
   if [ "${step:0:1}" != "@" ] && [ "${step:0:1}" != "!" ] && [ "${step:0:1}" != "~" ] \
     && [ "${step:0:1}" != "%" ] && [ "${step:0:1}" != "+" ] && [ "${step:0:1}" != "-" ]
   then 
+    ##Parse block variables 
+    #step=`_parse_blockvars ${step}`
     #If the step has no script 
     if [ ! -f @RUNROOT@/@SCRIPTPATH@/${step}.sh ] && [ ! -f @RUNROOT@/@CONFIGPATH@/${step}.ini ]
     then 
