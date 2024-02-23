@@ -3,7 +3,7 @@
 # File Name : combine_patch.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Mon 20 Nov 2023 08:58:15 AM CET
+# Last Modified : Wed Jan 10 05:10:46 2024
 #
 #=========================================
 
@@ -154,7 +154,7 @@ do
   for _file in ${inplist}
   do 
     #Replace the first file with the output name, then clear the rest
-    _replace_datahead ${_file##*/} "${outname}"
+    _replace_datahead ${_file} "${outname}"
     outname=""
   done 
 done 
