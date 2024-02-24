@@ -1,5 +1,5 @@
 #
-# prepare_cosmosis.sh Documentation & Housekeeping functions
+# prepare_values_priors.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@========================================@DEF@\n"
-    _message "@BLU@== @RED@ Running prepare_cosmosis.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@========================================@DEF@\n"
+    _message "@BLU@=============================================@DEF@\n"
+    _message "@BLU@== @RED@ Running prepare_values_priors.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@=============================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Prepare the n_effective and sigma_e input files '
-  echo '# for CosmoSIS'
+  echo '# Construct cosmosis values and prior files'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,44 +42,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLU BV:BLIND BV:COSMOSIS_PATCHLIST BV:TOMOLIMS DATABLOCK DEF PATCHLIST RED RUNROOT STORAGEPATH SURVEY
+  echo BLU BV:BOLTZMAN BV:IAMODEL BV:PRIOR_A1 BV:PRIOR_A2 BV:PRIOR_ABARY BV:PRIOR_AIA BV:PRIOR_ALPHA1 BV:PRIOR_ALPHA2 BV:PRIOR_A_IA BV:PRIOR_A_PIV BV:PRIOR_BETA BV:PRIOR_BIAS_TA BV:PRIOR_B_IA BV:PRIOR_F_R_1 BV:PRIOR_F_R_2 BV:PRIOR_F_R_3 BV:PRIOR_F_R_4 BV:PRIOR_F_R_5 BV:PRIOR_F_R_6 BV:PRIOR_H0 BV:PRIOR_LOG10_M_MEAN_1 BV:PRIOR_LOG10_M_MEAN_2 BV:PRIOR_LOG10_M_MEAN_3 BV:PRIOR_LOG10_M_MEAN_4 BV:PRIOR_LOG10_M_MEAN_5 BV:PRIOR_LOG10_M_MEAN_6 BV:PRIOR_LOG10_M_PIV BV:PRIOR_LOGTAGN BV:PRIOR_MNU BV:PRIOR_NS BV:PRIOR_OMBH2 BV:PRIOR_OMCH2 BV:PRIOR_OMEGAK BV:PRIOR_S8INPUT BV:PRIOR_W BV:PRIOR_WA BV:PRIOR_Z_PIV BV:TOMOLIMS DATABLOCK DEF RED RUNROOT STORAGEPATH SURVEY
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo ALLHEAD
+  echo nzbias_uncorr
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  outlist=''
-  #Output is dynamic, depending on the value of BV:COSMOSIS_PATCHLIST
-  patchvar="@BV:COSMOSIS_PATCHLIST@"
-  patchvar=`_parse_blockvars ${patchvar}`
-  #Define the patches to loop over {{{
-  if [ "${patchvar}" == "ALL" ]
-  then 
-    patchlist=`echo @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb` 
-  else 
-    patchlist="${patchvar}"
-  fi 
-  #}}}
-  for patch in ${patchlist}
-  do 
-    outlist="${outlist} cosmosis_neff_${patch}_@BV:BLIND@ cosmosis_sigmae_${patch}_@BV:BLIND@ cosmosis_xipm_${patch}_@BV:BLIND@"
-  done 
-  echo ${outlist} cosmosis_inputs
+  echo nzbias_uncorr
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/prepare_cosmosis.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/prepare_values_priors.sh
 } 
 #}}}
 
