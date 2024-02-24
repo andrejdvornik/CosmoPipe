@@ -1,0 +1,96 @@
+#This is a template for module description files
+name: lin_z_dependent_ia_model
+version: '1.0'
+purpose: adds redshift dependence to IA, with a linear equation
+url: ''
+interface: lin_z_dependent_ia_model.py
+attribution: [Marika Asgari, Benjamin Joachimi, Konrad Kuijken]
+rules: ''
+cite: []
+assumptions:
+-   Input model only produces E-modes.
+-   Currently only works for cosmic shear IA 
+
+explanation: |
+    Takes input IA Cls, Cl^ij_II and Cl^ij_GI. Then creates 
+    new Cl^ij_II = [f_r^(i) * (<M_*>^(i) / M_{*, pivot})^beta] * [f_r^(j) * (<M_*>^(j) / M_{*, pivot})^beta]  * Cl^ij_II
+    new Cl^ij_GI = [f_r^(j) * (<M_*>^(j) / M_{*, pivot})^beta] * Cl^ij_GI
+    new Cl^ij_IG = [f_r^(i) * (<M_*>^(i) / M_{*, pivot})^beta] * Cl^ij_IG
+
+params: 
+        suffix:
+            meaning: "suffix used to distinguish between different data vectors"
+            type: str
+            default: ""
+        new_suffix:
+            meaning: "If provided will save the resulting IA Cls using this suffix"
+            type: str
+            default: ""
+        # sample:
+        #     meaning: "sample name used to retrieve the correct redshift distribution, only used if a_mean not given."
+        #     type: str
+        #     default: ""
+
+inputs:
+    intrinsic_alignment_parameters_{suffix}:
+        beta:
+            meaning: Mass dependence power for early-type galaxies
+            type: real
+            default:
+        log10_M_pivot:
+            meaning: log10 of pivot halo mass (M_sun/h), can be derive from mean halo mass of early-type galaxies
+            type: real
+            default:
+        log10_M_mean_{i}:
+            meaning: log10 of mean halo mass (M_sun/h) of early-type galaxies per redshif bin from catalogues 
+            type: real
+            default:
+        f_r_{i}:
+            meaning: Fraction of early-type galaxies per redshift bin, can be calculated using T_B from catalogues
+            type: real
+            default:
+
+    shear_cl_ii:
+        nbin_a:
+            meaning: Number of tomographic bins
+            type: int
+            default:
+        bin_{i}_{j}:
+            meaning: Intrinsic-intrinsic angular spectra for pairs of i,j values
+                C_ell
+            type: real 1d
+            default:
+    shear_cl_gi:
+        bin_{i}_{j}:
+            meaning: Shear-intrinsic angular spectra for pairs of i,j values
+                C_ell
+            type: real 1d
+            default:
+        bin_{j}_{i}:
+            meaning: Intrinsic-shear angular spectra for pairs of i,j values
+                C_ell
+            type: real 1d
+            default:
+outputs:
+    shear_cl_ii:
+        nbin_a:
+            meaning: Number of tomographic bins
+            type: int
+            default:
+        bin_{i}_{j}:
+            meaning: Intrinsic-intrinsic angular spectra for pairs of i,j values
+                C_ell
+            type: real 1d
+            default:
+    shear_cl_gi:
+        bin_{i}_{j}:
+            meaning: Shear-intrinsic angular spectra for pairs of i,j values
+                C_ell
+            type: real 1d
+            default:
+        bin_{j}_{i}:
+            meaning: Intrinsic-shear angular spectra for pairs of i,j values
+                C_ell
+            type: real 1d
+            default:
+    
