@@ -704,7 +704,8 @@ function _parse_blockvars {
         #>&2 echo "[${_baklist}]" 
         #>&2 echo "{${_filelist}}" 
         _filelist="@BV:${_var}@"
-        exit 1 
+        #exit 1 
+        break
       else 
         #If defined, maintain the BV string
         _filelist=`echo ${_prompt}`
