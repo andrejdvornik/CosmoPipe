@@ -544,6 +544,10 @@ fi
 
 #Prepare the pipeline section {{{ 
 extraparams="cosmological_parameters/S_8 cosmological_parameters/sigma_8 cosmological_parameters/A_s cosmological_parameters/omega_m cosmological_parameters/omega_nu cosmological_parameters/omega_lambda cosmological_parameters/cosmomc_theta"
+if [ "${IAMODEL^^}" == "MASSDEP" ] 
+then
+  extraparams=="${extraparams} intrinsic_alignment_parameters/a intrinsic_alignment_parameters/beta"
+fi
 #Add nz shift values to outputs {{{
 shifts=""
 for i in `seq ${NTOMO}`
@@ -587,7 +591,7 @@ then
 		iamodel_pipeline="linear_alignment projection lin_z_dependence_for_ia add_intrinsic"
 	elif [ "${IAMODEL^^}" == "MASSDEP" ] 
 	then
-		iamodel_pipeline="linear_alignment projection mass_dependence_for_ia add_intrinsic"
+		iamodel_pipeline="correlated_massdep_priors linear_alignment projection mass_dependence_for_ia add_intrinsic"
 	else
 		_message "Intrinsic alignment model not implemented: ${IAMODEL^^}\n"
   		exit 1
@@ -859,6 +863,18 @@ do
 			uncorrelated_parameters = ${unc_shifts}
 			output_parameters = ${shifts}
 			covariance = @DB:nzcov@
+			
+			EOF
+			;; #}}}
+	"correlated_massdep_priors") #{{{
+	  massdep_params="intrinsic_alignment_parameters/a intrinsic_alignment_parameters/beta"
+	  unc_massdep_params="intrinsic_alignment_parameters/uncorr_a intrinsic_alignment_parameters/uncorr_beta"
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(KCAP_PATH)s/utils/correlated_priors.py
+			uncorrelated_parameters = ${unc_massdep_params}
+			output_parameters = ${massdep_params}
+			covariance = @RUNROOT@/INSTALL/ia_models/mass_dependent_ia/massdep_cov.txt
 			
 			EOF
 			;; #}}}
