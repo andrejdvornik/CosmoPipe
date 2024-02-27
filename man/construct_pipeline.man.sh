@@ -104,7 +104,7 @@ function _read_pipe {
     inquote="F"
     #For each element in the line 
     for(i=1; i<=NF; i++) {
-      #gsub(SQ,DQ,$i)
+      gsub(SQ,DQ,$i)
       #If we are inside a quotation: 
       if (inquote=="T") { 
         #Check for the ending quotation mark 
