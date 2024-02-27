@@ -3,7 +3,7 @@
 # File Name : inherit.sh
 # Created By : awright
 # Creation Date : 20-08-2023
-# Last Modified : Wed 06 Dec 2023 03:40:49 PM CET
+# Last Modified : Tue 27 Feb 2024 04:57:02 PM CET
 #
 #=========================================
 
@@ -46,46 +46,16 @@ do
   
   #Make the new block element 
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${block}
-
-  #Read the external datablock {{{
-  function _read_externalblock { 
-    #Read the data block entries 
-    head=1
-    _req=${1}
-    _outblock=''
-    while read item
-    do 
-      #Check if we have reached the BLOCK yet
-      if [ "$item" == "BLOCK:" ] 
-      then 
-        head=0
-        continue
-      fi 
-      if [ "${_req}" == "" ] 
-      then 
-        #Add the contents to the output block 
-        _outblock="${_outblock} ${item}"
-      elif [ "${item%%=*}" == "${_req}" ]
-      then 
-        #Add the contents to the output block 
-        _outblock="${_outblock} ${item}"
-      fi 
-    done < ${pipepath}/block.txt
-    _outblock=`echo ${_outblock} | sed 's/ /\n/g' | xargs echo`
-    echo ${_outblock}
-  }
-  #}}}
   
   #Loop through the new files 
-  filelist=''
-    #_message "#${_outblock}#"
-  inputlist=`_read_externalblock ${block}`
-  inputlist=`_blockentry_to_filelist ${inputlist}`
-  for file in ${inputlist}
+  #filelist=''
+  filelist=`_read_external_datablock ${pipepath}/block.txt ${block}`
+  filelist=`_blockentry_to_filelist ${filelist}`
+  for file in ${filelist}
   do 
     #Add the new file to the filelist 
-    filelist="${filelist} ${file##*/}"
-    echo ${file##*/}
+    #filelist="${filelist} ${file##*/}"
+    #echo ${file##*/}
     #Inherit! 
     rsync -atqL ${pipepath}/${block}/${file##*/} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${block}/${file##*/}
   done 
