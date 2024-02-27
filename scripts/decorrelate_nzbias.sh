@@ -12,9 +12,9 @@ then
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzbias_uncorr
 fi 
 #Decorrelated the Nz bias values 
-@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/decorrelate_nzbias.py \
-  --zbias @DB:nzbias@ \
-  --zcov @DB:nzcov@ \
+@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/decorrelate_params.py \
+  --means @DB:nzbias@ \
+  --cov @DB:nzcov@ \
   --output '@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzbias_uncorr/nz_bias_uncorr.txt' 2>&1
 
 #Update the datablock contents file 
