@@ -198,6 +198,27 @@ function _read_datablock {
 }
 #}}}
 
+#Read an external datablock {{{
+function _read_external_datablock { 
+  #Read the data block entries 
+  _loc=${1}
+  _req=${2}
+  _outblock=''
+  if [ "${_req}" == "" ] 
+  then 
+    _outblock=`grep -v "^BLOCK:" ${_loc} `
+  else 
+    _outblock=`grep "^${_req}=" ${_loc} || echo `
+  fi 
+  #_message "#${_outblock}#"
+  #_outblock=`echo ${_outblock} | sed 's/ /\n/g' | sort | uniq | xargs echo`
+  #_outblock=`echo ${_outblock} | sed 's/ /\n/g' | xargs echo`
+  _outblock=`echo ${_outblock} | sed 's/ /\n/g'`
+  #_message "#${_outblock}#"
+  echo ${_outblock}
+}
+#}}}
+
 #Write the datablock {{{
 function _write_datablock { 
   #Update the BLOCK items 
