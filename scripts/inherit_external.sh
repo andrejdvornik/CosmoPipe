@@ -3,7 +3,7 @@
 # File Name : inherit_external.sh
 # Created By : awright
 # Creation Date : 20-08-2023
-# Last Modified : Wed 06 Dec 2023 10:54:04 AM CET
+# Last Modified : Tue 27 Feb 2024 04:49:24 PM CET
 #
 #=========================================
 
@@ -26,7 +26,7 @@ do
   #Test that the item exists 
   if [ ! -d ${pipepath}/${block} ] 
   then 
-    _message "@RED@ - ERROR! Inheritence pipeline block element does not exist!"
+    _message "@RED@ - ERROR! Inheritence pipeline block element ${block} does not exist!"
     exit 1 
   fi 
 
@@ -51,10 +51,13 @@ do
   
   #Loop through the new files 
   filelist=''
-  for file in `ls ${pipepath}/${block}` 
+  #Get the files from the block.txt 
+  filelist=`_read_external_datablock ${pipepath}/block.txt ${block}`
+  filelist=`_blockentry_to_filelist ${filelist}`
+  for file in ${filelist}  
   do 
     #Add the new file to the filelist 
-    filelist="${filelist} ${file##*/}"
+    #filelist="${filelist} ${file##*/}"
     #Inherit! 
     rsync -atvL ${pipepath}/${block}/${file##*/} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${block}/${file##*/}
   done 
