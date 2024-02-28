@@ -3,16 +3,18 @@
 # File Name : replicate.sh
 # Created By : awright
 # Creation Date : 25-04-2023
-# Last Modified : Tue 14 Nov 2023 10:35:07 PM CET
+# Last Modified : Wed 28 Feb 2024 03:54:38 PM CET
 #
 #=========================================
 
 NREPL=@BV:NREPL@
 ASLINK=@BV:LINKREPL@
 
+outlist=''
+inlist=''
 for file in @DB:ALLHEAD@ 
 do 
-  outlist=''
+  inlist="$inlist ${file##*/}"
   _message "   > @BLU@Constructing @DEF@${NREPL}@BLU@ replicates for catalogue @DEF@${file##*/}@DEF@ "
   for i in `seq ${NREPL}` 
   do 
@@ -49,7 +51,7 @@ do
     outlist="$outlist $ofile"
   done 
   _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
-  _replace_datahead "${file}" "${outlist}"
 done 
+_replace_datahead "${inlist}" "${outlist}"
 
 
