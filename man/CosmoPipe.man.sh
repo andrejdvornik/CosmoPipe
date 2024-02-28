@@ -507,50 +507,63 @@ function _add_datahead {
 function _replace_datahead { 
   #Current head 
   _head=`_read_datahead`
-  #Update the datablock txt file 
-  echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
-  for _file in ${_head} 
+  #Number of head files 
+  _nheadfile=`echo ${_head} | awk '{print NF}'` 
+  #Number of input files 
+  _ninfile=`echo ${1} | awk '{print NF}'` 
+  #Number of output files 
+  _noutfile=`echo ${2} | awk '{print NF}'` 
+  #Make output list 
+  _outlist=''
+  for _newfile in ${2} 
   do 
-    #If this is the file we want to update 
-    if [ "${_file}" == "${1##*/}" ] 
-    then 
-      #Make sure we don't delete what we want to keep 
-      _delete=TRUE
-      #Loop over new files 
-      for _newfile in ${2} 
-      do 
-        #Is the old file in the new file list?
-        if [ "${_file}" == "${_newfile##*/}" ]
-        then 
-          #Don't delete the new file!
-          _delete=FALSE
-        fi 
-      done 
-      if [ "${_delete}" == "FALSE" ]
-      then 
-        #Don't delete the new file!
-        >&2 echo "name unchanged ${1##*/} -> ${_newfile##*/}"
-      elif [ "${_delete}" == "TRUE" ] 
-      then 
-        #Replace this file in the datahead
-        >&2 echo "replace ${1##*/} -> ${_newfile##*/}"
-        #Remove the old file(s)
-        rm -f ${1} 
-      else 
-        >&2 echo "_delete variable in _replace_datahead has invalid value: ${_delete}?!"
-        exit 1
-      fi 
-      #Loop over new files 
-      for _newfile in ${2} 
-      do 
-        #Add new file to the data block 
-        echo "${_newfile##*/}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
-      done 
-    else 
-      #Otherwise keep going
-      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
-    fi
+    #Strip file paths from outlst 
+    _outlist="${_outlist} ${_newfile##*/}" 
   done 
+  #For each input file 
+  for _infile in ${1} 
+  do
+    #Check if the file exists in the datahead 
+    _nmatchhead=`grep -c ${_infile##*/} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt || echo -n ` 
+    if [ ${_nmatchhead} -eq 0 ] 
+    then 
+      #This file is not in the datahead?! 
+      continue 
+    fi 
+    #Check if the file exists in the output list 
+    _nmatchout=`echo ${2} | grep -c ${_infile##*/} || echo -n `
+    if [ ${_nmatchout} -ne 0 ]
+    then 
+      #Don't delete the new file!
+      >&2 echo "name unchanged ${_infile##*/}"
+    else 
+      #Replace this file in the datahead
+      if [ ${_noutfile} -eq 1 ] 
+      then 
+        >&2 echo "replacing ${_infile##*/} -> ${_outlist}"
+      else 
+        >&2 echo "replacing ${_infile##*/} by multiple files" 
+      fi 
+      #Remove the old file(s)
+      rm -f ${_infile} 
+    fi 
+    #Only update the head if this is a one-to-many replacement 
+    if [ ${_ninfile} -eq 1 ] 
+    then 
+      #This is a one-to-many replacement: add new files to the head.txt 
+      @P_SED_INPLACE@ "s#${_infile##*/}#${_outlist// /\\n}#g" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
+    fi 
+  done 
+  if [ ${_ninfile} -gt 1 ]
+  then 
+    if [ ${_ninfile} -ne ${_nheadfile} ] 
+    then 
+      >&2 echo "_replace_datahead only works with one-to-many replacements OR ALLHEAD-to-ALLHEAD replacement! ${_ninfile} != ${_nheadfile} or 1"
+      exit 1 
+    fi 
+    #This is a many-to-many replacement: write all new files to the head.txt 
+    echo -e "${_outlist// /\\n}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
+  fi 
 }
 #}}}
 
