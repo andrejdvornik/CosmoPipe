@@ -35,7 +35,6 @@ PRIOR_A_IA="@BV:PRIOR_A_IA@"
 PRIOR_B_IA="@BV:PRIOR_B_IA@"
 PRIOR_A_PIV="@BV:PRIOR_A_PIV@"
 #Mass dependent IA model
-PRIOR_BETA="@BV:PRIOR_BETA@"
 PRIOR_LOG10_M_PIV="@BV:PRIOR_LOG10_M_PIV@"
 PRIOR_LOG10_M_MEAN_1="@BV:PRIOR_LOG10_M_MEAN_1@"
 PRIOR_LOG10_M_MEAN_2="@BV:PRIOR_LOG10_M_MEAN_2@"
@@ -411,7 +410,7 @@ then
   echo "A = 1.0" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
 elif [ "${IAMODEL^^}" == "MASSDEP" ] 
 then
-  for param in AIA beta log10_M_piv log10_M_mean_1 log10_M_mean_2 log10_M_mean_3 log10_M_mean_4 log10_M_mean_5 log10_M_mean_6 f_r_1 f_r_2 f_r_3 f_r_4 f_r_5 f_r_6
+  for param in log10_M_piv log10_M_mean_1 log10_M_mean_2 log10_M_mean_3 log10_M_mean_4 log10_M_mean_5 log10_M_mean_6 f_r_1 f_r_2 f_r_3 f_r_4 f_r_5 f_r_6
   do 
     #Load the prior variable name {{{
     pvar=${param^^}
@@ -453,6 +452,23 @@ then
       #}}}
     fi 
     #}}}
+  done
+  #Add the uncorrelated AIA and beta 
+  params_all=`cat @DB:massdep_params_uncorr@`
+  n=1
+  for param in uncorr_a uncorr_beta
+  do 
+    val=`echo ${params_all} | awk -v d=${n} '{print $d}'`
+    lo=`echo $val | awk '{print $1-5.00}'`
+    hi=`echo $val | awk '{print $1+5.00}'`
+    echo "${param} = ${lo} ${val} ${hi} " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+    if [ "${found_gauss}" == "FALSE" ]
+    then 
+      echo "${blockname}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+      found_gauss=TRUE
+    fi 
+    echo "${param} = gaussian ${val} 1.0 " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+    n=$((n+1))
   done
 else
 	_message "Intrinsic alignment model not implemented: ${IAMODEL^^}\n"
