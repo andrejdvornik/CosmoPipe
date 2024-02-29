@@ -49,7 +49,14 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo massdep_params_uncorr nzbias_uncorr
+  iamodel="@BV:IAMODEL@"
+  iamodel=`_parse_blockvars ${iamodel}`
+  if [ ${iamodel} == 'massdep' ]
+  then 
+    echo massdep_params_uncorr nzbias_uncorr
+  else 
+    echo nzbias_uncorr
+  fi 
 } 
 #}}}
 
