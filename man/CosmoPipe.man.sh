@@ -507,50 +507,87 @@ function _add_datahead {
 function _replace_datahead { 
   #Current head 
   _head=`_read_datahead`
+  #Number of head files 
+  _nheadfile=`echo ${_head} | awk '{print NF}'` 
+  #Number of input files 
+  _ninfile=`echo ${1} | awk '{print NF}'` 
+  #Number of output files 
+  _noutfile=`echo ${2} | awk '{print NF}'` 
   #Update the datablock txt file 
   echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
-  for _file in ${_head} 
+  #For each input file 
+  for _infile in ${1} 
   do 
-    #If this is the file we want to update 
-    if [ "${_file}" == "${1##*/}" ] 
-    then 
-      #Make sure we don't delete what we want to keep 
-      _delete=TRUE
-      #Loop over new files 
-      for _newfile in ${2} 
-      do 
-        #Is the old file in the new file list?
-        if [ "${_file}" == "${_newfile##*/}" ]
+    #Check through each file in the datahead 
+    for _file in ${_head} 
+    do 
+      #If this is the file we want to update 
+      if [ "${_file}" == "${_infile##*/}" ] 
+      then 
+        #Make sure we don't delete what we want to keep 
+        _delete=TRUE
+        #Loop over new files 
+        for _newfile in ${2} 
+        do 
+          #Is the old file in the new file list?
+          if [ "${_file}" == "${_newfile##*/}" ]
+          then 
+            #Don't delete the new file!
+            _delete=FALSE
+            break
+          fi 
+        done 
+        if [ "${_delete}" == "FALSE" ]
         then 
           #Don't delete the new file!
-          _delete=FALSE
+          >&2 echo "name unchanged ${_infile##*/}"
+        elif [ "${_delete}" == "TRUE" ] 
+        then 
+          #Replace this file in the datahead
+          if [ ${_noutfile} -eq 1 ] 
+          then 
+            >&2 echo "replacing ${_infile##*/} -> ${_newfile##*/}"
+          else 
+            >&2 echo "replacing ${_infile##*/} by multiple files" 
+          fi 
+          #Remove the old file(s)
+          rm -f ${_infile} 
+        else 
+          >&2 echo "_delete variable in _replace_datahead has invalid value: ${_delete}?!"
+          exit 1
         fi 
-      done 
-      if [ "${_delete}" == "FALSE" ]
+        #Only update the head if this is a one-to-many replacement 
+        if [ ${_ninfile} -eq 1 ] 
+        then 
+          #This is a one-to-many replacement: add new files to the head.txt 
+          for _newfile in ${2} 
+          do 
+            #Add new file to the data block 
+            echo "${_newfile##*/}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
+          done 
+        fi 
+      elif [ ${_ninfile} -eq 1 ] 
       then 
-        #Don't delete the new file!
-        >&2 echo "name unchanged ${1##*/} -> ${_newfile##*/}"
-      elif [ "${_delete}" == "TRUE" ] 
-      then 
-        #Replace this file in the datahead
-        >&2 echo "replace ${1##*/} -> ${_newfile##*/}"
-        #Remove the old file(s)
-        rm -f ${1} 
-      else 
-        >&2 echo "_delete variable in _replace_datahead has invalid value: ${_delete}?!"
-        exit 1
-      fi 
-      #Loop over new files 
-      for _newfile in ${2} 
-      do 
-        #Add new file to the data block 
-        echo "${_newfile##*/}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
-      done 
-    else 
-      #Otherwise keep going
-      echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
-    fi
+        #Otherwise keep going
+        #Only update the head if this is a one-to-many replacement 
+        echo "${_file}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
+      fi
+    done 
   done 
+  if [ ${_ninfile} -gt 1 ]
+  then 
+    if [ ${_ninfile} -ne ${_nheadfile} ] 
+    then 
+      >&2 echo "_replace_datahead only works with one-to-many replacements OR ALLHEAD-to-ALLHEAD replacement! ${_ninfile} != ${_nheadfile} or 1"
+      exit 1 
+    fi 
+    #This is a many-to-many replacement: write all new files to the head.txt 
+    for _newfile in ${2} 
+    do 
+      #Add new file to the data block 
+      echo "${_newfile##*/}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
+    done 
+  fi 
 }
 #}}}
 
