@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLU BV:TOMOLIMS BV:TOMOLIMS DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  echo ALLPATCH BLU BV:COSMOSIS_PATCHLIST BV:TOMOLIMS BV:TOMOLIMS DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 
@@ -55,7 +55,7 @@ function _inp_data {
   patchvar="@BV:COSMOSIS_PATCHLIST@"
   patchvar=`_parse_blockvars ${patchvar}`
   #Define the patches to loop over {{{
-  if [ "${patchvar}" == "ALL" ]
+  if [ "${patchvar}" == "ALL" ] || [ "${patchvar}" == "@BV:COSMOSIS_PATCHLIST@" ]
   then 
     patchlist=`echo @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb` 
   else 
