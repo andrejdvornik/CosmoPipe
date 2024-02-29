@@ -211,6 +211,7 @@ fi
 #Initialise variables {{{
 allneeds=''
 allneeds_def=''
+absent_block=''
 echo  > @RUNROOT@/@PIPELINE@_links.R
 currstep=0
 currsubstep=0
@@ -302,8 +303,13 @@ do
     echo HEAD assignment: writing ${step:1} to datahead 
     #Modify the HEAD to the request value {{{
     _target=${step:1}
-    _target=`_parse_blockvars ${_target}`
-    VERBOSE=1 _write_datahead "${_target}" "_validitytest_"
+    _target=`VERBOSE=0 _parse_blockvars ${_target}`
+    if [ "$(_inblock $_target)" == "0" ]
+    then 
+      absent_block="${absent_block} ${_target}"
+      _write_datablock $_target "_validitytest_"
+    fi 
+    VERBOSE=1 _write_datahead "${_target}" "_validitytest_" 
     #Set the "laststep" to be this block element
     laststep=${_target}
     #If resuming and haven't found the "RESUME" entry, save this assignment
@@ -317,7 +323,8 @@ do
     echo BLOCK assignment: writing datahead to ${step:1} 
     #Modify the datablock with the current HEAD {{{
     _target=${step:1}
-    _target=`_parse_blockvars ${_target}`
+    _target=`VERBOSE=0 _parse_blockvars ${_target}`
+    echo parsed 
 		VERBOSE=1 _write_datablock ${_target} "`_read_datahead`"
     #Write the link between the previous processing function and this block element
     echo "${laststep} -.-> ${_target}(${_target})" >> @RUNROOT@/@PIPELINE@_links.R
@@ -331,7 +338,7 @@ do
   then 
     #Delete an item from the datablock  {{{
     name=${step:1}
-    name=`_parse_blockvars ${name}`
+    name=`VERBOSE=0 _parse_blockvars ${name}`
     echo BLOCK deletion: removing ${name} 
 		VERBOSE=1 _delete_blockitem "${name}" TEST
     #}}}
@@ -340,9 +347,9 @@ do
     #Rename an item in the datablock  {{{
     names=${step:1}
     oldname=${names%%-*}
-    oldname=`_parse_blockvars ${oldname}`
+    oldname=`VERBOSE=0 _parse_blockvars ${oldname}`
     newname=${names##*-}
-    newname=`_parse_blockvars ${newname}`
+    newname=`VERBOSE=0 _parse_blockvars ${newname}`
     echo BLOCK rename: moving ${oldname} to ${newname}
 		VERBOSE=1 _rename_blockitem "${oldname}" "${newname}" TEST
     if [ "${lastassign}" == "${oldname}" ] 
@@ -358,9 +365,9 @@ do
     #Export an item from the datablock  {{{
     names=${step:1}
     blockname=${names%%-*}
-    blockname=`_parse_blockvars ${blockname}`
+    blockname=`VERBOSE=0 _parse_blockvars ${blockname}`
     outname=${names##*-}
-    outname=`_parse_blockvars ${outname}`
+    outname=`VERBOSE=0 _parse_blockvars ${outname}`
     echo BLOCK export: copying ${blockname} to external folder ${outname}
 		VERBOSE=1 _export_blockitem "${blockname}" "${outname}" TEST
     #}}}
@@ -451,7 +458,7 @@ do
     #Check inputs and outputs {{{
     inputs=`_inp_data`
     echo "Raw inputs: ${inputs}"
-    inputs=`_parse_blockvars ${inputs}` 
+    inputs=`VERBOSE=0 _parse_blockvars ${inputs}` 
     echo "After variable parse: ${inputs}"
     #}}}
     #Check the data block for these inputs & add graph entries {{{
@@ -488,15 +495,18 @@ do
           fi 
           #}}}
         else 
-          echo "Error message"
-          #Error {{{
-          VERBOSE=1 _message " - ERROR!\n\n"
-          VERBOSE=1 _message "   ${RED}ERROR: ${BLU}Input ${DEF}${inp}${BLU} does not exist in the data-block when needed for step ${DEF}${step}${BLU}!${DEF}\n" 
-          VERBOSE=1 _message "   ${RED}       ${BLU}Check the ${DEF}@PIPELINE@_pipeline.log${BLU} file for details of the construction.\n" 
-          echo "`_read_datablock`"
-          VERBOSE=1 _message "   ${RED}       Pipeline is invalid!${DEF}\n" 
-          exit 1 
-          #}}}
+          #echo "Error message"
+          ##Error {{{
+          #VERBOSE=1 _message " - ERROR!\n\n"
+          #VERBOSE=1 _message "   ${RED}ERROR: ${BLU}Input ${DEF}${inp}${BLU} does not exist in the data-block when needed for step ${DEF}${step}${BLU}!${DEF}\n" 
+          #VERBOSE=1 _message "   ${RED}       ${BLU}Check the ${DEF}@PIPELINE@_pipeline.log${BLU} file for details of the construction.\n" 
+          #echo "`_read_datablock`"
+          #VERBOSE=1 _message "   ${RED}       Pipeline is invalid!${DEF}\n" 
+          #exit 1 
+          ##}}}
+          #
+          #Add the missing item to the absent_block list 
+          absent_block="${absent_block} ${inp}"
         fi 
       fi 
       #}}}
@@ -507,7 +517,7 @@ do
     outlist=''
     outputs=`_outputs`
     echo "Raw outputs: ${outputs}"
-    outputs=`_parse_blockvars ${outputs}` 
+    outputs=`VERBOSE=0 _parse_blockvars ${outputs}` 
     echo "After variable parse: ${outputs}"
     ##}}}
     #Save these outputs to the data block  {{{
@@ -540,6 +550,22 @@ do
     #}}}
   fi 
 done
+#Check for absent block elements {{{
+absent_block=`echo ${absent_block}`
+if [ "${absent_block}" != "" ] 
+then 
+  echo "Error: missing block elements"
+  absent_block=`echo ${absent_block} | sed 's/ /\n/g' | sort | uniq | awk '{printf $0" "}'`
+  #Error {{{
+  VERBOSE=1 _message " - @RED@ERROR!@DEF@\n"
+  VERBOSE=1 _message "   ${RED}ERROR: ${BLU}There are requested or input block elements that do not exist in the data-head when needed. These are: ${DEF}\n" 
+  VERBOSE=1 _message "   ${BLU}->${DEF}${absent_block}${BLU}<-${DEF}\n" 
+  VERBOSE=1 _message "   ${RED}       ${BLU}These should either be inherited from other pipelines, or the processing functions that make them must be added.\n" 
+  VERBOSE=1 _message "   ${RED}       Pipeline is invalid!${DEF}\n" 
+  exit 1 
+  #}}}
+fi 
+#}}}
 #Check for resume errors {{{
 if [ "${resume}" == "TRUE" ] && [ "${found_resume}" == "FALSE" ]
 then 
