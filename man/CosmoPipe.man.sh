@@ -541,8 +541,11 @@ function _replace_datahead {
       if [ ${_noutfile} -eq 1 ] 
       then 
         >&2 echo "replacing ${_infile##*/} -> ${_outlist}"
-      else 
+      elif [ ${_noutfile} -gt 1 ] 
+      then 
         >&2 echo "replacing ${_infile##*/} by multiple files" 
+      else 
+        >&2 echo "deleting ${_infile##*/}" 
       fi 
       #Remove the old file(s)
       rm -f ${_infile} 
@@ -757,7 +760,7 @@ function _parse_blockvars {
       count=$((count+1))
       if [ ${count} -gt 10 ]
       then 
-        >&2 echo "ERROR: SOMETHING WRONG IN VARIABLE PARSE"
+         _message "@RED@ERROR: VARIABLE PARSE IS RECURSIVE:@BLU@${string} @DEF@"
         #exit 1 
         break
       fi 
