@@ -3,7 +3,7 @@
 # File Name : make_data_vector_allstats.sh
 # Created By : stoelzner
 # Creation Date : 01-04-2023
-# Last Modified : Fri 08 Dec 2023 01:10:28 PM CET
+# Last Modified : Thu 29 Feb 2024 10:00:52 PM CET
 #
 #=========================================
 
@@ -18,9 +18,18 @@ elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
 then 
   inputs="@DB:bandpowers@"
 #}}}
+elif [ "${STATISTIC^^}" == "XIPSF" ] #{{{
+then 
+  inputs="@DB:xipsf_binned@"
+#}}}
+elif [ "${STATISTIC^^}" == "XIGPSF" ] #{{{
+then 
+  inputs="@DB:xigpsf_binned@"
+#}}}
 elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
 then 
   inputs="@DB:xipm_binned@"
+#}}}
 fi
 #Input mbias files 
 mfiles="@DB:mbias@"
