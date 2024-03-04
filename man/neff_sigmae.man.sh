@@ -43,7 +43,12 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLU BV:BLIND BV:E1NAME BV:E2NAME BV:WEIGHTNAME DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  list=''
+  for patch in @PATCHLIST@ @ALLPATCH@ 
+  do 
+    list="${list} BV:SURVEYAREA_${patch}"
+  done
+  echo ALLPATCH BLU BV:BLIND BV:E1NAME BV:E2NAME BV:WEIGHTNAME DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH ${list}
 } 
 #}}}
 

@@ -77,7 +77,7 @@ def rebin(x,signal,weight,x_min,x_max,nbins):
 parser = ArgumentParser(description='Construct an input cosebi data vector for cosmosis mcmc')
 parser.add_argument("-i", "--inputfiles", dest="DataFiles",nargs='+',
     help="Full Input file names", metavar="inputFile",required=True)
-parser.add_argument("-s", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis', 'bandpowers','xipm'],
+parser.add_argument("-s", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis', 'bandpowers','xipm','xipsf','xigpsf'],
     help="2pt statistic, must be either cosebis, bandpowers, or xipm")
 parser.add_argument("-m", "--mbias", dest="mbias",nargs='+',
     help="multiplicative bias per tomographic bin",required=True)
@@ -88,6 +88,9 @@ parser.add_argument("-o", "--outputfile", dest="outputFile",
 
 args = parser.parse_args()
 statistic = args.statistic
+label = statistic
+if statistic == 'xipsf' or statistic == 'xigpsf': 
+    statistic='xipm'
 
 nBins_source = len(args.tomoBins)-1
 tomoBins = [ str(i).replace(".","p") for i in args.tomoBins ]
@@ -172,7 +175,7 @@ elif statistic == 'xipm':
     XipmDataFiles = np.array(args.DataFiles)[matches_xipm]
     for bin1 in range(nBins_source):
         for bin2 in range(bin1,nBins_source):
-            tomoxcorrstr="_"+ZBstr[bin1]+"_"+ZBstr[bin2]+'_xipm_binned.asc'
+            tomoxcorrstr="_"+ZBstr[bin1]+"_"+ZBstr[bin2]+'_'+label+'_binned.asc'
             match=np.array([tomoxcorrstr in i for i in XipmDataFiles])
             fileNameInput=XipmDataFiles[match][0]
             input_files.append(fileNameInput)

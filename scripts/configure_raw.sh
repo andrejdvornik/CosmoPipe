@@ -43,6 +43,7 @@ _varcheck $0
 pipeline_only=FALSE
 recheck=FALSE
 resume=""
+resumenum=''
 while [ $# -gt 0 ] 
 do 
   case $1 in 
@@ -53,6 +54,20 @@ do
     "--resume") 
       resume="--resume" 
       shift
+      if [ $# -gt 0 ] 
+      then 
+        re='^[1-9]+$'
+        if [[ ${1:0:1} =~ $re ]]
+        then 
+          resumenum=$1
+          shift 
+        elif [ "${1^^}" == "AUTO" ]
+        then 
+          step=`ls -tr ${RUNROOT}/${LOGPATH}/step* | tail -1 | awk -F/ '{print $NF}' | awk -F_ '{print $2}'`
+          resumenum=${step}
+          shift
+        fi 
+      fi
       ;; 
     "--*")
       echo "Unknown command line option: $1"
@@ -169,7 +184,7 @@ done
 for pipe in ${PIPELINE}
 do 
   _message "   >${RED} Constructing Pipeline ${pipe} ${DEF}" 
-  PIPELINE=${pipe} VERBOSE=0 bash ${RUNROOT}/${SCRIPTPATH}/construct_pipeline.sh ${RUNROOT}/pipeline.ini ${resume} > ${pipe}_pipeline.log
+  PIPELINE=${pipe} VERBOSE=0 bash ${RUNROOT}/${SCRIPTPATH}/construct_pipeline.sh ${RUNROOT}/pipeline.ini ${resume} ${resumenum} > ${pipe}_pipeline.log
   _message "${BLU} - Done! ${DEF}\n"
 done 
 #}}}

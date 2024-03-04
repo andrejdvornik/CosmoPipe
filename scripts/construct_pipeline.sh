@@ -14,6 +14,9 @@ do
       resume="TRUE" 
       echo "Resuming pipeline from requested location!"
       shift
+      resumenum=$1
+      echo "Resume number is ${resumenum}"
+      shift 
       ;; 
     *)
       if [ -f $1 ] 
@@ -225,7 +228,8 @@ do
   if [ "${resume}" == "TRUE" ] 
   then 
     #If so, did we find 'RESUME' 
-    if [ "${step}" == "RESUME" ] 
+    stepnum=${step##*=}
+    if [ "${step}" == "RESUME" ] || [ "${stepnum}" == "${resumenum}" ]
     then 
       #Did we _already_ find resume (multiple in the pipeline?!)
       if [ "${found_resume}" == "TRUE" ]
@@ -233,10 +237,12 @@ do
         VERBOSE=1 _message " - ERROR!\n\n"
         VERBOSE=1 _message "   ${RED}ERROR: ${BLU}Multiple ${RED}RESUME${BLU} items are present in the pipeline!${DEF}\n" 
         exit 1 
-        exit 1 
-      else 
-        #If so, document and continue 
-        found_resume='TRUE'
+      fi 
+      #Document that we found the resume step
+      found_resume='TRUE'
+      if [ "${step}" == "RESUME" ]
+      then 
+        #If so, continue 
         continue
       fi 
     fi 
@@ -727,11 +733,16 @@ do
   if [ "${resume}" == "TRUE" ] 
   then 
     #If so, did we find 'RESUME' 
-    if [ "${step}" == "RESUME" ] 
+    stepnum=${step##*=}
+    if [ "${step}" == "RESUME" ]  || [ "${stepnum}" == "${resumenum}" ]
     then 
       #If so, document and continue 
       found_resume='TRUE'
-      continue
+      if [ "${step}" == "RESUME" ]
+      then 
+        #If so, continue 
+        continue
+      fi 
     elif [ "${found_resume}" == "FALSE" ] && [ "${step:0:1}" != "+" ]
     then 
       echo "RESUME means that we skip step: ${step}" 
