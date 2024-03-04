@@ -247,7 +247,7 @@ l_max = @BV:LMAXBANDPOWERS@
 nbands = @BV:NBANDPOWERS@
 apodise = 1
 delta_x = @BV:APODISATIONWIDTH@
-theta_min =${theta_lo}
+theta_min = ${theta_lo}
 theta_max = ${theta_up}
 output_foldername = %(2PT_STATS_PATH)s/bandpowers_window/
 

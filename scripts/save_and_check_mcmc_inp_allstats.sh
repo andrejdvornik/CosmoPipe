@@ -15,26 +15,50 @@ then
 elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] || [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
 then
   non_linear_model=mead2015
+elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020_NOFEEDBACK" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020_NOFEEDBACK" ]
+then
+  non_linear_model=mead2020
 else
   _message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
   exit 1
 fi
+CHAINSUFFIX=@BV:CHAINSUFFIX@
 #Input data vector
 STATISTIC="@BV:STATISTIC@"
+ITERATION=@BV:ITERATION@
 if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 then
   input_datavector="@DB:cosebis_vec@"
   input_covariance="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_cosebis/covariance_matrix_${non_linear_model}.mat"
+  if [ -n "$ITERATION" ] && [ "$ITERATION" -eq "$ITERATION" ]
+  then
+    filename_extension=${CHAINSUFFIX}_iteration_${ITERATION}
+    input_covariance_iterative=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_cosebis/covariance_matrix_${non_linear_model}${filename_extension}.mat
+  fi 
 #}}}
 elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
 then 
   input_datavector="@DB:bandpowers_vec@"
   input_covariance="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_bandpowers/covariance_matrix_${non_linear_model}.mat"
+  if [ -n "$ITERATION" ] && [ "$ITERATION" -eq "$ITERATION" ]
+  then
+    filename_extension=${CHAINSUFFIX}_iteration_${ITERATION}
+    input_covariance_iterative=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_bandpowers/covariance_matrix_${non_linear_model}${filename_extension}.mat
+  fi 
 #}}}
 elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
 then 
   input_datavector="@DB:xipm_vec@"
   input_covariance="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_xipm/covariance_matrix_${non_linear_model}.mat"
+  if [ -n "$ITERATION" ] && [ "$ITERATION" -eq "$ITERATION" ]
+  then
+    filename_extension=${CHAINSUFFIX}_iteration_${ITERATION}
+    input_covariance_iterative=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_xipm/covariance_matrix_${non_linear_model}${filename_extension}.mat
+  fi
+fi
+if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020_NOFEEDBACK" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020_NOFEEDBACK" ]
+then
+  non_linear_model=mead2020_feedback
 fi
 #If needed, create the output directory {{{
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@ ]
@@ -66,6 +90,27 @@ NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
   --covariance ${input_covariance} \
   --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model} \
   --plotdir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
+
+if [ ! -z "$input_covariance_iterative" ]
+then
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp_allstats.py \
+  --datavector ${input_datavector} \
+  --statistic @BV:STATISTIC@ \
+  --nz @DB:nz@ \
+  --nmaxcosebis @BV:NMAXCOSEBIS@ \
+  --nbandpowers @BV:NBANDPOWERS@ \
+  --nxipm @BV:NXIPM@ \
+  --ellmin @BV:LMINBANDPOWERS@ \
+  --ellmax @BV:LMAXBANDPOWERS@ \
+  --thetamin @BV:THETAMINXI@ \
+  --thetamax @BV:THETAMAXXI@ \
+  --ntomo ${NTOMO} \
+  --neff @DB:cosmosis_neff@ \
+  --sigmae @DB:cosmosis_sigmae@ \
+  --covariance ${input_covariance_iterative} \
+  --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}${filename_extension} \
+  --plotdir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
+fi
 
 _write_datablock "mcmc_inp_@BV:STATISTIC@" "MCMC_input_${non_linear_model}.fits"
 
