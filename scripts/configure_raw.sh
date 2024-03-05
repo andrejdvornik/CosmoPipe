@@ -43,7 +43,7 @@ _varcheck $0
 pipeline_only=FALSE
 recheck=FALSE
 resume=""
-resumenum=''
+resumenum='0'
 while [ $# -gt 0 ] 
 do 
   case $1 in 
