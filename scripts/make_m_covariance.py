@@ -16,7 +16,8 @@ corr_file = args.sigma_corr_file
 
 sigma_m = np.loadtxt(sigma_m_file,comments='#')
 corr = np.loadtxt(corr_file,comments='#')
-
+if sigma_m.ndim == 0:
+    sigma_m=np.array([sigma_m])
 #Input M bias uncertainty
 #Fixed 2% mbias uncertainty 
 sigma_m_0p02=np.ones(len(sigma_m))*0.02
