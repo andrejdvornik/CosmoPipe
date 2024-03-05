@@ -552,6 +552,8 @@ nGal_source=[]
 for tempval in args.NeffFile:
     if os.path.isfile(tempval):
         data=np.loadtxt(tempval,comments='#')
+        if data.ndim == 0:
+            data=np.array([data])
         for val in data: 
             nGal_source.append(val)
     else:
@@ -567,6 +569,8 @@ sigma_e=[]
 for tempval in args.SigmaeFile:
     if os.path.isfile(tempval):
         data=np.loadtxt(tempval,comments='#')
+        if data.ndim == 0:
+            data=np.array([data])
         for val in data: 
             sigma_e.append(val)
     else:
