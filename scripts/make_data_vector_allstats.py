@@ -106,6 +106,8 @@ mout=[]
 for mval in m:
     if os.path.isfile(mval):
         data=np.loadtxt(mval,comments='#')
+        if data.ndim == 0:
+            data=np.array([data])
         for val in data: 
             mout.append(val)
     else:

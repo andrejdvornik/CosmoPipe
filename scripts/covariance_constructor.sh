@@ -3,7 +3,7 @@
 # File Name : covariance_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Mon 15 Jan 2024 09:57:00 AM CET
+# Last Modified : Fri 08 Dec 2023 10:48:51 AM CET
 #
 #=========================================
 
@@ -44,7 +44,7 @@ fi
 mix_term=@BV:MIXTERM@
 if [ "${mix_term^^}" == "TRUE" ]
 then 
-  mixterm="xipxip"
+  mixterm="xipxip,xipxim,ximxim"
   mixterm_basefile=`_read_datablock @BV:MIXTERM_BASEFILE@`
   mixterm_basefile=`_blockentry_to_filelist ${mixterm_basefile}`
   mixterm_basefile="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/@BV:MIXTERM_BASEFILE@/${mixterm_basefile}"
@@ -67,14 +67,18 @@ BOLTZMAN="@BV:BOLTZMAN@"
 if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
 then
   non_linear_model=mead2020_feedback
+  #non_linear_model=mead2020
 elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] || [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
 then
   non_linear_model=mead2015
+elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020_NOFEEDBACK" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020_NOFEEDBACK" ]
+then
+  non_linear_model=mead2020
 else
   _message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
     exit 1
 fi
-
+IAMODEL="@BV:IAMODEL@"
 # Infer central values of the prior for cosmological and nuisance parameters
 central_value () {
   n=`echo $1 | awk '{print NF}'`
@@ -87,15 +91,57 @@ central_value () {
   fi
   echo $value
 }
-AIA=`central_value "@BV:PRIOR_AIA@"`
-H0=`central_value "@BV:PRIOR_H0@"`
-omega_b=`central_value "@BV:PRIOR_OMBH2@"`
-omega_c=`central_value "@BV:PRIOR_OMCH2@"`
+ITERATION=@BV:ITERATION@
+if [ -n "$ITERATION" ] && [ "$ITERATION" -eq "$ITERATION" ]
+then
+  CHAINSUFFIX=@BV:CHAINSUFFIX@
+  previous=`echo "$ITERATION" | awk '{printf "%d", $1-1}'`
+  bestfit_file=@RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/bestfit/bestfit${CHAINSUFFIX}_values_iteration_${previous}.txt
+  while read name value
+  do
+    name=`echo $name| tr '-' '_'`
+    printf -v "$name" '%s' $value
+  done < ${bestfit_file}
+
+  if [ "${IAMODEL^^}" == "LINEAR" ] 
+	then
+    AIA=$intrinsic_alignment_parameters__a
+  else
+    AIA=`central_value "@BV:PRIOR_AIA@"`
+  fi
+  H0=${cosmological_parameters__h0}
+  omega_b=${cosmological_parameters__ombh2}
+  omega_c=${cosmological_parameters__omch2} 
+  ns=${cosmological_parameters__n_s}
+  S8=${cosmological_parameters__s_8_input}
+  logT_AGN=${halo_model_parameters__log_t_agn}
+  nlparam="HMCode_logT_AGN = $logT_AGN"
+  filename_extension=${CHAINSUFFIX}_iteration_${ITERATION}
+  nzfile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/biased_nz/nz${CHAINSUFFIX}_iteration_${previous}.fits
+else
+  AIA=`central_value "@BV:PRIOR_AIA@"`
+  H0=`central_value "@BV:PRIOR_H0@"`
+  omega_b=`central_value "@BV:PRIOR_OMBH2@"`
+  omega_c=`central_value "@BV:PRIOR_OMCH2@"` 
+  ns=`central_value "@BV:PRIOR_NS@"`
+  S8=`central_value "@BV:PRIOR_S8INPUT@"`
+  filename_extension=""
+  nzfile=@DB:cosmosis_nz@
+  if [ "${non_linear_model}" == "mead2020_feedback" ]
+  then
+    logT_AGN=`central_value "@BV:PRIOR_LOGTAGN@"`
+    nlparam="HMCode_logT_AGN = $logT_AGN"
+  elif [ "${non_linear_model}" == "mead2015" ]
+  then
+    Abary=`central_value "@BV:PRIOR_ABARY@"`
+    # a_0 and a_1 are hardcoded in the cosmosis constructor as well...
+    eta=`echo "$Abary 0.98 -0.12" | awk '{printf "%f", $2 + $3 * $1}'`
+    nlparam=$'HMCode_A_baryon = $Abary\nHMCode_eta_baryon = $eta'
+  fi
+fi
 w0=`central_value "@BV:PRIOR_W@"`
 wa=`central_value "@BV:PRIOR_WA@"` 
-ns=`central_value "@BV:PRIOR_NS@"`
 mnu=`central_value "@BV:PRIOR_MNU@"`
-S8=`central_value "@BV:PRIOR_S8INPUT@"`
 Omega_m=`echo "$omega_b $omega_c $H0" | awk '{printf "%f", ($1 + $2) /$3 /$3}'`
 Omega_b=`echo "$omega_b $H0" | awk '{printf "%f", $1 /$2 /$2}'`
 Omega_de=`echo "$Omega_m $H0" | awk '{printf "%f", 1 - $1}'`
@@ -112,6 +158,12 @@ else
 fi
 # COSEBIs basis function path
 COSEBISLOC=@RUNROOT@/@CONFIGPATH@/cosebis/
+mbiaslist=""
+for file in @DB:cosmosis_mbias@
+do 
+  mbiaslist="${mbiaslist} `cat ${file}`"
+done 
+mbiaslist=`echo ${mbiaslist} | sed 's/ /,/g'`
 msigmalist=""
 for file in @DB:cosmosis_msigma@
 do 
@@ -149,10 +201,10 @@ f_tomo_file = f_tomo.asc
 
 [output settings]
 directory = ${output_path}
-file = covariance_list_${non_linear_model}.dat, covariance_matrix_${non_linear_model}.mat
+file = covariance_list_${non_linear_model}${filename_extension}.dat, covariance_matrix_${non_linear_model}${filename_extension}.mat
 style = list, matrix
 list_style_spatial_first = True
-corrmatrix_plot = correlation_coefficient.pdf
+corrmatrix_plot = correlation_coefficient${filename_extension}.pdf
 save_configs = save_configs.ini
 save_Cells = True
 save_trispectra = False
@@ -172,15 +224,6 @@ mult_shear_bias = ${msigmalist}
 limber = True
 pixelised_cell = False
 pixel_Nside = 2048
-n_spec = 0
-ell_spec_min = 2
-ell_spec_max = 514
-ell_spec_bins = 64
-ell_spec_type = lin
-ell_photo_min = 51
-ell_photo_max = 2952
-ell_photo_bins = 12
-ell_photo_type = log
 
 [covRspace settings]
 projected_radius_min = 0.01
@@ -223,12 +266,11 @@ mix_term_target_patchsize = 10
 mix_term_do_overlap = True
 mix_term_nbins_phi = 100
 mix_term_nmax = 10
-mix_term_dpix_min = 0.25
-mix_term_do_ec = True
-mix_term_file_path_save_triplets = ${input_path}/mixterm/triplets
-mix_term_subsample = 10 
-mix_term_nsubr = 5 
-mix_term_file_path_load_triplets = ${input_path}/mixterm/triplets
+mix_term_do_ec = False
+mix_term_subsample = 1 
+mix_term_nsubr = 7 
+mix_term_file_path_save_triplets = @RUNROOT@/INSTALL/OneCovariance/input/catalogue_mixed/tripletcounts_legacy.fits
+mix_term_file_path_load_triplets = /net/home/fohlen13/reischke/Git/OneCovariance/input/catalogue_mixed/legacytriplets.fits
 
 EOF
 else
@@ -307,7 +349,7 @@ EOF
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 [redshift]
 z_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz/
-zlens_file = @DB:cosmosis_nz@
+zlens_file = ${nzfile}
 zlens_extension = NZ_SOURCE
 
 EOF
@@ -378,6 +420,7 @@ small_k_damping_for1h = damped
 
 [powspec evaluation]
 non_linear_model = ${non_linear_model}
+${nlparam}
 log10k_bins = 400
 log10k_min = -3.49
 log10k_max = 2.15
@@ -412,23 +455,25 @@ EOF
 # Covariance between summary statistics {{{
 if [ "${cov_between_stats}" == "True" ]
 then
-    arb_fourier_filter_mmE_file_xipm="fourier_weight_realspace_cf_mm_p_?.table"
-    arb_fourier_filter_mmB_file_xipm="fourier_weight_realspace_cf_mm_m_?.table"
-    arb_real_filter_mm_p_file_xipm="real_weight_realspace_cf_mm_p_?.table"
-    arb_real_filter_mm_m_file_xipm="real_weight_realspace_cf_mm_m_?.table"
+    arb_fourier_filter_mmE_file_xipm="fourier_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    arb_fourier_filter_mmB_file_xipm="fourier_weight_realspace_cf_mm_m_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    arb_real_filter_mm_p_file_xipm="real_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    arb_real_filter_mm_m_file_xipm="real_weight_realspace_cf_mm_m_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
 
-    arb_fourier_filter_mmE_file_cosebis="WnLog?-@BV:THETAMINXI@-@BV:THETAMAXXI@.table"
-    arb_fourier_filter_mmB_file_cosebis="WnLog?-@BV:THETAMINXI@-@BV:THETAMAXXI@.table"
-    arb_real_filter_mm_p_file_cosebis="Tplus?_@BV:THETAMINXI@-@BV:THETAMAXXI@.table"
-    arb_real_filter_mm_m_file_cosebis="Tminus?_@BV:THETAMINXI@-@BV:THETAMAXXI@.table"
+    arb_fourier_filter_mmE_file_cosebis="WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    arb_fourier_filter_mmB_file_cosebis="WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    arb_real_filter_mm_p_file_cosebis="Tplus_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    arb_real_filter_mm_m_file_cosebis="Tminus_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
 
-    arb_fourier_filter_mmE_file_bandpowers="fourier_weight_bandpowers_mmE_?.table"
-    arb_fourier_filter_mmB_file_bandpowers="fourier_weight_bandpowers_mmB_?.table"
-    arb_real_filter_mm_p_file_bandpowers="real_weight_bandpowers_mmE_?.table"
-    arb_real_filter_mm_m_file_bandpowers="real_weight_bandpowers_mmB_?.table"
+    t_lo=`printf "%.2f" $theta_lo`
+    t_up=`printf "%.2f" $theta_up`
+    arb_fourier_filter_mmE_file_bandpowers="fourier_weight_bandpowers_mmE_${t_lo}-${t_up}_?.table"
+    arb_fourier_filter_mmB_file_bandpowers="fourier_weight_bandpowers_mmB_${t_lo}-${t_up}_?.table"
+    arb_real_filter_mm_p_file_bandpowers="real_weight_bandpowers_mmE_${t_lo}-${t_up}_?.table"
+    arb_real_filter_mm_m_file_bandpowers="real_weight_bandpowers_mmB_${t_lo}-${t_up}_?.table"
 
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-arb_summary_directory = @RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/
+arb_summary_directory = @RUNROOT@/@CONFIGPATH@/covariance_arb_summary/
 arb_fourier_filter_mmE_file = ${arb_fourier_filter_mmE_file_@BV:STATISTIC@}, ${arb_fourier_filter_mmE_file_@BV:SECONDSTATISTIC@}
 arb_fourier_filter_mmB_file = ${arb_fourier_filter_mmB_file_@BV:STATISTIC@}, ${arb_fourier_filter_mmB_file_@BV:SECONDSTATISTIC@}
 arb_real_filter_mm_p_file = ${arb_real_filter_mm_p_file_@BV:STATISTIC@}, ${arb_real_filter_mm_p_file_@BV:SECONDSTATISTIC@}

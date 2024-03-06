@@ -1,5 +1,5 @@
 #
-# save_and_check_mcmc_inp_allstats.sh Documentation & Housekeeping functions
+# calculate_xi_EB.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@===================================================@DEF@\n"
-    _message "@BLU@== @RED@ Running save_and_check_mcmc_inp_allstats.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@===================================================@DEF@\n"
+    _message "@BLU@=======================================@DEF@\n"
+    _message "@BLU@== @RED@ Running calculate_xi_EB.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@=======================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Construct the MCMC input file for cosebis and '
-  echo '# bandpowers'
+  echo '# Computes xi_E/B data vector and covariance from COSEBIs measurements'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,28 +42,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLINDING BV:BOLTZMAN BV:CHAINSUFFIX BV:ITERATION BV:LMAXBANDPOWERS BV:LMINBANDPOWERS BV:NBANDPOWERS BV:NMAXCOSEBIS BV:NXIPM BV:STATISTIC BV:THETAMAXXI BV:THETAMINXI BV:TOMOLIMS DATABLOCK PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH SURVEY
+  echo BINNING BLU BV:BOLTZMAN BV:NTHREADS BV:NXIPM BV:THETAMAXXI BV:THETAMINXI DATABLOCK DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo @BV:STATISTIC@_vec covariance_@BV:STATISTIC@ cosmosis_neff cosmosis_sigmae nz
+  echo cosebis_vec covariance_cosebis
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo mcmc_inp_@BV:STATISTIC@
+  echo xiEB_vec covariance_xiEB
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp_allstats.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/calculate_xi_EB.sh
 } 
 #}}}
 
