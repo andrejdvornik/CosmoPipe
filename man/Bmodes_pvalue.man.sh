@@ -50,8 +50,10 @@ stat="BV:STATISTIC@"
 function _inp_data { 
   #Data inputs (leave blank if none)
   if [ "${stat^^}" == "COSEBIS" ]
+  then
     echo mcmc_inp_cosebis
   elif [ "${stat^^}" == "BANDPOWERS" ]
+  then
     echo mcmc_inp_bandpowers
   fi
 } 
