@@ -554,6 +554,7 @@ function _replace_datahead {
     if [ ${_ninfile} -eq 1 ] 
     then 
       #This is a one-to-many replacement: add new files to the head.txt 
+      _outlist=`echo ${_outlist}`
       @P_SED_INPLACE@ "s#${_infile##*/}#${_outlist// /\\n}#g" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
     fi 
   done 
@@ -565,6 +566,8 @@ function _replace_datahead {
       exit 1 
     fi 
     #This is a many-to-many replacement: write all new files to the head.txt 
+    _outlist=`echo ${_outlist}`
+    echo "HEAD:" > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
     echo -e "${_outlist// /\\n}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/head.txt
   fi 
 }
