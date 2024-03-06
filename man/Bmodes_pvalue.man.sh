@@ -45,11 +45,15 @@ function _inp_var {
   echo BLINDING BV:BOLTZMAN BV:STATISTIC BV:THETAMAXXI BV:THETAMINXI BV:TOMOLIMS PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH SURVEY
 } 
 #}}}
-
+stat="BV:STATISTIC@"
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo mcmc_inp_bandpowers mcmc_inp_cosebis
+  if [ "${stat^^}" == "COSEBIS" ]
+    echo mcmc_inp_cosebis
+  elif [ "${stat^^}" == "BANDPOWERS" ]
+    echo mcmc_inp_bandpowers
+  fi
 } 
 #}}}
 
