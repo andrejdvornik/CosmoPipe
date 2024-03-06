@@ -55,24 +55,25 @@ for bin1 in range(ntomo):
             ax[x,y].errorbar(B_data['ANG'][idx], B_data['VALUE'][idx]*1e10, B_std[idx]*1e10, linestyle = 'None', marker = '.', markersize=5)
         if statistic == 'bandpowers':
             ax[x,y].errorbar(B_data['ANG'][idx], B_data['VALUE'][idx]/B_data['ANG'][idx]*1e7, B_std[idx]/B_data['ANG'][idx]*1e7, linestyle = 'None', marker = '.', markersize=5)
-            ax[x,y].set_xscale('log')
-        ax[x,y].text(0.03, 0.95, 'zbin %d-%d'%(bin1+1,bin2+1), horizontalalignment='left', verticalalignment='top', transform = ax[x,y].transAxes)
+        ax[x,y].text(0.03, 0.96, 'zbin %d-%d'%(bin1+1,bin2+1), horizontalalignment='left', verticalalignment='top', transform = ax[x,y].transAxes)
         ax[x,y].axhline(y=0, color='black', linestyle= 'dashed')
         chi2 = np.dot(B_data['VALUE'][idx],np.dot(np.linalg.inv(B_cov[idx,:][:,idx]),B_data['VALUE'][idx]))
         p = stats.chi2.sf(chi2, n_data_per_bin)
-        ax[x,y].text(0.95, 0.95, 'p = %.3f'%p, horizontalalignment='right', verticalalignment='top', transform = ax[x,y].transAxes)
+        ax[x,y].text(0.03, 0.04, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
         bincount+=1
 # ax[0,0].set_xticks((5,10,15,20))
 # ax[0,0].set_ylim((-6,12))
 # ax[0,0].set_ylim((-20,20))
 # ax[0,0].set_yticks((0,20))
+if statistic == 'bandpowers':
+    ax[0,0].set_xscale('log')
 fig.supylabel(ylabel)
 fig.supxlabel(xlabel)
 plt.text(0.07, 0.9, 'Bmodes ' + statistic, fontsize=14, transform=plt.gcf().transFigure, color='red')
 chi2 = np.dot(B_data['VALUE'],np.dot(np.linalg.inv(B_cov),B_data['VALUE']))
 p = stats.chi2.sf(chi2, n_data)
 
-plt.text(0.90, 0.9, 'p = %.3e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
+plt.text(0.90, 0.9, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
 plt.savefig(output_dir+'/bmodes.pdf')
 plt.close()
 
