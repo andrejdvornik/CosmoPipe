@@ -65,7 +65,10 @@ for bin1 in range(ntomo):
         ax[x,y].axhline(y=0, color='black', linestyle= 'dashed')
         chi2 = np.dot(B_data['VALUE'][idx],np.dot(np.linalg.inv(B_cov[idx,:][:,idx]),B_data['VALUE'][idx]))
         p = stats.chi2.sf(chi2, n_data_per_bin)
-        ax[x,y].text(0.03, 0.04, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
+        if p > 1e-2:
+            ax[x,y].text(0.03, 0.04, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
+        else:
+            ax[x,y].text(0.03, 0.04, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
         bincount+=1
 # ax[0,0].set_xticks((5,10,15,20))
 # ax[0,0].set_ylim((-6,12))
