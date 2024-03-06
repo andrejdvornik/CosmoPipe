@@ -129,6 +129,8 @@ m_corr_b=np.ones(m_corr_e.shape)
 
 m_corr_arr = np.concatenate((m_corr_e,m_corr_b))
 
+m_corr_arr_all = np.concatenate((m_corr_e,m_corr_e))
+
 # This is were the raw 2pt data is saved 
 print(args.DataFiles)
 input_files = []
@@ -151,6 +153,7 @@ if statistic == 'cosebis':
             fileNameInput=BnDataFiles[match][0]
             input_files.append(fileNameInput)
     datavector_no_m_bias, datavector_with_m_bias  = make_2pt_vector(input_files,m_corr_arr)
+    datavector_no_m_bias_all, datavector_with_m_bias_all  = make_2pt_vector(input_files,m_corr_arr_all)
 
 elif statistic == 'bandpowers':
     matches_bandpowers = np.array([ "CEE_" in i for i in args.DataFiles])
@@ -171,6 +174,7 @@ elif statistic == 'bandpowers':
             fileNameInput=CBBDataFiles[match][0]
             input_files.append(fileNameInput)
     datavector_no_m_bias, datavector_with_m_bias  = make_2pt_vector(input_files,m_corr_arr)
+    datavector_no_m_bias_all, datavector_with_m_bias_all  = make_2pt_vector(input_files,m_corr_arr_all)
 
 elif statistic == 'xipm':
     matches_xipm = np.array([ "xipm_binned_" in i for i in args.DataFiles])
@@ -186,5 +190,10 @@ else:
     raise Exception('Unknown statistic!')
 
 # Save output files
-np.savetxt(args.outputFile+'.txt',datavector_with_m_bias)
-np.savetxt(args.outputFile+'_no_m_bias.txt',datavector_no_m_bias)
+if statistic == 'xipm':
+    np.savetxt(args.outputFile+'.txt',datavector_with_m_bias)
+    np.savetxt(args.outputFile+'_no_m_bias.txt',datavector_no_m_bias)
+else:
+    np.savetxt(args.outputFile+'_m_E_only.txt',datavector_with_m_bias)
+    np.savetxt(args.outputFile+'.txt',datavector_with_m_bias_all)
+    np.savetxt(args.outputFile+'_no_m_bias.txt',datavector_no_m_bias)
