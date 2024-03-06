@@ -12,16 +12,45 @@
 inref="@DB:som_weight_reference@"
 incal="@DB:som_weight_training@"
 mainlist_all="@DB:som_weight_refr_cats@"
+mainlist_all_cal="@DB:som_weight_calib_cats@"
 nref=`echo ${inref} | awk '{print NF}'`
 ncal=`echo ${incal} | awk '{print NF}'`
 nrefout=`echo ${mainlist_all} | awk '{print NF}'`
 outlist=""
 
+#Reorder the reference, calibration, and mainlist lists to be in tomographic ordering {{{
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
+inref_ord=''
+incal_ord=''
+inmain_ord=''
+inmain_ord_cal=''
+for i in `seq -w $NTOMO`
+do
+  #Define the Z_B limits from the TOMOLIMS {{{
+  ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $n}'`
+  ZB_hi=`echo @BV:TOMOLIMS@ | awk -v n=$i '{print $(n+1)}'`
+  #}}}
+  #Define the tomographic bin string {{{
+  ZB_lo_str=`echo $ZB_lo | sed 's/\./p/g'`
+  ZB_hi_str=`echo $ZB_hi | sed 's/\./p/g'`
+  appendstr="_ZB${ZB_lo_str}t${ZB_hi_str}"
+  #Select the files that have this string 
+  tomo_ref_files=`echo ${inref} | sed 's/ /\n/g' | grep ${appendstr} | awk '{printf $0 " "}' || echo `
+  tomo_train_files=`echo ${incal} | sed 's/ /\n/g' | grep ${appendstr} | awk '{printf $0 " "}' || echo `
+  tomo_main_files=`echo ${mainlist_all} | sed 's/ /\n/g' | grep ${appendstr} | awk '{printf $0 " "}' || echo `
+  tomo_main_files_cal=`echo ${mainlist_all_cal} | sed 's/ /\n/g' | grep ${appendstr} | awk '{printf $0 " "}' || echo `
+  #append these lists to the new file lists 
+  inref_ord="${inref_ord} ${tomo_ref_files}"
+  incal_ord="${incal_ord} ${tomo_train_files}"
+  inmain_ord="${inmain_ord} ${tomo_main_files}"
+  inmain_ord_cal="${inmain_ord_cal} ${tomo_main_files_cal}"
+done 
+
 #Check if we replicated the reference catalogues, or used them as is {{{
 if [ ${nref} -eq ${nrefout} ]
 then 
   inputlist=""
-  for input in @DB:som_weight_reference@ 
+  for input in ${inref_ord} 
   do
     #Remove the extension 
     ext=${input##*.}
@@ -39,7 +68,7 @@ then
     done 
     if [ $nbase -gt 1 ]
     then 
-      _message "@RED - ERROR\nSomething wrong in the creation of the input reference filelist@DEF@\n"
+      _message "@RED@ - ERROR\nSomething wrong in the creation of the input reference filelist@DEF@\n"
       exit 1 
     elif [ ${nbase} -eq 0 ]
     then 
@@ -48,7 +77,7 @@ then
   done 
 else
   #We used the SOM_DIR internal replication: base list is the raw reference list
-  inputlist="@DB:som_weight_reference@"
+  inputlist="${inref_ord}"
 fi 
 #}}}
 
@@ -62,6 +91,8 @@ done
 
 #Save the reference input list, it is needed for the calibration catalogues (which inherit the reference name)
 ref_inputlist="${inputlist}"
+#Use the reference catalogue main list for the first section
+mainlist_all="${inmain_ord}" 
 
 #Loop over inputlist files 
 for input in ${ref_inputlist}
@@ -388,9 +419,8 @@ fi
 
 #Construct and merge the gold weights for the calibration sample catalogues {{{
 #For each catalogue in the output folder of compute_nz_weights {{{
-incal="@DB:som_weight_training@"
-mainlist_all="@DB:som_weight_calib_cats@"
-ncal=`echo ${incal} | awk '{print NF}'`
+mainlist_all="${inmain_ord_cal}"
+ncal=`echo ${incal_ord} | awk '{print NF}'`
 ncalout=`echo ${mainlist_all} | awk '{print NF}'`
 outlist=""
 
@@ -398,7 +428,7 @@ outlist=""
 if [ ${ncal} -eq ${ncalout} ]
 then 
   inputlist=""
-  for input in @DB:som_weight_training@ 
+  for input in ${incal_ord}
   do
     #Remove the extension 
     ext=${input##*.}
@@ -425,7 +455,7 @@ then
   done 
 else
   #We used the SOM_DIR internal replication: base list is the raw calibration list
-  inputlist="@DB:som_weight_training@"
+  inputlist="${incal_ord}"
 fi 
 #}}}
 
