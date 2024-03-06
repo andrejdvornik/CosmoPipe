@@ -77,8 +77,10 @@ if ntomo !=1:
     plt.text(0.07, 0.9, 'Bmodes ' + statistic, fontsize=14, transform=plt.gcf().transFigure, color='red')
     chi2 = np.dot(B_data['VALUE'],np.dot(np.linalg.inv(B_cov),B_data['VALUE']))
     p = stats.chi2.sf(chi2, n_data)
-
-    plt.text(0.90, 0.9, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
+    if p > 1e-2:
+        plt.text(0.90, 0.9, 'p = %.2f'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
+    else:
+        plt.text(0.90, 0.9, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
     plt.savefig(output_dir+'/bmodes_%.2f-%.2f.pdf'%(thetamin,thetamax))
     plt.close()
 
@@ -95,6 +97,7 @@ if ntomo !=1:
             for bin2 in range(bin1,ntomo):
                 x = bincount//7
                 y = bincount%7
+                idx = np.where((B_data['BIN1']==bin1+1) & (B_data['BIN2']==bin2+1) & (B_data['ANGBIN']<=5))[0]
                 ax[x,y].errorbar(B_data['ANG'][idx], B_data['VALUE'][idx]*1e10, B_std[idx]*1e10, linestyle = 'None', marker = '.', markersize=5)
                 ax[x,y].text(0.03, 0.96, 'zbin %d-%d'%(bin1+1,bin2+1), horizontalalignment='left', verticalalignment='top', transform = ax[x,y].transAxes)
                 ax[x,y].axhline(y=0, color='black', linestyle= 'dashed')
@@ -111,8 +114,10 @@ if ntomo !=1:
         idx = np.where(B_data['ANGBIN']<=5)[0]
         chi2 = np.dot(B_data['VALUE'][idx],np.dot(np.linalg.inv(B_cov[idx,:][:,idx]),B_data['VALUE'][idx]))
         p = stats.chi2.sf(chi2, n_data)
-
-        plt.text(0.90, 0.9, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
+        if p > 1e-2:
+            plt.text(0.90, 0.9, 'p = %.2f'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
+        else:
+            plt.text(0.90, 0.9, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
         plt.savefig(output_dir+'/bmodes_%.2f-%.2f_nmax5.pdf'%(thetamin,thetamax))
         plt.close()
 else:
@@ -145,8 +150,10 @@ else:
     plt.text(0.07, 0.9, 'Bmodes ' + statistic, fontsize=14, transform=plt.gcf().transFigure, color='red')
     chi2 = np.dot(B_data['VALUE'],np.dot(np.linalg.inv(B_cov),B_data['VALUE']))
     p = stats.chi2.sf(chi2, n_data)
-
-    plt.text(0.90, 0.9, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
+    if p > 1e-2:
+        plt.text(0.90, 0.9, 'p = %.2f'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
+    else:
+        plt.text(0.90, 0.9, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
     plt.savefig(output_dir+'/bmodes_%.2f-%.2f.pdf'%(thetamin,thetamax))
     plt.close()
 
@@ -179,8 +186,10 @@ else:
         idx = np.where(B_data['ANGBIN']<=5)[0]
         chi2 = np.dot(B_data['VALUE'][idx],np.dot(np.linalg.inv(B_cov[idx,:][:,idx]),B_data['VALUE'][idx]))
         p = stats.chi2.sf(chi2, n_data)
-
-        plt.text(0.90, 0.9, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
+        if p > 1e-2:
+            plt.text(0.90, 0.9, 'p = %.2f'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
+        else:
+            plt.text(0.90, 0.9, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
         plt.savefig(output_dir+'/bmodes_%.2f-%.2f_nmax5.pdf'%(thetamin,thetamax))
         plt.close()
 
