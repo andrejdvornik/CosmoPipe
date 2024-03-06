@@ -116,6 +116,7 @@ then
   S8=${cosmological_parameters__s_8_input}
   logT_AGN=${halo_model_parameters__log_t_agn}
   nlparam="HMCode_logT_AGN = $logT_AGN"
+  nlparam2=""
   filename_extension=${CHAINSUFFIX}_iteration_${ITERATION}
   nzfile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/biased_nz/nz${CHAINSUFFIX}_iteration_${previous}.fits
 else
@@ -127,6 +128,7 @@ else
   S8=`central_value "@BV:PRIOR_S8INPUT@"`
   filename_extension=""
   nzfile=@DB:cosmosis_nz@
+  nlparam2=""
   if [ "${non_linear_model}" == "mead2020_feedback" ]
   then
     logT_AGN=`central_value "@BV:PRIOR_LOGTAGN@"`
@@ -136,7 +138,8 @@ else
     Abary=`central_value "@BV:PRIOR_ABARY@"`
     # a_0 and a_1 are hardcoded in the cosmosis constructor as well...
     eta=`echo "$Abary 0.98 -0.12" | awk '{printf "%f", $2 + $3 * $1}'`
-    nlparam=$'HMCode_A_baryon = $Abary\nHMCode_eta_baryon = $eta'
+    nlparam="HMCode_A_baryon = $Abary"
+    nlparam2="HMCode_eta_baryon = $eta"
   fi
 fi
 w0=`central_value "@BV:PRIOR_W@"`
@@ -420,10 +423,11 @@ small_k_damping_for1h = damped
 
 [powspec evaluation]
 non_linear_model = ${non_linear_model}
-${nlparam}
 log10k_bins = 400
 log10k_min = -3.49
 log10k_max = 2.15
+${nlparam}
+${nlparam2}
 
 [trispec evaluation]
 log10k_bins = 70
