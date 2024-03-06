@@ -40,6 +40,8 @@ NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
   --inputfile ${inputfile} \
   --statistic @BV:STATISTIC@ \
   --ntomo ${NTOMO} \
+  --thetamin @BV:THETAMINXI@ \
+  --thetamax @BV:THETAMAXXI@ \
   --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
 
 

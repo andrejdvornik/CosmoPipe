@@ -8,11 +8,15 @@ from matplotlib.patches import Rectangle
 
 parser = ArgumentParser(description='Calculate bmodes')
 parser.add_argument("--inputfile", dest="inputfile",
-    help="Input file", metavar="file_red",required=True)
+    help="Input file", required=True)
 parser.add_argument("--statistic", dest="statistic",
-    help="Statistic", metavar="file_blue",required=True)
+    help="Statistic", required=True)
 parser.add_argument("--ntomo", dest="ntomo", type=int,
     help="Number of tomographic bins", metavar="output",required=True)
+parser.add_argument("--thetamin", dest="thetamin", type=float,
+    help="Minimum theta", metavar="output",required=True)
+parser.add_argument("--thetamax", dest="thetamax", type=float,
+    help="Maximum theta", metavar="output",required=True)    
 parser.add_argument("--output_dir", dest="output_dir",
     help="Output directory", metavar="output",required=True)
 
@@ -20,6 +24,8 @@ args = parser.parse_args()
 inputfile = args.inputfile
 statistic = args.statistic
 ntomo = args.ntomo
+thetamin = args.thetamin
+thetamax = args.thetamax
 output_dir = args.output_dir
 
 if statistic == 'cosebis':
@@ -74,7 +80,7 @@ chi2 = np.dot(B_data['VALUE'],np.dot(np.linalg.inv(B_cov),B_data['VALUE']))
 p = stats.chi2.sf(chi2, n_data)
 
 plt.text(0.90, 0.9, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
-plt.savefig(output_dir+'/bmodes.pdf')
+plt.savefig(output_dir+'/bmodes_%.2f-%.2f.pdf'%(thetamin,thetamax))
 plt.close()
 
 
