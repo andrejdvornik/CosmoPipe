@@ -170,12 +170,6 @@ else
 fi
 # COSEBIs basis function path
 COSEBISLOC=@RUNROOT@/@CONFIGPATH@/cosebis/
-mbiaslist=""
-for file in @DB:cosmosis_mbias@
-do 
-  mbiaslist="${mbiaslist} `cat ${file}`"
-done 
-mbiaslist=`echo ${mbiaslist} | sed 's/ /,/g'`
 msigmalist=""
 for file in @DB:cosmosis_msigma@
 do 
