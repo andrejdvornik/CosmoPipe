@@ -3,7 +3,7 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Fri Feb 23 10:54:22 2024
+# Last Modified : Sun 03 Mar 2024 05:07:25 PM CET
 #
 #=========================================
 #Script to generate a cosmosis .ini, values, & priors file 
@@ -522,10 +522,10 @@ then
 
 	cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini <<- EOF
 	[list]
-	filename = %(OUTPUT_FOLDER)s/output_${list_input}_%(blind)s.txt 
+	filename = %(OUTPUT_FOLDER)s/output_${list_input}_%(blind)s${CHAINSUFFIX}.txt 
 	
 	EOF
-  OUTPUTNAME="%(OUTPUT_FOLDER)s/output_list_${list_input}_%(blind)s.txt"
+  OUTPUTNAME="%(OUTPUT_FOLDER)s/output_list_${list_input}_%(blind)s${CHAINSUFFIX}.txt"
 
 #}}}
 elif [ "${SAMPLER^^}" == "EMCEE" ] #{{{
