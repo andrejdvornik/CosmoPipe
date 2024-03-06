@@ -114,9 +114,18 @@ then
   omega_c=${cosmological_parameters__omch2} 
   ns=${cosmological_parameters__n_s}
   S8=${cosmological_parameters__s_8_input}
-  logT_AGN=${halo_model_parameters__log_t_agn}
-  nlparam="HMCode_logT_AGN = $logT_AGN"
-  nlparam2=""
+  if [ "${non_linear_model}" == "mead2020_feedback" ]
+  then
+    logT_AGN=${halo_model_parameters__log_t_agn}
+    nlparam="HMCode_logT_AGN = $logT_AGN"
+    nlparam2=""
+  elif [ "${non_linear_model}" == "mead2015" ]
+  then
+    Abary=${halo_model_parameters__a}
+    eta=`echo "$Abary 0.98 -0.12" | awk '{printf "%f", $2 + $3 * $1}'`
+    nlparam="HMCode_A_baryon = $Abary"
+    nlparam2="HMCode_eta_baryon = $eta"
+  fi
   filename_extension=${CHAINSUFFIX}_iteration_${ITERATION}
   nzfile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/biased_nz/nz${CHAINSUFFIX}_iteration_${previous}.fits
 else
