@@ -19,6 +19,8 @@ parser.add_argument("--thetamax", dest="thetamax", type=float,
     help="Maximum theta", metavar="output",required=True)    
 parser.add_argument("--output_dir", dest="output_dir",
     help="Output directory", metavar="output",required=True)
+parser.add_argument("--title", dest="title",
+    help="Plot title", metavar="title",required=True)
 
 args = parser.parse_args()
 inputfile = args.inputfile
@@ -27,6 +29,7 @@ ntomo = args.ntomo
 thetamin = args.thetamin
 thetamax = args.thetamax
 output_dir = args.output_dir
+title = args.title
 
 if statistic == 'cosebis':
     extension = 'Bn'
@@ -74,7 +77,7 @@ if ntomo !=1:
         ax[0,0].set_xscale('log')
     fig.supylabel(ylabel)
     fig.supxlabel(xlabel)
-    plt.text(0.07, 0.9, 'Bmodes ' + statistic, fontsize=14, transform=plt.gcf().transFigure, color='red')
+    plt.text(0.07, 0.9, r'%s %s, $\theta=[%.2f,%.2f]$'%(title,statistic,thetamin,thetamax) , fontsize=14, transform=plt.gcf().transFigure, color='red')
     chi2 = np.dot(B_data['VALUE'],np.dot(np.linalg.inv(B_cov),B_data['VALUE']))
     p = stats.chi2.sf(chi2, n_data)
     if p > 1e-2:
@@ -110,7 +113,7 @@ if ntomo !=1:
                 bincount+=1
         fig.supylabel(ylabel)
         fig.supxlabel(xlabel)
-        plt.text(0.07, 0.9, 'Bmodes ' + statistic, fontsize=14, transform=plt.gcf().transFigure, color='red')
+        plt.text(0.07, 0.9, r'%s %s, $\theta=[%.2f,%.2f]$'%(title,statistic,thetamin,thetamax), fontsize=14, transform=plt.gcf().transFigure, color='red')
         idx = np.where(B_data['ANGBIN']<=5)[0]
         chi2 = np.dot(B_data['VALUE'][idx],np.dot(np.linalg.inv(B_cov[idx,:][:,idx]),B_data['VALUE'][idx]))
         p = stats.chi2.sf(chi2, n_data)
@@ -136,13 +139,13 @@ else:
         ax.set_xscale('log')
     fig.supylabel(ylabel)
     fig.supxlabel(xlabel)
-    plt.text(0.07, 0.9, 'Bmodes ' + statistic, fontsize=14, transform=plt.gcf().transFigure, color='red')
+    plt.text(0.07, 0.9, r'%s %s, $\theta=[%.2f,%.2f]$'%(title,statistic,thetamin,thetamax), fontsize=14, transform=plt.gcf().transFigure, color='red')
     chi2 = np.dot(B_data['VALUE'],np.dot(np.linalg.inv(B_cov),B_data['VALUE']))
     p = stats.chi2.sf(chi2, n_data)
     if p > 1e-2:
-        plt.text(0.90, 0.9, 'p = %.2f'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
+        ax.text(0.16, 0.12, 'p = %.2f'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='left')
     else:
-        plt.text(0.90, 0.9, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
+        ax.text(0.16, 0.12, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='left')
     plt.savefig(output_dir+'/bmodes_%.2f-%.2f.pdf'%(thetamin,thetamax))
     plt.close()
 
@@ -161,14 +164,14 @@ else:
                 ax.axhline(y=0, color='black', linestyle= 'dashed')
         fig.supylabel(ylabel)
         fig.supxlabel(xlabel)
-        plt.text(0.07, 0.9, 'Bmodes ' + statistic, fontsize=14, transform=plt.gcf().transFigure, color='red')
+        plt.text(0.07, 0.9, r'%s %s, $\theta=[%.2f,%.2f]$'%(title,statistic,thetamin,thetamax), fontsize=14, transform=plt.gcf().transFigure, color='red')
         idx = np.where(B_data['ANGBIN']<=5)[0]
         chi2 = np.dot(B_data['VALUE'][idx],np.dot(np.linalg.inv(B_cov[idx,:][:,idx]),B_data['VALUE'][idx]))
         p = stats.chi2.sf(chi2, n_data)
         if p > 1e-2:
-            plt.text(0.90, 0.9, 'p = %.2f'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
+            ax.text(0.16, 0.12, 'p = %.2f'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='left')
         else:
-            plt.text(0.90, 0.9, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
+            ax.text(0.16, 0.12, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='left')
         plt.savefig(output_dir+'/bmodes_%.2f-%.2f_nmax5.pdf'%(thetamin,thetamax))
         plt.close()
 
