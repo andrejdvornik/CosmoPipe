@@ -258,8 +258,8 @@ if mode == 'cosebis':
     for n in range(1,nModes+1):
         #define Tplus and Tminus file names for this mode
 
-        TplusFileName= tfoldername+'/'+tplusfile+'_n'+str(n)+'_'+thetaRange
-        TminusFileName= tfoldername+'/'+tminusfile+'_n'+str(n)+'_'+thetaRange
+        TplusFileName= tfoldername+'/'+tplusfile+'_n'+str(n)+'_'+thetaRange+'.table'
+        TminusFileName= tfoldername+'/'+tminusfile+'_n'+str(n)+'_'+thetaRange+'.table'
 
         if(os.path.isfile(TplusFileName)):
             file = open(TplusFileName)
