@@ -64,6 +64,8 @@ if __name__ == '__main__':
              help='Name of the Dec column in the second catalogue')
     parser.add_argument('--nthreads', dest="num_threads", type=int,default=None,
              help='Number of desired parallel threads. If None (default) then uses all available')
+    parser.add_argument('--bin_slop', dest="bin_slop", type=float,required=True, 
+             help='bin_slop value')
     
     args = parser.parse_args()
     
@@ -86,6 +88,7 @@ if __name__ == '__main__':
     cat2raname = args.cat2raname
     cat2decname = args.cat2decname
     num_threads = args.num_threads
+    inbinslop = args.bin_slop
 
     print("Using the following parameters:") 
     print(f"nbins = {args.nbins}")
@@ -107,6 +110,7 @@ if __name__ == '__main__':
     print(f"cat2raname = {args.cat2raname}")
     print(f"cat2decname = {args.cat2decname}")
     print(f"num_threads = {args.num_threads}")
+    print(f"bin_slop = {args.bin_slop}")
 
     #Convert weighted to logical 
     weighted=weighted.lower() in ["true","t","1","y","yes"]
@@ -123,13 +127,13 @@ if __name__ == '__main__':
                                       g1_col=cat1e1name, g2_col=cat1e2name, w_col=cat1wname)
     cat2 = treecorr.Catalog(fitscat2, ra_col=cat2raname, dec_col=cat2decname, ra_units='deg', dec_units='deg', \
                                       g1_col=cat2e1name, g2_col=cat2e2name, w_col=cat2wname)
-
-    if nbins > 100: ## Fine-binning
-        inbinslop = 1.5
-        print(f"binslop = {inbinslop} (because of fine binning)")
-    else: ## Broad bins
-        inbinslop = 0.08
-        print(f"binslop = {inbinslop} (because of coarse binning)")
+    # This check is implemented in calc_xi_with_treecorr
+    # if nbins > 100: ## Fine-binning
+    #     inbinslop = 1.5
+    #     print(f"binslop = {inbinslop} (because of fine binning)")
+    # else: ## Broad bins
+    #     inbinslop = 0.08
+    #     print(f"binslop = {inbinslop} (because of coarse binning)")
 
     # Define the binning based on command line input
     if(binning=='lin'): 
