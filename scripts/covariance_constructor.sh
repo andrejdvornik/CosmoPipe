@@ -28,18 +28,66 @@ STATISTIC="@BV:STATISTIC@"
 SECONDSTATISTIC="@BV:SECONDSTATISTIC@"
 if [ "${STATISTIC^^}" == "XIPM" ]
 then
-est_shear=xi_pm
+  est_shear=xi_pm
+  n_arb=@BV:NXIPM@
+  arb_fourier_filter_mmE_file_@BV:STATISTIC@="fourier_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+  arb_fourier_filter_mmB_file_@BV:STATISTIC@="fourier_weight_realspace_cf_mm_m_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+  arb_real_filter_mm_p_file_@BV:STATISTIC@="real_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+  arb_real_filter_mm_m_file_@BV:STATISTIC@="real_weight_realspace_cf_mm_m_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
 elif [ "${STATISTIC^^}" == "COSEBIS" ]
 then
-est_shear=cosebi
+  est_shear=cosebi
+  n_arb=@BV:NMAXCOSEBIS@
+  arb_fourier_filter_mmE_file_@BV:STATISTIC@="WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+  arb_fourier_filter_mmB_file_@BV:STATISTIC@="WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+  arb_real_filter_mm_p_file_@BV:STATISTIC@="Tplus_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+  arb_real_filter_mm_m_file_@BV:STATISTIC@="Tminus_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+elif [ "${STATISTIC^^}" == "COSEBIS_DIMLESS" ]
+then
+  est_shear=cosebi
+  n_arb=@BV:NMAXCOSEBIS@
+  arb_fourier_filter_mmE_file_@BV:STATISTIC@="dimensionless_Wn_@BV:THETAMINXI@_to_@BV:THETAMAXXI@_?.table"
+  arb_fourier_filter_mmB_file_@BV:STATISTIC@="dimensionless_Wn_@BV:THETAMINXI@_to_@BV:THETAMAXXI@_?.table"
+  arb_real_filter_mm_p_file_@BV:STATISTIC@="dimensionless_Tp_@BV:THETAMINXI@_to_@BV:THETAMAXXI@_?.table"
+  arb_real_filter_mm_m_file_@BV:STATISTIC@="dimensionless_Tm_@BV:THETAMINXI@_to_@BV:THETAMAXXI@_?.table"
 elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
 then
-est_shear=bandpowers
+  est_shear=bandpowers
+  n_arb=@BV:NBANDPOWERS@
+  theta_lo=`echo 'e(l(@BV:THETAMINXI@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+  theta_up=`echo 'e(l(@BV:THETAMAXXI@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+  t_lo=`printf "%.2f" $theta_lo`
+  t_up=`printf "%.2f" $theta_up`
+  arb_fourier_filter_mmE_file_@BV:STATISTIC@="fourier_weight_bandpowers_mmE_${t_lo}-${t_up}_?.table"
+  arb_fourier_filter_mmB_file_@BV:STATISTIC@="fourier_weight_bandpowers_mmB_${t_lo}-${t_up}_?.table"
+  arb_real_filter_mm_p_file_@BV:STATISTIC@="real_weight_bandpowers_mmE_${t_lo}-${t_up}_?.table"
+  arb_real_filter_mm_m_file_@BV:STATISTIC@="real_weight_bandpowers_mmB_${t_lo}-${t_up}_?.table"
 else 
   #ERROR: Unknown statistic {{{
   _message "Unknown statistic: ${STATISTIC^^}\n"
   exit 1
   #}}}
+fi
+# Check if the arbitrary input files exist
+use_arbitrary=True
+for i in $(seq -f "%02g" 1 $n_arb)
+do
+  file=`echo ${arb_fourier_filter_mmE_file_@BV:STATISTIC@} | sed "s/?/${i}/g"`
+  file2=`echo ${arb_fourier_filter_mmB_file_@BV:STATISTIC@} | sed "s/?/${i}/g"`
+  file3=`echo ${arb_real_filter_mm_p_file_@BV:STATISTIC@} | sed "s/?/${i}/g"`
+  file4=`echo ${arb_real_filter_mm_m_file_@BV:STATISTIC@} | sed "s/?/${i}/g"`
+  arb_base=@RUNROOT@/@CONFIGPATH@/covariance_arb_summary/
+  if [ ! -f $arb_base${file} ] || [ ! -f $arb_base${file2} ] || [ ! -f $arb_base${file3} ] || [ ! -f $arb_base${file4} ]
+  then
+    use_arbitrary=False
+    _message "$arb_base${file}\n"
+    _message "One or more arbitrary input files do not exist. Calculating filters on the fly!\n"
+    break
+  fi
+done
+if [ "${use_arbitrary}" == "True" ]
+then
+  _message "Using arbitrary input files!\n"
 fi
 mix_term=@BV:MIXTERM@
 if [ "${mix_term^^}" == "TRUE" ]
@@ -288,7 +336,7 @@ integration_intervals = 50
 EOF
 fi
 
-if [ "${STATISTIC^^}" == "COSEBIS" ]  || [ "${SECONDSTATISTIC^^}" == "COSEBIS" ]
+if [ "${STATISTIC^^}" == "COSEBIS" ]  || [ "${SECONDSTATISTIC^^}" == "COSEBIS" ] || [ "${STATISTIC^^}" == "COSEBIS_DIMLESS" ]
 then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covCOSEBI settings]
@@ -303,8 +351,6 @@ fi
 
 if [ "${STATISTIC^^}" == "BANDPOWERS" ]  || [ "${SECONDSTATISTIC^^}" == "BANDPOWERS" ]
 then
-theta_lo=`echo 'e(l(@BV:THETAMINXI@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-theta_up=`echo 'e(l(@BV:THETAMAXXI@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covbandpowers settings]
 apodisation_log_width = @BV:APODISATIONWIDTH@
@@ -493,6 +539,22 @@ arbitrary_accuracy = 1e-5
 
 EOF
 
+fi
+if [ "${use_arbitrary}" == "True" ]
+then
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+arb_summary_directory = @RUNROOT@/@CONFIGPATH@/covariance_arb_summary/
+arb_fourier_filter_mmE_file = ${arb_fourier_filter_mmE_file_@BV:STATISTIC@}
+arb_fourier_filter_mmB_file = ${arb_fourier_filter_mmB_file_@BV:STATISTIC@}
+arb_real_filter_mm_p_file = ${arb_real_filter_mm_p_file_@BV:STATISTIC@}
+arb_real_filter_mm_m_file = ${arb_real_filter_mm_m_file_@BV:STATISTIC@}
+
+[arbitrary_summary]
+do_arbitrary_obs = True
+oscillations_straddle = 50
+arbitrary_accuracy = 1e-5
+
+EOF
 fi
 #}}}
 
