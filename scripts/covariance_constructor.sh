@@ -80,7 +80,6 @@ do
   if [ ! -f $arb_base${file} ] || [ ! -f $arb_base${file2} ] || [ ! -f $arb_base${file3} ] || [ ! -f $arb_base${file4} ]
   then
     use_arbitrary=False
-    _message "$arb_base${file}\n"
     _message "One or more arbitrary input files do not exist. Calculating filters on the fly!\n"
     break
   fi
