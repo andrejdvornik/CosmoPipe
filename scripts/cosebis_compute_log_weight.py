@@ -23,10 +23,13 @@ parser.add_argument(
 parser.add_argument(
     "--outputbase", type=str,required=True,
     help="base path for output of weights/roots/normalisations")
+parser.add_argument(
+    "--dimless", type=bool,required=False, default=False,
+    help="Flag for dimensionless cosebis")
 
 ## arg parser
 args = parser.parse_args()
-
+dimless = args.dimless
 mp.dps = 160
 
 #define constants
@@ -34,6 +37,9 @@ Nmax = args.nmax
 tmin = float(args.thetamin)
 tmax = float(args.thetamax)
 zmax = mp.log(tmax/tmin)
+
+tbar = (tmax + tmin)/2
+BB = (tmax - tmin)/(tmax + tmin)
 
 file_name_prefix = 'tmin'+args.thetamin+'_tmax'+args.thetamax+'_Nmax'+str(Nmax)
 
@@ -81,10 +87,16 @@ for nn in np.arange(2,Nmax+1):
         #doing a matrix multiplication (seems the easiest this way in mpmath)
         for j in range(0,nn+1):           
             for i in range(0,m+2): 
-                aa[m-1,j] += J(1,i+j,zmax)*coeff_j[m,i] 
+                if dimless:
+                    aa[m-1,j] += J(2,i+j,zmax)*coeff_j[m,i] 
+                else:
+                    aa[m-1,j] += J(1,i+j,zmax)*coeff_j[m,i] 
             
         for i in range(0,m+2): 
-            bb[int(m-1)] -= J(1,i+nn+1,zmax)*coeff_j[m,i]
+            if dimless:
+                bb[int(m-1)] -= J(2,i+nn+1,zmax)*coeff_j[m,i]
+            else:    
+                bb[int(m-1)] -= J(1,i+nn+1,zmax)*coeff_j[m,i]
 
     #adding equations (33)
     for j in range(nn+1):
@@ -106,11 +118,18 @@ for nn in np.arange(1,Nmax+1):
     temp_sum = mp.mpf(0)
     for i in range(nn+2):
         for j in range(nn+2):
-            temp_sum += coeff_j[nn-1,i]*coeff_j[nn-1,j]*J(1,i+j,zmax)
-
-    temp_Nn = (mp.expm1(zmax))/(temp_sum)
-    #N_n chosen to be > 0.  
-    temp_Nn = mp.sqrt(mp.fabs(temp_Nn))
+            if dimless:
+                temp_sum += coeff_j[nn-1,i]*coeff_j[nn-1,j]*J(2,i+j,zmax)
+            else:
+                temp_sum += coeff_j[nn-1,i]*coeff_j[nn-1,j]*J(1,i+j,zmax)
+    if dimless:
+        temp_Nn = 1/(temp_sum)
+        #N_n chosen to be > 0.  
+        temp_Nn = mp.sqrt(mp.fabs(temp_Nn)) * mp.sqrt(tbar**2 * BB / (tmin**2))
+    else:
+        temp_Nn = (mp.expm1(zmax))/(temp_sum)
+        #N_n chosen to be > 0.  
+        temp_Nn = mp.sqrt(mp.fabs(temp_Nn))
     Nn.append(temp_Nn)
 
 np.save(args.outputbase+file_name_prefix+'_normalisations_tlog',Nn)

@@ -294,6 +294,7 @@ def saveFitsXipm(datavec,covariance, outputFilename):
     )
     return
 
+
 ###############################################################################
 ## Checks and plots
 
@@ -493,7 +494,7 @@ def unitaryTest(name1, name2):
 parser = ArgumentParser(description='Construct a cosmosis mcmc input file')
 parser.add_argument("--datavector", dest="DataVector",nargs=2,
     help="Full Input file names", metavar="DataVector",required=True)
-parser.add_argument("-s", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis', 'bandpowers','xipm'],
+parser.add_argument("-s", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis','cosebis_dimless','bandpowers','xipm','xiEB'],
     help="2pt statistic, must be either cosebis, bandpowers, or xipm")
 parser.add_argument("--nz", dest="NzList",nargs='+',type=str,
     help="list of Nz per tomographic bin",required=True)
@@ -528,6 +529,9 @@ args = parser.parse_args()
 statistic = args.statistic
 plotdir = args.plotdir
 outputfile=args.outputFile
+
+if statistic == 'cosebis_dimless': 
+    statistic='cosebis'
 
 # Folder and file names for nofZ, for the sources it will depend on the blind
 
@@ -588,6 +592,10 @@ elif statistic == 'bandpowers':
 elif statistic =='xipm':
     saveFitsXipm(datavec=args.DataVector[0],covariance=args.covarianceFile[0],outputFilename=outputfile+'.fits')
     saveFitsXipm(datavec=args.DataVector[1],covariance=args.covarianceFile[0],outputFilename=outputfile+'_no_m_bias.fits')
+elif statistic =='xiEB':
+    saveFitsXipm(datavec=args.DataVector[0],covariance=args.covarianceFile[0],outputFilename=outputfile+'.fits')
+    saveFitsXipm(datavec=args.DataVector[1],covariance=args.covarianceFile[0],outputFilename=outputfile+'_no_m_bias.fits')
+
 else:
     raise Exception('Unknown statistic!')
 

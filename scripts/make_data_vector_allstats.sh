@@ -14,6 +14,10 @@ if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 then
   inputs="@DB:cosebis@"
 #}}}
+elif [ "${STATISTIC^^}" == "COSEBIS_DIMLESS" ] #{{{
+then
+  inputs="@DB:cosebis_dimless@"
+#}}}
 elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
 then 
   inputs="@DB:bandpowers@"
@@ -33,7 +37,6 @@ then
 fi
 #Input mbias files 
 mfiles="@DB:mbias@"
-
 for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
 do 
   #Remove the 'comb' if needed 

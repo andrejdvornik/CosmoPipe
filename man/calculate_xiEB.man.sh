@@ -49,7 +49,7 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo cosebis_vec covariance_cosebis
+  echo cosebis_dimless_vec covariance_cosebis_dimless
 } 
 #}}}
 
@@ -63,7 +63,7 @@ function _outputs {
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/calculate_xi_EB.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/calculate_xiEB.sh
 } 
 #}}}
 
