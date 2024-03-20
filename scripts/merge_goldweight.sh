@@ -3,7 +3,7 @@
 # File Name : merge_goldweight.sh
 # Created By : awright
 # Creation Date : 21-09-2023
-# Last Modified : Wed 07 Feb 2024 12:48:50 AM CET
+# Last Modified : Wed 20 Mar 2024 11:04:26 AM CET
 #
 #=========================================
 
@@ -469,16 +469,32 @@ done
 
 #Loop over inputlist files and construct output file names
 outlist=''
-for input in ${inputlist}
-do
-  #Construct the output name {{{
-  outname=${input##*/}
-  #Outname extension
-  outext=${outname##*.}
-  outname=${outname//.${outext}/_goldwt.${outext}}
-  outlist="${outlist} ${outname}"
-  #}}}
-done
+outname_type='target'
+if [ "${outname_type}" == "calib" ]
+  for input in ${inputlist}
+  do
+    #Construct the output name {{{
+    outname=${input##*/}
+    #Outname extension
+    outext=${outname##*.}
+    outname=${outname//.${outext}/_goldwt.${outext}}
+    outlist="${outlist} ${outname}"
+    #}}}
+  done 
+elif [ "${outname_type}" == "target" ]
+then 
+  for input in ${ref_inputlist} 
+  do
+    #Construct the output name {{{
+    outname=${input##*/}
+    #Outname extension 
+    outext=${outname##*.}
+    outname=${outname//.${outext}/_goldwt.${outext}}
+    #}}}
+  done 
+else 
+  _message "@RED - ERROR\nUnknown output file name type ${outname_type}. Must be 'target' or 'calib' @DEF@\n"
+fi 
  
 #Loop over inputlist files 
 count=0
