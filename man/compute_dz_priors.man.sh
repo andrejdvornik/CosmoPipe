@@ -57,7 +57,12 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo nzbias nzcov
+  _outlist=''
+  for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+  do 
+    _outlist="${_outlist} nzbias_${patch} nzcov_${patch}"
+  done 
+  echo ${_outlist}
 } 
 #}}}
 

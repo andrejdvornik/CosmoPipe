@@ -3,7 +3,7 @@
 # File Name : compute_m_bias.sh
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Wed 01 Nov 2023 01:51:50 PM CET
+# Last Modified : Wed 20 Mar 2024 10:43:55 AM CET
 #
 #=========================================
 
@@ -11,15 +11,22 @@
 calib_cats="@DB:som_weight_calib_gold@"
 refr_cats="@DB:som_weight_refr_gold@"
 
-#Construct the dz folders, if needed 
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzbias ]
-then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzbias
-fi 
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzcov ]
-then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzcov
-fi 
+for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+do 
+  nfile=`echo ${calib_cats} | grep -c "_${patch}_" || echo `
+  if [ ${nfile} -gt 0 ]
+  then 
+    #Construct the dz folders, if needed 
+    if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzbias_${patch} ]
+    then 
+      mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzbias_${patch}
+    fi 
+    if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzcov_${patch} ]
+    then 
+      mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzcov_${patch}
+    fi 
+  fi 
+done 
 
 #Construct the tomographic bin catalogue strings {{{
 binstrings=''
@@ -49,19 +56,29 @@ fi
 #Run the Nz bias construction for each bin {{{
 @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/compute_dz_priors.R -c ${calib_cats} -r ${refr_cats} \
   --binstrings ${binstrings} \
+  --patchstrings @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb \
   ${calibweight} \
   -w @BV:WEIGHTNAME@ \
   --syserr @BV:NZSYSERROR@ \
   -g "SOMweight" \
   -z @BV:ZSPECNAME@ \
-  --biasout @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzbias/Nz_biases.txt \
-  --covout @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzcov/Nz_covariance.txt 2>&1
+  --biasoutbase @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzbias \
+  --biasout Nz_biases.txt \
+  --covoutbase @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzcov \
+  --covout Nz_covariance.txt 2>&1
 #}}}
 
-#Add the Nzcov file(s) to the datablock 
-_write_datablock nzcov "Nz_covariance.txt"
-#Add the Nzcov file(s) to the datablock 
-_write_datablock nzbias "Nz_biases.txt"
+for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+do 
+  nfile=`echo ${calib_cats} | grep -c "_${patch}_" || echo `
+  if [ ${nfile} -gt 0 ]
+  then 
+    #Add the Nzcov file(s) to the datablock 
+    _write_datablock nzcov_${patch} "Nz_covariance.txt"
+    #Add the Nzcov file(s) to the datablock 
+    _write_datablock nzbias_${patch} "Nz_biases.txt"
+  fi 
+done 
 
 
 
