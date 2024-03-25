@@ -57,7 +57,12 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo nz
+  outlist=""
+  for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb 
+  do
+    outlist="$outlist nz_${patch}"
+  done
+  echo $outlist
 } 
 #}}}
 

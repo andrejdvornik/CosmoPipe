@@ -49,7 +49,7 @@ do
     done
     
     #Add the Nz file(s) to the datablock 
-    _write_datablock nz_${usepatch} "${outlist}"
+    _write_datablock nz_${patch} "${outlist}"
     _message " @RED@ - Done! @DEF@\n"
     
   fi 
