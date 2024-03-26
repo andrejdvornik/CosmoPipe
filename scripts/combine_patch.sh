@@ -3,7 +3,7 @@
 # File Name : combine_patch.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Wed Jan 10 05:10:46 2024
+# Last Modified : Fri 15 Mar 2024 08:45:48 AM CET
 #
 #=========================================
 
@@ -38,7 +38,7 @@ do
   links="FALSE"
   for file in ${cata}
   do 
-    if [ ${#file} -gt 255 ] 
+    if [ ${#file} -gt 250 ] 
     then 
       links="TRUE"
     fi 
