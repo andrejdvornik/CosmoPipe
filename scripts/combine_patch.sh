@@ -3,7 +3,7 @@
 # File Name : combine_patch.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Wed Jan 10 05:10:46 2024
+# Last Modified : Tue 26 Mar 2024 02:44:41 AM CET
 #
 #=========================================
 
@@ -38,7 +38,7 @@ do
   links="FALSE"
   for file in ${cata}
   do 
-    if [ ${#file} -gt 255 ] 
+    if [ ${#file} -gt 250 ] 
     then 
       links="TRUE"
     fi 
@@ -48,14 +48,14 @@ do
   if [ "${links}" == "TRUE" ] 
   then 
     #Remove existing infile links 
-    if [ -e infile.lnk ] || [ -h infile.lnk ]
+    if [ -e infile_$$.lnk ] || [ -h infile_$$.lnk ]
     then 
-      rm infile.lnk
+      rm infile_$$.lnk
     fi 
     #Create input link
     originp=${cata}
-    ln -s ${cata} infile.lnk
-    cata="infile.lnk"
+    ln -s ${cata} infile_$$.lnk
+    cata="infile_$$.lnk"
   fi 
   #}}}
   #Check if the patch label exists {{{
@@ -116,23 +116,23 @@ do
     for file in ${origlist} 
     do 
     #Remove existing infile links 
-    if [ -h infile${count}.lnk ]
+    if [ -h infile${count}_$$.lnk ]
     then 
-      rm infile${count}.lnk
+      rm infile${count}_$$.lnk
     fi
-      ln -s ${file} infile${count}.lnk 
-      inplist="${inplist} infile${count}.lnk"
+      ln -s ${file} infile${count}_$$.lnk 
+      inplist="${inplist} infile${count}_$$.lnk"
       count=$((count+1))
     done 
       #Remove existing outfile links 
-    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
     then 
-      rm outfile.lnk
+      rm outfile_$$.lnk
     fi
     #Create output links 
-    ln -s ${outname} outfile.lnk
+    ln -s ${outname} outfile_$$.lnk
     origoname=${outname}
-    outname=outfile.lnk
+    outname=outfile_$$.lnk
   fi 
 
   #Combine the catalogues into one 

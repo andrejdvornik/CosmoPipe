@@ -3,7 +3,7 @@
 # File Name : extract_patch.sh
 # Created By : awright
 # Creation Date : 28-03-2023
-# Last Modified : Wed Jan 10 05:08:49 2024
+# Last Modified : Tue 26 Mar 2024 02:44:55 AM CET
 #
 #=========================================
 
@@ -71,23 +71,23 @@ do
   if [ "${links}" == "TRUE" ] 
   then
     #Remove existing infile links 
-    if [ -e infile.lnk ] || [ -h infile.lnk ]
+    if [ -e infile_$$.lnk ] || [ -h infile_$$.lnk ]
     then 
-      rm infile.lnk
+      rm infile_$$.lnk
     fi 
     #Remove existing outfile links 
-    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
     then 
-      rm outfile.lnk
+      rm outfile_$$.lnk
     fi
     #Create input link
     originp=${inputfile}
-    ln -s ${inputfile} infile.lnk 
-    inputfile="infile.lnk"
+    ln -s ${inputfile} infile_$$.lnk 
+    inputfile="infile_$$.lnk"
     #Create output links 
-    ln -s ${outputname} outfile.lnk
+    ln -s ${outputname} outfile_$$.lnk
     origout=${outputname}
-    outputname=outfile.lnk
+    outputname=outfile_$$.lnk
   fi 
   #}}}
 

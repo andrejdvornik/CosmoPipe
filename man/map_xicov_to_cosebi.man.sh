@@ -1,5 +1,5 @@
 #
-# calc_xi_w_treecorr.sh Documentation & Housekeeping functions
+# map_xicov_to_cosebi.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@==========================================@DEF@\n"
-    _message "@BLU@== @RED@ Running calc_xi_w_treecorr.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@==========================================@DEF@\n"
+    _message "@BLU@===========================================@DEF@\n"
+    _message "@BLU@== @RED@ Running map_xicov_to_cosebi.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@===========================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Compute correlations function patch-wise for all '
-  echo '# catalogues in the DATAHEAD'
+  echo '# Map a xipm covariance to a cosebis covariance'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,28 +42,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BINNING BLU BV:BINSLOP BV:DECNAME BV:E1NAME BV:E2NAME BV:NTHETABINXI BV:NTHREADS BV:RANAME BV:THETAMAXXI BV:THETAMINXI BV:TOMOLIMS BV:WEIGHTNAME DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  echo BINNING BV:NMAXCOSEBIS BV:NTHETABINXI BV:NTHREADS BV:THETAMAXXI BV:THETAMINXI BV:TOMOLIMS CONFIGPATH DATABLOCK PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo ALLHEAD
+  echo DATAHEAD
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo xipm jackknife_cov
+  echo DATAHEAD
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/calc_xi_w_treecorr.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/map_xicov_to_cosebi.sh
 } 
 #}}}
 

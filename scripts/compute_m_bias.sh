@@ -3,7 +3,7 @@
 # File Name : compute_m_bias.sh
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Sat 09 Dec 2023 11:37:39 AM CET
+# Last Modified : Mon Mar 18 15:48:04 2024
 #
 #=========================================
 
@@ -34,10 +34,13 @@ fi
 
 outputlist=''
 outputlistbase=''
+#Initialise the joblist 
+echo > @RUNROOT@/@RUNTIME@/mbias_joblist_$$.sh 
 for i in `seq ${nsurf}` 
 do 
   #Select the relevant files {{{
   surf_current=`echo ${allsurf} | awk -v n=$i '{print $n}'`
+  surf_current_new=${surf_current##.*}_datwgt.asc
   if [ ${nsurf} -gt ${nhead} ] 
   then 
     #Data side requires recycling 
@@ -54,7 +57,7 @@ do
     if [ $((${i}%${nhead})) -eq 1 ]
     then 
       #First loop of a new realisation, notify
-      _message "@BLU@Starting realisation @RED@$((${count}/${nhead}))@DEF@\n"
+      _message "\r@BLU@Preparing realisation @RED@$((${count}/${nhead}))@DEF@"
     fi 
   else 
     #The n^th entry 
@@ -78,16 +81,20 @@ do
   #}}}
 
   #Correct for the variable shear dm {{{
-  _message " > @BLU@Computing the m-biases for catalogue @RED@${data_current##*/}@DEF@"
+  #Add job to the joblist 
+  cat >> @RUNROOT@/@RUNTIME@/mbias_joblist_$$.sh << EOF 
+  echo " > @BLU@Computing the m-biases for catalogue @RED@${data_current##*/}@DEF@" ; \
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/compute_m_bias.py \
     --input_surface ${surf_current} \
+    --output_surface ${surf_current_new} \
     --input_cat ${data_current} \
     --output ${outputname} \
     --m12name @BV:M1NAME@ @BV:M2NAME@ \
     --weightname @BV:WEIGHTNAME@ \
     --SNRname @BV:SNRNAME@ \
-    --Rname @BV:RNAME@ 2>&1 
-  _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
+    --Rname @BV:RNAME@ 2>&1 ; \
+  echo " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
+EOF
   #}}}
 
   #Update the output list {{{
@@ -95,6 +102,39 @@ do
   outputlistbase="${outputlistbase} ${outputname##*/}"
   #}}}
 done
+
+#Run the jobs in parallel {{{
+NTHREAD=@BV:NTHREADS@
+_message "\n@BLU@Preparing Parallel Jobs with $NTHREAD threads @DEF@\n"
+#Constructs NTHREAD chunks of the original commandlist {{{
+split --numeric-suffixes=01 -e -n l/${NTHREAD} --additional-suffix=_of_${NTHREAD}.sh @RUNROOT@/@RUNTIME@/mbias_joblist_$$.sh mbias_$$_job
+#}}}
+#Distribute the executables and wait for their completion {{{
+for i in `seq -w $NTHREAD`
+do
+  _message "\r@BLU@Launching job @RED@${i}@DEF@"
+  if [ -f mbias_$$_job${i}_of_${NTHREAD}.sh ]
+  then 
+    screen -L -Logfile mbias_$$_job${i}_of_${NTHREAD}.log -S mbias_$$_job${i}_of_${NTHREAD}.sh -d -m bash mbias_$$_job${i}_of_${NTHREAD}.sh
+  fi 
+done
+#}}}
+sleep 1
+#Check if we can continue to the next MODE {{{
+while [ `ps au | grep -v "bash -c " | grep -v grep | grep -c mbias_$$_job` -ge 1 ]
+do
+  #If this is the first loop of the wait, then print what is running  /*fold*/ {{{
+  if [ "${prompt}" != "mbias" ]
+  then
+    _message "@BLU@Pipeline paused while waiting for @RED@mbias@BLU@ to be completed (@DEF@`date`@BLU@)@DEF@"
+    prompt=mbias
+  fi
+  sleep 10
+  #/*fend*/}}}
+done
+_message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
+#}}}
+#}}}
 
 #Update the datahead {{{
 for _head in ${allhead} 

@@ -3,7 +3,7 @@
 # File Name : ldacrentab.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Sat 03 Jun 2023 05:15:40 PM CEST
+# Last Modified : Tue 26 Mar 2024 02:45:18 AM CET
 #
 #=========================================
 
@@ -26,14 +26,14 @@ done
 if [ "${links}" == "TRUE" ] 
 then
   #Remove existing infile links 
-  if [ -e infile.lnk ] || [ -h infile.lnk ]
+  if [ -e infile_$$.lnk ] || [ -h infile_$$.lnk ]
   then 
-    rm infile.lnk
+    rm infile_$$.lnk
   fi
   #Create input link
   originp=${input}
-  ln -s ${input} infile.lnk 
-  input="infile.lnk"
+  ln -s ${input} infile_$$.lnk 
+  input="infile_$$.lnk"
 fi 
 
 #Get the existing table name 

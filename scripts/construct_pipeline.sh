@@ -512,7 +512,8 @@ do
           ##}}}
           #
           #Add the missing item to the absent_block list 
-          absent_block="${absent_block} ${inp}"
+          echo "${inp} is missing!"
+          absent_block="${absent_block}($step) ${inp}"
         fi 
       fi 
       #}}}

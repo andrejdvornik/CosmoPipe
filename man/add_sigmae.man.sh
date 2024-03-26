@@ -42,7 +42,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BV:TOMOLIMS DATABLOCK RUNROOT SIGMAELIST STORAGEPATH
+  echo BV:SIGMAELIST BV:TOMOLIMS DATABLOCK RUNROOT STORAGEPATH
 } 
 #}}}
 

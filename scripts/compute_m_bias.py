@@ -3,7 +3,7 @@
 # File Name : compute_m_surface.py
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Tue 19 Sep 2023 12:14:52 PM CEST
+# Last Modified : Mon 18 Mar 2024 09:32:29 PM CET
 #
 #=========================================
 
@@ -26,6 +26,8 @@ parser.add_argument("--input_cat", dest="input_data",
             help="Full Input file name and path", metavar="input",required=True)
 parser.add_argument("--output", dest="outputpath",
             help="Full Output file name and path",required=True)
+parser.add_argument("--output_surface", dest="outputpath_surf",
+            help="Full Output file name and path for surface file",required=True)
 parser.add_argument("--m12name", dest="col_m12",nargs=2,
             help="Column names for the m1/m2 variables in the m_surface file",required=True)
 parser.add_argument("--weightname", dest="col_weight",
@@ -63,7 +65,7 @@ cata_surface, ldac_surface = mcf.flexible_read(args.input_surface)
 # calculate m
 m_res = pd.DataFrame(-999., index=np.arange(1),
                     columns = ['m','m_err','m1', 'm2', 'm1_err', 'm2_err','Nwei','Nwei_good','Nwei_good_out','N','N_good'])
-m1, m2, m1_err, m2_err, good_id, goodwt = mcf.mCalFunc_from_surface(cata=cata_used, surface=cata_surface, 
+m1, m2, m1_err, m2_err, good_id, goodwt, newsurf = mcf.mCalFunc_from_surface(cata=cata_used, surface=cata_surface, 
                                             col_SNR="SNR", col_R="R", col_weight="weight", 
                                             col_m1=args.col_m12[0], col_m2=args.col_m12[1])
 print(f'{args.input_data}: {(m1+m2)/2.}, {np.sqrt(m1_err**2+m2_err**2)}')
@@ -81,3 +83,8 @@ m_res.loc[0, 'N_good'] = len(cata_data.loc[good_id,args.col_weight].values)
 
 m_res.to_csv(args.outputpath, index=False, float_format='%.6f')
 print(f'results saved to {args.outputpath}')
+
+#save m calibraiton surface 
+mcf.flexible_write(newsurf,args.outputpath_surf,ldac_surface)
+print(f'surface saved to {args.outputpath_surf}')
+

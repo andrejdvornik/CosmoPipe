@@ -1,9 +1,9 @@
 #=========================================
 #
-# File Name : calc_xi_w_treecorr.sh
+# File Name : calc_xipsf_w_treecorr.sh
 # Created By : awright
-# Creation Date : 27-03-2023
-# Last Modified : Fri 22 Mar 2024 08:55:46 PM CET
+# Creation Date : 29-02-2024
+# Last Modified : Thu 29 Feb 2024 06:07:54 PM CET
 #
 #=========================================
 
@@ -77,60 +77,32 @@ do
       outname=${outname}${appendstr}${appendstr2}_ggcorr.txt
 
       #Check if the output file exists 
-      if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipm/${outname} ]
+      if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipsf/${outname} ]
       then 
         _message "    -> @BLU@Removing previous @RED@Bin $ZBIN1@BLU@ x @RED@Bin $ZBIN2@BLU@ correlation function@DEF@"
-        rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipm/${outname}
-        xipmblock=`_read_datablock xipm`
-        currentblock=`_blockentry_to_filelist ${xipmblock}`
+        rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipsf/${outname}
+        xipsfblock=`_read_datablock xipsf`
+        currentblock=`_blockentry_to_filelist ${xipsfblock}`
         currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname} | awk '{printf $0 " "}' || echo `
-        _write_datablock xipm "${currentblock}"
+        _write_datablock xipsf "${currentblock}"
         _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       fi 
 
-      #Check if the user specified a bin_slop value. If not: use some standard values
-      bin_slop=@BV:BINSLOP@
-      if [[ $bin_slop =~ ^[+-]?[0-9]+\.?[0-9]*$ ]]
-      then
-        bin_slop=@BV:BINSLOP@
-      else
-        if [ @BV:NTHETABINXI@ -gt 100 ]
-        then
-          bin_slop=1.5
-        else
-          bin_slop=0.08
-        fi
-      fi
-
-      #Output covariance name (if needed)
-      covoutname=${outname%%.*}_cov.mat
-      if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/jackknife_cov ] 
-      then 
-        mkdir -p @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/jackknife_cov 
-      fi 
       _message "    -> @BLU@Bin $ZBIN1 ($ZB_lo < Z_B <= $ZB_hi) x Bin $ZBIN2 ($ZB_lo2 < Z_B <= $ZB_hi2)@DEF@"
       MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
         @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_xi_w_treecorr.py \
-        --nbins @BV:NTHETABINXI@ --theta_min @BV:THETAMINXI@ --theta_max @BV:THETAMAXXI@ --binning @BINNING@ --bin_slop ${bin_slop}\
+        --nbins @BV:NTHETABINXI@ --theta_min @BV:THETAMINXI@ --theta_max @BV:THETAMAXXI@ --binning @BINNING@ \
         --fileone ${file_one} \
         --filetwo ${file_two} \
-        --output @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipm/${outname} \
-        --covoutput @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/jackknife_cov/${covoutname} \
+        --output @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipsf/${outname} \
         --weighted True \
-        --patch_centers @BV:PATCH_CENTERFILE@ \
-        --file1e1 "@BV:E1NAME@" --file1e2 "@BV:E2NAME@" --file1w "@BV:WEIGHTNAME@" --file1ra "@BV:RANAME@" --file1dec "@BV:DECNAME@" \
-        --file2e1 "@BV:E1NAME@" --file2e2 "@BV:E2NAME@" --file2w "@BV:WEIGHTNAME@" --file2ra "@BV:RANAME@" --file2dec "@BV:DECNAME@" \
+        --file1e1 "@BV:PSFE1NAME@" --file1e2 "@BV:PSFE2NAME@" --file1w "@BV:WEIGHTNAME@" --file1ra "@BV:RANAME@" --file1dec "@BV:DECNAME@" \
+        --file2e1 "@BV:PSFE1NAME@" --file2e2 "@BV:PSFE2NAME@" --file2w "@BV:WEIGHTNAME@" --file2ra "@BV:RANAME@" --file2dec "@BV:DECNAME@" \
         --nthreads @BV:NTHREADS@ 2>&1 
       _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       #Add the correlation function to the datablock 
-      xipmblock=`_read_datablock xipm`
-      _write_datablock xipm "`_blockentry_to_filelist ${xipmblock}` ${outname}"
-      if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/jackknife_cov/${covoutname} ]
-      then 
-        #Move the jackknife covariance 
-        jackknife_covblock=`_read_datablock jackknife_cov`
-        _write_datablock jackknife_cov "`_blockentry_to_filelist ${jackknife_covblock}` ${covoutname}"
-      fi 
+      xipsfblock=`_read_datablock xipsf`
+      _write_datablock xipsf "`_blockentry_to_filelist ${xipsfblock}` ${outname}"
     done
 	done
   _message "  }\n"

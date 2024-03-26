@@ -3,7 +3,7 @@
 # File Name : mcal_functions.py
 # Created By : awright
 # Creation Date : 25-05-2023
-# Last Modified : Sun 26 Nov 2023 09:03:13 PM CET
+# Last Modified : Mon 18 Mar 2024 09:55:11 PM CET
 #
 #=========================================
 
@@ -483,7 +483,8 @@ def mCalFunc_from_surface(cata, surface,col_SNR, col_R, col_weight, col_m1, col_
                         'm1': np.array(surface[col_m1]).astype(float),
                         'm1_err': np.array(surface[f'{col_m1}_err']).astype(float),
                         'm2': np.array(surface[col_m2]).astype(float),
-                        'm2_err': np.array(surface[f'{col_m2}_err']).astype(float)
+                        'm2_err': np.array(surface[f'{col_m2}_err']).astype(float),
+                        'data_wgt': 0 
                         })
 
     # bin galaxies
@@ -520,6 +521,7 @@ def mCalFunc_from_surface(cata, surface,col_SNR, col_R, col_weight, col_m1, col_
             print(f"THERE IS NO SURFACE ELEMENT FOR SNR_BIN {bin_SNR_id} AND R_BIN {bin_R_id}?!")
             continue 
 
+        surface.loc[mask_surf,'data_wgt'] += wgRealBin
         #print(mask_surf)
         #print(surface.loc[mask_surf, 'm1'])
         m1_final += (wgRealBin * surface.loc[mask_surf, 'm1'].values[0])
@@ -532,6 +534,6 @@ def mCalFunc_from_surface(cata, surface,col_SNR, col_R, col_weight, col_m1, col_
     m2_final = m2_final / wgRealSum
     m1_err_final = m1_err_final**0.5 / wgRealSum
     m2_err_final = m2_err_final**0.5 / wgRealSum
-    return (m1_final, m2_final, m1_err_final, m2_err_final, good_id, wgRealSum)
+    return (m1_final, m2_final, m1_err_final, m2_err_final, good_id, wgRealSum,surface)
 #}}}
 

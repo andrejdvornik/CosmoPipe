@@ -1,5 +1,5 @@
 #
-# calc_xi_w_treecorr.sh Documentation & Housekeeping functions
+# select_K1000.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@==========================================@DEF@\n"
-    _message "@BLU@== @RED@ Running calc_xi_w_treecorr.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@==========================================@DEF@\n"
+    _message "@BLU@====================================@DEF@\n"
+    _message "@BLU@== @RED@ Running select_K1000.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@====================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,8 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Compute correlations function patch-wise for all '
-  echo '# catalogues in the DATAHEAD'
+  echo '# Select sources that are in K1000 tiles using the '
+  echo '# THELI_NAME variable'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,28 +43,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BINNING BLU BV:BINSLOP BV:DECNAME BV:E1NAME BV:E2NAME BV:NTHETABINXI BV:NTHREADS BV:RANAME BV:THETAMAXXI BV:THETAMINXI BV:TOMOLIMS BV:WEIGHTNAME DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  echo BLU DEF P_RSCRIPT RED RUNROOT SCRIPTPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo ALLHEAD
+  echo DATAHEAD
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo xipm jackknife_cov
+  echo DATAHEAD
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/calc_xi_w_treecorr.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/select_K1000.sh
 } 
 #}}}
 

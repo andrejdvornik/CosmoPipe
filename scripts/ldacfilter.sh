@@ -3,7 +3,7 @@
 # File Name : ldacfilter.sh
 # Created By : awright
 # Creation Date : 16-05-2023
-# Last Modified : Wed Jan 10 05:12:58 2024
+# Last Modified : Tue 26 Mar 2024 02:45:09 AM CET
 #
 #=========================================
 
@@ -51,23 +51,23 @@ done
 if [ "${links}" == "TRUE" ] 
 then
   #Remove existing infile links 
-  if [ -e infile.lnk ] || [ -h infile.lnk ]
+  if [ -e infile_$$.lnk ] || [ -h infile_$$.lnk ]
   then 
-    rm infile.lnk
+    rm infile_$$.lnk
   fi 
   #Remove existing outfile links 
-  if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+  if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
   then 
-    rm outfile.lnk
+    rm outfile_$$.lnk
   fi
   #Create input link
   originp=${input}
-  ln -s ${input} infile.lnk 
-  input="infile.lnk"
+  ln -s ${input} infile_$$.lnk 
+  input="infile_$$.lnk"
   #Create output links 
-  ln -s ${output} outfile.lnk
+  ln -s ${output} outfile_$$.lnk
   origout=${output}
-  output=outfile.lnk
+  output=outfile_$$.lnk
 fi 
 
 #Try to filter with ldactools 

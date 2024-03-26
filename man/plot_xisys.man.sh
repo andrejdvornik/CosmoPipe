@@ -1,5 +1,5 @@
 #
-# calc_xi_w_treecorr.sh Documentation & Housekeeping functions
+# plot_xisys.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@==========================================@DEF@\n"
-    _message "@BLU@== @RED@ Running calc_xi_w_treecorr.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@==========================================@DEF@\n"
+    _message "@BLU@==================================@DEF@\n"
+    _message "@BLU@== @RED@ Running plot_xisys.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@==================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Compute correlations function patch-wise for all '
-  echo '# catalogues in the DATAHEAD'
+  echo '# Plot the sys correlation function'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,28 +42,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BINNING BLU BV:BINSLOP BV:DECNAME BV:E1NAME BV:E2NAME BV:NTHETABINXI BV:NTHREADS BV:RANAME BV:THETAMAXXI BV:THETAMINXI BV:TOMOLIMS BV:WEIGHTNAME DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  echo BLINDING BV:BLIND BV:BOLTZMAN BV:LIST_INPUT_SAMPLER BV:NXIPM BV:STATISTIC BV:TOMOLIMS P_RSCRIPT RUNROOT SCRIPTPATH STORAGEPATH SURVEY
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo ALLHEAD
+  echo covariance_xipm xigpsf_vec xipm_vec xipsf_vec
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo xipm jackknife_cov
+  echo covariance_xipm xigpsf_vec xipm_vec xipsf_vec
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/calc_xi_w_treecorr.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/plot_xisys.sh
 } 
 #}}}
 
