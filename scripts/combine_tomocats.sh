@@ -3,7 +3,7 @@
 # File Name : combine_cats.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Wed Jan 10 05:10:50 2024
+# Last Modified : Tue 26 Mar 2024 02:44:49 AM CET
 #
 #=========================================
 
@@ -96,23 +96,23 @@ do
   if [ "${links}" == "TRUE" ] 
   then
     #Remove existing outfile links 
-    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
     then 
-      rm outfile.lnk
+      rm outfile_$$.lnk
     fi 
     count=1
     origlist=${filelist}
     filelist=''
     for file in ${origlist} 
     do 
-      ln -s ${file} infile${count}.lnk 
-      filelist="${filelist} infile${count}.lnk"
+      ln -s ${file} infile${count}_$$.lnk 
+      filelist="${filelist} infile${count}_$$.lnk"
       count=$((count+1))
     done 
     #Create output links 
-    ln -s ${outname} outfile.lnk
+    ln -s ${outname} outfile_$$.lnk
     origoname=${outname}
-    outname=outfile.lnk
+    outname=outfile_$$.lnk
   fi 
 
   #Combine the DATAHEAD catalogues into one 

@@ -3,7 +3,7 @@
 # File Name : merge_goldweight.sh
 # Created By : awright
 # Creation Date : 21-09-2023
-# Last Modified : Wed 20 Mar 2024 12:02:01 PM CET
+# Last Modified : Tue 26 Mar 2024 02:45:27 AM CET
 #
 #=========================================
 
@@ -197,23 +197,23 @@ do
   if [ "${links}" == "TRUE" ] 
   then
     #Remove existing infile links 
-    if [ -e infile.lnk ] || [ -h infile.lnk ]
+    if [ -e infile_$$.lnk ] || [ -h infile_$$.lnk ]
     then 
-      rm infile.lnk
+      rm infile_$$.lnk
     fi 
     #Remove existing outfile links 
-    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
     then 
-      rm outfile.lnk
+      rm outfile_$$.lnk
     fi
     #Create input link
     originp=${input}
-    ln -s ${input}_tmp infile.lnk_tmp
-    input="infile.lnk"
+    ln -s ${input}_tmp infile_$$.lnk_tmp
+    input="infile_$$.lnk"
     #Create outfile links 
-    ln -s ${outfile} outfile.lnk
+    ln -s ${outfile} outfile_$$.lnk
     origout=${outfile}
-    outfile=outfile.lnk
+    outfile=outfile_$$.lnk
   fi 
   #}}}
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacjoinkey \
@@ -250,14 +250,14 @@ do
   if [ "${links}" == "TRUE" ] 
   then
     #Remove existing outfile links 
-    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
     then 
-      rm outfile.lnk
+      rm outfile_$$.lnk
     fi
     #Create outfile links 
-    ln -s ${outfile}_tmp outfile.lnk_tmp
+    ln -s ${outfile}_tmp outfile_$$.lnk_tmp
     origout=${outfile}
-    outfile=outfile.lnk
+    outfile=outfile_$$.lnk
   fi 
   #}}}
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacrenkey \
@@ -292,14 +292,14 @@ do
   if [ "${links}" == "TRUE" ] 
   then
     #Remove existing outfile links 
-    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
     then 
-      rm outfile.lnk
+      rm outfile_$$.lnk
     fi
     #Create outfile links 
-    ln -s ${outfile} outfile.lnk
+    ln -s ${outfile} outfile_$$.lnk
     origout=${outfile}
-    outfile=outfile.lnk
+    outfile=outfile_$$.lnk
   fi 
   #}}}
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldaccalc \
@@ -333,14 +333,14 @@ do
   if [ "${links}" == "TRUE" ] 
   then
     #Remove existing outfile links 
-    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
     then 
-      rm outfile.lnk
+      rm outfile_$$.lnk
     fi
     #Create outfile links 
-    ln -s ${outfile}_tmp outfile.lnk_tmp
+    ln -s ${outfile}_tmp outfile_$$.lnk_tmp
     origout=${outfile}
-    outfile=outfile.lnk
+    outfile=outfile_$$.lnk
   fi 
   #}}}
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldaccalc \
@@ -370,14 +370,14 @@ do
   if [ "${links}" == "TRUE" ] 
   then
     #Remove existing outfile links 
-    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
     then 
-      rm outfile.lnk
+      rm outfile_$$.lnk
     fi
     #Create outfile links 
-    ln -s ${outfile} outfile.lnk
+    ln -s ${outfile} outfile_$$.lnk
     origout=${outfile}
-    outfile=outfile.lnk
+    outfile=outfile_$$.lnk
   fi 
   #}}}
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldaccalc \
@@ -605,23 +605,23 @@ do
   if [ "${links}" == "TRUE" ] 
   then
     #Remove existing infile links 
-    if [ -e infile.lnk ] || [ -h infile.lnk ]
+    if [ -e infile_$$.lnk ] || [ -h infile_$$.lnk ]
     then 
-      rm infile.lnk
+      rm infile_$$.lnk
     fi 
     #Remove existing outfile links 
-    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
     then 
-      rm outfile.lnk
+      rm outfile_$$.lnk
     fi
     #Create input link
     originp=${cal_input}
-    ln -s ${cal_input}${suffix} infile.lnk${suffix}
-    cal_input="infile.lnk"
+    ln -s ${cal_input}${suffix} infile_$$.lnk${suffix}
+    cal_input="infile_$$.lnk"
     #Create outfile links 
-    ln -s ${outfile} outfile.lnk
+    ln -s ${outfile} outfile_$$.lnk
     origout=${outfile}
-    outfile=outfile.lnk
+    outfile=outfile_$$.lnk
   fi 
   #}}}
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacjoinkey \
@@ -661,14 +661,14 @@ do
     if [ "${links}" == "TRUE" ] 
     then
       #Remove existing outfile links 
-      if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+      if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
       then 
-        rm outfile.lnk
+        rm outfile_$$.lnk
       fi
       #Create outfile links 
-      ln -s ${outfile}_tmp outfile.lnk_tmp
+      ln -s ${outfile}_tmp outfile_$$.lnk_tmp
       origout=${outfile}
-      outfile=outfile.lnk
+      outfile=outfile_$$.lnk
     fi 
     #}}}
     #Rename the original weight column {{{
@@ -705,14 +705,14 @@ do
     if [ "${links}" == "TRUE" ] 
     then
       #Remove existing outfile links 
-      if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+      if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
       then 
-        rm outfile.lnk
+        rm outfile_$$.lnk
       fi
       #Create outfile links 
-      ln -s ${outfile} outfile.lnk
+      ln -s ${outfile} outfile_$$.lnk
       origout=${outfile}
-      outfile=outfile.lnk
+      outfile=outfile_$$.lnk
     fi 
     #}}}
     @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldaccalc \
@@ -746,14 +746,14 @@ do
     if [ "${links}" == "TRUE" ] 
     then
       #Remove existing outfile links 
-      if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+      if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
       then 
-        rm outfile.lnk
+        rm outfile_$$.lnk
       fi
       #Create outfile links 
-      ln -s ${outfile}_tmp outfile.lnk_tmp
+      ln -s ${outfile}_tmp outfile_$$.lnk_tmp
       origout=${outfile}
-      outfile=outfile.lnk
+      outfile=outfile_$$.lnk
     fi 
     #}}}
     @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldaccalc \
@@ -790,14 +790,14 @@ do
     if [ "${links}" == "TRUE" ] 
     then
       #Remove existing outfile links 
-      if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+      if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
       then 
-        rm outfile.lnk
+        rm outfile_$$.lnk
       fi
       #Create outfile links 
-      ln -s ${outfile}_tmp outfile.lnk_tmp
+      ln -s ${outfile}_tmp outfile_$$.lnk_tmp
       origout=${outfile}
-      outfile=outfile.lnk
+      outfile=outfile_$$.lnk
     fi 
     #}}}
     @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacrenkey \

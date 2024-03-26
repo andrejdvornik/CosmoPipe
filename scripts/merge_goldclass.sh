@@ -3,7 +3,7 @@
 # File Name : merge_goldclass.sh
 # Created By : awright
 # Creation Date : 27-03-2023
-# Last Modified : Wed 19 Jul 2023 09:44:54 AM CEST
+# Last Modified : Tue 26 Mar 2024 02:45:22 AM CET
 #
 #=========================================
 
@@ -62,32 +62,32 @@ do
   if [ "${links}" == "TRUE" ] 
   then 
     #Remove existing infile links 
-    if [ -e infile.lnk ] || [ -h infile.lnk ]
+    if [ -e infile_$$.lnk ] || [ -h infile_$$.lnk ]
     then 
-      rm infile.lnk
+      rm infile_$$.lnk
     fi 
     #Remove existing outfile links 
-    if [ -e outfile.lnk ] || [ -h outfile.lnk ]
+    if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
     then 
-      rm outfile.lnk
+      rm outfile_$$.lnk
     fi
     #Remove existing mainfile links 
-    if [ -e mainfile.lnk ] || [ -h mainfile.lnk ]
+    if [ -e mainfile_$$.lnk ] || [ -h mainfile_$$.lnk ]
     then 
-      rm mainfile.lnk
+      rm mainfile_$$.lnk
     fi  
     #Create input link
     originp=${input}
-    ln -s ${input} infile.lnk 
-    input="infile.lnk"
+    ln -s ${input} infile_$$.lnk 
+    input="infile_$$.lnk"
     #Create output links 
-    ln -s ${outfile} outfile.lnk
+    ln -s ${outfile} outfile_$$.lnk
     origout=${outfile}
-    outfile=outfile.lnk
+    outfile=outfile_$$.lnk
     #Create maincat links 
-    ln -s ${mainfile} mainfile.lnk
+    ln -s ${mainfile} mainfile_$$.lnk
     origmain=${mainfile}
-    mainfile=mainfile.lnk
+    mainfile=mainfile_$$.lnk
   fi 
   #}}}
   #Remove zero weight sources from main catalogue {{{
