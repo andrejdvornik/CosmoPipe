@@ -42,7 +42,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo DATABLOCK NZCOVFILE RUNROOT STORAGEPATH
+  echo BV:NZCOVFILE DATABLOCK RUNROOT STORAGEPATH
 } 
 #}}}
 
