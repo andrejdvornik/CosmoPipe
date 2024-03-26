@@ -34,7 +34,7 @@ parser.add_argument("--nzcovariance", dest="nzcovariance",
 parser.add_argument("--nzoutput", dest="nzoutput",
     help="Output directory for biased n(z)",required=False, type=str)
 parser.add_argument("--chainsuffix", dest="chainsuffix",
-    help="Chainsuffix",required=False, default='', type=str)
+    help="Chainsuffix",required=False, nargs='?', default='', type=str)
 
 args = parser.parse_args()
 inputchain = args.inputchain
