@@ -3,7 +3,7 @@
 # File Name : calc_xi_w_treecorr.sh
 # Created By : awright
 # Creation Date : 27-03-2023
-# Last Modified : Mon 04 Dec 2023 01:59:40 PM CET
+# Last Modified : Fri 22 Mar 2024 08:55:46 PM CET
 #
 #=========================================
 
@@ -102,6 +102,12 @@ do
         fi
       fi
 
+      #Output covariance name (if needed)
+      covoutname=${outname%%.*}_cov.mat
+      if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/jackknife_cov ] 
+      then 
+        mkdir -p @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/jackknife_cov 
+      fi 
       _message "    -> @BLU@Bin $ZBIN1 ($ZB_lo < Z_B <= $ZB_hi) x Bin $ZBIN2 ($ZB_lo2 < Z_B <= $ZB_hi2)@DEF@"
       MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
         @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_xi_w_treecorr.py \
@@ -109,7 +115,9 @@ do
         --fileone ${file_one} \
         --filetwo ${file_two} \
         --output @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipm/${outname} \
+        --covoutput @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/jackknife_cov/${covoutname} \
         --weighted True \
+        --patch_centers @BV:PATCH_CENTERFILE@ \
         --file1e1 "@BV:E1NAME@" --file1e2 "@BV:E2NAME@" --file1w "@BV:WEIGHTNAME@" --file1ra "@BV:RANAME@" --file1dec "@BV:DECNAME@" \
         --file2e1 "@BV:E1NAME@" --file2e2 "@BV:E2NAME@" --file2w "@BV:WEIGHTNAME@" --file2ra "@BV:RANAME@" --file2dec "@BV:DECNAME@" \
         --nthreads @BV:NTHREADS@ 2>&1 
@@ -117,6 +125,12 @@ do
       #Add the correlation function to the datablock 
       xipmblock=`_read_datablock xipm`
       _write_datablock xipm "`_blockentry_to_filelist ${xipmblock}` ${outname}"
+      if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/jackknife_cov/${covoutname} ]
+      then 
+        #Move the jackknife covariance 
+        jackknife_covblock=`_read_datablock jackknife_cov`
+        _write_datablock jackknife_cov "`_blockentry_to_filelist ${jackknife_covblock}` ${covoutname}"
+      fi 
     done
 	done
   _message "  }\n"

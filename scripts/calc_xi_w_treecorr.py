@@ -38,6 +38,8 @@ if __name__ == '__main__':
              help='file for first input catalogue')
     parser.add_argument('-j','--filetwo', dest="fitscat2", type=str,required=True,
              help='file for second input catalogue')
+    parser.add_argument('-co','--covoutput', dest="covoutfile", type=str,default='cov.txt',
+             help='file for covariance output')
     parser.add_argument('-o','--output', dest="outfile", type=str,required=True,
              help='file for output catalogue')
     parser.add_argument('-w','--weighted', dest="weighted", type=str,required=True,
@@ -62,6 +64,8 @@ if __name__ == '__main__':
              help='Name of the Dec column in the first catalogue')
     parser.add_argument('--file2dec', dest="cat2decname", type=str,default='DELTA_J2000',
              help='Name of the Dec column in the second catalogue')
+    parser.add_argument('--patch_centers', dest="center_file", type=str,default='',
+             help='File containing centers for performing jackknife/bootstrap covariance calculations')
     parser.add_argument('--nthreads', dest="num_threads", type=int,default=None,
              help='Number of desired parallel threads. If None (default) then uses all available')
     parser.add_argument('--bin_slop', dest="bin_slop", type=float,required=True, 
@@ -76,6 +80,7 @@ if __name__ == '__main__':
     fitscat1 = args.fitscat1
     fitscat2 = args.fitscat2
     outfile = args.outfile
+    covoutfile = args.covoutfile
     weighted = args.weighted
     cat1e1name = args.cat1e1name
     cat1e2name = args.cat1e2name
@@ -89,6 +94,7 @@ if __name__ == '__main__':
     cat2decname = args.cat2decname
     num_threads = args.num_threads
     inbinslop = args.bin_slop
+    center_file = args.center_file
 
     print("Using the following parameters:") 
     print(f"nbins = {args.nbins}")
@@ -98,6 +104,7 @@ if __name__ == '__main__':
     print(f"fitscat1 = {args.fitscat1}")
     print(f"fitscat2 = {args.fitscat2}")
     print(f"outfile = {args.outfile}")
+    print(f"covoutfile = {args.covoutfile}")
     print(f"weighted = {args.weighted}")
     print(f"cat1e1name = {args.cat1e1name}")
     print(f"cat1e2name = {args.cat1e2name}")
@@ -111,6 +118,7 @@ if __name__ == '__main__':
     print(f"cat2decname = {args.cat2decname}")
     print(f"num_threads = {args.num_threads}")
     print(f"bin_slop = {args.bin_slop}")
+    print(f"center_file = {args.center_file}")
 
     #Convert weighted to logical 
     weighted=weighted.lower() in ["true","t","1","y","yes"]
@@ -123,10 +131,17 @@ if __name__ == '__main__':
         raise ValueError('\"%s\" is not an allowed option for binning' % binning)
 
     # prepare the catalogues
-    cat1 = treecorr.Catalog(fitscat1, ra_col=cat1raname, dec_col=cat1decname, ra_units='deg', dec_units='deg', \
-                                      g1_col=cat1e1name, g2_col=cat1e2name, w_col=cat1wname)
-    cat2 = treecorr.Catalog(fitscat2, ra_col=cat2raname, dec_col=cat2decname, ra_units='deg', dec_units='deg', \
-                                      g1_col=cat2e1name, g2_col=cat2e2name, w_col=cat2wname)
+    if center_file != '': 
+        cat1 = treecorr.Catalog(fitscat1, ra_col=cat1raname, dec_col=cat1decname, ra_units='deg', dec_units='deg', \
+                                          g1_col=cat1e1name, g2_col=cat1e2name, w_col=cat1wname,patch_centers=center_file)
+        #cat1.write_patch_centers(file_name=outfile+"cens.txt")
+        cat2 = treecorr.Catalog(fitscat2, ra_col=cat2raname, dec_col=cat2decname, ra_units='deg', dec_units='deg', \
+                                          g1_col=cat2e1name, g2_col=cat2e2name, w_col=cat2wname,patch_centers=cat1.patch_centers)
+    else: 
+        cat1 = treecorr.Catalog(fitscat1, ra_col=cat1raname, dec_col=cat1decname, ra_units='deg', dec_units='deg', \
+                                          g1_col=cat1e1name, g2_col=cat1e2name, w_col=cat1wname)
+        cat2 = treecorr.Catalog(fitscat2, ra_col=cat2raname, dec_col=cat2decname, ra_units='deg', dec_units='deg', \
+                                          g1_col=cat2e1name, g2_col=cat2e2name, w_col=cat2wname)
     # This check is implemented in calc_xi_with_treecorr
     # if nbins > 100: ## Fine-binning
     #     inbinslop = 1.5
@@ -138,12 +153,20 @@ if __name__ == '__main__':
     # Define the binning based on command line input
     if(binning=='lin'): 
         print("Performing LINEAR binning") 
-        gg = treecorr.GGCorrelation(min_sep=theta_min, max_sep=theta_max, nbins=nbins, sep_units='arcmin',\
-            bin_type='Linear', bin_slop=inbinslop)
+        if center_file != '': 
+            gg = treecorr.GGCorrelation(min_sep=theta_min, max_sep=theta_max, nbins=nbins, sep_units='arcmin',\
+                bin_type='Linear', bin_slop=inbinslop, var_method='jackknife')
+        else: 
+            gg = treecorr.GGCorrelation(min_sep=theta_min, max_sep=theta_max, nbins=nbins, sep_units='arcmin',\
+                bin_type='Linear', bin_slop=inbinslop)
     else: # Log is the default bin_type for Treecorr
         print("Performing LOGARITHMIC binning") 
-        gg = treecorr.GGCorrelation(min_sep=theta_min, max_sep=theta_max, nbins=nbins, sep_units='arcmin', \
-            bin_slop=inbinslop)
+        if center_file != '':
+            gg = treecorr.GGCorrelation(min_sep=theta_min, max_sep=theta_max, nbins=nbins, sep_units='arcmin', \
+                bin_slop=inbinslop, var_method='jackknife')
+        else: 
+            gg = treecorr.GGCorrelation(min_sep=theta_min, max_sep=theta_max, nbins=nbins, sep_units='arcmin',\
+                bin_slop=inbinslop)
 
 
     # Calculate the 2pt correlation function
@@ -198,4 +221,7 @@ if __name__ == '__main__':
 
         # Write it out unweighted npairs and praise-be again for Jarvis and his well documented code
         gg.write(outfile, precision=12)
+
+    if center_file != "": 
+        np.savetxt(covoutfile,gg.cov)
 
