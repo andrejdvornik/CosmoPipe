@@ -30,7 +30,7 @@ p <- add_argument(p, "--xlim", help="x-axis limits", default=c(0.09,0.52))
 # Add an optional argument
 p <- add_argument(p, "--ylim", help="y-axis limits", default=c(0.63,0.86))
 # Add an optional argument
-p <- add_argument(p, "--title", help="Plot title", default="Chain")
+p <- add_argument(p, "--title", help="Plot title", default="Chain",nargs="+")
 # Add a flag
 p <- add_argument(p, "--removeh2", help="remove h2 dependence from variables", flag=TRUE)
 ## Add a flag
