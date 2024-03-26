@@ -89,12 +89,12 @@ parser.add_argument("-o", "--outputfile", dest="outputFile",
 args = parser.parse_args()
 statistic = args.statistic
 label = statistic
-print('test')
+
 if statistic == 'xipsf' or statistic == 'xigpsf': 
     statistic='xipm'
 if statistic == 'cosebis_dimless': 
     statistic='cosebis'
-print(statistic)
+    
 nBins_source = len(args.tomoBins)-1
 tomoBins = [ str(i).replace(".","p") for i in args.tomoBins ]
 
