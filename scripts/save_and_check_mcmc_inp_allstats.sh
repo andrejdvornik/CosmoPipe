@@ -148,7 +148,7 @@ then
   --neff @DB:cosmosis_neff@ \
   --sigmae @DB:cosmosis_sigmae@ \
   --covariance ${input_covariance_iterative} \
-  --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_xiE/MCMC_input_${non_linear_model}${filename_extension} \
+  --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}${filename_extension} \
   --plotdir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
 fi
 _write_datablock "mcmc_inp_@BV:STATISTIC@" "MCMC_input_${non_linear_model}.fits"
