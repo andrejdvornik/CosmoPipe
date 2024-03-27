@@ -153,7 +153,7 @@ if __name__ == '__main__':
     # Define the binning based on command line input
     if(binning=='lin'): 
         print("Performing LINEAR binning") 
-        if center_file != '': 
+        if center_file: 
             gg = treecorr.GGCorrelation(min_sep=theta_min, max_sep=theta_max, nbins=nbins, sep_units='arcmin',\
                 bin_type='Linear', bin_slop=inbinslop, var_method='jackknife')
         else: 
@@ -161,7 +161,7 @@ if __name__ == '__main__':
                 bin_type='Linear', bin_slop=inbinslop)
     else: # Log is the default bin_type for Treecorr
         print("Performing LOGARITHMIC binning") 
-        if center_file != '':
+        if center_file:
             gg = treecorr.GGCorrelation(min_sep=theta_min, max_sep=theta_max, nbins=nbins, sep_units='arcmin', \
                 bin_slop=inbinslop, var_method='jackknife')
         else: 
