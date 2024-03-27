@@ -64,7 +64,7 @@ if __name__ == '__main__':
              help='Name of the Dec column in the first catalogue')
     parser.add_argument('--file2dec', dest="cat2decname", type=str,default='DELTA_J2000',
              help='Name of the Dec column in the second catalogue')
-    parser.add_argument('--patch_centers', dest="center_file", type=str,default='',
+    parser.add_argument('--patch_centers', dest="center_file", type=str, nargs='?',default='',
              help='File containing centers for performing jackknife/bootstrap covariance calculations')
     parser.add_argument('--nthreads', dest="num_threads", type=int,default=None,
              help='Number of desired parallel threads. If None (default) then uses all available')
