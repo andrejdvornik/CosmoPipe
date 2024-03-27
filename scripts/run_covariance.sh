@@ -45,3 +45,9 @@ then
 else
   _write_datablock "covariance_@BV:STATISTIC@" "covariance_matrix_${non_linear_model}.mat"
 fi
+
+#Clean up the temporary input folder
+if [ -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/arb_summary_filters ]
+then 
+  rm -r @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/arb_summary_filters/
+fi 
