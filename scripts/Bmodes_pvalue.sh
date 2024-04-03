@@ -25,8 +25,14 @@ then
 #}}}
 elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
 then 
-  _message "B-modes are not defined for xipm\n"
+  _message "B-modes are not defined for vanilla xipm! Use xiEB instead!\n"
+#}}}
+elif [ "${STATISTIC^^}" == "XIEB" ] #{{{
+then 
+  inputfile=@DB:mcmc_inp_xiE@
+  inputfile_B=@DB:mcmc_inp_xiB@
 fi
+#}}}
 #If needed, create the output directory {{{
 if [ ! -d @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots ]
 then 
@@ -36,6 +42,8 @@ fi
 
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 
+if [ "${STATISTIC^^}" == "XIEB" ] #{{{
+then
 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue.py \
   --inputfile ${inputfile} \
   --statistic @BV:STATISTIC@ \
@@ -43,7 +51,26 @@ NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
   --thetamin @BV:THETAMINXI@ \
   --thetamax @BV:THETAMAXXI@ \
   --title "@SURVEY@" \
+  --suffix "@BV:CHAINSUFFIX@E" \
   --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
-
-
+@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue.py \
+  --inputfile ${inputfile_B} \
+  --statistic @BV:STATISTIC@ \
+  --ntomo ${NTOMO} \
+  --thetamin @BV:THETAMINXI@ \
+  --thetamax @BV:THETAMAXXI@ \
+  --title "@SURVEY@" \
+  --suffix "@BV:CHAINSUFFIX@B" \
+  --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
+else
+@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue.py \
+  --inputfile ${inputfile} \
+  --statistic @BV:STATISTIC@ \
+  --ntomo ${NTOMO} \
+  --thetamin @BV:THETAMINXI@ \
+  --thetamax @BV:THETAMAXXI@ \
+  --title "@SURVEY@" \
+  --suffix "@BV:CHAINSUFFIX@" \
+  --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
+fi
 
