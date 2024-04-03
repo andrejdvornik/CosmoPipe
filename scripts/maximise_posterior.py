@@ -50,6 +50,8 @@ nzcovariance = args.nzcovariance
 nzfile = args.nzfile
 nzoutput = args.nzoutput
 chainsuffix=args.chainsuffix
+if not chainsuffix:
+    chainsuffix=''
 
 
 # Set up cosmosis pipeline
