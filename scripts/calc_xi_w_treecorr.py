@@ -131,7 +131,7 @@ if __name__ == '__main__':
         raise ValueError('\"%s\" is not an allowed option for binning' % binning)
 
     # prepare the catalogues
-    if center_file != '': 
+    if center_file: 
         cat1 = treecorr.Catalog(fitscat1, ra_col=cat1raname, dec_col=cat1decname, ra_units='deg', dec_units='deg', \
                                           g1_col=cat1e1name, g2_col=cat1e2name, w_col=cat1wname,patch_centers=center_file)
         #cat1.write_patch_centers(file_name=outfile+"cens.txt")
