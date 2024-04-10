@@ -129,9 +129,9 @@ rootfile=args.rootfile
 logwidth=args.logwidth
 thetamin_apod=args.thetamin_apod
 thetamax_apod=args.thetamax_apod
-if not thetamin_apod is None: 
+if thetamin_apod: 
     thetamin_apod=float(thetamin_apod)
-if not thetamax_apod is None: 
+if thetamax_apod: 
     thetamax_apod=float(thetamax_apod)
 ellmin=args.ellmin
 ellmax=args.ellmax
