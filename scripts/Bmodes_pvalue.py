@@ -34,6 +34,18 @@ output_dir = args.output_dir
 title = args.title
 suffix = args.suffix
 
+def pvalue(data, cov, mask=None):
+    if any(mask):
+        n_data = len(np.where(mask)[0])
+    else: 
+        n_data = len(data)
+        mask = np.full(n_data, True)
+    # mask = np.where(mask)
+    chi2 = np.dot(data[mask],np.dot(np.linalg.inv(cov[mask,:][:,mask]),data[mask]))
+    p = stats.chi2.sf(chi2, n_data)
+    return(p)
+
+
 if statistic == 'cosebis':
     extension = 'Bn'
     ylabel = r'$B_{\rm n}[10^{-10}{\rm rad}^2]$'
@@ -110,6 +122,7 @@ if statistic != 'xiEB':
         else:
             plt.savefig(output_dir+'/bmodes_%.2f-%.2f.pdf'%(thetamin,thetamax))
         plt.close()
+        plist = ['All: %.2e'%(p)]
 
         if statistic =='cosebis':
             # update n_data and n_data per bin 
@@ -150,6 +163,61 @@ if statistic != 'xiEB':
             else:
                 plt.savefig(output_dir+'/bmodes_%.2f-%.2f_nmax5.pdf'%(thetamin,thetamax))
             plt.close()
+            plist_5 = ['All: %.2e'%(p)]
+
+        p_singlebins=np.zeros((ntomo,ntomo))
+        p_excludeone=np.zeros((ntomo,ntomo))
+        p_singlebins_5=np.zeros((ntomo,ntomo))
+        p_excludeone_5=np.zeros((ntomo,ntomo))
+        for i in range(1,ntomo+1):
+            mask_only = (B_data['BIN1']==i) | (B_data['BIN2']==i)
+            mask_without = (B_data['BIN1']!=i) & (B_data['BIN2']!=i)
+            p_only = pvalue(B_data['VALUE'], B_cov, mask_only)
+            p_without = pvalue(B_data['VALUE'], B_cov, mask_without)
+
+            plist.append('Bin %d only: %.2e'%(i,p_only))
+            plist.append('Without bin %d: %.2e'%(i,p_without))
+            if suffix:
+                np.savetxt(output_dir+'/pvalues_%.2f-%.2f_%s.pdf.txt'%(thetamin,thetamax,suffix),plist, fmt='%s')
+            else:
+                np.savetxt(output_dir+'/pvalues_%.2f-%.2f.pdf.txt'%(thetamin,thetamax),plist, fmt='%s')
+            
+            if statistic =='cosebis':
+                mask_only_5 = ((B_data['BIN1']==i) | (B_data['BIN2']==i)) & (B_data['ANGBIN']<=5)
+                mask_without_5 = (B_data['BIN1']!=i) & (B_data['BIN2']!=i) & (B_data['ANGBIN']<=5)
+                p_only_5 = pvalue(B_data['VALUE'], B_cov, mask_only_5)
+                p_without_5 = pvalue(B_data['VALUE'], B_cov, mask_without_5)
+
+                plist_5.append('Bin %d only: %.2e'%(i,p_only_5))
+                plist_5.append('Without bin %d: %.2e'%(i,p_without_5))
+                if suffix:
+                    np.savetxt(output_dir+'/pvalues_%.2f-%.2f_nmax5_%s.pdf.txt'%(thetamin,thetamax,suffix),plist_5, fmt='%s')
+                else:
+                    np.savetxt(output_dir+'/pvalues_%.2f-%.2f_nmax5.pdf.txt'%(thetamin,thetamax),plist_5, fmt='%s')
+
+            for j in range(i,ntomo+1):
+                mask_only = ((B_data['BIN1']==i) & (B_data['BIN2']==j)) | ((B_data['BIN1']==j) & (B_data['BIN2']==i))
+                mask_without = ((B_data['BIN1']!=i) & (B_data['BIN2']!=j)) & ((B_data['BIN1']!=j) & (B_data['BIN2']!=i))
+                p_singlebins[i-1,j-1] = pvalue(B_data['VALUE'], B_cov, mask_only)
+                p_excludeone[i-1,j-1] = pvalue(B_data['VALUE'], B_cov, mask_without)
+                if statistic =='cosebis':
+                    mask_only_5 = (((B_data['BIN1']==i) & (B_data['BIN2']==j)) | ((B_data['BIN1']==j) & (B_data['BIN2']==i))) & (B_data['ANGBIN']<=5)
+                    mask_without_5 = (((B_data['BIN1']!=i) & (B_data['BIN2']!=j)) & ((B_data['BIN1']!=j) & (B_data['BIN2']!=i))) & (B_data['ANGBIN']<=5)
+                    p_singlebins_5[i-1,j-1] = pvalue(B_data['VALUE'], B_cov, mask_only_5)
+                    p_excludeone_5[i-1,j-1] = pvalue(B_data['VALUE'], B_cov, mask_without_5)
+        if suffix:
+            np.savetxt(output_dir+'/pvalues_singlebins_%.2f-%.2f_%s.pdf.txt'%(thetamin,thetamax,suffix),p_singlebins, fmt='%.2e')
+            np.savetxt(output_dir+'/pvalues_excludeone_%.2f-%.2f_%s.pdf.txt'%(thetamin,thetamax,suffix),p_excludeone, fmt='%.2e')
+            if statistic =='cosebis':
+                np.savetxt(output_dir+'/pvalues_singlebins_%.2f-%.2f_nmax5_%s.pdf.txt'%(thetamin,thetamax,suffix),p_singlebins_5, fmt='%.2e')
+                np.savetxt(output_dir+'/pvalues_excludeone_%.2f-%.2f_nmax5_%s.pdf.txt'%(thetamin,thetamax,suffix),p_excludeone_5, fmt='%.2e')
+        else:
+            np.savetxt(output_dir+'/pvalues_singlebins_%.2f-%.2f.pdf.txt'%(thetamin,thetamax),p_singlebins, fmt='%.2e')
+            np.savetxt(output_dir+'/pvalue_excludeone_%.2f-%.2f.pdf.txt'%(thetamin,thetamax),p_excludeone, fmt='%.2e')
+            if statistic =='cosebis':
+                np.savetxt(output_dir+'/pvalues_singlebins_%.2f-%.2f_nmax5.pdf.txt'%(thetamin,thetamax),p_singlebins_5, fmt='%.2e')
+                np.savetxt(output_dir+'/pvalue_excludeone_%.2f-%.2f_nmax5.pdf.txt'%(thetamin,thetamax),p_excludeone_5, fmt='%.2e')
+
     else:
         fig, ax = plt.subplots(1,1, figsize = (5,5), sharex=True, sharey=True)
         plt.subplots_adjust(wspace=0, hspace=0, bottom=0.1, left=0.15)
