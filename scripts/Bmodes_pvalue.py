@@ -197,12 +197,14 @@ if statistic != 'xiEB':
 
             for j in range(i,ntomo+1):
                 mask_only = ((B_data['BIN1']==i) & (B_data['BIN2']==j)) | ((B_data['BIN1']==j) & (B_data['BIN2']==i))
-                mask_without = ((B_data['BIN1']!=i) & (B_data['BIN2']!=j)) & ((B_data['BIN1']!=j) & (B_data['BIN2']!=i))
+                mask_without = mask_only == False
                 p_singlebins[i-1,j-1] = pvalue(B_data['VALUE'], B_cov, mask_only)
                 p_excludeone[i-1,j-1] = pvalue(B_data['VALUE'], B_cov, mask_without)
                 if statistic =='cosebis':
-                    mask_only_5 = (((B_data['BIN1']==i) & (B_data['BIN2']==j)) | ((B_data['BIN1']==j) & (B_data['BIN2']==i))) & (B_data['ANGBIN']<=5)
-                    mask_without_5 = (((B_data['BIN1']!=i) & (B_data['BIN2']!=j)) & ((B_data['BIN1']!=j) & (B_data['BIN2']!=i))) & (B_data['ANGBIN']<=5)
+                    mask_only_5 = (((B_data['BIN1']==i) & (B_data['BIN2']==j)) | ((B_data['BIN1']==j) & (B_data['BIN2']==i)))
+                    mask_without_5 = mask_only_5 == False
+                    mask_only_5 = mask_only_5 & (B_data['ANGBIN']<=5)
+                    mask_without_5 = mask_without_5 & (B_data['ANGBIN']<=5)
                     p_singlebins_5[i-1,j-1] = pvalue(B_data['VALUE'], B_cov, mask_only_5)
                     p_excludeone_5[i-1,j-1] = pvalue(B_data['VALUE'], B_cov, mask_without_5)
         if suffix:
