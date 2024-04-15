@@ -122,7 +122,7 @@ if statistic != 'xiEB':
         else:
             plt.savefig(output_dir+'/bmodes_%.2f-%.2f.pdf'%(thetamin,thetamax))
         plt.close()
-        plist = ['All: %.2e'%(p)]
+        plist = ['All:             %.2e'%(p)]
 
         if statistic =='cosebis':
             # update n_data and n_data per bin 
@@ -163,7 +163,7 @@ if statistic != 'xiEB':
             else:
                 plt.savefig(output_dir+'/bmodes_%.2f-%.2f_nmax5.pdf'%(thetamin,thetamax))
             plt.close()
-            plist_5 = ['All: %.2e'%(p)]
+            plist_5 = ['All:             %.2e'%(p)]
 
         p_singlebins=np.zeros((ntomo,ntomo))
         p_excludeone=np.zeros((ntomo,ntomo))
@@ -175,8 +175,8 @@ if statistic != 'xiEB':
             p_only = pvalue(B_data['VALUE'], B_cov, mask_only)
             p_without = pvalue(B_data['VALUE'], B_cov, mask_without)
 
-            plist.append('Bin %d only: %.2e'%(i,p_only))
-            plist.append('Without bin %d: %.2e'%(i,p_without))
+            plist.append('Bin %d only:      %.2e'%(i,p_only))
+            plist.append('Excluding bin %d: %.2e'%(i,p_without))
             if suffix:
                 np.savetxt(output_dir+'/pvalues_%.2f-%.2f_%s.pdf.txt'%(thetamin,thetamax,suffix),plist, fmt='%s')
             else:
@@ -188,8 +188,8 @@ if statistic != 'xiEB':
                 p_only_5 = pvalue(B_data['VALUE'], B_cov, mask_only_5)
                 p_without_5 = pvalue(B_data['VALUE'], B_cov, mask_without_5)
 
-                plist_5.append('Bin %d only: %.2e'%(i,p_only_5))
-                plist_5.append('Without bin %d: %.2e'%(i,p_without_5))
+                plist_5.append('Bin %d only:      %.2e'%(i,p_only_5))
+                plist_5.append('Excluding bin %d: %.2e'%(i,p_without_5))
                 if suffix:
                     np.savetxt(output_dir+'/pvalues_%.2f-%.2f_nmax5_%s.pdf.txt'%(thetamin,thetamax,suffix),plist_5, fmt='%s')
                 else:
