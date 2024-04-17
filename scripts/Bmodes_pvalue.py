@@ -89,6 +89,7 @@ if statistic != 'xiEB':
                 ax[x,y].axhline(y=0, color='black', linestyle= 'dashed')
                 chi2 = np.dot(B_data['VALUE'][idx],np.dot(np.linalg.inv(B_cov[idx,:][:,idx]),B_data['VALUE'][idx]))
                 p = stats.chi2.sf(chi2, n_data_per_bin)
+                print([bin1,bin2,chi2,n_data_per_bin,p])
                 if p > 1e-2:
                     ax[x,y].text(0.03, 0.04, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
                 else:
@@ -101,6 +102,7 @@ if statistic != 'xiEB':
         plt.text(0.07, 0.9, r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax) , fontsize=14, transform=plt.gcf().transFigure, color='red')
         chi2 = np.dot(B_data['VALUE'],np.dot(np.linalg.inv(B_cov),B_data['VALUE']))
         p = stats.chi2.sf(chi2, n_data)
+        print(['-','-',chi2,n_data,p])
         if p > 1e-2:
             plt.text(0.90, 0.9, 'p = %.2f'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
         else:
