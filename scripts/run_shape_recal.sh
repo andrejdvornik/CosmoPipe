@@ -3,7 +3,7 @@
 # File Name : run_shape_recal.sh
 # Created By : awright
 # Creation Date : 26-05-2023
-# Last Modified : Wed Jan 10 05:13:39 2024
+# Last Modified : Fri 05 Apr 2024 12:45:45 PM UTC
 #
 #=========================================
 
@@ -41,7 +41,8 @@ _message " > @BLU@Constructing shape-recalibrated catalogue for @RED@${current##
     --col_ZB @BV:ZPHOTNAME@ \
     --Z_B_edges @BV:TOMOLIMS@ \
     --cols_e12 @BV:E1NAME@ @BV:E2NAME@ \
-    --cols_psf_e12 @BV:PSFE1NAME@ @BV:PSFE2NAME@ 2>&1 
+    --cols_psf_e12 @BV:PSFE1NAME@ @BV:PSFE2NAME@ \
+    --flagsource False --removeconst @BV:SHAPECAL_CTERM@ 2>&1 
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 #}}}
 
