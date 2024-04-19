@@ -130,10 +130,10 @@ do
       fi
       
       #Check if the user specified a bin_slop value. If not: use some standard values
-      bin_slop=@BV:BINSLOP_NN@
+      bin_slop=@BV:BINSLOPNN@
       if [[ $bin_slop =~ ^[+-]?[0-9]+\.?[0-9]*$ ]]
       then
-        bin_slop=@BV:BINSLOP_NN@
+        bin_slop=@BV:BINSLOPNN@
       else
         if [ @BV:NTHETABINGT@ -gt 100 ]
         then
@@ -143,10 +143,10 @@ do
         fi
       fi
       
-      bin_slop=@BV:BINSLOP_NG@
+      bin_slop=@BV:BINSLOPNG@
       if [[ $bin_slop =~ ^[+-]?[0-9]+\.?[0-9]*$ ]]
       then
-        bin_slop=@BV:BINSLOP_NG@
+        bin_slop=@BV:BINSLOPNG@
       else
         if [ @BV:NTHETABINGT@ -gt 100 ]
         then

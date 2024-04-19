@@ -1,6 +1,8 @@
 # ----------------------------------------------------------------
 # File Name:           calc_gt_w_treecorr.py
 # Author:              Catherine Heymans (heymans@roe.ac.uk)
+#                      Adapted by Andrej Dvornik to include w(theta) estimation and
+#                      modified for CosmoPipe
 # Description:         short python script to run treecorr to calculate gamma_t
 #                      we're using the Mandelbaum estimator where the randoms are subtracted
 #                      so we need a lens, source and random catalogue 
