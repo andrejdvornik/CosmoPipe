@@ -1,6 +1,7 @@
   #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import argparse
 import numpy as np
 import matplotlib.pyplot as pl
@@ -10,7 +11,7 @@ from astropy.cosmology import FlatLambdaCDM, Flatw0waCDM, LambdaCDM, z_at_value
 from astropy.stats import sigma_clip
 import scipy.stats as ss
 from scipy.signal import find_peaks
-from scipy.stats.kde import gaussian_kde
+from scipy.stats import gaussian_kde
 from sklearn.neighbors import KernelDensity
 import dill as pickle
 pl.ioff()
@@ -29,13 +30,13 @@ if __name__ == '__main__':
     parser.add_argument('--nbins', type=int, help='Number of stellar mass bins', nargs='?', default=30, const=30)
     parser.add_argument('--min_z', type=float, help='Minimum redshift of the bin if not using computed stellar mass limits', nargs='?', default=0.001, const=0.001)
     parser.add_argument('--max_z', type=float, help='Maximum redshift of the bin if not using computed stellar mass limits', nargs='?', default=1.0, const=1.0)
-    parser.add_argument('--stellar_mass_column', type=str, help='Stellar mass column', nargs='?', default='stellar_mass', const=None)
-    parser.add_argument('--z_column', type=str, help='Redshift column', nargs='?', default='z_ANNZ_KV', const=None)
-    parser.add_argument('--path', type=str, help='Path to npy files required for mass limit', nargs='?', default='', const='')
-    parser.add_argument('--file', type=str, help='Input catalogue', nargs='?', default='fluxscale_fixed.fits', const=None)
+    parser.add_argument('--stellar_mass_column', type=str, help='Stellar mass column', default='stellar_mass', required=True)
+    parser.add_argument('--z_column', type=str, help='Redshift column', default='z_ANNZ_KV', required=True)
+    parser.add_argument('--path', type=str, help='Path to npy files required for mass limit', required=True)
+    parser.add_argument('--file', type=str, help='Input catalogue', default='fluxscale_fixed.fits', required=True)
     parser.add_argument('--compare_to_gama', type=bool, help='Plot comparison figures', nargs='?', default=False, const=True)
-    parser.add_argument('--output', type=str, help='Output SMF file', nargs='?', default='smf.txt', const=None)
-    parser.add_argument('--output_vmax', type=str, help='Output VMAX file', nargs='?', default='vmax.txt', const=None)
+    parser.add_argument('--output', type=str, help='Output SMF file', default='smf.txt', required=True)
+    parser.add_argument('--output_vmax', type=str, help='Output VMAX file', default='vmax.txt', required=True)
     args = parser.parse_args()
 
     compare_to_gama = args.compare_to_gama
@@ -88,10 +89,10 @@ if __name__ == '__main__':
 
     cosmo_model = LambdaCDM(H0=h0*100., Om0=omegam, Ode0=omegav)
 
-    with open(path + 'mass_lim.npy', 'rb') as dill_file:
+    with open(os.path.join(path, 'mass_lim.npy'), 'rb') as dill_file:
         fit_func_inv = pickle.load(dill_file)
         
-    with open(path + 'mass_lim_low.npy', 'rb') as dill_file:
+    with open(os.path.join(path, 'mass_lim_low.npy'), 'rb') as dill_file:
         fit_func_low = pickle.load(dill_file)
     
     data = file_in[1].data

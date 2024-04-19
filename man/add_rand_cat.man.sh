@@ -1,5 +1,5 @@
 #
-# run_massfuncfitpy.sh Documentation & Housekeeping functions
+# add_rand_cat.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@==========================================@DEF@\n"
-    _message "@BLU@== @RED@ Running run_massfuncfitpy.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@==========================================@DEF@\n"
+    _message "@BLU@=====================================@DEF@\n"
+    _message "@BLU@== @RED@ Running add_rand_cat.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@=====================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Calculate the stellar mass limit for a sample of galaxies (like KiDS Bright sample, GAMA) '
-  echo '# for catalogue specified in the pipeline/variables.sh '
+  echo '# Add main lens randoms catalogue to data block'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,29 +42,29 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:H0 BV:OMEGAM BV:OMEGAV BV:MINMASS BV:MAXMASS BV:MINZ BV:MAXZ BV:STELLARMASS BV:REDSHIFT DATABLOCK DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  echo BV:RANDMAINCAT DATABLOCK RUNROOT STORAGEPATH
 }
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo fluxscale_corrected
-}
+  echo 
+} 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo mass_lims
+  echo RAND_CATS
 }
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/run_massfuncfitpy.sh
-} 
+  echo bash @RUNROOT@/@SCRIPTPATH@/add_rand_cat.sh
+}
 #}}}
 
 # Unset Function command {{{ 

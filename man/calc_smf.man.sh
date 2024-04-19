@@ -43,14 +43,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLU BV:NSMFBINS BV:MINMASS BV:MAXMASS BV:H0 BV:OMEGAM BV:OMEGAV BV:MINZ BV:MAXZ BV:REDSHIFT BV:STELLARMASS BV:SURVEYAREADEG DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  echo ALLPATCH BLU BV:NSMFBINS BV:MINMASS BV:MAXMASS BV:H0 BV:OMEGAM BV:OMEGAV BV:MINZ BV:MAXZ BV:REDSHIFT BV:STELLARMASS SURVEYAREADEG DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
 }
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo SMF_LENS_CATS mass_lims
+  echo smf_lens_cats mass_lims
 }
 #}}}
 
@@ -64,7 +64,7 @@ function _outputs {
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/calc_wt_w_treecorr.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/calc_smf.sh
 }
 #}}}
 

@@ -9,13 +9,20 @@
 
 ### Construct fluxscale corrected catalogue ### {{{
 _message "Applying fluxscale correction to the KiDS Bright catalogue:"
-file_one="@DB:LENS_CATS@"
+file_one="@BV:LENS_CATS@"
 #Define the output filename
 outname=${file_one##*/}
 outname=${outname%%.*}
 outname=${outname}_fluxscale_corrected.fits
 
-#Check if the output file exists 
+
+#If needed, make the output folder
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/fluxscale_corrected/ ]
+then
+  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/fluxscale_corrected
+fi
+
+#Check if the output file exists
 if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/fluxscale_corrected/${outname} ]
 then
   _message "    -> @BLU@Removing previous fluxscale corrected catalogue for file ${file_one}@DEF@"

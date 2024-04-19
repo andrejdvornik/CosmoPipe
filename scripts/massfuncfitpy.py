@@ -34,12 +34,12 @@ if __name__ == '__main__':
     parser.add_argument('--max_mass', type=float, help='Maximum stellar mass to determine mass limit', nargs='?', default=12.0, const=12.0)
     parser.add_argument('--min_z', type=float, help='Minimum redshift to determine mass limit', nargs='?', default=0.0, const=0.0)
     parser.add_argument('--max_z', type=float, help='Maximum redshift to determine mass limit', nargs='?', default=0.6, const=0.6)
-    parser.add_argument('--stellar_mass_column', type=str, help='Stellar mass column', nargs='?', default='stellar_mass_fluxscale_corrected', const=None)
-    parser.add_argument('--z_column', type=str, help='Redshift column', nargs='?', default='z_ANNZ_KV', const=None)
-    parser.add_argument('--file', type=str, help='Input catalogue', nargs='?', default='fluxscale_fixed.fits', const=None)
+    parser.add_argument('--stellar_mass_column', type=str, help='Stellar mass column', default='stellar_mass_fluxscale_corrected', required=True)
+    parser.add_argument('--z_column', type=str, help='Redshift column', default='z_ANNZ_KV', required=True)
+    parser.add_argument('--file', type=str, help='Input catalogue', default='fluxscale_fixed.fits', required=True)
     parser.add_argument('--plot_inspect_figs', type=bool, help='Plot inspect figures', nargs='?', default=False, const=True)
-    parser.add_argument('--outfile1', type=str, help='Output file for mass lim function', nargs='?', default='mass_lim.npy', const=None)
-    parser.add_argument('--outfile2', type=str, help='Output file for low mass lim function', nargs='?', default='mass_lim_low.npy', const=None)
+    parser.add_argument('--outfile1', type=str, help='Output file for mass lim function', default='mass_lim.npy', required=True)
+    parser.add_argument('--outfile2', type=str, help='Output file for low mass lim function', default='mass_lim_low.npy', required=True)
     args = parser.parse_args()
     
     plot_inspect_figs = args.plot_inspect_figs
