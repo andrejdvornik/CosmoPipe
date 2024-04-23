@@ -6,3 +6,4 @@ RUNTIME
 data/KiDS*.fits 
 tmp*
 *.bak
+scripts/unused
