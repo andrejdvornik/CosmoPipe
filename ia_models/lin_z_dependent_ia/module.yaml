@@ -1,0 +1,96 @@
+#This is a template for module description files
+name: lin_z_dependent_ia_model
+version: '1.0'
+purpose: adds redshift dependence to IA, with a linear equation
+url: ''
+interface: lin_z_dependent_ia_model.py
+attribution: [Marika Asgari, Benjamin Joachimi, Konrad Kuijken]
+rules: ''
+cite: []
+assumptions:
+-   Input model only produces E-modes and has an amplitude equal 1.
+-   Currently only works for cosmic shear IA 
+
+explanation: 
+    Takes input IA Cls, Cl^ij_II and Cl^ij_GI. Checks that their amplitude is 1 (a=1). Then creates 
+    new Cl^ij_II = (A_IA + B_IA * a_mean_i/a_pivot) * (A_IA + B_IA * a_mean_j/a_pivot) * Cl^ij_II
+    new Cl^ij_GI = (A_IA + B_IA * a_mean_j/a_pivot) * Cl^ij_GI
+    new Cl^ij_IG = (A_IA + B_IA * a_mean_i/a_pivot) * Cl^ij_IG
+
+params: 
+        suffix:
+            meaning: "suffix used to distinguish between different data vectors"
+            type: str
+            default: ""
+        new_suffix:
+            meaning: "If provided will save the resulting IA Cls using this suffix"
+            type: str
+            default: ""
+        sample:
+            meaning: "sample name used to retrieve the correct redshift distribution, only used if a_mean not given."
+            type: str
+            default: ""
+
+inputs:
+    intrinsic_alignment_parameters_{suffix}:
+        a_ia:
+            meaning: "redshift independant amplitude for the IA signal"
+            type: real
+            default:
+        b_ia:
+            meaning: "redshift dependent amplitude for the IA signal"
+            type: real
+            default:
+        a_pivot:
+            meaning: pivot scale factor
+            type: real
+            default:
+        a_mean_{i}:
+            meaning: mean scale factor per redshift bin, if not given will calculate from nz
+            type: real
+            default:
+
+    shear_cl_ii:
+        nbin_a:
+            meaning: Number of tomographic bins
+            type: int
+            default:
+        bin_{i}_{j}:
+            meaning: Intrinsic-intrinsic angular spectra for pairs of i,j values
+                C_ell
+            type: real 1d
+            default:
+    shear_cl_gi:
+        bin_{i}_{j}:
+            meaning: Shear-intrinsic angular spectra for pairs of i,j values
+                C_ell
+            type: real 1d
+            default:
+        bin_{j}_{i}:
+            meaning: Intrinsic-shear angular spectra for pairs of i,j values
+                C_ell
+            type: real 1d
+            default:
+outputs:
+    shear_cl_ii:
+        nbin_a:
+            meaning: Number of tomographic bins
+            type: int
+            default:
+        bin_{i}_{j}:
+            meaning: Intrinsic-intrinsic angular spectra for pairs of i,j values
+                C_ell
+            type: real 1d
+            default:
+    shear_cl_gi:
+        bin_{i}_{j}:
+            meaning: Shear-intrinsic angular spectra for pairs of i,j values
+                C_ell
+            type: real 1d
+            default:
+        bin_{j}_{i}:
+            meaning: Intrinsic-shear angular spectra for pairs of i,j values
+                C_ell
+            type: real 1d
+            default:
+    

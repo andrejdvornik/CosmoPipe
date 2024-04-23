@@ -2,110 +2,93 @@ import numpy as np
 import sys
 import ldac
 import astropy.io.fits as pyfits
+from argparse import ArgumentParser
 
+parser = ArgumentParser(description='Compute neff and sigmae from user inputs')
+parser.add_argument('-i','--input', dest="input", type=str,required=True,
+         help='file for input catalogue')
+parser.add_argument('--e1name', dest="e1name", type=str,default='e1',
+         help='Name of the e1 component in the catalogue')
+parser.add_argument('--e2name', dest="e2name", type=str,default='e2',
+         help='Name of the e2 component in the catalogue')
+parser.add_argument('--wname', dest="wname", type=str,default='weight',
+         help='Name of the weight in the catalogue')
+parser.add_argument('--area', dest="area", type=float,required=True,
+         help='Area of the survey in square arcmin')
+parser.add_argument('--mbias', dest="mbias",type=float,default=0.0,
+         help='multiplicative bias for this catalogue')
+
+args = parser.parse_args()
 try:
-  catalogue=pyfits.open(sys.argv[1])[1].data
-  e1=catalogue.field('@E1VAR@')
-  e2=catalogue.field('@E2VAR@')
-  weight=catalogue.field('@WEIGHTNAME@')
-  Z_B=catalogue.field('Z_B')
-  GAAP_Flag=catalogue.field('@GAAPFLAG@')
+  catalogue=pyfits.open(args.input)[1].data
+  e1=catalogue.field(args.e1name)
+  e2=catalogue.field(args.e2name)
+  weight=catalogue.field(args.wname)
 except Exception:
-  ldac_cat = ldac.LDACCat(sys.argv[1])
+  ldac_cat = ldac.LDACCat(args.input)
   catalogue = ldac_cat['OBJECTS']
-  e1=catalogue['@E1VAR@']
-  e2=catalogue['@E2VAR@']
-  weight=catalogue['@WEIGHTNAME@']
-  Z_B=catalogue['Z_B']
-  GAAP_Flag=catalogue['@GAAPFLAG@']
+  e1=catalogue[args.e1name]
+  e2=catalogue[args.e2name]
+  weight=catalogue[args.wname]
 
-area=float(sys.argv[2])
+area=args.area
 
-#Define the tomographic bins 
-tomolims="@TOMOLIMS@"
-tomolims=[float(s) for s in tomolims.split()]
+#m-bias values per tomographic bin
+mbias_p1=args.mbias + 1.0
 
-# NOTE: currently the m-bias is not used in the calculation
-##m-bias values per tomographic bin
-#mbias="@MBIASVALUES@"
-#mbias_p1=[float(s) + 1.0 for s in mbias.split()]
-##estimate of m-bias for full sample
-#mbias_p1.append(sum(mbias_p1)/len(mbias_p1))
-mbias_p1 = [1.0 for _ in range(len(tomolims))]
+print("# n_obj n_eff[1/arcmin^2] sigma_e1 sigma_e2 sigma_e1_wsq sigma_e2_wsq sigma_e sigma_e")
 
-#Nbins is nTOMO + 1 (ALL) = len(tomolims)-1+1
-nbins=len(tomolims)
+number = len(e1)
 
-print "# zlow zhigh n_obj n_eff[1/arcmin^2] sigma_e1 sigma_e2 sigma_e1_wsq sigma_e2_wsq sigma_e"
+weight_sq = weight**2
+weight_sum = weight.sum()
 
-for j in range(nbins):
-  if (j<nbins-1) :
-    low_z = tomolims[j]
-    high_z = tomolims[j+1]
-  else:
-    low_z = tomolims[0]
-    high_z = tomolims[nbins-1]
+n_eff = (
+  np.sum( weight * mbias_p1    )**2 /
+  np.sum((weight * mbias_p1)**2) /
+  area)
 
-  low_z_cut = low_z + 0.001 
-  high_z_cut = high_z + 0.001 
-  photoz_cut = (Z_B > low_z_cut) & (Z_B <= high_z_cut)
-  GAAP_Flag_cut = GAAP_Flag == 0
 
-  all_cuts = photoz_cut & GAAP_Flag_cut
-  number = np.count_nonzero(all_cuts)
+mean_e1 = np.average(e1, weights=weight)
+mean_e2 = np.average(e2, weights=weight)
 
-  weight_masked = weight[all_cuts]
-  weight_sq_masked = weight_masked**2
-  weight_sum = weight_masked.sum()
+K_0 = (mbias_p1)**2 * np.sum(weight_sq)
+sigma_eps = np.sqrt((1/K_0)*np.sum((weight_sq)*(e1**2 + e2**2)))/np.sqrt(2)
 
-  # if per-object m-bias values are given
-  if len(mbias_p1) == len(Z_B):
-    mbias_p1_masked = mbias_p1[all_cuts]
-  else:
-    mbias_p1_masked = mbias_p1[j]
+sigma_e1 = np.sqrt((  # standard error of the mean
+    np.sum(weight * e1**2   ) /
+    np.sum(weight * mbias_p1) -
+    mean_e1**2
+  ) / weight_sum)
 
-  e1_masked = e1[all_cuts]
-  e2_masked = e2[all_cuts]
+sigma_e2 = np.sqrt((  # standard error of the mean
+    np.sum(weight * e2**2   ) /
+    np.sum(weight * mbias_p1) -
+    mean_e2**2
+  ) / weight_sum)
 
-  n_eff = (
-    np.sum( weight_masked * mbias_p1_masked    )**2 /
-    np.sum((weight_masked * mbias_p1_masked)**2) /
-    area)
+mean_e1_wsq = np.average(e1, weights=weight**2)
+mean_e2_wsq = np.average(e2, weights=weight**2)
+sigma_e1_wsq = np.sqrt((  # standard error of the mean with weights squared
+    np.sum((weight * e1      )**2) /
+    np.sum((weight * mbias_p1)**2) -
+    mean_e1_wsq**2
+  ) / weight_sum)
+sigma_e2_wsq = np.sqrt((  # standard error of the mean with weights squared
+    np.sum((weight * e2      )**2) /
+    np.sum((weight * mbias_p1)**2) -
+    mean_e2_wsq**2
+  ) / weight_sum)
 
-  mean_e1 = np.average(e1_masked, weights=weight_masked)
-  mean_e2 = np.average(e2_masked, weights=weight_masked)
-  sigma_e1 = np.sqrt((  # standard error of the mean
-      np.sum(weight_masked * e1_masked**2   ) /
-      np.sum(weight_masked * mbias_p1_masked) -
-      mean_e1**2
-    ) / weight_sum)
-  sigma_e2 = np.sqrt((  # standard error of the mean
-      np.sum(weight_masked * e2_masked**2   ) /
-      np.sum(weight_masked * mbias_p1_masked) -
-      mean_e2**2
-    ) / weight_sum)
+sigma_e = (  # geometric mean
+  np.sqrt(  # standard deviation of e1 (assuming mean is zero)
+    np.sum((weight * e1      )**2) /
+    np.sum((weight * mbias_p1)**2)
+  ) / 2.0 +
+  np.sqrt(  # standard deviation of e2 (assuming mean is zero)
+    np.sum((weight * e2      )**2) /
+    np.sum((weight * mbias_p1)**2)
+  ) / 2.0)
 
-  mean_e1_wsq = np.average(e1_masked, weights=weight_masked**2)
-  mean_e2_wsq = np.average(e2_masked, weights=weight_masked**2)
-  sigma_e1_wsq = np.sqrt((  # standard error of the mean with weights squared
-      np.sum((weight_masked * e1_masked      )**2) /
-      np.sum((weight_masked * mbias_p1_masked)**2) -
-      mean_e1_wsq**2
-    ) / weight_sum)
-  sigma_e2_wsq = np.sqrt((  # standard error of the mean with weights squared
-      np.sum((weight_masked * e2_masked      )**2) /
-      np.sum((weight_masked * mbias_p1_masked)**2) -
-      mean_e2_wsq**2
-    ) / weight_sum)
+print(number, n_eff, sigma_e1, sigma_e2, sigma_e1_wsq, sigma_e2_wsq, sigma_eps, sigma_e)
 
-  sigma_e = (  # geometric mean
-    np.sqrt(  # standard deviation of e1 (assuming mean is zero)
-      np.sum((weight_masked * e1_masked      )**2) /
-      np.sum((weight_masked * mbias_p1_masked)**2)
-    ) / 2.0 +
-    np.sqrt(  # standard deviation of e2 (assuming mean is zero)
-      np.sum((weight_masked * e2_masked      )**2) /
-      np.sum((weight_masked * mbias_p1_masked)**2)
-    ) / 2.0)
-
-  print low_z, high_z, number, n_eff, sigma_e1, sigma_e2, sigma_e1_wsq, sigma_e2_wsq, sigma_e
