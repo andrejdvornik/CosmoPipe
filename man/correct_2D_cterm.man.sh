@@ -1,5 +1,5 @@
 #
-# run_shape_recal.sh Documentation & Housekeeping functions
+# correct_2D_cterm.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@=======================================@DEF@\n"
-    _message "@BLU@== @RED@ Running run_shape_recal.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@=======================================@DEF@\n"
+    _message "@BLU@========================================@DEF@\n"
+    _message "@BLU@== @RED@ Running correct_2D_cterm.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@========================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,7 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Perform shape recalibration to remove PSF leakage'
+  echo '# Correct a catalogue for 2D c-terms'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -42,7 +42,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:E1NAME BV:E2NAME BV:NBINR BV:NBINSNR BV:PSFE1NAME BV:PSFE2NAME BV:SHAPECAL_CTERM BV:SNRNAME BV:TOMOLIMS BV:WEIGHTNAME BV:ZPHOTNAME DEF PYTHON3BIN RED RUNROOT SCRIPTPATH
+  echo BV:E1NAME BV:E2NAME BV:XNAME BV:YNAME MACHINE P_RSCRIPT RUNROOT SCRIPTPATH
 } 
 #}}}
 
@@ -63,7 +63,7 @@ function _outputs {
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/run_shape_recal.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/correct_2D_cterm.sh
 } 
 #}}}
 

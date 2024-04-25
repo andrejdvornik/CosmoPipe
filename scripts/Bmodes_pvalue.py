@@ -109,6 +109,7 @@ if statistic != 'xiEB':
                         plt.text(0.03, 0.11, 'p = %.2f'%p_mult, color='blue', horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
                     else:
                         plt.text(0.03, 0.11, 'p = %.2e'%p_mult, color='blue', horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
+                print([bin1,bin2,chi2,n_data_per_bin,p])
                 if p > 1e-2:
                     ax[x,y].text(0.03, 0.01, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
                 else:
@@ -127,6 +128,7 @@ if statistic != 'xiEB':
                 plt.text(0.90, 0.95, 'p = %.2f'%p_mult, fontsize=14, transform=plt.gcf().transFigure, color='blue', horizontalalignment='right')
             else:
                 plt.text(0.90, 0.95, 'p = %.2e'%p_mult, fontsize=14, transform=plt.gcf().transFigure, color='blue', horizontalalignment='right')
+        print(['-','-',chi2,n_data,p])
         if p > 1e-2:
             plt.text(0.90, 0.9, 'p = %.2f'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
         else:

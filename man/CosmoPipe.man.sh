@@ -778,12 +778,17 @@ function _parse_blockvars {
 #Write the blockvars {{{
 function _write_blockvars { 
   #Get the variables 
-  if [ "${2:0:4}" == "@BV:" ] 
+  if [ "${2:0:4}" == "@BV:" ] || [ "${2:0:4}" == "@DB:" ]
   then 
     #The variable assignment is a reference: assign the referred value 
     _target=${2:4}
     _target=${_target%@}
-    _filelist=`_read_blockvars ${_target}`
+    if [ "${2:0:4}" == "@BV:" ]
+    then 
+      _filelist=`_read_blockvars ${_target}`
+    else 
+      _filelist=`_read_datablock ${_target}`
+    fi 
     #Remove variable name and brackets 
     _filelist=${_filelist#*=}
     _prompt=${_filelist#\{}

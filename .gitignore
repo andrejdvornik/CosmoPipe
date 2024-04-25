@@ -6,3 +6,8 @@ RUNTIME
 data/KiDS*.fits 
 tmp*
 *.bak
+scripts/unused
+scripts/ImSim
+config/covariance_arb_summary
+kcap_all/
+

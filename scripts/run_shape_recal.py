@@ -58,6 +58,12 @@ parser.add_argument(
 parser.add_argument(
     "--Z_B_edges", type=float, nargs='*', default=None,
     help="edges for tomographic binning.")
+parser.add_argument(
+    "--removeconst", type=str, default="False", 
+    help="remove constant term from ellipticities?")
+parser.add_argument(
+    "--flagsource", type=str, default="False", 
+    help="flag sources that are not well modelled?")
 
 ## arg parser
 args = parser.parse_args()
@@ -70,6 +76,8 @@ col_ZB = args.col_ZB
 col_e1, col_e2 = args.cols_e12
 col_psf_e1, col_psf_e2 = args.cols_psf_e12
 Z_B_edges = np.array(args.Z_B_edges)
+flagsource = args.flagsource == "True"
+remove_constant = args.removeconst == "True"
 
 # >>>>>>>>>>>>>>>>>>>>> workhorse
 
@@ -115,7 +123,8 @@ for ibin_R in range(N_R):
 
 print("timer: "+str(time.time()-tzero))
 ## construct a temporary pandas df 
-obj_df = pd.DataFrame({"bin_R":obj_cat['bin_R'].astype(np.int32),
+obj_df = pd.DataFrame({"AlphaRecal_index":np.arange(len(obj_cat)),
+                       "bin_R":obj_cat['bin_R'].astype(np.int32),
                        "bin_snr":obj_cat["bin_snr"].astype(np.float64),
                        col_snr:obj_cat[col_snr].astype(np.float64),
                        col_weight:obj_cat[col_weight].astype(np.float64),
@@ -138,9 +147,11 @@ print("timer: "+str(time.time()-tzero))
 cata_alpha = cata_grouped.sum()
 cata_alpha = cata_alpha[[col_weight]].copy()
 cata_alpha.rename(columns={col_weight: 'total_weights'}, inplace=True)
+cata_corr = []
 for name, group in cata_grouped:
 
     # out shear
+    index_obj = group['AlphaRecal_index'].values
     e1_out = np.array(group[col_e1])
     e2_out = np.array(group[col_e2])
     weight_out = np.array(group[col_weight])
@@ -158,16 +169,54 @@ for name, group in cata_grouped:
     ## e1
     mod_wls = sm.WLS(e1_out, sm.add_constant(e1_psf), weights=weight_out)
     res_wls = mod_wls.fit()
+    #If we want to flag sources 
+    if flagsource: 
+        #Get predicted e1_out 
+        fitvals = res_wls.get_prediction()
+        #Get e1 1-sigma confidence interval size
+        conf_int = fitvals.conf_int(obs=True,alpha=0.3173105)
+        conf_int = conf_int[:,1]-conf_int[:,0]
+        #Flag sources that are more than 5-sigma away from the prediction 
+        tmp_mask_e1 = (e1_out > fitvals.predicted + conf_int*5) | (e1_out < fitvals.predicted - conf_int*5)
+
     cata_alpha.loc[name, 'alpha1'] = res_wls.params[1]
     cata_alpha.loc[name, 'alpha1_err'] = (res_wls.cov_params()[1, 1])**0.5
     del e1_out, e1_psf, mod_wls, res_wls
     ## e2
     mod_wls = sm.WLS(e2_out, sm.add_constant(e2_psf), weights=weight_out)
     res_wls = mod_wls.fit()
+    #If we want to flag sources 
+    if flagsource: 
+        #Get predicted e2_out 
+        fitvals = res_wls.get_prediction()
+        #Get e2 1-sigma confidence interval size
+        conf_int = fitvals.conf_int(obs=True,alpha=0.3173105)
+        conf_int = conf_int[:,1]-conf_int[:,0]
+        #Flag sources that are more than 5-sigma away from the prediction 
+        tmp_mask_e2 = (e2_out > fitvals.predicted + conf_int*5) | (e2_out < fitvals.predicted - conf_int*5)
+
     cata_alpha.loc[name, 'alpha2'] = res_wls.params[1]
     cata_alpha.loc[name, 'alpha2_err'] = (res_wls.cov_params()[1, 1])**0.5
     del e2_out, e2_psf, weight_out, mod_wls, res_wls
+    
+    if flagsource: 
+        cata_tmp = pd.DataFrame({'AlphaRecal_index': index_obj, 
+                                'AlphaRecalD1_alpha1_est': cata_alpha.loc[name, 'alpha1'],
+                                'AlphaRecalD1_alpha2_est': cata_alpha.loc[name, 'alpha2'],
+                                'AlphaRecalD1_alpha1_err_est': cata_alpha.loc[name, 'alpha1_err'],
+                                'AlphaRecalD1_alpha2_err_est': cata_alpha.loc[name, 'alpha2_err'],
+                                'mask': (tmp_mask_e1 | tmp_mask_e2)==False })
+    else: 
+        cata_tmp = pd.DataFrame({'AlphaRecal_index': index_obj, 
+                                'AlphaRecalD1_alpha1_est': cata_alpha.loc[name, 'alpha1'],
+                                'AlphaRecalD1_alpha2_est': cata_alpha.loc[name, 'alpha2'],
+                                'AlphaRecalD1_alpha1_err_est': cata_alpha.loc[name, 'alpha1_err'],
+                                'AlphaRecalD1_alpha2_err_est': cata_alpha.loc[name, 'alpha2_err']})
 
+    cata_corr.append(cata_tmp)
+
+
+cata_corr = pd.concat(cata_corr)
 del cata_grouped
 print('alpha map produced in', time.time() - start_time, 's')
 
@@ -205,6 +254,13 @@ alpha = poly1[0] \
         + poly1[2] * np.power(obj_cat[col_snr], -3) \
         + poly1[3] * obj_cat['R'] \
         + poly1[4] * obj_cat['R'] * np.power(obj_cat[col_snr], -2)
+# save/merge
+obj_cat['AlphaRecalD1_alpha1_est'] = np.zeros(len(obj_cat)).astype(np.float64) 
+obj_cat['AlphaRecalD1_alpha1_est'][cata_corr['AlphaRecal_index']] = cata_corr['AlphaRecalD1_alpha1_est'] 
+obj_cat['AlphaRecalD1_alpha1_err_est'] = np.zeros(len(obj_cat)).astype(np.float64) 
+obj_cat['AlphaRecalD1_alpha1_err_est'][cata_corr['AlphaRecal_index']] = cata_corr['AlphaRecalD1_alpha1_err_est'] 
+obj_cat['AlphaRecalD1_alpha1'] = np.zeros(len(obj_cat)).astype(np.float64)
+obj_cat['AlphaRecalD1_alpha1'] = alpha 
 obj_cat['AlphaRecalD1_e1'] = np.zeros(len(obj_cat)).astype(np.float64)
 obj_cat['AlphaRecalD1_e1'] = obj_cat[col_e1] - alpha * obj_cat[col_psf_e1]
 del alpha, poly1
@@ -214,9 +270,25 @@ alpha = poly2[0] \
         + poly2[2] * np.power(obj_cat[col_snr], -3) \
         + poly2[3] * obj_cat['R'] \
         + poly2[4] * obj_cat['R'] * np.power(obj_cat[col_snr], -2)
+# save/merge
+obj_cat['AlphaRecalD1_alpha2_est'] = np.zeros(len(obj_cat)).astype(np.float64) 
+obj_cat['AlphaRecalD1_alpha2_est'][cata_corr['AlphaRecal_index']] = cata_corr['AlphaRecalD1_alpha2_est'] 
+obj_cat['AlphaRecalD1_alpha2_err_est'] = np.zeros(len(obj_cat)).astype(np.float64) 
+obj_cat['AlphaRecalD1_alpha2_err_est'][cata_corr['AlphaRecal_index']] = cata_corr['AlphaRecalD1_alpha2_err_est'] 
+obj_cat['AlphaRecalD1_alpha2'] = np.zeros(len(obj_cat)).astype(np.float64)
+obj_cat['AlphaRecalD1_alpha2'] = alpha 
 obj_cat['AlphaRecalD1_e2'] = np.zeros(len(obj_cat)).astype(np.float64)
 obj_cat['AlphaRecalD1_e2'] = obj_cat[col_e2] - alpha * obj_cat[col_psf_e2]
+
 del alpha, poly2
+
+#Mask the poorly modelled objects 
+if flagsource: 
+    mask = np.zeros(len(obj_cat)).astype(bool) 
+    mask[cata_corr['AlphaRecal_index']] = cata_corr['mask'] 
+    print('number with well modelled alphas after step D1', np.sum(mask), 'fraction', np.sum(mask)/len(obj_cat))
+    obj_cat = obj_cat.filter(mask)
+    del mask 
 
 ## meaningful e
 mask_tmp = (obj_cat['AlphaRecalD1_e1']>-1) & (obj_cat['AlphaRecalD1_e1']<1) \
@@ -291,27 +363,72 @@ for name, group in obj_df.groupby(by=['bin_ZB', 'bin_R', 'bin_snr']):
     ## e1
     mod_wls = sm.WLS(e1_out, sm.add_constant(e1_psf), weights=weight_out)
     res_wls = mod_wls.fit()
+    #If we want to flag sources 
+    if flagsource: 
+        #Get predicted e1_out 
+        fitvals = res_wls.get_prediction()
+        #Get e1 1-sigma confidence interval size
+        conf_int = fitvals.conf_int(obs=True,alpha=0.3173105)
+        conf_int = conf_int[:,1]-conf_int[:,0]
+        #Flag sources that are more than 5-sigma away from the prediction 
+        tmp_mask_e1 = (e1_out > fitvals.predicted + conf_int*5) | (e1_out < fitvals.predicted - conf_int*5)
     alpha1 = res_wls.params[1]
+    const1 = res_wls.params[0]
     del res_wls, mod_wls
     ## e2
     mod_wls = sm.WLS(e2_out, sm.add_constant(e2_psf), weights=weight_out)
     res_wls = mod_wls.fit()
+    #If we want to flag sources 
+    if flagsource: 
+        #Get predicted e2_out 
+        fitvals = res_wls.get_prediction()
+        #Get e2 1-sigma confidence interval size
+        conf_int = fitvals.conf_int(obs=True,alpha=0.3173105)
+        conf_int = conf_int[:,1]-conf_int[:,0]
+        #Flag sources that are more than 5-sigma away from the prediction 
+        tmp_mask_e2 = (e2_out > fitvals.predicted + conf_int*5) | (e2_out < fitvals.predicted - conf_int*5)
+        #mask keeps True and discards False
+        mask = (tmp_mask_e1 | tmp_mask_e2) == False
     alpha2 = res_wls.params[1]
+    const2 = res_wls.params[0]
     del weight_out, res_wls, mod_wls
 
     # >>>>>>>>>>>>>>>> correct 
-    e1_corr = e1_out - alpha1 * e1_psf
-    e2_corr = e2_out - alpha2 * e2_psf
-    del e1_out, alpha1, e1_psf, e2_out, alpha2, e2_psf
+    if remove_constant: 
+        e1_corr = e1_out - alpha1 * e1_psf - const1
+        e2_corr = e2_out - alpha2 * e2_psf - const2 
+    else: 
+        e1_corr = e1_out - alpha1 * e1_psf
+        e2_corr = e2_out - alpha2 * e2_psf
 
     # >>>>>>>>>>>>>>>> save
-    cata_tmp = pd.DataFrame({'AlphaRecal_index': index_obj, 
-                            'AlphaRecalD2_e1': e1_corr,
-                            'AlphaRecalD2_e2': e2_corr})
-    del index_obj, e1_corr, e2_corr
+    if flagsource: 
+        cata_tmp = pd.DataFrame({'AlphaRecal_index': index_obj, 
+                                'AlphaRecalD2_e1': e1_corr,
+                                'AlphaRecalD2_e2': e2_corr,
+                                'AlphaRecalD2_alpha1': alpha1,
+                                'AlphaRecalD2_alpha2': alpha2,
+                                'AlphaRecalD2_const1': const1,
+                                'AlphaRecalD2_const2': const2,
+                                'mask': mask })
+    else: 
+        cata_tmp = pd.DataFrame({'AlphaRecal_index': index_obj, 
+                                'AlphaRecalD2_e1': e1_corr,
+                                'AlphaRecalD2_e2': e2_corr,
+                                'AlphaRecalD2_alpha1': alpha1,
+                                'AlphaRecalD2_alpha2': alpha2,
+                                'AlphaRecalD2_const1': const1,
+                                'AlphaRecalD2_const2': const2})
+    del e1_out, alpha1, e1_psf, e2_out, alpha2, e2_psf, const1, const2, index_obj, e1_corr, e2_corr
     cata_corr.append(cata_tmp)
     del cata_tmp
 cata_corr = pd.concat(cata_corr)
+
+#Mask the poorly modelled objects 
+if flagsource: 
+    print('number with well modelled alphas after step D1', np.sum(cata_corr['mask']), 'fraction', np.sum(cata_corr['mask'])/len(cata_corr))
+    cata_corr = cata_corr[cata_corr['mask']]
+    del mask 
 
 # meaningful e
 mask_tmp = (cata_corr['AlphaRecalD2_e1']>-1) & (cata_corr['AlphaRecalD2_e1']<1) \
@@ -321,10 +438,20 @@ cata_corr = cata_corr[mask_tmp]
 del mask_tmp
 
 # merge
+obj_cat['AlphaRecalD2_alpha1'] = np.zeros(len(obj_cat)).astype(np.float64) 
+obj_cat['AlphaRecalD2_alpha1'][cata_corr['AlphaRecal_index']] = cata_corr['AlphaRecalD2_alpha1'] 
+obj_cat['AlphaRecalD2_alpha2'] = np.zeros(len(obj_cat)).astype(np.float64) 
+obj_cat['AlphaRecalD2_alpha2'][cata_corr['AlphaRecal_index']] = cata_corr['AlphaRecalD2_alpha2'] 
+obj_cat['AlphaRecalD2_const1'] = np.zeros(len(obj_cat)).astype(np.float64) 
+obj_cat['AlphaRecalD2_const1'][cata_corr['AlphaRecal_index']] = cata_corr['AlphaRecalD2_const1'] 
+obj_cat['AlphaRecalD2_const2'] = np.zeros(len(obj_cat)).astype(np.float64) 
+obj_cat['AlphaRecalD2_const2'][cata_corr['AlphaRecal_index']] = cata_corr['AlphaRecalD2_const2'] 
 obj_cat['AlphaRecalD2_e1'] = np.zeros(len(obj_cat)).astype(np.float64) 
-obj_cat['AlphaRecalD2_e2'] = np.zeros(len(obj_cat)).astype(np.float64) 
 obj_cat['AlphaRecalD2_e1'][cata_corr['AlphaRecal_index']] = cata_corr['AlphaRecalD2_e1'] 
+obj_cat['AlphaRecalD2_e2'] = np.zeros(len(obj_cat)).astype(np.float64) 
 obj_cat['AlphaRecalD2_e2'][cata_corr['AlphaRecal_index']] = cata_corr['AlphaRecalD2_e2'] 
+mask_tmp = ((obj_cat['AlphaRecalD2_e1'] == 0) & (obj_cat['AlphaRecalD2_e2'] == 0))==False
+obj_cat = obj_cat.filter(mask_tmp)
 del cata_corr
 print('D2 finished in', time.time() - start_time, 's')
 print("timer: "+str(time.time()-tzero))

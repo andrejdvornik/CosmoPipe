@@ -42,6 +42,7 @@ _varcheck $0
 #Read command line options  {{{
 pipeline_only=FALSE
 recheck=FALSE
+useauto=FALSE
 resume=""
 resumenum='0'
 while [ $# -gt 0 ] 
@@ -56,15 +57,14 @@ do
       shift
       if [ $# -gt 0 ] 
       then 
-        re='^[1-9]+$'
+        re='^[0-9]+$'
         if [[ ${1:0:1} =~ $re ]]
         then 
           resumenum=$1
           shift 
         elif [ "${1^^}" == "AUTO" ]
         then 
-          step=`ls -tr ${RUNROOT}/${LOGPATH}/step* | tail -1 | awk -F/ '{print $NF}' | awk -F_ '{print $2}'`
-          resumenum=${step}
+          useauto=TRUE
           shift
         fi 
       fi
@@ -87,6 +87,11 @@ done
 if [ "${recheck}" == "TRUE" ] 
 then 
   source @RUNROOT@/variables.sh 
+fi 
+if [ "${useauto}" == "TRUE" ]
+then 
+  step=`ls -tr ${RUNROOT}/${LOGPATH}/step* | tail -1 | awk -F/ '{print $NF}' | awk -F_ '{print $2}'`
+  resumenum=${step}
 fi 
 #}}}
 
@@ -118,7 +123,7 @@ then
   
   #Make and populate the runtime scripts directory {{{
   _message "   >${RED} Copying Provided Data Products to Storage Path${DEF}" 
-  mkdir -p ${RUNROOT}/${STORAGEPATH}/DATAHEAD
+  mkdir -p ${RUNROOT}/${STORAGEPATH}/${DATABLOCK}/DATAHEAD
   rsync -autv ${PACKROOT}/data/* ${RUNROOT}/${STORAGEPATH}/ > ${RUNROOT}/INSTALL/datatranfer.log 2>&1 
   _message "${BLU} - Done! ${DEF}\n"
   _message "   >${RED} Copying scripts & configs to Run directory${DEF}" 
@@ -181,6 +186,10 @@ done
 #}}}
 
 #Create the pipeline, & update the runtime scripts with the relevant paths & variables {{{
+if [ "${resume}" == "" ] 
+then 
+  resumenum=''
+fi 
 for pipe in ${PIPELINE}
 do 
   _message "   >${RED} Constructing Pipeline ${pipe} ${DEF}" 

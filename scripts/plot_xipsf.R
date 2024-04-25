@@ -3,7 +3,7 @@
 # File Name : plot_TPD.R
 # Created By : awright
 # Creation Date : 18-04-2023
-# Last Modified : Thu 04 Apr 2024 12:51:56 PM CEST
+# Last Modified : Thu 04 Apr 2024 01:28:16 PM CEST
 #
 #=========================================
 
@@ -108,10 +108,7 @@ cols<-colnames(tpd)
 cols<-cols[which(grepl("scale_cuts_output",cols,ignore.case=T))]
 tpd<-as.matrix(tpd[,cols,with=F])
 
-dat<-(gpsf$V1^2/psf$V1)/tpd[which.max(tpdweight),]
-#dat<-dat$V1
-#print(c(length(radius),length(gpsf$V1),length(psf$V1),length(tpd[which.max(tpdweight),])))
-#dat<-psf*sqrt(radius)
+dat<-(psf$V1)*sqrt(radius)
 
 
 #Define the layout matrix for the figure 
@@ -143,13 +140,14 @@ start=0
 ylims_upper<-list()
 start_tmp<-0
 mfact<-ceiling(median(log10(abs(dat[1:(length(dat)/2)]))))
+#mfact<--5
 for (i in 1:args$ntomo) { 
   ylim=c(Inf,-Inf)
   ylims_upper[[i]]=list()
   for (j in i:args$ntomo) { 
     ind<-start_tmp+1:ndata
-    ylim=c(min(c(ylim[1],dat[ind]/10^mfact,(-0.1*sqrt(diag(cov)[ind]))/10^mfact/tpd[which.max(tpdweight),ind])),
-          max(c(ylim[2],dat[ind]/10^mfact,(+0.1*sqrt(diag(cov)[ind]))/10^mfact/tpd[which.max(tpdweight),ind])))
+    ylim=c(min(c(ylim[1],dat[ind]/10^mfact,(-0*sqrt(radius[ind])*sqrt(diag(cov)[ind]))/10^mfact/tpd[which.max(tpdweight),ind])),
+          max(c(ylim[2],dat[ind]/10^mfact,(+0*sqrt(radius[ind])*sqrt(diag(cov)[ind]))/10^mfact/tpd[which.max(tpdweight),ind])))
     #ylim=c(min(c(ylim[1],(-3*sqrt(diag(cov)[ind]))/10^mfact)),
     #       max(c(ylim[2],(+3*sqrt(diag(cov)[ind]))/10^mfact)))
     start_tmp<-start_tmp+ndata
@@ -161,6 +159,7 @@ for (i in 1:args$ntomo) {
 ylims_lower<-list()
 for (i in 1:args$ntomo) ylims_lower[[i]]=list()
 mfact<-ceiling(median(log10(abs(dat[length(dat)/2 + 1:(length(dat)/2)]))))
+#mfact<--5
 for (jj in 1:args$ntomo) { 
   start_tmp<-length(dat)/2
   for (i in 1:args$ntomo) { 
@@ -168,8 +167,8 @@ for (jj in 1:args$ntomo) {
       ind<-start_tmp+1:ndata
       if (j==jj) {  
         cat(paste0("[",i,",",j,"] "))
-        ylim=c(min(c(ylim[1],dat[ind]/10^mfact,(-0.1*sqrt(diag(cov)[ind]))/10^mfact/tpd[which.max(tpdweight),ind])),
-               max(c(ylim[2],dat[ind]/10^mfact,(+0.1*sqrt(diag(cov)[ind]))/10^mfact/tpd[which.max(tpdweight),ind])))
+        ylim=c(min(c(ylim[1],dat[ind]/10^mfact,(-0*sqrt(radius[ind])*sqrt(diag(cov)[ind]))/10^mfact/tpd[which.max(tpdweight),ind])),
+               max(c(ylim[2],dat[ind]/10^mfact,(+0*sqrt(radius[ind])*sqrt(diag(cov)[ind]))/10^mfact/tpd[which.max(tpdweight),ind])))
       }
       start_tmp<-start_tmp+ndata
     }
@@ -184,6 +183,7 @@ print(ylims_lower)
 for (uplo in 1:2) { 
   #Define the scaling factor for the y-labels 
   mfact<-ceiling(median(log10(abs(dat[length(dat)/2*(uplo-1) + 1:(length(dat)/2)]))))
+  #mfact<--5
   for (i in 1:args$ntomo) { 
     for (j in i:args$ntomo) { 
       ind<-start+1:ndata
@@ -202,8 +202,8 @@ for (uplo in 1:2) {
       #magicaxis::magerr(x=radius[ind],dat[ind]/10^mfact,yhi=sqrt(diag(cov)[ind])/10^mfact,ylo=sqrt(diag(cov)[ind])/10^mfact,lwd=2)
       polygon(col=rgb(232,243,247,maxColorValue=255),border=NA,
               x=c(radius[ind],rev(radius[ind])),
-              y=c(-0.1*sqrt(diag(cov)[ind])/tpd[which.max(tpdweight),ind]/10^mfact,
-              rev( 0.1*sqrt(diag(cov)[ind])/tpd[which.max(tpdweight),ind]/10^mfact)))
+              y=c(-0*sqrt(radius[ind])*sqrt(diag(cov)[ind])/tpd[which.max(tpdweight),ind]/10^mfact,
+              rev( 0*sqrt(radius[ind])*sqrt(diag(cov)[ind])/tpd[which.max(tpdweight),ind]/10^mfact)))
       #Zero line 
       abline(h=0,lwd=1,lty=3)
       lines(col=rgb(238,87,75,maxColorValue=255),radius[ind],dat[ind]/10^mfact,lwd=1.5)
@@ -218,9 +218,9 @@ for (uplo in 1:2) {
     }
   }
   if (uplo==1) { 
-    mtext(side=4,text=bquote(.(parse(text="xi['+']^'sys'/xi['+']^paste(Lambda,'CDM')")[[1]])*" x10"^.(mfact)),line=2.5,outer=T)
+    mtext(side=4,text=bquote(.(parse(text="xi['+']^'psf'*sqrt(theta)")[[1]])*" x10"^.(mfact)),line=2.5,outer=T)
   } else if (uplo==2) {  
-    mtext(side=2,text=bquote(.(parse(text="xi['-']^'sys'/xi['-']^paste(Lambda,'CDM')")[[1]])*" x10"^.(mfact)),line=2.5,outer=T)
+    mtext(side=2,text=bquote(.(parse(text="xi['-']^'psf'*sqrt(theta)")[[1]])*" x10"^.(mfact)),line=2.5,outer=T)
   }
 }
 #Annotate axes 

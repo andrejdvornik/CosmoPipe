@@ -3,7 +3,7 @@
 # File Name : spatial_split.R
 # Created By : awright
 # Creation Date : 10-07-2023
-# Last Modified : Wed 22 Nov 2023 04:10:32 PM CET
+# Last Modified : Tue 02 Apr 2024 09:16:30 AM UTC
 #
 #=========================================
 
@@ -66,14 +66,18 @@ if (length(output.cats)!=nsplit) {
 } 
 #}}}
 
-#Read the input catalogue {{{
-cat<-helpRfuncs::read.file(input.cat)
+#Read the input catalogue for col names {{{
+cat<-helpRfuncs::read.file(input.cat,nrow=10)
 #}}}
 
 #Check that the x.name varaible is in the catalogue 
 if (!x.name %in% colnames(cat)) {  
   stop(paste(x.name,"variable is not in provided catalogue!")) 
 }
+
+#Read the input catalogue {{{
+cat<-helpRfuncs::read.file(input.cat)
+#}}}
 
 #Set up the cut object (for faster splitting) {{{
 tmp<-data.frame(x=cat[[x.name]])

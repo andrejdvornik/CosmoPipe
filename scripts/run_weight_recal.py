@@ -57,6 +57,9 @@ parser.add_argument(
 parser.add_argument(
     "--cols_psf_e12", type=str, nargs=2, 
     help="column names for e1_psf, e2_psf.")
+parser.add_argument(
+    "--flagsource", type=str, default='False',
+    help="Do we want to flag and remove outlying sources?.")
 
 ## arg parser
 args = parser.parse_args()
@@ -65,6 +68,8 @@ col_weight = args.col_weight
 col_var = args.col_var
 col_snr = args.col_snr
 col_e1, col_e2 = args.cols_e12
+flagsource = args.flagsource == "True"
+print([args.flagsource,flagsource])
 
 if args.cols_e12_corr is not None:
     col_e1_corr, col_e2_corr = args.cols_e12_corr
@@ -197,9 +202,16 @@ for name, group in pd_cat.groupby(by=['bin_R', 'bin_snr']):
     try: 
         res_wls = mod_wls.fit()
         alpha = res_wls.params[1]
+        fitvals = res_wls.get_prediction(sm.add_constant(e_psf_rotated))
     except:
         print(f"warning: weighted LS fit failed in bin {name}")
         alpha = res_ols.params[1]
+        fitvals = res_ols.get_prediction(sm.add_constant(e_psf_rotated))
+    
+    #Get the confidence interval 
+    conf_int = fitvals.conf_int(obs=True,alpha=0.3173105)
+    conf_int = conf_int[:,1]-conf_int[:,0]
+    mask = ((Var > fitvals.predicted + conf_int*5) | (Var < fitvals.predicted - conf_int*5))
     # alpha_err = (res_ols.cov_params()[1, 1])**0.5
 
     # >>>>>>>>>>>>>>>> correct 
@@ -209,8 +221,9 @@ for name, group in pd_cat.groupby(by=['bin_R', 'bin_snr']):
 
     # >>>>>>>>>>>>>>>> save
     pd_cat_tmp = pd.DataFrame({'AlphaRecal_index': index_obj, 
-                            'AlphaRecalC_variance': Var_corr})
-    del index_obj, Var_corr
+                            'AlphaRecalC_variance': Var_corr,
+                            'mask': mask})
+    del index_obj, Var_corr, mask, fitvals, conf_int
     pd_cat_corr.append(pd_cat_tmp)
     del pd_cat_tmp
 
@@ -227,6 +240,10 @@ pd_cat_corr.loc[:, 'AlphaRecalC_weight'] = 2*(maxmoment - pd_cat_corr['AlphaReca
 ## post process of weights
 pd_cat_corr.loc[(pd_cat_corr['AlphaRecalC_weight']>maxweight), 'AlphaRecalC_weight'] = maxweight
 pd_cat_corr.loc[(pd_cat_corr['AlphaRecalC_weight']<maxweight/1000.), 'AlphaRecalC_weight'] = 0.
+if flagsource: 
+    print('number with well modelled alphas after weight recalibration', np.sum(pd_cat_corr['mask']==False), 'fraction', np.sum(pd_cat_corr['mask']==False)/len(pd_cat_corr))
+    pd_cat_corr.loc[(pd_cat_corr['mask']), 'AlphaRecalC_weight'] = 0.
+    pd_cat_corr.drop('mask',axis=1,inplace=True) 
 
 # merge
 obj_cat = obj_cat.merge(pd_cat_corr, how = 'outer', on = 'AlphaRecal_index',suffixes=('_orig',None))
