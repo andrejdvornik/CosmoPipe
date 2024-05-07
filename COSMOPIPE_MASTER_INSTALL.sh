@@ -131,12 +131,24 @@ fi
 _message "   >${RED} Installing cosmosis-standard-library ${DEF}"
 python_vers=`conda run -n ${CONDAPIPENAME} python --version | head -1 | awk '{print $2}' | awk -F. '{print "python"$1"."$2 }'`
 cosmosis_src=`conda run -n ${CONDAPIPENAME} which cosmosis | sed "s@/bin/cosmosis@/lib/${python_vers}/site-packages/cosmosis/@"`
-cat > csl_make.sh <<-EOF
-source cosmosis-configure
-COSMOSIS_SRC_DIR=${cosmosis_src} cosmosis-build-standard-library
-EOF
+#Clone the cosmosis-standard-library repository {{{
+_message "   >${RED} Cloning the cosmosis-standard-library Git repository${DEF}"
+#Clone the repository
+if [ -d ${RUNROOT}/INSTALL/cosmosis-standard-library ] 
+then 
+  rm -fr cosmosis-standard-library
+fi
+git clone https://github.com/joezuntz/cosmosis-standard-library.git >> gitclone_output.log 2>&1
+_message "${BLU} - Done! ${DEF}\n"
 #Replace the cpdef instances with cdef in classy.pyx
 ${P_SED_INPLACE} "s# cpdef # cdef #" cosmosis-standard-library/boltzmann/class/class_v3.2.0/python/classy.pyx 
+#}}}
+cat > csl_make.sh <<-EOF
+source cosmosis-configure
+cd cosmosis-standard-library
+make
+cd ..
+EOF
 conda run -n ${CONDAPIPENAME} bash csl_make.sh cosmosis-build-standard-library > CSL_install_output.log 2>&1
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
