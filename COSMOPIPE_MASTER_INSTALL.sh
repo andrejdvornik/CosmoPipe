@@ -542,6 +542,7 @@ cp ${PACKROOT}/scripts/configure_raw.sh ${RUNROOT}/configure.sh
 cp ${PACKROOT}/scripts/variables_raw.sh ${RUNROOT}/variables.sh 
 cp ${PACKROOT}/config/defaults.sh ${RUNROOT}/defaults.sh 
 cp ${PACKROOT}/config/pipeline.ini ${RUNROOT}/pipeline.ini 
+cp ${PACKROOT}/config/subroutines.ini ${RUNROOT}/subroutines.ini 
 for OPT in $OPTLIST
 do 
   ${P_SED_INPLACE} "s#\\@${OPT}\\@#${!OPT}#g" ${RUNROOT}/configure.sh ${RUNROOT}/variables.sh
