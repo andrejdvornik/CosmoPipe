@@ -135,6 +135,8 @@ cat > csl_make.sh <<-EOF
 source cosmosis-configure
 COSMOSIS_SRC_DIR=${cosmosis_src} cosmosis-build-standard-library
 EOF
+#Replace the cpdef instances with cdef in classy.pyx
+${P_SED_INPLACE} "s# cpdef # cdef #" cosmosis-standard-library/boltzmann/class/class_v3.2.0/python/classy.pyx 
 conda run -n ${CONDAPIPENAME} bash csl_make.sh cosmosis-build-standard-library > CSL_install_output.log 2>&1
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
