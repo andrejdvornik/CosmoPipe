@@ -153,6 +153,8 @@ if __name__ == '__main__':
         raise ValueError('\"%s\" is not an allowed option for binning' % binning)
 
     # prepare the catalogues
+    if lenswname in ["None","none",""]:
+        lenswname = None
 
     if center_file:
 

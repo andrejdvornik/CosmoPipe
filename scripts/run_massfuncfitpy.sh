@@ -58,10 +58,11 @@ MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
   --z_column @BV:REDSHIFT@ 2>&1
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
-
+outlist=""
+outlist="${outlist} ${outname_1}"
+outlist="${outlist} ${outname_2}"
 #Add the mass limit functions to the datablock
-  mass_limsblock=`_read_datablock mass_lims`
-_write_datablock mass_lims "`_blockentry_to_filelist ${mass_lims}` ${outname_1}"
-_write_datablock mass_lims "`_blockentry_to_filelist ${mass_lims}` ${outname_2}"
+_write_datablock mass_lims "${outlist}"
+
 
 #}}}

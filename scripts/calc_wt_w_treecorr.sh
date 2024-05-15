@@ -9,83 +9,52 @@
 
 ### Estimate corrrelation functions ### {{{
 _message "Estimating galaxy-clustering correlation functions:"
-lensfiles="@DB:LENS_CATS@"
-randfiles="@DB:RAND_CATS@"
-for patch in @ALLPATCH@ @PATCHLIST@
-do 
-  _message " > Patch ${patch} {\n"
-  #Select the catalogues from DATAHEAD in this patch
-  lens_filelist=''
-  rand_filelist=''
-  
-  for file in ${lensfiles}
-  do
-    if [[ "$file" =~ .*"_${patch}_".* ]]
-    then
-      lens_filelist="${lens_filelist} ${file}"
-    fi
-  done
-  
-  for file in ${randfiles}
-  do
-    if [[ "$file" =~ .*"_${patch}_".* ]]
-    then
-      rand_filelist="${rand_filelist} ${file}"
-    fi
-  done
+lensfiles="@BV:LENS_CATS@"
+randfiles="@BV:RAND_CATS@"
 
-  #If we don't have any catalogues in the datahead for this patch
-  if [ "${lens_filelist}" == "" ]
-  then
-    _message "  >> @RED@ NONE @DEF@ << \n"
-    continue
-  fi
+lens_filelist=''
+rand_filelist=''
   
-  if [ "${rand_filelist}" == "" ]
-  then
-    _message "  >> @RED@ NONE @DEF@ << \n"
-    continue
-  fi
+for file in ${lensfiles}
+do
+  lens_filelist="${lens_filelist} ${file}"
+done
+  
+for file in ${randfiles}
+do
+  rand_filelist="${rand_filelist} ${file}"
+done
 
-  NBIN=`echo @BV:LENSLIMS@ | awk '{print NF-1}'`
-  #Loop over tomographic/any other lens bins in this patch
-  #For clustering we only do autocorrelations at this stage!
-	for LBIN1 in `seq ${NBIN}`
-	do
-    #Define the Z_B limits from the TOMOLIMS {{{
-    LB_lo=`echo @BV:LENSLIMS@ | awk -v n=$LBIN1 '{print $n}'`
-    LB_hi=`echo @BV:LENSLIMS@ | awk -v n=$LBIN1 '{print $(n+1)}'`
-    #}}}
-    #Define the string to append to the file names {{{
-    LB_lo_str=`echo $LB_lo | sed 's/\./p/g'`
-    LB_hi_str=`echo $LB_hi | sed 's/\./p/g'`
-    appendstr="_LB${LB_lo_str}t${LB_hi_str}"
-    #}}}
-    #Get the input file one
-    file_lens_one=`echo ${lens_filelist} | sed 's/ /\n/g' | grep ${appendstr} || echo `
-    file_rand_one=`echo ${rand_filelist} | sed 's/ /\n/g' | grep ${appendstr} || echo `
-    #Check that the file exists
-    if [ "${file_lens_one}" == "" ]
-    then
-      _message "@RED@ - ERROR!\n"
-      _message "A lens file with the bin string @DEF@${appendstr}@RED@ does not exist in the data head\n"
-      exit 1
-    fi
+  
+
+NBIN="@BV:NLENSBINS@"
+#Loop over tomographic/any other lens bins in this patch
+#For clustering we only do autocorrelations at this stage!
+for LBIN1 in `seq ${NBIN}`
+do
+  appendstr="_LB${LBIN1}"
+  #}}}
+  #Get the input file one
+  file_lens_one=`echo ${lens_filelist} | sed 's/ /\n/g' | grep ${appendstr} || echo `
+  file_rand_one=`echo ${rand_filelist} | sed 's/ /\n/g' | grep ${appendstr} || echo `
+  #Check that the file exists
+  if [ "${file_lens_one}" == "" ]
+  then
+    _message "@RED@ - ERROR!\n"
+    _message "A lens file with the bin string @DEF@${appendstr}@RED@ does not exist in the data head\n"
+    exit 1
+  fi
     
-    if [ "${file_rand_one}" == "" ]
-    then
-      _message "@RED@ - ERROR!\n"
-      _message "A randoms file with the bin string @DEF@${appendstr}@RED@ does not exist in the data head\n"
-      exit 1
-    fi
+  if [ "${file_rand_one}" == "" ]
+  then
+    _message "@RED@ - ERROR!\n"
+    _message "A randoms file with the bin string @DEF@${appendstr}@RED@ does not exist in the data head\n"
+    exit 1
+  fi
 	  ##Loop over tomographic/any other lens bins in this patch
-	  #for LBIN2 in `seq $LBIN1 ${NTOMO}`
+	  #for LBIN2 in `seq $LBIN1 ${NBIN}`
 	  #do
-      #LB_lo2=`echo @BV:LENSLIMS@ | awk -v n=$LBIN2 '{print $n}'`
-      #LB_hi2=`echo @BV:LENSLIMS@ | awk -v n=$LBIN2 '{print $(n+1)}'`
-      #LB_lo_str2=`echo $ZB_lo2 | sed 's/\./p/g'`
-      #LB_hi_str2=`echo $ZB_hi2 | sed 's/\./p/g'`
-      #appendstr2="_LB${LB_lo_str2}t${LB_hi_str2}"
+      #appendstr2="_LB${LBIN2}"
       #
       ##Check that the required input files exist
       #file_lens_two=`echo ${lens_filelist} | sed 's/ /\n/g' | grep ${appendstr} || echo `
@@ -156,10 +125,10 @@ do
       then
         mkdir -p @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/jackknife_cov_wt
       fi
-      _message "    -> @BLU@Bin $LBIN ($LB_lo < lens_bin <= $LB_hi) x Bin $LBIN ($LB_lo < lens_bin <= $LB_hi)@DEF@"
+      _message "    -> @BLU@Bin $LBIN1 x Bin $LBIN1 @DEF@"
       MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
         @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_gt_w_treecorr.py \
-        --clustering --nbins @BV:NTHETABINWT@ --theta_min @BV:THETAMINWT@ --theta_max @BV:THETAMAXWT@ --binning @BINNINGWT@ --bin_slop_NN ${bin_slop_NN} --bin_slop_NG ${bin_slop_NG}\
+        --clustering --nbins @BV:NTHETABINWT@ --theta_min @BV:THETAMINWT@ --theta_max @BV:THETAMAXWT@ --binning @BV:BINNINGWT@ --bin_slop_NN ${bin_slop_NN} --bin_slop_NG ${bin_slop_NG}\
         --lenscat ${file_lens} \
         --randcat ${file_rand}
         --output @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/wt/${outname} \
@@ -179,8 +148,7 @@ do
         jackknife_covblock=`_read_datablock jackknife_cov_wt`
         _write_datablock jackknife_cov "`_blockentry_to_filelist ${jackknife_covblock}` ${covoutname}"
       fi
-    #done
-	done
-  _message "  }\n"
+  #done
 done
+
 #}}}

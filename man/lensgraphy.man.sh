@@ -1,5 +1,5 @@
 #
-# calc_wt_treecorr.sh Documentation & Housekeeping functions
+# lensgraphy.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@==========================================@DEF@\n"
-    _message "@BLU@== @RED@ Running calc_wt_w_treecorr.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@==========================================@DEF@\n"
+    _message "@BLU@==================================@DEF@\n"
+    _message "@BLU@== @RED@ Running lensgraphy.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@==================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,11 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Compute galaxy clustering correlation function patch-wise for all '
-  echo '# lens catalogues specified in the pipeline/variables.sh '
+  echo '# Perform lens binning of the catalogue '
+  echo '# currently at the top of the data block. The script'
+  echo '#  takes the catalogue and applies the selection '
+  echo '# given by LENSLIMSX and LENSLIMSY, creating N new catalogues on '
+  echo '# the top of the data block.'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,28 +46,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BV:BINNINGWT BLU BV:BINSLOPNN BV:LENSDECNAME BV:RANDDECNAME BV:NTHETABINWT BV:NTHREADS BV:PATCH_CENTERFILE BV:LENSRANAME BV:RANDRANAME BV:THETAMAXWT BV:THETAMINWT BV:LENSWEIGHTNAME DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  echo BLU BV:STELLARMASS BV:REDSHIFT BV:LENSLIMSX BV:LENSLIMSY BV:SLICEIN DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH DATABLOCK
 }
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo LENS_CATS RAND_CATS
+  echo fluxscale_corrected
 }
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo wt jackknife_cov_wt
+  echo lens_cats lens_cats_metadata rand_cats
 }
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/calc_wt_w_treecorr.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/lensgraphy.sh
 }
 #}}}
 

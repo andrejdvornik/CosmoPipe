@@ -22,148 +22,201 @@ from sklearn.neighbors import KernelDensity
 import matplotlib.patheffects as pe
 import matplotlib.patches as mpatches
 from matplotlib.patches import Rectangle
+import dill as pickle
+import argparse
+import os
 
 
 
 if __name__ == '__main__':
 
 
-    random = True
-    print(random)
+    parser = argparse.ArgumentParser(description='Cut given binning limits by the lower and upper stellar mass limit.')
+    parser.add_argument('--m_bins', type=str, help='Stellar mass bins', nargs='+', required=True)
+    parser.add_argument('--z_bins', type=str, help='Redshift bins', nargs='+', required=True)
+    parser.add_argument('--stellar_mass_column', type=str, help='Stellar mass column', default='stellar_mass', required=True)
+    parser.add_argument('--z_column', type=str, help='Redshift column', default='z_ANNZ_KV', required=True)
+    parser.add_argument('--path', type=str, help='Path to npy files required for mass limit', required=True)
+    parser.add_argument('--file', type=str, help='Input catalogue', default='fluxscale_fixed.fits', required=True)
+    parser.add_argument('--file_rand', type=str, help='Input randoms catalogue', default='fluxscale_fixed_rand.fits', required=True)
+    parser.add_argument('--plot', type=bool, help='Plot check figures', nargs='?', default=False, const=True)
+    parser.add_argument('--randoms', type=bool, help='Apply selection to randoms', nargs='?', default=False, const=True)
+    parser.add_argument('--percentile_split', type=bool, help='Further split bins by percentiles of galaxies', nargs='?', default=False, const=True)
+    parser.add_argument('--percentiles', type=bool, help='Which percentiles to split the galaxies', nargs='+', default=[])
+    parser.add_argument('--slice_in', type=str, help='In which quantity to split data first', required=True)
+    parser.add_argument('--output_path', type=str, help='Output path', required=True)
+    parser.add_argument('--output_name', type=str, help='Output file', required=True)
+    parser.add_argument('--output_name_rand', type=str, help='Output file randoms', required=True)
+    #parser.add_argument('--volume_limited', type=bool, help='Create volume limited samples', default=True, required=True)
     
-    min_z = 0.0
-    max_z = 0.7
+    args = parser.parse_args()
     
+    #volume_limited = args.volume_limited
     
+    random = args.randoms
+    percentile_split = args.percentile_split
+    plot = args.plot
+    
+    m_bins_in = args.m_bins #np.array([9.1,9.6,9.95,10.25,10.5,10.7,11.3])
+    z_bins_in = args.z_bins
+    
+    m_bins = np.array([float(i) for i in m_bins_in])
+    z_bins = np.array([float(i) for i in z_bins_in])
+    
+    z_column = args.z_column
+    stellar_mass_column = args.stellar_mass_column
+    
+    print(stellar_mass_column)
+    print(args.slice_in)
+    
+    if args.slice_in == stellar_mass_column:
+        slice_in_m = True
+        slice_in_z = False
+    if args.slice_in == z_column:
+        slice_in_m = False
+        slice_in_z = True
+    
+    path = args.path
+    outpath = args.output_path
+    outname = args.output_name
+    outname_rand = args.output_name_rand
+    percentiles_in = args.percentiles #[25, 50, 75]
+    percentiles = np.array([float(i) for i in percentiles_in])
 
-    h = 1.0
-    omegam = 0.3
-    omegav = 0.7
+    
+    file_in = fits.open(args.file, memmap=True)
+    data = file_in[1].data
+    
+    stellar_mass_in = data[stellar_mass_column]
+    z_in = data[z_column]
+    
+    details = {}
 
-    cosmo_model = LambdaCDM(H0=h*100., Om0=omegam, Ode0=omegav)
-
-
-    import dill as pickle
-    with open('/net/home/fohlen13/dvornik/smf_for_cosmo/mass_lim_final.npy', 'rb') as dill_file:
+    with open(os.path.join(path, 'mass_lim.npy'), 'rb') as dill_file:
         fit_func_inv = pickle.load(dill_file)
-        
-    with open('/net/home/fohlen13/dvornik/smf_for_cosmo/mass_lim_low_final.npy', 'rb') as dill_file:
+    with open(os.path.join(path, 'mass_lim_low.npy'), 'rb') as dill_file:
         fit_func_low = pickle.load(dill_file)
+    
+    
+    if slice_in_m and slice_in_z:
+        raise ValueError('Primary slicing in redshift and stellar mass is not allowed, select one or another')
+        
+        
+    if slice_in_m:
+        x_bins = m_bins
+        y_bins_in = z_bins
+        func_low = fit_func_low
+        func_high = fit_func_inv
+        x_data = stellar_mass_in
+        y_data = z_in
+        details['x_data_name'] = stellar_mass_column
+        details['y_data_name'] = z_column
+    if slice_in_z:
+        x_bins = z_bins
+        y_bins_in = m_bins
+        yrange = np.linspace(m_bins[0], m_bins[-1], 100)
+        # Need to invert low/high limits as otherwise we get inconsistency when slicing
+        func_high = interp1d(fit_func_low(yrange), yrange, fill_value='extrapolate')
+        func_low = interp1d(fit_func_inv(yrange), yrange, fill_value='extrapolate')
+        x_data = z_in
+        y_data = stellar_mass_in
+        details['x_data_name'] = z_column
+        details['y_data_name'] = stellar_mass_column
 
+    if plot:
+        x = np.linspace(6.0, 13.0, 100)
+        pl.rc('text',usetex=True)
+        fig, ax = pl.subplots(1, 1, figsize=(6, 6))
+        ax.set_ylim([6, 12])
+        ax.set_xlim([0, 0.55])
+        ax.hexbin(z_in, stellar_mass_in, gridsize=100, cmap='viridis', bins='log', rasterized=True, extent=(0, 0.7, 6, 12))
+        ax.plot(fit_func_inv(x), x, label=r'$M_{\star}\, \mathrm{limit}$')
     
-    
-    file_in = fits.open('/net/home/fohlen13/dvornik/lephare_bright_stellarmasses/absmag_ugriZYJHKs/photozs.DR4.1_bright_ugri+KV_masses.fits')
-    
-    data_in = file_in[1].data
-    
-    print(len(data_in))
-    
-    
-    z_in = data['z_ANNZ_KV']
-    
-    r_proj = cosmo_model.comoving_distance(z_in).value
-    
-    step = 0.5
-    m_low = 8.5
-    m_high = 11.5
-    bins = np.int((m_high-m_low)/step)
-    
-    m_bins = np.linspace(m_low, m_high, bins+1, endpoint=True)
-    m_bins = np.array([9.1,9.6,9.95,10.25,10.5,10.7,11.3])
-    
-    z_print = []
-    mass_print = []
-    
-    index_column = z_in.copy()
-    index_column[:] = -99
-    print(np.unique(index_column))
-    
-    x = np.linspace(6.0, 13.0, 100)
-    pl.rc('text',usetex=True)
-    #pl.rcParams.update({'font.size': 20})
-    fig, ax = pl.subplots(1, 1, figsize=(6, 6))
-    ax.set_ylim([6, 12])
-    ax.set_xlim([0, 0.55])
-    ax.hexbin(z_in, stellar_mass_in, gridsize=100, cmap=my_cmap, bins='log', rasterized=True, extent=(0, 0.7, 6, 12))
-    ax.plot(fit_func_inv(x), x, label=r'$M_{\star}\, \mathrm{limit}$')
-    for i in range(bins):
-        z_low = fit_func_low(m_bins[i+1])
-        z_high = fit_func_inv(m_bins[i])
+    # First we refine the binning with the stellar mass/luminosity limits
+    count = 0
+    for i in range(len(x_bins)-1):
+        y_low = func_low(x_bins[i+1])
+        y_high = func_high(x_bins[i])
+        y_bins_extra = np.array([y_low, y_high])
+        y_bins = np.concatenate((y_bins_in, y_bins_extra))
         
-        idx = np.where((stellar_mass_in <= m_bins[i+1]) & (stellar_mass_in > m_bins[i]) & (z_in <= z_high) & (z_in > z_low))
-        ax.scatter(z_in[idx], stellar_mass_in[idx], color='k', alpha=0.25, marker='.', s=1, rasterized=True)
-        print(stellar_mass_in[idx].size)
-        index_column[idx] = i+1
+        #idx = np.where((stellar_mass_in <= x_bins[i+1]) & (stellar_mass_in > x_bins[i]) & (z_in <= z_high) & (z_in > z_low))
+        idx0 = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_high) & (y_data > y_low))
         
-        ax.add_patch(Rectangle((z_low,m_bins[i]),(z_high-z_low),(m_bins[i+1]-m_bins[i]),linewidth=1,edgecolor='r',facecolor='none'))
-        z_print.append(np.median(z_in[idx]))
-        mass_print.append(np.log10(np.median(10.0**stellar_mass_in[idx])))
+        if slice_in_m and percentile_split:
+            med = np.percentile(y_data[idx0], percentiles)
+            y_bins = np.append(y_bins, med)
+                
+        if slice_in_z and percentile_split:
+            med = np.log10(np.percentile(10.0**y_data[idx0], percentiles))
+            y_bins = np.append(y_bins, med)
+            
+        y_bins = np.sort(y_bins)
+        y_bins = y_bins[(y_bins <= y_high) & (y_bins >= y_low)]
+        
+        # Then we apply refined binning including additional splits in median numbers
+        for j in range(len(y_bins)-1):
+            idx = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_bins[j+1]) & (y_data > y_bins[j]))
        
-    ax.set_ylabel(r'$\log(M_{\star}/h^{-2}\,M_{\odot})$')
-    ax.set_xlabel(r'$z_{\mathrm{ANNz}}$')
-    #ax.axes.set_aspect('equal')
-    handles, labels = ax.get_legend_handles_labels()
-    # manually define a new patch
-    patch = mpatches.Patch(edgecolor='red', facecolor='white', label=r'$\mathrm{Volume\, limited\ sample}$')
-    # handles is a list, so append manual patch
-    handles.append(patch)
-    # plot the legend
-    pl.legend(handles=handles, loc='lower right')#, fontsize=12)
-            
-    pl.tight_layout()
-    pl.savefig('/net/home/fohlen13/dvornik/smf_for_cosmo/selection_update2.pdf', dpi=800)
-    pl.clf()
-   
+            data_out = np.copy(data[np.where(data[idx])])
     
-    data_out = np.copy(data[np.where(index_column != -99)])
-    print(len(data_out)) #check size
-    new_cols = fits.Column(name='bins', format='I', array=index_column[np.where(index_column != -99)])
-    new_cols1 = fits.Column(name='stellar_mass', format='D', array=stellar_mass_in[np.where(index_column != -99)])
-    new_cols2 = fits.Column(name='r_como', format='D', array=r_proj[np.where(index_column != -99)])
-    
-    cols = fits.ColDefs(data_out)
-    hdu = fits.BinTableHDU.from_columns(cols + new_cols + new_cols1 + new_cols2)
-    hdu.writeto('/net/home/fohlen13/dvornik/smf_for_cosmo/selection_final_test.fits', overwrite=True)
-
-   
-    
-    
-    if random:
-        print('\nCreate randoms')
-        data_in = fits.open('/net/home/fohlen13/dvornik/smf_for_cosmo/selection_final.fits')
-        data_in = data_in[1].data
-        random_in = fits.open('/net/home/fohlen13/dvornik/random_cats/bright_randoms/ANNzBright_match_100A_randoms.fits')
-        random_in = random_in[1].data
-        
-        print(len(random_in['ID']))
-        z_in_rand = random_in['z_ANNZ_KV']
-        
-        for i in range(bins):
-            
-            z_low = fit_func_low(m_bins[i+1])
-            z_high = fit_func_inv(m_bins[i])
-        
-            idx = np.where((z_in_rand <= z_high) & (z_in_rand > z_low))
-            random = np.copy(random_in[idx])
-        
-            mask_bin = np.where(data_in['bins']==i+1)
-            index = np.in1d(random['clone_ID'], data_in['ID'][mask_bin])
-            
-            data_out = np.copy(random[np.where(random[index])])#[::3]) # remove every 3nd after testing
-            print(len(data_out))
-            
-            num_col = np.arange(len(data_out['clone_ID']))
-            print(len(np.unique(num_col)))
-            r_proj_rand = cosmo_model.comoving_distance(data_out['z_ANNZ_KV']).value
+            if plot:
+                ax.scatter(z_in[idx], stellar_mass_in[idx], color='k', alpha=0.25, marker='.', s=1, rasterized=True)
+                if slice_in_m:
+                    ax.add_patch(Rectangle((y_bins[j],x_bins[i]),(y_bins[j+1]-y_bins[j]),(x_bins[i+1]-x_bins[i]),linewidth=1,edgecolor='r',facecolor='none'))
+                if slice_in_z:
+                    ax.add_patch(Rectangle((x_bins[i],y_bins[j]),(x_bins[i+1]-x_bins[i]),(y_bins[j+1]-y_bins[j]),linewidth=1,edgecolor='r',facecolor='none'))
             
             cols = fits.ColDefs(data_out)
-            num = fits.Column(name='UNIQUEID', format='J', array=num_col)
-            new_cols_r = fits.Column(name='r_como', format='D', array=r_proj_rand)
+            hdu = fits.BinTableHDU.from_columns(cols)
+            hdu.writeto(f'{outname}{count+1}.fits', overwrite=True)
+            details['x_lims_lo'] = x_bins[i]
+            details['x_lims_hi'] = x_bins[i+1]
+            details['y_lims_lo'] = y_bins[j]
+            details['y_lims_hi'] = y_bins[j+1]
+            if slice_in_m:
+                details['x_med'] = np.median(x_data[idx])
+                details['y_med'] = np.log10(np.median(10.0**y_data[idx]))
+            if slice_in_z:
+                details['x_med'] = np.log10(np.median(10.0**x_data[idx]))
+                details['y_med'] = np.median(y_data[idx])
+            with open(f'{outpath}/stats_LB{count+1}.txt', 'w') as f:
+                for key, value in details.items():
+                    f.write(f'{key}\t{value}\n')
+
+
+            if random:
+                print('\nApplying selection to randoms...')
+                random_in = fits.open(args.file_rand, memmap=True)
+                randoms = random_in[1].data
             
-            hdu = fits.BinTableHDU.from_columns(cols + num + new_cols_r)
-            hdu.writeto('/net/home/fohlen13/dvornik/random_cats/bright_randoms/selection_final_{}.fits'.format(i+1), overwrite=True)
+                index = np.in1d(randoms['clone_ID'].astype(bytes), data_out['ID'])
+            
+                rand_out = np.copy(randoms[np.where(randoms[index])])#[::3]) # remove every 3nd after testing
+                num_col = np.arange(len(rand_out['clone_ID']))
+            
+                cols_rand = fits.ColDefs(rand_out)
+                num = fits.Column(name='UNIQUEID', format='J', array=num_col)
+                hdu = fits.BinTableHDU.from_columns(cols_rand + num)
+                hdu.writeto(f'{outname_rand}{count+1}_rand.fits', overwrite=True)
+            count += 1
+            
+    with open(f'{outpath}/nbins.txt', 'w') as f:
+        f.write(f'nbins\t{count}\n')
 
-
+    if plot:
+        ax.set_ylabel(r'$\log(M_{\star}/h^{-2}\,M_{\odot})$')
+        ax.set_xlabel(r'$z_{\mathrm{ANNz}}$')
+        handles, labels = ax.get_legend_handles_labels()
+        # manually define a new patch
+        patch = mpatches.Patch(edgecolor='red', facecolor='white', label=r'$\mathrm{Volume\, limited\ sample}$')
+        # handles is a list, so append manual patch
+        handles.append(patch)
+        # plot the legend
+        pl.legend(handles=handles, loc='lower right')#, fontsize=12)
+        pl.tight_layout()
+        pl.savefig(f'{outpath}/selection.pdf', dpi=800)
+        pl.clf()
 
 
     

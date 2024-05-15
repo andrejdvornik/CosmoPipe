@@ -10,8 +10,8 @@
 ### Estimate corrrelation functions ### {{{
 _message "Estimating galaxy-galaxy lensing correlation functions:"
 sourcefiles="@DB:ALLHEAD@"
-lensfiles="@DB:LENS_CATS@"
-randfiles="@DB:RAND_CATS@"
+lensfiles="@BV:LENS_CATS@"
+randfiles="@BV:RAND_CATS@"
 for patch in @ALLPATCH@ @PATCHLIST@
 do 
   _message " > Patch ${patch} {\n"
@@ -29,18 +29,18 @@ do
   
   for file in ${lensfiles}
   do
-    if [[ "$file" =~ .*"_${patch}_".* ]]
-    then
+    #if [[ "$file" =~ .*"_${patch}_".* ]]
+    #then
       lens_filelist="${lens_filelist} ${file}"
-    fi
+    #fi
   done
   
   for file in ${randfiles}
   do
-    if [[ "$file" =~ .*"_${patch}_".* ]]
-    then
+    #if [[ "$file" =~ .*"_${patch}_".* ]]
+    #then
       rand_filelist="${rand_filelist} ${file}"
-    fi
+    #fi
   done
 
   #If we don't have any catalogues in the datahead for this patch
@@ -62,19 +62,12 @@ do
     continue
   fi
 
-  NBIN=`echo @BV:LENSLIMS@ | awk '{print NF-1}'`
+  NBIN="@BV:NLENSBINS@"
   NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
   #Loop over tomographic/any other lens bins in this patch
 	for LBIN in `seq ${NBIN}`
 	do
-    #Define the Z_B limits from the TOMOLIMS {{{
-    LB_lo=`echo @BV:LENSLIMS@ | awk -v n=$LBIN '{print $n}'`
-    LB_hi=`echo @BV:LENSLIMS@ | awk -v n=$LBIN '{print $(n+1)}'`
-    #}}}
-    #Define the string to append to the file names {{{
-    LB_lo_str=`echo $LB_lo | sed 's/\./p/g'`
-    LB_hi_str=`echo $LB_hi | sed 's/\./p/g'`
-    appendstr="_LB${LB_lo_str}t${LB_hi_str}"
+    appendstr="_LB${LBIN}"
     #}}}
     #Get the input file one
     file_lens=`echo ${lens_filelist} | sed 's/ /\n/g' | grep ${appendstr} || echo `
@@ -162,10 +155,10 @@ do
       then
         mkdir -p @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/jackknife_cov_gt
       fi
-      _message "    -> @BLU@Bin $LBIN ($LB_lo < lens_bin <= $LB_hi) x Bin $ZBIN ($ZB_lo2 < Z_B <= $ZB_hi2)@DEF@"
+      _message "    -> @BLU@Bin $LBIN x Bin $ZBIN ($ZB_lo2 < Z_B <= $ZB_hi2)@DEF@"
       MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
         @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_gt_w_treecorr.py \
-        --lensing --nbins @BV:NTHETABINGT@ --theta_min @BV:THETAMINGT@ --theta_max @BV:THETAMAXGT@ --binning @BINNINGGT@ --bin_slop_NN ${bin_slop_NN} --bin_slop_NG ${bin_slop_NG}\
+        --lensing --nbins @BV:NTHETABINGT@ --theta_min @BV:THETAMINGT@ --theta_max @BV:THETAMAXGT@ --binning @BV:BINNINGGT@ --bin_slop_NN ${bin_slop_NN} --bin_slop_NG ${bin_slop_NG}\
         --lenscat ${file_lens} \
         --sourcecat ${file_source} \
         --randcat ${file_rand}
