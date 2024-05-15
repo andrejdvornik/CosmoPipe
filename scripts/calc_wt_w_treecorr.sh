@@ -11,21 +11,45 @@
 _message "Estimating galaxy-clustering correlation functions:"
 lensfiles="@BV:LENS_CATS@"
 randfiles="@BV:RAND_CATS@"
+  
+if [ -d ${lensfiles} ]
+then
+  inputlist=`ls @BV:LENS_CATS@`
+  lens_filelist=""
+  #This just makes sure that the files are added correctly
+  for file in ${inputlist}
+  do
+    #Save the output file to the list {{{
+    lens_filelist="${lens_filelist} ${lensfiles}${file}"
+    #}}}
+  done
+elif [ -f ${lensfiles} ]
+then
+  lens_filelist=${lensfile}
+else
+  _message "${RED} - ERROR: Main input lens catalogue @BV:SMF_LENS_CATS@ does not exist!"
+  exit -1
+fi
+  
+if [ -d ${randfiles} ]
+then
+  inputlist=`ls @BV:RAND_CATS@`
+  rand_filelist=""
+  #This just makes sure that the files are added correctly
+  for file in ${inputlist}
+  do
+    #Save the output file to the list {{{
+    rand_filelist="${rand_filelist} ${randfiles}${file}"
+    #}}}
+  done
+elif [ -f ${randfiles} ]
+then
+  rand_filelist=${randfile}
+else
+  _message "${RED} - ERROR: Main input lens catalogue @BV:RAND_CATS@ does not exist!"
+  exit -1
+fi
 
-lens_filelist=''
-rand_filelist=''
-  
-for file in ${lensfiles}
-do
-  lens_filelist="${lens_filelist} ${file}"
-done
-  
-for file in ${randfiles}
-do
-  rand_filelist="${rand_filelist} ${file}"
-done
-
-  
 
 NBIN="@BV:NLENSBINS@"
 #Loop over tomographic/any other lens bins in this patch
@@ -33,7 +57,6 @@ NBIN="@BV:NLENSBINS@"
 for LBIN1 in `seq ${NBIN}`
 do
   appendstr="_LB${LBIN1}"
-  #}}}
   #Get the input file one
   file_lens_one=`echo ${lens_filelist} | sed 's/ /\n/g' | grep ${appendstr} || echo `
   file_rand_one=`echo ${rand_filelist} | sed 's/ /\n/g' | grep ${appendstr} || echo `
@@ -83,7 +106,7 @@ do
       #Check if the output file exists 
       if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/wt/${outname} ]
       then
-        _message "    -> @BLU@Removing previous @RED@Bin $LBIN1@BLU@ x @RED@Bin $LBIN1@BLU@ galaxy-galaxy lensing correlation function@DEF@"
+        _message "    -> @BLU@Removing previous @RED@Bin $LBIN1@BLU@ x @RED@Bin $LBIN1@BLU@ galaxy clustering correlation function@DEF@"
         rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/gt/${outname}
         gtblock=`_read_datablock wt`
         currentblock=`_blockentry_to_filelist ${wtblock}`
@@ -129,8 +152,8 @@ do
       MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
         @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_gt_w_treecorr.py \
         --clustering --nbins @BV:NTHETABINWT@ --theta_min @BV:THETAMINWT@ --theta_max @BV:THETAMAXWT@ --binning @BV:BINNINGWT@ --bin_slop_NN ${bin_slop_NN} --bin_slop_NG ${bin_slop_NG}\
-        --lenscat ${file_lens} \
-        --randcat ${file_rand}
+        --lenscat ${file_lens_one} \
+        --randcat ${file_rand_one} \
         --output @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/wt/${outname} \
         --covoutput @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/jackknife_cov_wt/${covoutname} \
         --weighted True \

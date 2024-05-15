@@ -14,6 +14,7 @@ import treecorr
 import sys
 import numpy as np
 import astropy.io.fits as fits
+import argparse
 
 ## Calculate shape noise given noisy & noise-free shear
 def subtractNoise(g_1, g_2, eps_1, eps_2):
@@ -29,22 +30,22 @@ if __name__ == '__main__':
     # Read in user input to set the nbins, theta_min, theta_max, lin_not_log, lenscat, rancat, sourcecat, outfilename, weighted
         # Read in user input to set the nbins, theta_min, theta_max, lin_not_log, fitscat1, fitscat2, outfilename, weighted
     # Specify the input arguments
-    parser = ArgumentParser(description='Compute galaxy-galaxy lensing and or/clustering from user inputs')
+    parser = argparse.ArgumentParser(description='Compute galaxy-galaxy lensing and or/clustering from user inputs')
     parser.add_argument('-n', '--nbins', dest="nbins",type=int,
         help='Number of theta bins', metavar="nBins",required=True)
-    parser.add_argument('-s','--theta_min', dest="theta_min", type=float,required=True,
+    parser.add_argument('-tmin','--theta_min', dest="theta_min", type=float,required=True,
              help='minimum theta for binning')
-    parser.add_argument('-l','--theta_max', dest="theta_max", type=float,required=True,
+    parser.add_argument('-tmax','--theta_max', dest="theta_max", type=float,required=True,
              help='maximum theta for binning')
     parser.add_argument('-b','--binning', dest="binning", type=str, required=True,
              help='What binning scheme do we want? log or lin')
-    parser.add_argument('-i','--lenscat', dest="lenscat", type=str,required=True,
+    parser.add_argument('-l','--lenscat', dest="lenscat", type=str,required=True,
              help='file for first input catalogue')
-    parser.add_argument('-j','--randcat', dest="randcat", type=str,required=True,
+    parser.add_argument('-r','--randcat', dest="randcat", type=str,required=True,
              help='file for second input catalogue')
-    parser.add_argument('-j','--sourcecat', dest="sourcecat", type=str,required=False, default='None',
+    parser.add_argument('-s','--sourcecat', dest="sourcecat", type=str,required=False, default='None',
              help='file for second input catalogue')
-    parser.add_argument('-co','--covoutput', dest="covoutfile", type=str,default='cov.txt',
+    parser.add_argument('-co','--covoutput', dest="covoutfile", type=str,required=True,
              help='file for covariance output')
     parser.add_argument('-o','--output', dest="outfile", type=str,required=True,
              help='file for output catalogue')
@@ -78,10 +79,10 @@ if __name__ == '__main__':
              help='bin_slop value for NN cross correlation')
     parser.add_argument('--bin_slop_NG', dest="bin_slop_NG", type=float,required=True,
              help='bin_slop value for NG cross correlation')
-    parser.add_argument('--clustering', dest="clustering", type=bool,required=True, const=True, default=True
-             help='Run clustering')
-    parser.add_argument('--lensing', dest="lensing", type=bool,required=True, cons=True, default=True
-             help='Run galaxy-galaxy lensing')
+    parser.add_argument('--clustering', dest="clustering", type=bool, const=True,default=False,
+             help='Run clustering', nargs='?')
+    parser.add_argument('--lensing', dest="lensing", type=bool, const=True,default=False,
+             help='Run galaxy-galaxy lensing', nargs='?')
     
     args = parser.parse_args()
     
@@ -182,7 +183,7 @@ if __name__ == '__main__':
     #    inbinslop_NG = 0.05
         
     # Define the binning based on command line input
-    if binnign == 'lin':
+    if binning == 'lin':
         config = {'min_sep': theta_min,
                   'max_sep': theta_max,
                   'nbins'  : nbins,
@@ -261,7 +262,7 @@ if __name__ == '__main__':
         gamma_t = func_gamma_t(corrs_gamma_t)
         gamma_x = func_gamma_x(corrs_gamma_x)
         
-        if center_file != "":
+        if center_file is not None:
             cov_gt = treecorr.estimate_multi_cov(corrs_gamma_t, method='jackknife', func=func_gamma_t)
             samples_gt, w_gt = treecorr.build_multi_cov_design_matrix(corrs_gamma_t, method='jackknife', func=func_gamma_t)
             np.savetxt(covoutfile, cov_gt)
@@ -324,7 +325,7 @@ if __name__ == '__main__':
                 ['r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs', 'nocor_wtheta'],
                 [ dd.rnom, dd.meanr, dd.meanlogr, wt, np.sqrt(dd.varxi), dd.weight, dd.npairs, dd.xi])
                 
-        if center_file != "":
+        if center_file is not None:
             cov_wt = dd.estimate_cov(method='jackknife')
             samples_wt, w_wt = dd.build_cov_design_matrix(method='jackknife')
             np.savetxt(covoutfile, cov_wt)
