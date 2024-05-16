@@ -42,16 +42,17 @@ if __name__ == '__main__':
     parser.add_argument('--plot', type=bool, help='Plot check figures', nargs='?', default=False, const=True)
     parser.add_argument('--randoms', type=bool, help='Apply selection to randoms', nargs='?', default=False, const=True)
     parser.add_argument('--percentile_split', type=bool, help='Further split bins by percentiles of galaxies', nargs='?', default=False, const=True)
-    parser.add_argument('--percentiles', type=bool, help='Which percentiles to split the galaxies', nargs='+', default=[])
+    parser.add_argument('--percentiles', type=str, help='Which percentiles to split the galaxies', nargs='+', default=[])
     parser.add_argument('--slice_in', type=str, help='In which quantity to split data first', required=True)
     parser.add_argument('--output_path', type=str, help='Output path', required=True)
     parser.add_argument('--output_name', type=str, help='Output file', required=True)
     parser.add_argument('--output_name_rand', type=str, help='Output file randoms', required=True)
-    #parser.add_argument('--volume_limited', type=bool, help='Create volume limited samples', default=True, required=True)
+    parser.add_argument('--volume_limited', type=str, help='Create volume limited samples', required=True)
     
     args = parser.parse_args()
     
-    #volume_limited = args.volume_limited
+    volume_limited = args.volume_limited
+    volume_limited = volume_limited.lower() in ["true","t","1","y","yes"]
     
     random = args.randoms
     percentile_split = args.percentile_split
@@ -132,74 +133,170 @@ if __name__ == '__main__':
         ax.hexbin(z_in, stellar_mass_in, gridsize=100, cmap='viridis', bins='log', rasterized=True, extent=(0, 0.7, 6, 12))
         ax.plot(fit_func_inv(x), x, label=r'$M_{\star}\, \mathrm{limit}$')
     
-    # First we refine the binning with the stellar mass/luminosity limits
-    count = 0
-    for i in range(len(x_bins)-1):
-        y_low = func_low(x_bins[i+1])
-        y_high = func_high(x_bins[i])
-        y_bins_extra = np.array([y_low, y_high])
-        y_bins = np.concatenate((y_bins_in, y_bins_extra))
-        
-        #idx = np.where((stellar_mass_in <= x_bins[i+1]) & (stellar_mass_in > x_bins[i]) & (z_in <= z_high) & (z_in > z_low))
-        idx0 = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_high) & (y_data > y_low))
-        
-        if slice_in_m and percentile_split:
-            med = np.percentile(y_data[idx0], percentiles)
-            y_bins = np.append(y_bins, med)
-                
-        if slice_in_z and percentile_split:
-            med = np.log10(np.percentile(10.0**y_data[idx0], percentiles))
-            y_bins = np.append(y_bins, med)
-            
-        y_bins = np.sort(y_bins)
-        y_bins = y_bins[(y_bins <= y_high) & (y_bins >= y_low)]
-        
-        # Then we apply refined binning including additional splits in median numbers
-        for j in range(len(y_bins)-1):
-            idx = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_bins[j+1]) & (y_data > y_bins[j]))
-       
-            data_out = np.copy(data[np.where(data[idx])])
-    
-            if plot:
-                ax.scatter(z_in[idx], stellar_mass_in[idx], color='k', alpha=0.25, marker='.', s=1, rasterized=True)
-                if slice_in_m:
-                    ax.add_patch(Rectangle((y_bins[j],x_bins[i]),(y_bins[j+1]-y_bins[j]),(x_bins[i+1]-x_bins[i]),linewidth=1,edgecolor='r',facecolor='none'))
-                if slice_in_z:
-                    ax.add_patch(Rectangle((x_bins[i],y_bins[j]),(x_bins[i+1]-x_bins[i]),(y_bins[j+1]-y_bins[j]),linewidth=1,edgecolor='r',facecolor='none'))
-            
-            cols = fits.ColDefs(data_out)
-            hdu = fits.BinTableHDU.from_columns(cols)
-            hdu.writeto(f'{outname}{count+1}.fits', overwrite=True)
-            details['x_lims_lo'] = x_bins[i]
-            details['x_lims_hi'] = x_bins[i+1]
-            details['y_lims_lo'] = y_bins[j]
-            details['y_lims_hi'] = y_bins[j+1]
+    if volume_limited:
+        # First we refine the binning with the stellar mass/luminosity limits
+        count = 0
+        for i in range(len(x_bins)-1):
+            y_low = func_low(x_bins[i+1])
             if slice_in_m:
-                details['x_med'] = np.median(x_data[idx])
-                details['y_med'] = np.log10(np.median(10.0**y_data[idx]))
+                y_high = func_high(x_bins[i])
             if slice_in_z:
-                details['x_med'] = np.log10(np.median(10.0**x_data[idx]))
-                details['y_med'] = np.median(y_data[idx])
-            with open(f'{outpath}/stats_LB{count+1}.txt', 'w') as f:
-                for key, value in details.items():
-                    f.write(f'{key}\t{value}\n')
-
-
-            if random:
-                print('\nApplying selection to randoms...')
-                random_in = fits.open(args.file_rand, memmap=True)
-                randoms = random_in[1].data
+                y_high = func_high(x_bins[i+1])
+            y_bins_extra = np.array([y_low, y_high])
+            y_bins = np.concatenate((y_bins_in, y_bins_extra))
+            y_bins[(y_bins <= np.max(y_data)) & (y_bins >= np.min(y_data))]
+        
+            #idx = np.where((stellar_mass_in <= x_bins[i+1]) & (stellar_mass_in > x_bins[i]) & (z_in <= z_high) & (z_in > z_low))
+            idx0 = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_high) & (y_data > y_low))
             
-                index = np.in1d(randoms['clone_ID'].astype(bytes), data_out['ID'])
+            if slice_in_m and percentile_split:
+                med = np.percentile(y_data[idx0], percentiles)
+                y_bins = np.append(y_bins, med)
+                    
+            if slice_in_z and percentile_split:
+                med = np.log10(np.percentile(10.0**y_data[idx0], percentiles))
+                y_bins = np.append(y_bins, med)
+                
+            y_bins = np.sort(y_bins)
+            y_bins = y_bins[(y_bins <= y_high) & (y_bins >= y_low)]
             
-                rand_out = np.copy(randoms[np.where(randoms[index])])#[::3]) # remove every 3nd after testing
-                num_col = np.arange(len(rand_out['clone_ID']))
+            # Then we apply refined binning including additional splits in median numbers
+            for j in range(len(y_bins)-1):
+                idx = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_bins[j+1]) & (y_data > y_bins[j]))
+                if idx[0].size == 0:
+                    continue
+                data_out = np.copy(data[np.where(data[idx])])
+        
+                if plot:
+                    ax.scatter(z_in[idx], stellar_mass_in[idx], color='k', alpha=0.25, marker='.', s=1, rasterized=True)
+                    if slice_in_m:
+                        ax.add_patch(Rectangle((y_bins[j],x_bins[i]),(y_bins[j+1]-y_bins[j]),(x_bins[i+1]-x_bins[i]),linewidth=1,edgecolor='r',facecolor='none'))
+                    if slice_in_z:
+                        ax.add_patch(Rectangle((x_bins[i],y_bins[j]),(x_bins[i+1]-x_bins[i]),(y_bins[j+1]-y_bins[j]),linewidth=1,edgecolor='r',facecolor='none'))
+                
+                cols = fits.ColDefs(data_out)
+                hdu = fits.BinTableHDU.from_columns(cols)
+                hdu.writeto(f'{outname}{count+1}.fits', overwrite=True)
+                details['x_lims_lo'] = x_bins[i]
+                details['x_lims_hi'] = x_bins[i+1]
+                details['y_lims_lo'] = y_bins[j]
+                details['y_lims_hi'] = y_bins[j+1]
+                if slice_in_m:
+                    details['x_med'] = np.median(x_data[idx])
+                    details['y_med'] = np.log10(np.median(10.0**y_data[idx]))
+                if slice_in_z:
+                    details['x_med'] = np.log10(np.median(10.0**x_data[idx]))
+                    details['y_med'] = np.median(y_data[idx])
+                with open(f'{outpath}/stats_LB{count+1}.txt', 'w') as f:
+                    for key, value in details.items():
+                        f.write(f'{key}\t{value}\n')
+    
+    
+                if random:
+                    print('\nApplying selection to randoms...')
+                    random_in = fits.open(args.file_rand, memmap=True)
+                    randoms = random_in[1].data
+                
+                    index = np.in1d(randoms['clone_ID'].astype(bytes), data_out['ID'])
+                
+                    rand_out = np.copy(randoms[np.where(randoms[index])])#[::3]) # remove every 3nd after testing
+                    num_col = np.arange(len(rand_out['clone_ID']))
+                
+                    cols_rand = fits.ColDefs(rand_out)
+                    num = fits.Column(name='UNIQUEID', format='J', array=num_col)
+                    hdu = fits.BinTableHDU.from_columns(cols_rand + num)
+                    hdu.writeto(f'{outname_rand}{count+1}_rand.fits', overwrite=True)
+                count += 1
+                
+    if not volume_limited:
+        # First we refine the binning with the stellar mass/luminosity limits
+        count = 0
+        for i in range(len(x_bins)-1):
+            #y_high = np.max(y_bins_in)
+            if slice_in_m:
+                y_low = func_low(x_bins[i+1])
+                y_high = np.max(y_bins_in)
+            if slice_in_z:
+                y_low = np.min(y_bins_in)
+                y_high = func_high(x_bins[i+1])
+            y_bins_extra = np.array([y_low, y_high])
+            y_bins = np.unique(np.concatenate((y_bins_in, y_bins_extra)))
+        
+            #idx = np.where((stellar_mass_in <= x_bins[i+1]) & (stellar_mass_in > x_bins[i]) & (z_in <= z_high) & (z_in > z_low))
+            if slice_in_m:
+                idx0 = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_high) & (y_data > y_low) & (y_data <= func_high(x_data)))
+            if slice_in_z:
+                idx0 = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_high) & (y_data > y_low) & (y_data > func_low(x_data)))
             
-                cols_rand = fits.ColDefs(rand_out)
-                num = fits.Column(name='UNIQUEID', format='J', array=num_col)
-                hdu = fits.BinTableHDU.from_columns(cols_rand + num)
-                hdu.writeto(f'{outname_rand}{count+1}_rand.fits', overwrite=True)
-            count += 1
+            if slice_in_m and percentile_split:
+                med = np.percentile(y_data[idx0], percentiles)
+                y_bins = np.append(y_bins, med)
+                    
+            if slice_in_z and percentile_split:
+                med = np.log10(np.percentile(10.0**y_data[idx0], percentiles))
+                y_bins = np.append(y_bins, med)
+                
+            y_bins = np.sort(y_bins)
+            y_bins = y_bins[(y_bins <= y_high) & (y_bins >= y_low)]
+            
+            # Then we apply refined binning including additional splits in median numbers
+            for j in range(len(y_bins)-1):
+                if slice_in_m:
+                    idx = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_bins[j+1]) & (y_data > y_bins[j]) & (y_data <= func_high(x_data)))
+                if slice_in_z:
+                    idx = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_bins[j+1]) & (y_data > y_bins[j]) & (y_data > func_low(x_data)))
+                if idx[0].size == 0:
+                    continue
+                data_out = np.copy(data[np.where(data[idx])])
+        
+                if plot:
+                    ax.scatter(z_in[idx], stellar_mass_in[idx], color='k', alpha=0.25, marker='.', s=1, rasterized=True)
+                    if slice_in_m:
+                        ax.plot([y_bins[j], min(func_high(x_bins[i]), y_bins[j+1])], [x_bins[i], x_bins[i]], linewidth=1, color='r')
+                        ax.plot([y_bins[j], min(func_high(x_bins[i+1]), y_bins[j+1])], [x_bins[i+1], x_bins[i+1]], linewidth=1, color='r')
+                        ax.plot([y_bins[j], y_bins[j]], [x_bins[i], x_bins[i+1]], linewidth=1, color='r')
+                        ax.plot(np.maximum(func_high(np.linspace(x_bins[i], x_bins[i+1], 50, endpoint=True)), np.ones(50)*y_bins[j]), np.linspace(x_bins[i], x_bins[i+1], 50, endpoint=True),  linewidth=1, color='r')
+                    if slice_in_z:
+                        ax.plot([x_bins[i], x_bins[i]], [max(y_bins[j], func_low(x_bins[i])), y_bins[j+1]], linewidth=1, color='r')
+                        ax.plot([x_bins[i+1], x_bins[i+1]], [max(y_bins[j], func_low(x_bins[i+1])), y_bins[j+1]], linewidth=1, color='r')
+                        ax.plot([x_bins[i], x_bins[i+1]], [y_bins[j+1], y_bins[j+1]], linewidth=1, color='r')
+                        ax.plot(np.linspace(x_bins[i], x_bins[i+1], 50, endpoint=True), np.maximum(func_low(np.linspace(x_bins[i], x_bins[i+1], 50, endpoint=True)), np.ones(50)*y_bins[j]), linewidth=1, color='r')
+        
+                
+                cols = fits.ColDefs(data_out)
+                hdu = fits.BinTableHDU.from_columns(cols)
+                hdu.writeto(f'{outname}{count+1}.fits', overwrite=True)
+                details['x_lims_lo'] = x_bins[i]
+                details['x_lims_hi'] = x_bins[i+1]
+                details['y_lims_lo'] = y_bins[j]
+                details['y_lims_hi'] = y_bins[j+1]
+                if slice_in_m:
+                    details['x_med'] = np.median(x_data[idx])
+                    details['y_med'] = np.log10(np.median(10.0**y_data[idx]))
+                if slice_in_z:
+                    details['x_med'] = np.log10(np.median(10.0**x_data[idx]))
+                    details['y_med'] = np.median(y_data[idx])
+                with open(f'{outpath}/stats_LB{count+1}.txt', 'w') as f:
+                    for key, value in details.items():
+                        f.write(f'{key}\t{value}\n')
+    
+    
+                if random:
+                    print('\nApplying selection to randoms...')
+                    random_in = fits.open(args.file_rand, memmap=True)
+                    randoms = random_in[1].data
+                
+                    index = np.in1d(randoms['clone_ID'].astype(bytes), data_out['ID'])
+                
+                    rand_out = np.copy(randoms[np.where(randoms[index])])#[::3]) # remove every 3nd after testing
+                    num_col = np.arange(len(rand_out['clone_ID']))
+                
+                    cols_rand = fits.ColDefs(rand_out)
+                    num = fits.Column(name='UNIQUEID', format='J', array=num_col)
+                    hdu = fits.BinTableHDU.from_columns(cols_rand + num)
+                    hdu.writeto(f'{outname_rand}{count+1}_rand.fits', overwrite=True)
+                count += 1
+            
             
     with open(f'{outpath}/nbins.txt', 'w') as f:
         f.write(f'nbins\t{count}\n')
@@ -217,6 +314,3 @@ if __name__ == '__main__':
         pl.tight_layout()
         pl.savefig(f'{outpath}/selection.pdf', dpi=800)
         pl.clf()
-
-
-    

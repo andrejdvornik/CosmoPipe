@@ -46,7 +46,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:STELLARMASS BV:REDSHIFT BV:LENSLIMSX BV:LENSLIMSY BV:SLICEIN DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH DATABLOCK
+  echo BLU BV:STELLARMASS BV:REDSHIFT BV:LENSLIMSX BV:LENSLIMSY BV:SLICEIN BV:VOLUMELIMITED DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH DATABLOCK
 }
 #}}}
 
@@ -60,7 +60,7 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo lens_cats lens_cats_metadata rand_cats
+  echo lens_cats lens_cats_metadata rand_cats smf_lens_cats smf_lens_cats_metadata smf_rand_cats
 }
 #}}}
 

@@ -103,6 +103,7 @@ MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
   --slice_in @BV:SLICEIN@ \
   --plot \
   --random \
+  --volume_limited @BV:VOLUMELIMITED@ \
   --path @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mass_lims \
   --m_bins @BV:LENSLIMSX@ \
   --z_bins @BV:LENSLIMSY@ 2>&1
