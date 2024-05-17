@@ -55,15 +55,15 @@ do
   #Define the output filename
   outname=${file_lens_one##*/}
   outname0=${outname%%${appendstr}*}
-  outname1=${outname0}${appendstr}_smf.txt
-  outname2=${outname0}${appendstr}_vmax.txt
+  outname1=${outname0}${appendstr}
 
   #Check if the output file exists
-  if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/${outname1} ]
+  if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/${outname1}_smf.txt ]
   then
     _message "    -> @BLU@Removing previous @RED@Bin $LBIN@BLU@ stellar mass function function@DEF@"
-    rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/${outname1}
-    rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/${outname2}
+    rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/${outname1}_smf.txt
+    rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/${outname1}_vmax.txt
+    rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/${outname1}_smf_comp.png
     smfblock=`_read_datablock smf`
     currentblock=`_blockentry_to_filelist ${smfblock}`
     currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname} | awk '{printf $0 " "}' || echo `
@@ -78,18 +78,19 @@ do
     --nbins "@BV:NSMFBINS@" --min_mass "@BV:MINMASS@" --max_mass "@BV:MAXMASS@" \
     --h0 "@BV:H0@" --omegam "@BV:OMEGAM@" --omegav "@BV:OMEGAV@" \
     --file ${file_lens_one} \
-    --output @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/${outname1} \
-    --output_vmax @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/${outname2} \
+    --output_path @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/ \
+    --output_name ${outname1} \
     --min_z "@BV:MINZ@" --max_z "@BV:MAXZ@" \
     --stellar_mass_column @BV:STELLARMASS@ \
     --z_column @BV:REDSHIFT@ \
     --area @SURVEYAREADEG@ \
+    --compare_to_gama \
     --path @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mass_lims 2>&1
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       
   #Add the smf function to the datablock
   smfblock=`_read_datablock smf`
-  _write_datablock smf "`_blockentry_to_filelist ${smfblock}` ${outname}"
+  _write_datablock smf "`_blockentry_to_filelist ${smfblock}` ${outname}_smf.txt"
 done
 _message "  }\n"
 #}}}

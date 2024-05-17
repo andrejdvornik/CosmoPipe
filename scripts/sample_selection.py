@@ -137,15 +137,14 @@ if __name__ == '__main__':
         # First we refine the binning with the stellar mass/luminosity limits
         count = 0
         for i in range(len(x_bins)-1):
-            y_low = func_low(x_bins[i+1])
+            y_low = max(func_low(x_bins[i+1]), min(y_bins_in))
             if slice_in_m:
-                y_high = func_high(x_bins[i])
+                y_high = min(func_high(x_bins[i]), max(y_bins_in))
             if slice_in_z:
-                y_high = func_high(x_bins[i+1])
+                y_high = min(func_high(x_bins[i+1]), max(y_bins_in))
             y_bins_extra = np.array([y_low, y_high])
-            y_bins = np.concatenate((y_bins_in, y_bins_extra))
-            y_bins[(y_bins <= np.max(y_data)) & (y_bins >= np.min(y_data))]
-        
+            y_bins = np.unique(np.concatenate((y_bins_in, y_bins_extra)))
+
             #idx = np.where((stellar_mass_in <= x_bins[i+1]) & (stellar_mass_in > x_bins[i]) & (z_in <= z_high) & (z_in > z_low))
             idx0 = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_high) & (y_data > y_low))
             
@@ -212,13 +211,11 @@ if __name__ == '__main__':
         # First we refine the binning with the stellar mass/luminosity limits
         count = 0
         for i in range(len(x_bins)-1):
-            #y_high = np.max(y_bins_in)
+            y_high = min(func_high(x_bins[i+1]), max(y_bins_in))
             if slice_in_m:
-                y_low = func_low(x_bins[i+1])
-                y_high = np.max(y_bins_in)
+                y_low = max(func_low(x_bins[i+1]), min(y_bins_in))
             if slice_in_z:
-                y_low = np.min(y_bins_in)
-                y_high = func_high(x_bins[i+1])
+                y_low = max(func_low(x_bins[i]), min(y_bins_in))
             y_bins_extra = np.array([y_low, y_high])
             y_bins = np.unique(np.concatenate((y_bins_in, y_bins_extra)))
         

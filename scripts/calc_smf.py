@@ -35,8 +35,8 @@ if __name__ == '__main__':
     parser.add_argument('--path', type=str, help='Path to npy files required for mass limit', required=True)
     parser.add_argument('--file', type=str, help='Input catalogue', default='fluxscale_fixed.fits', required=True)
     parser.add_argument('--compare_to_gama', type=bool, help='Plot comparison figures', nargs='?', default=False, const=True)
-    parser.add_argument('--output', type=str, help='Output SMF file', default='smf.txt', required=True)
-    parser.add_argument('--output_vmax', type=str, help='Output VMAX file', default='vmax.txt', required=True)
+    parser.add_argument('--output_path', type=str, help='Output path', required=True)
+    parser.add_argument('--output_name', type=str, help='Output name', required=True)
     args = parser.parse_args()
 
     compare_to_gama = args.compare_to_gama
@@ -60,8 +60,8 @@ if __name__ == '__main__':
     omegav = args.omegav
     
     
-    outname = args.output
-    outname_vmax = args.output_vmax
+    out_path = args.output_path
+    outname = args.output_name
 
     file_in = fits.open(args.file)
 
@@ -106,9 +106,8 @@ if __name__ == '__main__':
     z_max = fit_func_inv(stellar_mass_in)
     z_max_i = np.minimum(z_max_bin, z_max)
     
-    dc_min = cosmo_model.comoving_distance(z_min).to('Mpc').value
-    dc_max = cosmo_model.comoving_distance(z_max_i).to('Mpc').value
-    
+    dc_min = cosmo_model.comoving_distance(z_min).to('Mpc').value * h0
+    dc_max = cosmo_model.comoving_distance(z_max_i).to('Mpc').value * h0
 
     
     V_max = 4.0*np.pi/3.0 * frac * (dc_max**3.0 - dc_min**3.0)
@@ -132,13 +131,15 @@ if __name__ == '__main__':
     data_out = np.array([10.0**M_center, phi_bins/step, np.ones_like(phi_bins)]).T
     vmax_out = np.array([M_center, vmax_out]).T
     
-    np.savetxt(outname, data_out)
-    np.savetxt(outname_vmax, vmax_out)
+    np.savetxt(f"{out_path}{outname}_smf.txt", data_out)
+    np.savetxt(f"{out_path}{outname}_vmax.txt", vmax_out)
     
     
     if compare_to_gama:
-        baldry = np.genfromtxt('gsmf-B12.txt')
-        wright = np.genfromtxt('GAMAII_BBD_GSMFs.csv', delimiter=',')
+        baldry = np.genfromtxt('/net/home/fohlen13/dvornik/smf_for_cosmo/gsmf-B12.txt')
+        wright = np.genfromtxt('/net/home/fohlen13/dvornik/smf_for_cosmo/GAMAII_BBD_GSMFs.csv', delimiter=',')
+        kids = np.genfromtxt('/net/home/fohlen13/dvornik/smf_for_cosmo/smf2_final.txt')
+        #kids = np.genfromtxt('/net/home/fohlen13/dvornik/2x2pt/data_final_fix/bin_13_mlf.txt')
     
         mstar_og = 10.819 - 1.0*np.log10(h0/0.7)
         alpha_1 = -0.646
@@ -153,10 +154,13 @@ if __name__ == '__main__':
         pl.rc('text',usetex=True)
         pl.rcParams.update({'font.size': 20})
         fig, ax = pl.subplots(1, 1, figsize=(8, 8))
-        ax.errorbar(baldry[:,0], baldry[:,2]*0.001, yerr=baldry[:,3]*0.001, ls='', ms=3, marker='o', label='Baldry et al. 2012')
-        ax.errorbar(wright[:,0], wright[:,4], yerr=[wright[:,5], wright[:,6]], ls='', ms=3, marker='o', label='Wright et al. 2017')
+        #ax.errorbar(baldry[:,0], baldry[:,2]*0.001, yerr=baldry[:,3]*0.001, ls='', ms=3, marker='o', label='Baldry et al. 2012')
+        #ax.errorbar(wright[:,0], wright[:,4], yerr=[wright[:,5], wright[:,6]], ls='', ms=3, marker='o', label='Wright et al. 2017')
         #ax.errorbar(M_center, phi_bins/step, yerr=0, ls='', ms=3, marker='o', label='KiDS bright')
-        ax.errorbar(M_center + 2.0*np.log10(h0/0.7), phi_bins/step * 0.7**3.0, yerr=0, ls='', ms=3, marker='o', label='KiDS bright h=0.7')
+        #ax.errorbar(np.log10(kids[:,0]) + 2.0*np.log10(1.0/0.7), kids[:,1] * 0.7**3.0, yerr=0, ls='', ms=3, marker='o', label='KiDS bright')
+        #ax.errorbar(M_center + 2.0*np.log10(h0/0.7), phi_bins/step, yerr=0, ls='', ms=3, marker='o', label='This sample')
+        ax.errorbar(np.log10(kids[:,0]), kids[:,1], yerr=0, ls='', ms=3, marker='o', label='KiDS bright')
+        ax.errorbar(M_center, phi_bins/step, yerr=0, ls='', ms=3, marker='o', label='This sample')
         ax.plot(wright[:,0], phi_angus_og, ls='--', color='red')
         ax.set_yscale('log')
         ax.set_ylim([1e-8, 1e-1])
@@ -164,7 +168,7 @@ if __name__ == '__main__':
         ax.set_xlabel(r'$\log(M_{\star}/h^{2}M_{\odot})$')
         ax.set_ylabel(r'$\phi (\mathrm{dex}^{-1}\,h^{3}\,\mathrm{Mpc}^{-3})$')
         ax.legend()
-        pl.savefig('smf_comparison.png')
+        pl.savefig(f"{out_path}{outname}_smf_comp.png")
         pl.clf()
         pl.close()
     
