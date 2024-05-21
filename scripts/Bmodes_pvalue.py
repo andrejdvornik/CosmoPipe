@@ -23,6 +23,8 @@ parser.add_argument("--title", dest="title",
     help="Plot title", metavar="title",required=True)
 parser.add_argument("--suffix", dest="suffix",
     help="Plot title suffix", metavar="suffix",required=True)
+parser.add_argument("--mult", dest="mult", type=float,
+    help="Multiplicative factor applied to the chi2 before calculating the p-value", metavar="mult",required=False)   
 
 args = parser.parse_args()
 inputfile = args.inputfile
@@ -33,15 +35,15 @@ thetamax = args.thetamax
 output_dir = args.output_dir
 title = args.title
 suffix = args.suffix
+mult = args.mult
 
-def pvalue(data, cov, mask=None):
-    if any(mask):
+def pvalue(data, cov, mask=None, mult=1.0):
+    if np.any(mask):
         n_data = len(np.where(mask)[0])
     else: 
         n_data = len(data)
         mask = np.full(n_data, True)
-    # mask = np.where(mask)
-    chi2 = np.dot(data[mask],np.dot(np.linalg.inv(cov[mask,:][:,mask]),data[mask]))
+    chi2 = mult*np.dot(data[mask],np.dot(np.linalg.inv(cov[mask,:][:,mask]),data[mask]))
     p = stats.chi2.sf(chi2, n_data)
     return(p)
 
@@ -101,11 +103,17 @@ if statistic != 'xiEB':
                 ax[x,y].axhline(y=0, color='black', linestyle= 'dashed')
                 chi2 = np.dot(B_data['VALUE'][idx],np.dot(np.linalg.inv(B_cov[idx,:][:,idx]),B_data['VALUE'][idx]))
                 p = stats.chi2.sf(chi2, n_data_per_bin)
+                if mult:
+                    p_mult = pvalue(B_data['VALUE'], B_cov, mask=((B_data['BIN1']==bin1+1) & (B_data['BIN2']==bin2+1) & (B_data['ANGBIN']<=5)), mult=mult)
+                    if p_mult > 1e-2:
+                        plt.text(0.03, 0.11, 'p = %.2f'%p_mult, color='blue', horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
+                    else:
+                        plt.text(0.03, 0.11, 'p = %.2e'%p_mult, color='blue', horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
                 print([bin1,bin2,chi2,n_data_per_bin,p])
                 if p > 1e-2:
-                    ax[x,y].text(0.03, 0.04, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
+                    ax[x,y].text(0.03, 0.01, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
                 else:
-                    ax[x,y].text(0.03, 0.04, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
+                    ax[x,y].text(0.03, 0.01, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
                 bincount+=1
         if statistic == 'bandpowers':
             ax[0,0].set_xscale('log')
@@ -114,6 +122,12 @@ if statistic != 'xiEB':
         plt.text(0.07, 0.9, r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax) , fontsize=14, transform=plt.gcf().transFigure, color='red')
         chi2 = np.dot(B_data['VALUE'],np.dot(np.linalg.inv(B_cov),B_data['VALUE']))
         p = stats.chi2.sf(chi2, n_data)
+        if mult:
+            p_mult = pvalue(B_data['VALUE'], B_cov, mask=None, mult=mult)
+            if p_mult > 1e-2:
+                plt.text(0.90, 0.95, 'p = %.2f'%p_mult, fontsize=14, transform=plt.gcf().transFigure, color='blue', horizontalalignment='right')
+            else:
+                plt.text(0.90, 0.95, 'p = %.2e'%p_mult, fontsize=14, transform=plt.gcf().transFigure, color='blue', horizontalalignment='right')
         print(['-','-',chi2,n_data,p])
         if p > 1e-2:
             plt.text(0.90, 0.9, 'p = %.2f'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
@@ -145,10 +159,16 @@ if statistic != 'xiEB':
                     ax[x,y].axhline(y=0, color='black', linestyle= 'dashed')
                     chi2 = np.dot(B_data['VALUE'][idx],np.dot(np.linalg.inv(B_cov[idx,:][:,idx]),B_data['VALUE'][idx]))
                     p = stats.chi2.sf(chi2, n_data_per_bin)
+                    if mult:
+                        p_mult = pvalue(B_data['VALUE'], B_cov, mask=((B_data['BIN1']==bin1+1) & (B_data['BIN2']==bin2+1) & (B_data['ANGBIN']<=5)), mult=mult)
+                        if p_mult > 1e-2:
+                            plt.text(0.03, 0.11, 'p = %.2f'%p_mult, color='blue', horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
+                        else:
+                            plt.text(0.03, 0.11, 'p = %.2e'%p_mult, color='blue', horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
                     if p > 1e-2:
-                        ax[x,y].text(0.03, 0.04, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
+                        ax[x,y].text(0.03, 0.01, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
                     else:
-                        ax[x,y].text(0.03, 0.04, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
+                        ax[x,y].text(0.03, 0.01, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
                     bincount+=1
             fig.supylabel(ylabel)
             fig.supxlabel(xlabel)
@@ -156,6 +176,12 @@ if statistic != 'xiEB':
             idx = np.where(B_data['ANGBIN']<=5)[0]
             chi2 = np.dot(B_data['VALUE'][idx],np.dot(np.linalg.inv(B_cov[idx,:][:,idx]),B_data['VALUE'][idx]))
             p = stats.chi2.sf(chi2, n_data)
+            if mult:
+                p_mult = pvalue(B_data['VALUE'], B_cov, mask=(B_data['ANGBIN']<=5), mult=mult)
+                if p_mult > 1e-2:
+                    plt.text(0.90, 0.95, 'p = %.2f'%p_mult, fontsize=14, transform=plt.gcf().transFigure,  color='blue', horizontalalignment='right')
+                else:
+                    plt.text(0.90, 0.95, 'p = %.2e'%p_mult, fontsize=14, transform=plt.gcf().transFigure,  color='blue', horizontalalignment='right')
             if p > 1e-2:
                 plt.text(0.90, 0.9, 'p = %.2f'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
             else:
@@ -241,6 +267,8 @@ if statistic != 'xiEB':
         plt.text(0.07, 0.9, r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=14, transform=plt.gcf().transFigure, color='red')
         chi2 = np.dot(B_data['VALUE'],np.dot(np.linalg.inv(B_cov),B_data['VALUE']))
         p = stats.chi2.sf(chi2, n_data)
+        if mult:
+            p_mult = pvalue(B_data['VALUE'], B_cov, mask=None, mult=mult)
         if p > 1e-2:
             ax.text(0.16, 0.12, 'p = %.2f'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='left')
         else:
@@ -270,6 +298,8 @@ if statistic != 'xiEB':
             idx = np.where(B_data['ANGBIN']<=5)[0]
             chi2 = np.dot(B_data['VALUE'][idx],np.dot(np.linalg.inv(B_cov[idx,:][:,idx]),B_data['VALUE'][idx]))
             p = stats.chi2.sf(chi2, n_data)
+            if mult:
+                p_mult = pvalue(B_data['VALUE'], B_cov, mask=(B_data['ANGBIN']<=5), mult=mult)
             if p > 1e-2:
                 ax.text(0.16, 0.12, 'p = %.2f'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='left')
             else:
@@ -297,9 +327,9 @@ else:
                 chi2 = np.dot(B_data_plus['VALUE'][idx],np.dot(np.linalg.inv(B_cov_plus[idx,:][:,idx]),B_data_plus['VALUE'][idx]))
                 p = stats.chi2.sf(chi2, n_data_per_bin)
                 if p > 1e-2:
-                    ax[x,y].text(0.03, 0.04, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
+                    ax[x,y].text(0.03, 0.01, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
                 else:
-                    ax[x,y].text(0.03, 0.04, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
+                    ax[x,y].text(0.03, 0.01, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
                 bincount+=1
         ax[0,0].set_xscale('log')
         fig.supylabel(ylabel_plus)
@@ -333,9 +363,9 @@ else:
                 chi2 = np.dot(B_data_minus['VALUE'][idx],np.dot(np.linalg.inv(B_cov_minus[idx,:][:,idx]),B_data_minus['VALUE'][idx]))
                 p = stats.chi2.sf(chi2, n_data_per_bin)
                 if p > 1e-2:
-                    ax[x,y].text(0.03, 0.04, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
+                    ax[x,y].text(0.03, 0.01, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
                 else:
-                    ax[x,y].text(0.03, 0.04, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
+                    ax[x,y].text(0.03, 0.01, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
                 bincount+=1
         ax[x,y].set_xscale('log')
         fig.supylabel(ylabel_minus)
@@ -369,9 +399,9 @@ else:
                 chi2 = np.dot(B_data_plus['VALUE'][idx],np.dot(np.linalg.inv(B_cov_plus[idx,:][:,idx]),B_data_plus['VALUE'][idx]))
                 p = stats.chi2.sf(chi2, n_data_per_bin)
                 # if p > 1e-2:
-                #     ax.text(0.03, 0.04, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax.transAxes)
+                #     ax.text(0.03, 0.01, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax.transAxes)
                 # else:
-                #     ax.text(0.03, 0.04, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax.transAxes)
+                #     ax.text(0.03, 0.01, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax.transAxes)
                 bincount+=1
         ax.set_xscale('log')
         fig.supylabel(ylabel_plus)
@@ -405,9 +435,9 @@ else:
                 chi2 = np.dot(B_data_minus['VALUE'][idx],np.dot(np.linalg.inv(B_cov_minus[idx,:][:,idx]),B_data_minus['VALUE'][idx]))
                 p = stats.chi2.sf(chi2, n_data_per_bin)
                 if p > 1e-2:
-                    ax.text(0.03, 0.04, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax.transAxes)
+                    ax.text(0.03, 0.01, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax.transAxes)
                 else:
-                    ax.text(0.03, 0.04, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax.transAxes)
+                    ax.text(0.03, 0.01, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax.transAxes)
                 bincount+=1
         ax.set_xscale('log')
         fig.supylabel(ylabel_minus)
