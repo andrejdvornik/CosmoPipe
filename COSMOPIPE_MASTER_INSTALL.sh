@@ -149,7 +149,7 @@ cd cosmosis-standard-library
 make
 cd ..
 EOF
-conda run -n ${CONDAPIPENAME} bash csl_make.sh cosmosis-build-standard-library > CSL_install_output.log 2>&1
+conda run -n ${CONDAPIPENAME} bash csl_make.sh > CSL_install_output.log 2>&1
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
 
