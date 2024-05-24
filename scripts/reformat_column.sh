@@ -3,7 +3,7 @@
 # File Name : reformat_column.sh 
 # Created By : awright
 # Creation Date : 24-05-2024
-# Last Modified : Fri 24 May 2024 10:07:47 AM CEST
+# Last Modified : Fri 24 May 2024 11:14:31 AM CEST
 #
 #=========================================
 
@@ -12,12 +12,11 @@ ext=${input##*.}
 outfile=${input//.${ext}/_rfmt.${ext}}
 
 #Get the format variables 
-COLUMNNAME=`echo @BV:NEWCOLUMN@ | awk '{print $1}'` 
-COLUMNCOMM=`echo @BV:NEWCOLUMN@ | awk '{print $2}'` 
-COLUMNUNIT=`echo @BV:NEWCOLUMN@ | awk '{print $3}'` 
+COLUMNNAME=`echo '@BV:NEWCOLUMN@' | awk '{print $1}'` 
+COLUMNCOMM=`echo '@BV:NEWCOLUMN@' | awk '{print $2}'` 
+COLUMNUNIT=`echo '@BV:NEWCOLUMN@' | awk '{print $3}'` 
 
 #Merge the goldweight column {{{
-_message "   -> @BLU@Merging goldweight column @DEF@"
 #Check if input file lengths are ok {{{
 links="FALSE"
 for file in ${input} ${outfile}
@@ -53,9 +52,8 @@ fi
 #Strip out the old column 
 _message " @BLU@> Pull out column to update @DEF@"
 @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactoasc \
-  -i ${input} \
-  -o ${outfile}_tmp \
-  -k ${COLUMNNAME} -t OBJECTS 2>&1
+  -i ${input} -s -q \
+  -k ${COLUMNNAME} -t OBJECTS > ${outfile}_tmp
 _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
 _message " @BLU@> Delete column to update from original catalogue @DEF@"
 @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacdelkey \
@@ -64,19 +62,23 @@ _message " @BLU@> Delete column to update from original catalogue @DEF@"
   -k ${COLUMNNAME} -t OBJECTS 2>&1
 _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
 #Get the format variables 
-TTYPE=`echo @BV:NEWFORMAT@ | awk '{print $1}'` 
-DEPTH=`echo @BV:NEWFORMAT@ | awk '{print $2}'` 
+TTYPE=`echo '@BV:NEWFORMAT@' | awk '{print $1}'` 
+DEPTH=`echo '@BV:NEWFORMAT@' | awk '{print $2}'` 
 if [ ${TTYPE^^} == "DOUBLE" ] || [ ${TTYPE^^} == "FLOAT" ] 
 then 
   HTYPE="FLOAT"
 elif [ ${TTYPE^^} == "STRING" ] 
 then 
   HTYPE="STRING"
+elif [ ${TTYPE^^} == "SHORT" ] || [ ${TTYPE^^} == "LONG" ] 
+then 
+  HTYPE="INTEGER"
 else 
-  HTYPE="INT"
+  echo "Unknown type ${TTYPE}"
+  exit 1
 fi 
 #Set up new ldac catalogue with correct format 
-echo > ${outfile}.columns <<- EOF
+cat > ${outfile}.columns <<- EOF
 COL_NAME = ${COLUMNNAME}
 COL_TTYPE = $TTYPE
 COL_HTYPE = $HTYPE
