@@ -42,7 +42,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:COLUMNNAME BV:NEWCOLUMN BV:NEWFORMAT BV:WEIGHTNAME DEF MACHINE RED RUNROOT
+  echo BLU BV:NEWCOLUMN BV:NEWFORMAT DEF MACHINE RED RUNROOT
 } 
 #}}}
 
