@@ -140,8 +140,9 @@ rn = []
 for nn in range(1,Nmax+1):
     rn.append(mpmath.polyroots(coeff_j[nn-1,:nn+2][::-1],maxsteps=500,extraprec=100))
     #[::-1])
-
-np.save(args.outputbase+file_name_prefix+'_roots',rn)
+    
+rn=np.array(rn,dtype='object')
+np.save(args.outputbase+file_name_prefix+'_roots',np.array(rn))
 
 out_norms = 'Normalization_%s-%s.table'%(args.thetamin,args.thetamax)
 out_roots = 'Root_%s-%s.table'%(args.thetamin,args.thetamax)
