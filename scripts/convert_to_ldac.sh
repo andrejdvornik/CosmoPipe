@@ -23,31 +23,31 @@ if [ "${objstr}" == "FAIL" ]
 then 
   run=1
 fi 
+objstr=''
 {
 @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${input} -t OBJECTS -k SeqNr 2>&1 && _message " @BLU@SeqNr found!@DEF@\n" || objstr="FAIL"
 } >&1
 {
 @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldactestexist -i ${input} -t FIELDS 2>&1 && _message " @BLU@FIELDS table found!@DEF@\n" || objstr="FAIL"
 } >&1
-if [ "${objstr}" == "FAIL" ] && [ "${run}" == "0" ]
+if [ "${objstr}" == "FAIL" ] 
 then 
   run=2
 fi 
 _message "@BLU@} - @RED@Done!@DEF@\n"
 
-if [ "${objstr}" == "FAIL" ] 
+if [ "${run}" == "1" ] 
 then 
-  if [ "${run}" == "1" ] 
+  _message "   > @BLU@Adding missing FIELD_POS variable: @DEF@${input##*/}@DEF@ "
+  @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacaddkey -i ${input} -o ${input}_tmp -t OBJECTS -k FIELD_POS 1 SHORT "FIELD_POS identifier" 2>&1
+  mv ${input}_tmp ${output}
+  _message " @BLU@- @RED@Done! (`date +'%a %H:%M'`)\n@DEF@"
+  if [ "${input}" != "${output}" ]
   then 
-    _message "   > @BLU@Adding missing FIELD_POS variable: @DEF@${input##*/}@DEF@ "
-    @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacaddkey -i ${input} -o ${input}_tmp -t OBJECTS -k FIELD_POS 1 SHORT "FIELD_POS identifier" 2>&1
-    mv ${input}_tmp ${output}
-    _message " @BLU@- @RED@Done! (`date +'%a %H:%M'`)\n@DEF@"
-    if [ "${input}" != "${output}" ]
-    then 
-      _replace_datahead ${input} ${output}
-    fi 
-  else 
+    _replace_datahead ${input} ${output}
+  fi 
+elif [ "${objstr}" == "FAIL" ] 
+then 
     #Notify 
     _message "   > @BLU@Converting non-LDAC FITS catalogue for use as LDAC: @DEF@${input##*/}@DEF@ "
 
@@ -73,7 +73,6 @@ then
 
     #Update the datahead 
     _replace_datahead ${input} ${output}
-  fi 
 else 
   #Notify 
   _message "   > @BLU@Catalogue @DEF@${input##*/}@BLU@ already appears LDAC compatible!@DEF@\n"
