@@ -63,8 +63,8 @@ _message "    -> @BLU@Computing nE bandpowers for file @RED@${input##*/}@DEF@"
     -i ${input} \
     -t "meanr" -g "gamT" -q "gamX" \
     --cfoldername ${outfold} \
-    -o ${output} -b @BINNING@ -s @BV:THETAMINXI@ \
-    -l @BV:THETAMAXXI@ \
+    -o ${output} -b @BV:BINNINGGT@ -s @BV:THETAMINGT@ \
+    -l @BV:THETAMAXGT@ \
     -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
     -k @BV:NBANDPOWERS@ \
     -d "bandpowers_ne" 2>&1 
@@ -81,10 +81,10 @@ then
 _message "    -> @BLU@Computing nn bandpowers for file @RED@${input##*/}@DEF@"
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/run_measure_statistics_cats2stats.py \
     -i ${input} \
-    -t "meanr" -j "xi" \
+    -t "meanr" -j "wtheta" \
     --cfoldername ${outfold} \
-    -o ${output} -b @BINNING@ -s @BV:THETAMINXI@ \
-    -l @BV:THETAMAXXI@ \
+    -o ${output} -b @BV:BINNINGWT@ -s @BV:THETAMINWT@ \
+    -l @BV:THETAMAXWT@ \
     -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
     -k @BV:NBANDPOWERS@ \
     -d "bandpowers_nn" 2>&1 
