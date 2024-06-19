@@ -18,9 +18,25 @@ elif [ "${STATISTIC^^}" == "COSEBIS_DIMLESS" ] #{{{
 then
   inputs="@DB:cosebis_dimless@"
 #}}}
-elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
-then 
-  inputs="@DB:bandpowers@"
+elif [ "${STATISTIC^^}" == "PSI_STATS_GM" ] #{{{
+then
+  inputs="@DB:psi_stats_gm@"
+#}}}
+elif [ "${STATISTIC^^}" == "PSI_STATS_GG" ] #{{{
+then
+  inputs="@DB:psi_stats_gg@"
+#}}}
+elif [ "${STATISTIC^^}" == "BANDPOWERS_EE" ] #{{{
+then
+  inputs="@DB:bandpowers_ee@"
+#}}}
+elif [ "${STATISTIC^^}" == "BANDPOWERS_NE" ] #{{{
+then
+  inputs="@DB:bandpowers_ne@"
+#}}}
+elif [ "${STATISTIC^^}" == "BANDPOWERS_NN" ] #{{{
+then
+  inputs="@DB:bandpowers_nn@"
 #}}}
 elif [ "${STATISTIC^^}" == "XIPSF" ] #{{{
 then 
@@ -33,6 +49,14 @@ then
 elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
 then 
   inputs="@DB:xipm_binned@"
+#}}}
+elif [ "${STATISTIC^^}" == "GT" ] #{{{
+then
+  inputs="@DB:gt_binned@"
+#}}}
+elif [ "${STATISTIC^^}" == "WT" ] #{{{
+then
+  inputs="@DB:wt_binned@"
 #}}}
 fi
 #Input mbias files 

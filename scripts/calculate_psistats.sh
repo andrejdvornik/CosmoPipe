@@ -12,16 +12,19 @@ mode=@BV:PSISTATSMODE@
 #Output file
 output=${input##*/}
 output=${output%_ggcorr*}
+output=${output%_gtcorr*}
+output=${output%_wtcorr*}
 output=${output}_psi_stats
-#Output folder: cosebis
-outfold=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/psi_stats/
-if [ ! -d ${outfold} ]
-then 
-  mkdir ${outfold}
-fi 
+
 
 if [ "${mode^^}" == "NE" ]
 then
+  #Output folder: psi_stats
+  outfold=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/psi_stats_gm/
+  if [ ! -d ${outfold} ]
+  then
+    mkdir ${outfold}
+  fi
   # check whether the pre-computed PSI stats tables exist
   SRCLOC=@RUNROOT@/@CONFIGPATH@/psi_filters
 
@@ -51,11 +54,17 @@ then
   
   #Add the files to the datablock
   PSInefile="psi_gm_${output}.asc"
-    psiblock=`_read_datablock psi_stats`
+    psiblock=`_read_datablock psi_stats_gm`
   _write_datablock cosebis "`_blockentry_to_filelist ${psiblock}` ${PSInefile}"
   
 elif [ "${mode^^}" == "NN" ]
 then
+  #Output folder: psi_stats
+  outfold=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/psi_stats_gg/
+  if [ ! -d ${outfold} ]
+  then
+    mkdir ${outfold}
+  fi
   # check whether the pre-computed PSI stats tables exist
   SRCLOC=@RUNROOT@/@CONFIGPATH@/psi_filters
   
@@ -84,7 +93,7 @@ then
   
   #Add the files to the datablock
   PSInnfile="psi_gg_${output}.asc"
-  psiblock=`_read_datablock psi_stats`
+  psiblock=`_read_datablock psi_stats_gg`
   _write_datablock cosebis "`_blockentry_to_filelist ${psiblock}` ${PSInnfile}"
 
 

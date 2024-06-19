@@ -88,6 +88,10 @@ parser.add_argument('-k','--nbins_bp', dest="nbins_bp", type=int,default=8, narg
 # xipm options
 parser.add_argument('--nbins_xipm', dest="nbins_xipm", type=int,default=9, nargs='?',
     help='number of xipm bins to produce, default is 9')
+parser.add_argument('--nbins_gt', dest="nbins_gt", type=int,default=9, nargs='?',
+    help='number of gt bins to produce, default is 9')
+parser.add_argument('--nbins_wt', dest="nbins_wt", type=int,default=9, nargs='?',
+    help='number of wt bins to produce, default is 9')
 
 # psi options
 parser.add_argument('--filterfoldername', dest="filterfoldername", 
@@ -454,5 +458,82 @@ elif mode == 'xipm':
     print(all_binned_data.shape)
     # Write it out to a file and praise-be for Jarvis and his well documented code
     treecorr.util.gen_write(xipmfileName, all_keys, all_binned_data, precision=12)
+    
+elif mode == 'gt':
+    if binning=='lin':
+        lin_not_log = True
+    else:
+        lin_not_log = False
+    meanr = tpcf_data['meanr']
+    meanlnr = tpcf_data['meanlogr']
+    weight = tpcf_data['weight']
+    keys = tpcf_data.keys()
+    
+    wgtBlock_keys = ['weight', 'npairs', 'npairs_weighted']
+    valueBlock_keys = [k for k in keys if (k not in wgtBlock_keys) and (k not in ['r_nom','meanr', 'meanlogr'])]
+
+    valueBlock = np.array([tpcf_data[key] for key in valueBlock_keys])
+    wgtBlock = np.array([tpcf_data[key] for key in wgtBlock_keys])
+
+    gtfileName=cfoldername+"/gt_binned_"+outputfile+".asc"
+
+    ## Turn sigma into sigma^2
+    sigma_idx = [i for i,k in enumerate(valueBlock_keys) if k.startswith('sigma')]
+    valueBlock[sigma_idx] = valueBlock[sigma_idx]**2
+
+    ## Rebin
+    ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock = rebin(thetamin, thetamax, nbins_gt, lin_not_log, meanr, meanlnr, weight, valueBlock, wgtBlock)
+
+    ## Turn sigma^2 into sigma
+    valueBlock[sigma_idx] = np.sqrt(valueBlock[sigma_idx])
+
+    all_keys = np.concatenate((['r_nom','meanr', 'meanlogr'], valueBlock_keys, wgtBlock_keys))
+    print(all_keys)
+    print(ctrBin.shape)
+    print(binned_valueBlock.shape)
+    print(binned_wgtBlock.shape)
+    all_binned_data = np.vstack((ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock))
+    print(all_binned_data.shape)
+    # Write it out to a file and praise-be for Jarvis and his well documented code
+    treecorr.util.gen_write(gtfileName, all_keys, all_binned_data, precision=12)
+    
+elif mode == 'wt':
+    if binning=='lin':
+        lin_not_log = True
+    else:
+        lin_not_log = False
+    meanr = tpcf_data['meanr']
+    meanlnr = tpcf_data['meanlogr']
+    weight = tpcf_data['weight']
+    keys = tpcf_data.keys()
+    
+    wgtBlock_keys = ['weight', 'npairs', 'npairs_weighted']
+    valueBlock_keys = [k for k in keys if (k not in wgtBlock_keys) and (k not in ['r_nom','meanr', 'meanlogr'])]
+
+    valueBlock = np.array([tpcf_data[key] for key in valueBlock_keys])
+    wgtBlock = np.array([tpcf_data[key] for key in wgtBlock_keys])
+
+    wtfileName=cfoldername+"/wt_binned_"+outputfile+".asc"
+
+    ## Turn sigma into sigma^2
+    sigma_idx = [i for i,k in enumerate(valueBlock_keys) if k.startswith('sigma')]
+    valueBlock[sigma_idx] = valueBlock[sigma_idx]**2
+
+    ## Rebin
+    ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock = rebin(thetamin, thetamax, nbins_wt, lin_not_log, meanr, meanlnr, weight, valueBlock, wgtBlock)
+
+    ## Turn sigma^2 into sigma
+    valueBlock[sigma_idx] = np.sqrt(valueBlock[sigma_idx])
+
+    all_keys = np.concatenate((['r_nom','meanr', 'meanlogr'], valueBlock_keys, wgtBlock_keys))
+    print(all_keys)
+    print(ctrBin.shape)
+    print(binned_valueBlock.shape)
+    print(binned_wgtBlock.shape)
+    all_binned_data = np.vstack((ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock))
+    print(all_binned_data.shape)
+    # Write it out to a file and praise-be for Jarvis and his well documented code
+    treecorr.util.gen_write(wtfileName, all_keys, all_binned_data, precision=12)
+    
 else:
     raise Exception('Unknown mode!')
