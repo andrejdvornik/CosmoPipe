@@ -41,7 +41,7 @@ fi
 #}}}
 
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
-
+MULT=@BV:MULT@
 if [ "${STATISTIC^^}" == "XIEB" ] #{{{
 then
 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue.py \
@@ -63,7 +63,20 @@ then
   --suffix "@BV:CHAINSUFFIX@B" \
   --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
 else
-@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue.py \
+if [ -n "$MULT" ]
+then
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue.py \
+  --inputfile ${inputfile} \
+  --statistic @BV:STATISTIC@ \
+  --ntomo ${NTOMO} \
+  --thetamin @BV:THETAMINXI@ \
+  --thetamax @BV:THETAMAXXI@ \
+  --title "@SURVEY@" \
+  --suffix "@BV:CHAINSUFFIX@" \
+  --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/ \
+  --mult ${MULT}
+else
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue.py \
   --inputfile ${inputfile} \
   --statistic @BV:STATISTIC@ \
   --ntomo ${NTOMO} \
@@ -72,5 +85,6 @@ else
   --title "@SURVEY@" \
   --suffix "@BV:CHAINSUFFIX@" \
   --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
+fi
 fi
 

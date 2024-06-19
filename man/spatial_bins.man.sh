@@ -1,5 +1,5 @@
 #
-# Bmodes_pvalue.sh Documentation & Housekeeping functions
+# spatial_bins.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@=====================================@DEF@\n"
-    _message "@BLU@== @RED@ Running Bmodes_pvalue.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@=====================================@DEF@\n"
+    _message "@BLU@====================================@DEF@\n"
+    _message "@BLU@== @RED@ Running spatial_bins.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@====================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,7 +17,8 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Calculates p values for bmodes'
+  echo '# Construct a catalogue of spatial bins from '
+  echo '# DATAHEAD files'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -42,34 +43,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLINDING BV:BOLTZMAN BV:CHAINSUFFIX BV:MULT BV:STATISTIC BV:THETAMAXXI BV:THETAMINXI BV:TOMOLIMS PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH SURVEY
+  echo BV:DECNAME BV:NSPLIT BV:NSPLITKEEP BV:RANAME BV:SPLITASP P_RSCRIPT RUNROOT SCRIPTPATH
 } 
 #}}}
-stat="BV:STATISTIC@"
+
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  if [ "${stat^^}" == "COSEBIS" ]
-  then
-    echo mcmc_inp_cosebis
-  elif [ "${stat^^}" == "BANDPOWERS" ]
-  then
-    echo mcmc_inp_bandpowers
-  fi
+  echo DATAHEAD
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo ''
+  echo DATAHEAD
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/spatial_bins.sh
 } 
 #}}}
 
