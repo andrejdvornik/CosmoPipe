@@ -204,7 +204,7 @@ def mkdir_mine(dirName):
     except FileExistsError:
         print("Directory " , dirName ,  " already exists")
         
-def saveFitsBP_3times2onepoint(datavec, covariance, outputFilename, nBins_lens, nBins_source, nBins_obs):
+def saveFitsBP_3times2onepoint(datavec, smfvec, covariance, outputFilename, nBins_lens, nBins_source, nBins_obs):
     scDict = {
         'use_stats': 'PeeE PneE Pnn 1pt'.lower()
     }
@@ -231,7 +231,7 @@ def saveFitsBP_3times2onepoint(datavec, covariance, outputFilename, nBins_lens, 
         covTag='file',
         covName=covariance,
         nobsTag='file',
-        nobsName=smf,
+        nobsName=smfvec,
         nOfZNameList=nOfZNameList,
         nGalList=nGalList,
         sigmaEpsList=sigmaEpsList,
