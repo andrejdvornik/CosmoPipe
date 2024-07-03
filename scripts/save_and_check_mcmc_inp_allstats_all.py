@@ -203,6 +203,41 @@ def mkdir_mine(dirName):
         print("Directory " , dirName ,  " Created ") 
     except FileExistsError:
         print("Directory " , dirName ,  " already exists")
+        
+def saveFitsBP_3times2onepoint(datavec, covariance, outputFilename, nBins_lens, nBins_source, nBins_obs):
+    scDict = {
+        'use_stats': 'PeeE PneE Pnn 1pt'.lower()
+    }
+    
+    nOfZNameList = list(nz.values())
+
+    nGalList     = nGal_source#.tolist()
+    sigmaEpsList = sigma_e#.tolist()
+    print(len(nGalList))
+    print(len(nOfZNameList))
+    print(nOfZNameList)
+    print(nz.values())
+    
+    saveFitsTwoPoint(
+        nbTomoN=nBins_lens,
+        nbTomoG=nBins_source,
+        nbObs=nBins_obs,
+        prefix_Flinc=None,
+        prefix_CosmoSIS=None,
+        scDict=scDict,
+        nnAuto=True,
+        meanTag='file',
+        meanName=datavec,
+        covTag='file',
+        covName=covariance,
+        nobsTag='file',
+        nobsName=smf,
+        nOfZNameList=nOfZNameList,
+        nGalList=nGalList,
+        sigmaEpsList=sigmaEpsList,
+        saveName=outputFilename
+    )
+    return
 
 def saveFitsCOSEBIs(datavec,covariance, outputFilename):
     scDict = {
