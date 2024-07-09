@@ -151,7 +151,7 @@ do
       _message "    -> @BLU@Bin $LBIN1 x Bin $LBIN1 @DEF@"
       MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
         @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_gt_w_treecorr.py \
-        --clustering --nbins @BV:NTHETABINWT@ --theta_min @BV:THETAMINWT@ --theta_max @BV:THETAMAXWT@ --binning @BV:BINNINGWT@ --bin_slop_NN ${bin_slop_NN} --bin_slop_NG ${bin_slop_NG}\
+        --clustering --nbins @BV:NTHETABINWT@ --theta_min @BV:THETAMINWT@ --theta_max @BV:THETAMAXWT@ --binning @BV:BINNING@ --bin_slop_NN ${bin_slop_NN} --bin_slop_NG ${bin_slop_NG}\
         --lenscat ${file_lens_one} \
         --randcat ${file_rand_one} \
         --output @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/wt/${outname} \

@@ -1,5 +1,5 @@
 #
-# rebin_xipm.sh Documentation & Housekeeping functions
+# rebin_gt.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -8,7 +8,7 @@ function _prompt {
   if [ "$1" != "0" ] 
   then
     _message "@BLU@==================================@DEF@\n"
-    _message "@BLU@== @RED@ Running rebin_xipm.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@== @RED@ Running rebin_gt.sh Mode @BLU@ ==@DEF@\n"
     _message "@BLU@==================================@DEF@\n"
   fi 
 }
@@ -17,7 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Create binned xipm from input xipm'
+  echo '# Create binned gamma_t/x from input gamma_t/x'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -42,8 +42,8 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BV:BINNING BLU BV:NXIPM BV:THETAMAXXI BV:THETAMINXI DATABLOCK DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
-} 
+  echo BV:BINNING BLU BV:NGT BV:THETAMAXGT BV:THETAMINGT DATABLOCK DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+}
 #}}}
 
 # Input data {{{ 
@@ -56,14 +56,14 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo xipm_binned
-} 
+  echo gt_binned
+}
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/rebin_xipm.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/rebin_gt.sh
 } 
 #}}}
 

@@ -25,7 +25,7 @@ rootfile=${SRCLOC}/TLogsRootsAndNorms/Root_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
 
 if [ ! -f ${normfile} ] || [ ! -f ${rootfile} ]
 then 
-  if [ "@BINNING@" == "log" ] 
+  if [ "@BV:BINNING@" == "log" ] 
   then 
     _message "    -> @BLU@Computing COSEBIs root and norm files@DEF@"
     @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/cosebis_compute_log_weight.py \
@@ -62,7 +62,7 @@ _message "    -> @BLU@Computing COSEBIs for file @RED@${input##*/}@DEF@"
   -i ${input} \
   -t "meanr" -p "xip" -m "xim" \
   --cfoldername ${outfold} \
-  -o ${output} -b @BINNING@ -n @BV:NMAXCOSEBIS@ -s @BV:THETAMINXI@ \
+  -o ${output} -b @BV:BINNING@ -n @BV:NMAXCOSEBIS@ -s @BV:THETAMINXI@ \
   -l @BV:THETAMAXXI@ --tfoldername ${SRCLOC}/Tplus_minus \
   --norm ${normfile} --root ${rootfile} \
   -d "cosebis" 2>&1 

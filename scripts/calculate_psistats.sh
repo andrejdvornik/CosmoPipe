@@ -47,7 +47,7 @@ then
     -i ${input} \
     -t "meanr" -g "gamT" -q "gamX" \
     --psifoldername ${outfold} \
-    -o ${output} -b @BV:BINNINGGT@ -nPsi @BV:NMAXPSISTATS@ -s @BV:THETAMINGT@ \
+    -o ${output} -b @BV:BINNING@ -nPsi @BV:NMAXPSISTATS@ -s @BV:THETAMINGT@ \
     -l @BV:THETAMAXGT@ --filterfoldername ${SRCLOC} \
     -d "psi_gm" 2>&1
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
@@ -86,7 +86,7 @@ then
     -i ${input} \
     -t "meanr" -j "wtheta" \
     --psifoldername ${outfold} \
-    -o ${output} -b @BV:BINNINGWT@ -nPsi @BV:NMAXPSISTATS@ -s @BV:THETAMINWT@ \
+    -o ${output} -b @BV:BINNING@ -nPsi @BV:NMAXPSISTATS@ -s @BV:THETAMINWT@ \
     -l @BV:THETAMAXWT@ --filterfoldername ${SRCLOC} \
     -d "psi_gg" 2>&1
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"

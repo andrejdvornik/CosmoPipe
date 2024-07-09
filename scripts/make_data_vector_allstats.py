@@ -123,12 +123,13 @@ if statistic == 'xipsf' or statistic == 'xigpsf':
 if statistic == 'cosebis_dimless': 
     statistic='cosebis'
     
-nBins_source = len(args.tomoBins)-1
-tomoBins = [ str(i).replace(".","p") for i in args.tomoBins ]
+if statistic in ['bandpower_ee', 'bandpower_ne', 'cosebis', 'psi_stats_gm', 'xipm', 'gt']:
+    nBins_source = len(args.tomoBins)-1
+    tomoBins = [ str(i).replace(".","p") for i in args.tomoBins ]
 
-ZBstr = {}
-for bin in range(nBins_source):
-    ZBstr[bin] = "ZB"+str(tomoBins[bin])+"t"+str(tomoBins[bin+1])
+    ZBstr = {}
+    for bin in range(nBins_source):
+        ZBstr[bin] = "ZB"+str(tomoBins[bin])+"t"+str(tomoBins[bin+1])
     
 if statistic in ['bandpower_ne', 'bandpowers_nn', 'psi_stats_gm', 'psi_stats_gg', 'gt', 'wt']:
     nBins_lens = len(args.lensBins)-1
@@ -156,19 +157,20 @@ for mval in m:
             raise ValueError(f"provided m {mval} is neither a valid file nor a float?!")
 
 print(mout)
-m_corr_e  = []
-for bin1 in range(nBins_source):
-    for bin2 in range(bin1,nBins_source):
-        m_corr = (1.+mout[bin2])*(1.+mout[bin1])
-        m_corr_e.append(m_corr)
-m_corr_e = np.asarray(m_corr_e)
-print(m_corr_e)
-# no b-bias correction for b-modes. Just fill an array with ones
-m_corr_b=np.ones(m_corr_e.shape)
+if statistic in ['bandpower_ee', 'cosebis', 'xipm']:
+    m_corr_e  = []
+    for bin1 in range(nBins_source):
+        for bin2 in range(bin1,nBins_source):
+            m_corr = (1.+mout[bin2])*(1.+mout[bin1])
+            m_corr_e.append(m_corr)
+    m_corr_e = np.asarray(m_corr_e)
+    print(m_corr_e)
+    # no b-bias correction for b-modes. Just fill an array with ones
+    m_corr_b=np.ones(m_corr_e.shape)
 
-m_corr_arr = np.concatenate((m_corr_e,m_corr_b))
+    m_corr_arr = np.concatenate((m_corr_e,m_corr_b))
 
-m_corr_arr_all = np.concatenate((m_corr_e,m_corr_e))
+    m_corr_arr_all = np.concatenate((m_corr_e,m_corr_e))
 
 # m correction for ggl
 if statistic in ['bandpower_ne', 'psi_stats_gm', 'gt']:
