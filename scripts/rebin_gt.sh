@@ -35,8 +35,8 @@ _message "    -> @BLU@Rebinning gamma_t/x for file @RED@${input##*/}@DEF@"
   -i ${input} \
   -t "meanr" -g "gamT" -q "gamX" \
   --cfoldername ${outfold} \
-  -o ${output} -b @BV:BINNING@ --nbins_gt @BV:NGT@ \
-  -s @BV:THETAMINGT@ -l @BV:THETAMAXGT@  \
+  -o ${output} -b @BV:BINNING@ --nbins_gt @BV:NTHETAREBIN@ \
+  -s @BV:THETAMIN@ -l @BV:THETAMAX@  \
  -d "gt" 2>&1
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 

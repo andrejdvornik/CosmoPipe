@@ -31,8 +31,8 @@ then
   then
     _message "    -> @BLU@Computing COSEBIs root and norm files@DEF@"
     @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/cosebis_compute_log_weight.py \
-      --thetamin @BV:THETAMINXI@ \
-      --thetamax @BV:THETAMAXXI@ \
+      --thetamin @BV:THETAMIN@ \
+      --thetamax @BV:THETAMAX@ \
       --nmax @BV:NMAXCOSEBIS@ \
       --dimless True \
       --outputbase ${SRCLOC}/TLogsRootsAndNorms_dimless/ 2>&1
@@ -65,8 +65,8 @@ _message "    -> @BLU@Computing COSEBIs for file @RED@${input##*/}@DEF@"
   -i ${input} \
   -t "meanr" -p "xip" -m "xim" \
   --cfoldername ${outfold} \
-  -o ${output} -b @BV:BINNING@ -n @BV:NMAXCOSEBIS@ -s @BV:THETAMINXI@ \
-  -l @BV:THETAMAXXI@ --tfoldername ${SRCLOC}/Tplus_minus_dimless \
+  -o ${output} -b @BV:BINNING@ -n @BV:NMAXCOSEBIS@ -s @BV:THETAMIN@ \
+  -l @BV:THETAMAX@ --tfoldername ${SRCLOC}/Tplus_minus_dimless \
   --norm ${normfile_dimless} --root ${rootfile_dimless} \
   -d "cosebis" 2>&1 
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"

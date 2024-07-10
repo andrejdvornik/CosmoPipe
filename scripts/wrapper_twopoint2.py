@@ -22,8 +22,6 @@ class TwoPointBuilder:
     def __init__(self,
                   nbTomoN=2, nbTomoG=5, nbObs=1,
                   N_theta=9, theta_min=0.5, theta_max=300,
-                  N_theta_gt=9, theta_min_gt=0.5, theta_max_gt=300,
-                  N_theta_wt=9, theta_min_wt=0.5, theta_max_wt=300,
                   N_ell=8, ell_min=100, ell_max=1500,
                   nbModes=5,
                   prefix_Flinc=None,
@@ -43,18 +41,10 @@ class TwoPointBuilder:
         self.nbTomoG = nbTomoG
         
         ## Define angular bin parameters
-        self.N_theta_xi   = N_theta
-        self.theta_min_xi = theta_min
-        self.theta_max_xi = theta_max
-        
-        self.N_theta_gt   = N_theta_gt
-        self.theta_min_gt = theta_min_gt
-        self.theta_max_gt = theta_max_gt
-        
-        self.N_theta_wt   = N_theta_wt
-        self.theta_min_wt = theta_min_wt
-        self.theta_max_wt = theta_max_wt
-        
+        self.N_theta   = N_theta
+        self.theta_min = theta_min
+        self.theta_max = theta_max
+    
         self.N_ell     = N_ell
         self.ell_min   = ell_min
         self.ell_max   = ell_max
@@ -72,15 +62,9 @@ class TwoPointBuilder:
     
     ## Initialize
     def setAngBins(self):
-        bAndC_theta_xi = np.logspace(np.log10(self.theta_min_xi), np.log10(self.theta_max_xi), 2*self.N_theta_xi+1)
-        self.theta_xi     = bAndC_theta_xi[1::2] ## [arcmin]
-        self.bin_theta_xi = bAndC_theta_xi[0::2]
-        bAndC_theta_wt = np.logspace(np.log10(self.theta_min_wt), np.log10(self.theta_max_wt), 2*self.N_theta_wt+1)
-        self.theta_wt     = bAndC_theta_wt[1::2] ## [arcmin]
-        self.bin_theta_wt = bAndC_theta_wt[0::2]
-        bAndC_theta_gt = np.logspace(np.log10(self.theta_min_gt), np.log10(self.theta_max_gt), 2*self.N_theta_gt+1)
-        self.theta_gt     = bAndC_theta_gt[1::2] ## [arcmin]
-        self.bin_theta_gt = bAndC_theta_gt[0::2]
+        bAndC_theta = np.logspace(np.log10(self.theta_min), np.log10(self.theta_max), 2*self.N_theta+1)
+        self.theta     = bAndC_theta[1::2] ## [arcmin]
+        self.bin_theta = bAndC_theta[0::2]
         bAndC_ell = np.logspace(np.log10(self.ell_min), np.log10(self.ell_max), 2*self.N_ell+1)
         self.ell       = bAndC_ell[1::2]
         self.bin_ell   = bAndC_ell[0::2]
@@ -104,11 +88,11 @@ class TwoPointBuilder:
     def makeTomoAngDict(self):
         labConv = wtp.LabelConvention()
         tomoAngDict = { ## Don't touch the order of this list
-            labConv.w:       [self.__pairListNN, self.N_theta_wt, self.theta_wt],
-            labConv.gamma_t: [self.__pairListNG, self.N_theta_gt, self.theta_gt],
-            labConv.gamma_x: [self.__pairListNG, self.N_theta_gt, self.theta_gt],
-            labConv.xi_p:    [self.__pairListGG, self.N_theta_xi, self.theta_xi],
-            labConv.xi_m:    [self.__pairListGG, self.N_theta_xi, self.theta_xi],
+            labConv.w:       [self.__pairListNN, self.N_theta, self.theta],
+            labConv.gamma_t: [self.__pairListNG, self.N_theta, self.theta_],
+            labConv.gamma_x: [self.__pairListNG, self.N_theta, self.theta_],
+            labConv.xi_p:    [self.__pairListGG, self.N_theta, self.theta_],
+            labConv.xi_m:    [self.__pairListGG, self.N_theta, self.theta],
             labConv.P_nn:    [self.__pairListNN, self.N_ell,   self.ell],
             labConv.P_ne_E:  [self.__pairListNG, self.N_ell,   self.ell],
             labConv.P_ne_B:  [self.__pairListNG, self.N_ell,   self.ell],
@@ -814,8 +798,6 @@ def getPrefix():
 def saveFitsTwoPoint(
         nbTomoN=2, nbTomoG=3, nbObs=1,
         N_theta=12, theta_min=0.5, theta_max=300,
-        N_theta_gt=12, theta_min_gt=0.5, theta_max_gt=300,
-        N_theta_wt=12, theta_min_wt=0.5, theta_max_wt=300,
         N_ell=8, ell_min=100, ell_max=1500,
         nbModes=5, nnAuto=False,
         prefix_Flinc=None,
@@ -834,8 +816,6 @@ def saveFitsTwoPoint(
     TPBuilder = TwoPointBuilder(
         nbTomoN=nbTomoN, nbTomoG=nbTomoG, nbObs=nbObs,
         N_theta=N_theta, theta_min=theta_min, theta_max=theta_max,
-        N_theta_gt=N_theta_gt, theta_min_gt=theta_min_gt, theta_max_gt=theta_max_gt,
-        N_theta_wt=N_theta_wt, theta_min_wt=theta_min_wt, theta_max_wt=theta_max_wt,
         N_ell=N_ell, ell_min=ell_min, ell_max=ell_max,
         nbModes=nbModes, nnAuto=nnAuto,
         prefix_Flinc=prefix_Flinc,

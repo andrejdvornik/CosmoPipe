@@ -44,8 +44,8 @@ then
     -i ${input} \
     -t "meanr" -p "xip" -m "xim" \
     --cfoldername ${outfold} \
-    -o ${output} -b @BV:BINNING@ -s @BV:THETAMINXI@ \
-    -l @BV:THETAMAXXI@ \
+    -o ${output} -b @BV:BINNING@ -s @BV:THETAMIN@ \
+    -l @BV:THETAMAX@ \
     -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
     -k @BV:NBANDPOWERS@ \
     -d "bandpowers_ee" 2>&1 
@@ -70,8 +70,8 @@ then
     -i ${input} \
     -t "meanr" -g "gamT" -q "gamX" \
     --cfoldername ${outfold} \
-    -o ${output} -b @BV:BINNING@ -s @BV:THETAMINGT@ \
-    -l @BV:THETAMAXGT@ \
+    -o ${output} -b @BV:BINNING@ -s @BV:THETAMIN@ \
+    -l @BV:THETAMAX@ \
     -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
     -k @BV:NBANDPOWERS@ \
     -d "bandpowers_ne" 2>&1 
@@ -96,8 +96,8 @@ then
     -i ${input} \
     -t "meanr" -j "wtheta" \
     --cfoldername ${outfold} \
-    -o ${output} -b @BV:BINNING@ -s @BV:THETAMINWT@ \
-    -l @BV:THETAMAXWT@ \
+    -o ${output} -b @BV:BINNING@ -s @BV:THETAMIN@ \
+    -l @BV:THETAMAX@ \
     -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
     -k @BV:NBANDPOWERS@ \
     -d "bandpowers_nn" 2>&1 

@@ -47,9 +47,9 @@ _message "    -> @BLU@Computing xi_E/B from COSEBIs@DEF@"
   --data @DB:cosebis_dimless_vec@ \
   --covariance @DB:covariance_cosebis_dimless@ \
   --ncores @BV:NTHREADS@ \
-  --thetamin @BV:THETAMINXI@ \
-  --thetamax @BV:THETAMAXXI@ \
-  --ntheta @BV:NXIPM@ \
+  --thetamin @BV:THETAMIN@ \
+  --thetamax @BV:THETAMAX@ \
+  --ntheta @BV:NTHETAREBIN@ \
   --binning @BV:BINNING@ \
   --ntomo ${NTOMO} \
   --output_data_E @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xiE_vec \

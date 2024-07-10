@@ -34,8 +34,8 @@ _message "    -> @BLU@Rebinning w(theta) for file @RED@${input##*/}@DEF@"
   -i ${input} \
   -t "meanr" -j "wtheta" \
   --cfoldername ${outfold} \
-  -o ${output} -b @BV:BINNING@ --nbins_wt @BV:NWT@ \
-  -s @BV:THETAMINWT@ -l @BV:THETAMAXWT@  \
+  -o ${output} -b @BV:BINNING@ --nbins_wt @BV:NTHETAREBIN@ \
+  -s @BV:THETAMIN@ -l @BV:THETAMAX@  \
  -d "wt" 2>&1
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
