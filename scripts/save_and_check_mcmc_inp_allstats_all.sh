@@ -119,11 +119,11 @@ then
   --nz @DB:nz@ \
   --nmaxcosebis @BV:NMAXCOSEBIS@ \
   --nbandpowers @BV:NBANDPOWERS@ \
-  --nxipm @BV:NXIPM@ \
+  --ntheta @BV:NTHETAREBIN@ \
   --ellmin @BV:LMINBANDPOWERS@ \
   --ellmax @BV:LMAXBANDPOWERS@ \
-  --thetamin @BV:THETAMINXI@ \
-  --thetamax @BV:THETAMAXXI@ \
+  --thetamin @BV:THETAMIN@ \
+  --thetamax @BV:THETAMAX@ \
   --ntomo ${NTOMO} \
   --neff @DB:cosmosis_neff@ \
   --sigmae @DB:cosmosis_sigmae@ \
@@ -139,11 +139,11 @@ then
   --nz @DB:nz@ \
   --nmaxcosebis @BV:NMAXCOSEBIS@ \
   --nbandpowers @BV:NBANDPOWERS@ \
-  --nxipm @BV:NXIPM@ \
+  --ntheta @BV:NTHETAREBIN@ \
   --ellmin @BV:LMINBANDPOWERS@ \
   --ellmax @BV:LMAXBANDPOWERS@ \
-  --thetamin @BV:THETAMINXI@ \
-  --thetamax @BV:THETAMAXXI@ \
+  --thetamin @BV:THETAMIN@ \
+  --thetamax @BV:THETAMAX@ \
   --ntomo ${NTOMO} \
   --neff @DB:cosmosis_neff@ \
   --sigmae @DB:cosmosis_sigmae@ \
@@ -160,11 +160,11 @@ else
       --nz @DB:nz@ \
       --nmaxcosebis @BV:NMAXCOSEBIS@ \
       --nbandpowers @BV:NBANDPOWERS@ \
-      --nxipm @BV:NXIPM@ \
+      --ntheta @BV:NTHETAREBIN@ \
       --ellmin @BV:LMINBANDPOWERS@ \
       --ellmax @BV:LMAXBANDPOWERS@ \
-      --thetamin @BV:THETAMINXI@ \
-      --thetamax @BV:THETAMAXXI@ \
+      --thetamin @BV:THETAMIN@ \
+      --thetamax @BV:THETAMAX@ \
       --ntomo ${NTOMO} \
       --neff @DB:cosmosis_neff@ \
       --sigmae @DB:cosmosis_sigmae@ \
@@ -178,11 +178,11 @@ else
     --nz @DB:nz@ \
     --nmaxcosebis @BV:NMAXCOSEBIS@ \
     --nbandpowers @BV:NBANDPOWERS@ \
-    --nxipm @BV:NXIPM@ \
+    --ntheta @BV:NTHETAREBIN@ \
     --ellmin @BV:LMINBANDPOWERS@ \
     --ellmax @BV:LMAXBANDPOWERS@ \
-    --thetamin @BV:THETAMINXI@ \
-    --thetamax @BV:THETAMAXXI@ \
+    --thetamin @BV:THETAMIN@ \
+    --thetamax @BV:THETAMAX@ \
     --ntomo ${NTOMO} \
     --neff @DB:cosmosis_neff@ \
     --sigmae @DB:cosmosis_sigmae@ \

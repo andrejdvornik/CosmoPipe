@@ -25,19 +25,7 @@ import wrapper_twopoint2 as wtp2
 ###############################################################################
 ## Main functions
 #{{{
-def saveFitsTwoPoint(
-        nbTomoN=2, nbTomoG=5,
-        N_theta=9, theta_min=0.5, theta_max=300,
-        N_ell=8, ell_min=100, ell_max=1500,
-        nbModes=5,
-        prefix_Flinc='',
-        prefix_CosmoSIS='',
-        scDict={},
-        meanTag=None, meanName=None,
-        covTag=None, covName=None,
-        nOfZNameList=None, nGalList=None, sigmaEpsList=None,
-        saveName=None
-    ):
+
     """
     This is a general function to save twopoint file.
     
@@ -141,21 +129,6 @@ def saveFitsTwoPoint(
     Nothing, but output a file
     """
     
-    wtp2.saveFitsTwoPoint(
-        nbTomoN=nbTomoN, nbTomoG=nbTomoG,
-        N_theta=N_theta, theta_min=theta_min, theta_max=theta_max,
-        N_ell=N_ell, ell_min=ell_min, ell_max=ell_max,
-        nbModes=nbModes,
-        prefix_Flinc=prefix_Flinc,
-        prefix_CosmoSIS=prefix_CosmoSIS,
-        scDict=scDict,
-        meanTag=meanTag, meanName=meanName,
-        covTag=covTag, covName=covName,
-        nOfZNameList=nOfZNameList, nGalList=nGalList, sigmaEpsList=sigmaEpsList,
-        saveName=saveName
-    )
-    return
-
 
 # copied from cosmosis
 def load_histogram_form(ext):
@@ -204,131 +177,6 @@ def mkdir_mine(dirName):
     except FileExistsError:
         print("Directory " , dirName ,  " already exists")
         
-def saveFitsBP_3times2onepoint(datavec, smfvec, covariance, outputFilename, nBins_lens, nBins_source, nBins_obs):
-    scDict = {
-        'use_stats': 'PeeE PneE Pnn 1pt'.lower()
-    }
-    
-    nOfZNameList = list(nz.values())
-
-    nGalList     = nGal_source#.tolist()
-    sigmaEpsList = sigma_e#.tolist()
-    print(len(nGalList))
-    print(len(nOfZNameList))
-    print(nOfZNameList)
-    print(nz.values())
-    
-    saveFitsTwoPoint(
-        nbTomoN=nBins_lens,
-        nbTomoG=nBins_source,
-        nbObs=nBins_obs,
-        prefix_Flinc=None,
-        prefix_CosmoSIS=None,
-        scDict=scDict,
-        nnAuto=True,
-        meanTag='file',
-        meanName=datavec,
-        covTag='file',
-        covName=covariance,
-        nobsTag='file',
-        nobsName=smfvec,
-        nOfZNameList=nOfZNameList,
-        nGalList=nGalList,
-        sigmaEpsList=sigmaEpsList,
-        saveName=outputFilename
-    )
-    return
-
-def saveFitsCOSEBIs(datavec,covariance, outputFilename):
-    scDict = {
-        # 'use_stats': 'En'.lower()
-        'use_stats': 'En Bn'.lower()
-    }
-
-    nOfZNameList=list(nz.values())
-
-    nGalList     = nGal_source#.tolist()
-    sigmaEpsList = sigma_e#.tolist()
-    print(len(nGalList))
-    print(len(nOfZNameList))
-    print(nOfZNameList)
-    print(nz.values())
-    saveFitsTwoPoint(
-        nbTomoN=0, nbTomoG=len(nOfZNameList),
-        nbModes=args.nmaxcosebis,
-        prefix_Flinc=None,
-        prefix_CosmoSIS=None,
-        scDict=scDict,
-        meanTag='file', 
-        meanName=datavec,
-        covTag='file', 
-        covName=covariance,
-        nOfZNameList=nOfZNameList, 
-        nGalList=nGalList, 
-        sigmaEpsList=sigmaEpsList,
-        saveName=outputFilename
-    )
-    return
-
-def saveFitsBP(datavec,covariance, outputFilename):
-    scDict = {
-        'use_stats': 'PeeE PeeB'.lower()
-    }
-
-    nOfZNameList=list(nz.values())
-
-    nGalList     = nGal_source#.tolist()
-    sigmaEpsList = sigma_e#.tolist()
-    
-    saveFitsTwoPoint(
-        nbTomoN=0, nbTomoG=len(nOfZNameList),
-        N_ell=args.nbandpowers, 
-        ell_min=args.ellmin, 
-        ell_max=args.ellmax,
-        # nbModes=5,
-        prefix_Flinc=None,
-        prefix_CosmoSIS=None,
-        scDict=scDict,
-        meanTag='file', 
-        meanName=datavec,
-        covTag='file', 
-        covName=covariance,
-        nOfZNameList=nOfZNameList, 
-        nGalList=nGalList, 
-        sigmaEpsList=sigmaEpsList,
-        saveName=outputFilename
-    )
-    return
-
-def saveFitsXipm(datavec,covariance, outputFilename):
-    scDict = {
-        'use_stats': 'xiP xiM'.lower()
-    }
-
-    nOfZNameList=list(nz.values())
-
-    nGalList     = nGal_source#.tolist()
-    sigmaEpsList = sigma_e#.tolist()
-    
-    saveFitsTwoPoint(
-        nbTomoN=0, nbTomoG=len(nOfZNameList),
-        N_theta=args.nxipm,
-        theta_min=args.thetamin,
-        theta_max=args.thetamax,
-        prefix_Flinc=None,
-        prefix_CosmoSIS=None,
-        scDict=scDict,
-        meanTag='file', 
-        meanName=datavec,
-        covTag='file', 
-        covName=covariance,
-        nOfZNameList=nOfZNameList, 
-        nGalList=nGalList, 
-        sigmaEpsList=sigmaEpsList,
-        saveName=outputFilename
-    )
-    return
-
 
 ###############################################################################
 ## Checks and plots
@@ -346,6 +194,14 @@ def plot_redshift(filename,title,savename):
     except:
         print("no lenses given")
         plot_lenses=False
+        
+    try:
+        ext=F["nz_obs"]
+        z_obs, nz_obs, n_bar_obs=load_histogram_form(ext)
+        plot_smf=True
+    except:
+        print("no smfs given")
+        plot_smf=False
 
     F.close()
 
@@ -356,6 +212,57 @@ def plot_redshift(filename,title,savename):
         plt.title(title)
         plt.setp(ax.get_xticklabels(),  visible=False)
         plt.subplots_adjust(wspace=0,hspace=0)
+        for bin1 in range(len(nz_lens)):
+            plt.xlim(0,2.0)
+            plt.plot(z_lens,nz_lens[bin1],label='lens '+str(bin1+1))
+            plt.legend(loc='best')
+
+        ax=plt.subplot(2,1,2)
+        plt.setp(ax.get_xticklabels(),  visible=True)
+        for bin1 in range(len(nz_source)):
+            plt.xlim(0,2.0)
+            plt.plot(z_source,nz_source[bin1],label='source '+str(bin1+1))
+            plt.legend(loc='best')
+
+        plt.xlabel("z")
+        plt.ylabel("P(z)")
+        plt.savefig(savename,bbox_inches='tight')
+    elif(plot_smf):
+        plt.clf()
+        ax=plt.subplot(2,1,1)
+        plt.ylabel("P(z)")
+        plt.title(title)
+        plt.setp(ax.get_xticklabels(),  visible=False)
+        plt.subplots_adjust(wspace=0,hspace=0)
+        for bin1 in range(len(nz_obs)):
+            plt.xlim(0,2.0)
+            plt.plot(z_obs,nz_obs[bin1],label='obs '+str(bin1+1))
+            plt.legend(loc='best')
+
+        ax=plt.subplot(2,1,2)
+        plt.setp(ax.get_xticklabels(),  visible=True)
+        for bin1 in range(len(nz_source)):
+            plt.xlim(0,2.0)
+            plt.plot(z_source,nz_source[bin1],label='source '+str(bin1+1))
+            plt.legend(loc='best')
+
+        plt.xlabel("z")
+        plt.ylabel("P(z)")
+        plt.savefig(savename,bbox_inches='tight')
+    elif(plot_lenses and plot_smf):
+        plt.clf()
+        ax=plt.subplot(3,1,1)
+        plt.ylabel("P(z)")
+        plt.title(title)
+        plt.setp(ax.get_xticklabels(),  visible=False)
+        plt.subplots_adjust(wspace=0,hspace=0)
+        for bin1 in range(len(nz_obs)):
+            plt.xlim(0,2.0)
+            plt.plot(z_obs,nz_obs[bin1],label='obs '+str(bin1+1))
+            plt.legend(loc='best')
+            
+        plt.setp(ax.get_xticklabels(),  visible=False)
+    
         for bin1 in range(len(nz_lens)):
             plt.xlim(0,2.0)
             plt.plot(z_lens,nz_lens[bin1],label='lens '+str(bin1+1))
@@ -421,6 +328,25 @@ def plot_data(filename,title,extname,savename):
     plt.clf()
     plt.title(title)
     plt.plot(data,'x')
+    plt.savefig(savename)
+    
+def plot_data_1pt(filename,title,extname,savename):
+    import matplotlib.pyplot as plt
+    F=fits.open(filename)
+    ext=F[extname]
+    #print(ext.columns)
+    plt.clf()
+    plt.title(title)
+    for i in range(1, 99999):
+        try:
+            data = ext.data['BIN{}'.format(i)]
+            x_val = ext.data['OBS{}'.format(i)]
+            #print(x_val, data)
+            plt.plot(x_val,data)
+        except:
+            break
+    plt.yscale('log')
+    plt.xscale('log')
     plt.savefig(savename)
 
 
@@ -520,6 +446,21 @@ def unitaryTest(name1, name2):
     """
     wtp2.unitaryTest(name1, name2)
     return
+    
+def read_value_or_file(input):
+    values = []
+    for tempval in input:
+        if os.path.isfile(tempval):
+            data=np.loadtxt(tempval,comments='#')
+            if data.ndim == 0:
+                data=np.array([data])
+            for val in data:
+                values.append(val)
+        else:
+            try:
+                values.append(float(tempval))
+            except:
+                raise ValueError(f"provided input {tempval} is neither a valid file nor a float?!")
 
 #}}}
 
@@ -529,30 +470,51 @@ def unitaryTest(name1, name2):
 parser = ArgumentParser(description='Construct a cosmosis mcmc input file')
 parser.add_argument("--datavector", dest="DataVector",nargs=2,
     help="Full Input file names", metavar="DataVector",required=True)
-parser.add_argument("-s", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis','cosebis_dimless','bandpowers','xipm','xiEB'],
+parser.add_argument("--smfdatavector", dest="smfvec",nargs=1,
+    help="SMF input file name", metavar="smfvec",required=False, default=None)
+parser.add_argument("-s", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis','cosebis_dimless','bandpowers','2pcf','2pcfEB'],
     help="2pt statistic, must be either cosebis, bandpowers, or xipm")
-parser.add_argument("--nz", dest="NzList",nargs='+',type=str,
-    help="list of Nz per tomographic bin",required=True)
+parser.add_argument("--m", dest="mode",nargs='+',type=str,
+    help="list modes to calculate statistis for (EE, NE, NN or OBS)",required=True, default=['EE'])
+    
+parser.add_argument("--nzsource", dest="NzList_source",nargs='+',type=str,
+    help="list of Nz per tomographic bin",required=False, default=None)
+parser.add_argument("--nzlens", dest="NzList_lens",nargs='+',type=str,
+    help="list of Nz per tomographic bin",required=False, default=None)
+parser.add_argument("--nzobs", dest="NzList_obs",nargs='+',type=str,
+    help="list of Nz per tomographic bin",required=False, default=None)
+    
 parser.add_argument("--ntomo", dest="nTomo",type=int,
-    help="Number of tomographic bins",required=True)
+    help="Number of tomographic bins",required=False, default=0)
+parser.add_argument("--nlens", dest="nLens",type=int,
+    help="Number of lens bins",required=False, default=0)
+parser.add_argument("--nobs", dest="nObs",type=int,
+    help="Number of SMF bins",required=False, default=0)
+    
 parser.add_argument("--nmaxcosebis", dest="nmaxcosebis",type=int,
-    help="maximum n for cosebis")
+    help="maximum n for cosebis",required=False, default=5)
 parser.add_argument("--nbandpowers", dest="nbandpowers",type=int,
-    help="number of bandpower bins")
-parser.add_argument("--nxipm", dest="nxipm",type=int,
-    help="number of xipm bins")
+    help="number of bandpower bins",required=False, default=8)
 parser.add_argument("--ellmin", dest="ellmin",type=float,
-    help="bandpower ell_min")
+    help="bandpower ell_min",required=False, default=100)
 parser.add_argument("--ellmax", dest="ellmax",type=float,
-    help="bandpower ell_max")
+    help="bandpower ell_max",required=False, default=1500)
+    
 parser.add_argument("--thetamin", dest="thetamin",type=float,
-    help="xipm theta_min")
+    help="xipm theta_min",required=False, default=0.5)
 parser.add_argument("--thetamax", dest="thetamax",type=float,
-    help="xipm theta_max")
-parser.add_argument("--neff", dest="NeffFile",nargs='+',
-    help="Neff values file",required=True)
+    help="xipm theta_max",required=False, default=300)
+parser.add_argument("--ntheta", dest="ntheta",type=int,
+    help="number of xipm bins",required=False, default=9)
+    
+parser.add_argument("--neff_source", dest="NeffFileSource",nargs='+',
+    help="Neff values file for sources",required=False, default=None)
+parser.add_argument("--neff_lens", dest="NeffFileLens",nargs='+',
+    help="Neff values file for lenses",required=False, default=None)
+parser.add_argument("--neff_obs", dest="NeffFileObs",nargs='+',
+    help="Neff values file for SMF",required=False, default=None)
 parser.add_argument("--sigmae", dest="SigmaeFile",nargs='+',
-    help="sigmae values file",required=True)
+    help="sigmae values file",required=False, default=None)
 parser.add_argument("--covariance", dest="covarianceFile",nargs=1,
     help="Covariance file",required=True)
 parser.add_argument("-o", "--outputfile", dest="outputFile",
@@ -567,72 +529,183 @@ outputfile=args.outputFile
 
 if statistic == 'cosebis_dimless': 
     statistic='cosebis'
+    
+if statistic == '2pcfEB':
+    statistic='2pcf'
 
 # Folder and file names for nofZ, for the sources it will depend on the blind
 
-nzlist=args.NzList
+nzlist_source = args.nzlist_source
+nzlist_lens = args.nzlist_lens
+nzlist_obs = args.nzlist_obs
+ntomo = args.nTomo
+nlens = args.nLens
+nobs = args.nObs
 
 #Check that provided files have compatible dimensions: len(datavec)==len(cov) 
 # if not len(args.DataVector_cosebis) == len(args.covarianceFile_cosebis): 
 #     raise ValueError('Number of data vectors must be the same as the number of covariances! %s != %s' % 
 #             (str(len(args.DataVector_cosebis)),str(len(args.covarianceFile_cosebis))))
 
-nBins_source = len(nzlist)
+stats_string = ''
 nz={}
-for bin in range(nBins_source):
-    nz['source'+str(bin+1)] = nzlist[bin]
-
-# number density of galaxies per arcmin^2
-# Sources:
-# read from file
-#filename = args.NeffFile
-#nGal_source = np.loadtxt(filename,comments="#")
-nGal_source=[]
-for tempval in args.NeffFile:
-    if os.path.isfile(tempval):
-        data=np.loadtxt(tempval,comments='#')
-        if data.ndim == 0:
-            data=np.array([data])
-        for val in data: 
-            nGal_source.append(val)
+if 'EE' or 'NE' in args.mode:
+    if ntomo > 0:
+        nBins_source = ntomo
+        for bin in range(nBins_source):
+            nz['source'+str(bin+1)] = nzlist_source[bin]
+        
+        if args.NeffFileSource is not None:
+            nGal_source = read_value_or_file(args.NeffFileSource)
+        else:
+            nGals_source = list(np.zeros(ntomo))
+        sigmaEpsList = read_value_or_file(args.SigmaeFile)
     else:
-        try:
-            nGal_source.append(float(tempval))
-        except:
-            raise ValueError(f"provided neff {tempval} is neither a valid file nor a float?!")
-
-# read from file
-#filename = args.SigmaeFile
-#sigma_e  = np.loadtxt(filename,comments="#")
-sigma_e=[]
-for tempval in args.SigmaeFile:
-    if os.path.isfile(tempval):
-        data=np.loadtxt(tempval,comments='#')
-        if data.ndim == 0:
-            data=np.array([data])
-        for val in data: 
-            sigma_e.append(val)
+        raise ValueError('At least one source bin expected!')
+else:
+    nBins_source = 0
+    nGal_source = []
+    sigmaEpsList = None
+    
+if 'NE' or 'NN' in args.mode:
+    if nlens > 0:
+        nBins_lens = nlens
+        for bin in range(nBins_lens):
+            nz['lens'+str(bin+1)] = nzlist_lens[bin]
+        
+        if args.NeffFileLens is not None:
+            nGal_lens = read_value_or_file(args.NeffFileLens)
+        else:
+            nGal_lens = list(np.zeros(nlens))
     else:
-        try:
-            sigma_e.append(float(tempval))
-        except:
-            raise ValueError(f"provided sigmae {tempval} is neither a valid file nor a float?!")
+        raise ValueError('At least one lens bin expected!')
+else:
+    nBins_lens = 0
+    nGal_lens = []
+
+if 'OBS' in args.mode:
+    if nobs > 0:
+        nBins_obs = nobs
+        for bin in range(nBins_obs):
+            nz['obs'+str(bin+1)] = nzlist_obs[bin]
+
+        if args.NeffFileLens is not None:
+            nGal_obs = read_value_or_file(args.NeffFileObs)
+        else:
+            nGal_obs = list(np.zeros(nobs))
+    else:
+        raise ValueError('At least one SMF bin expected!')
+else:
+    nBins_obs = 0
+    nGal_obs = []
+    
+nGalList = nGal_source + nGal_lens + nGal_obs
+        
+datavec = args.DataVector[0]
+datavec_no_mbias = args.DataVector[1]
+covariance = args.covarianceFile[0]
+outputFilename = outputfile+'.fits'
+outputFilename_no_mbias = outputfile+'_no_m_bias.fits'
+smfvec = args.smfvec[0]
+
+# This probably needs to be a list in the first place to preserve order!
+nOfZNameList = list(nz.values())
+
 # Fits files
 if statistic == 'cosebis':
-    saveFitsCOSEBIs(datavec=args.DataVector[0],covariance=args.covarianceFile[0],outputFilename=outputfile+'.fits')
-    saveFitsCOSEBIs(datavec=args.DataVector[1],covariance=args.covarianceFile[0],outputFilename=outputfile+'_no_m_bias.fits')
+    if 'EE' in args.mode:
+        stats_string = stats_string + 'En Bn '
+    if 'NE' in args.mode:
+        stats_string = stats_string + 'Psi_gm '
+    if 'NN' in args.mode:
+        stats_string = stats_string + 'Psi_gg '
+    if 'OBS' in args.mode:
+        stats_string = stats_string + '1pt '
+    scDict = {
+        'use_stats': stats_string.lower()
+        }
 elif statistic == 'bandpowers':
-    saveFitsBP(datavec=args.DataVector[0],covariance=args.covarianceFile[0],outputFilename=outputfile+'.fits')
-    saveFitsBP(datavec=args.DataVector[1],covariance=args.covarianceFile[0],outputFilename=outputfile+'_no_m_bias.fits') 
-elif statistic =='xipm':
-    saveFitsXipm(datavec=args.DataVector[0],covariance=args.covarianceFile[0],outputFilename=outputfile+'.fits')
-    saveFitsXipm(datavec=args.DataVector[1],covariance=args.covarianceFile[0],outputFilename=outputfile+'_no_m_bias.fits')
-elif statistic =='xiEB':
-    saveFitsXipm(datavec=args.DataVector[0],covariance=args.covarianceFile[0],outputFilename=outputfile+'.fits')
-    saveFitsXipm(datavec=args.DataVector[1],covariance=args.covarianceFile[0],outputFilename=outputfile+'_no_m_bias.fits')
-
+    if 'EE' in args.mode:
+        stats_string = stats_string + 'PeeE PeeB '
+    if 'NE' in args.mode:
+        stats_string = stats_string + 'PneE PneB '
+    if 'NN' in args.mode:
+        stats_string = stats_string + 'Pnn '
+    if 'OBS' in args.mode:
+        stats_string = stats_string + '1pt '
+    scDict = {
+        'use_stats': stats_string.lower()
+        }
+elif statistic =='2pcf':
+    if 'EE' in args.mode:
+        stats_string = stats_string + 'xiP xiM '
+    if 'NE' in args.mode:
+        stats_string = stats_string + 'gT gX '
+    if 'NN' in args.mode:
+        stats_string = stats_string + 'wTh '
+    if 'OBS' in args.mode:
+        stats_string = stats_string + '1pt '
+    scDict = {
+        'use_stats': stats_string.lower()
+        }
 else:
     raise Exception('Unknown statistic!')
+
+wtp2.saveFitsTwoPoint(
+        nbTomoN=nBins_lens,
+        nbTomoG=nBins_source,
+        nbObs=nBins_obs,
+        N_theta=args.ntheta,
+        theta_min=args.thetamin,
+        theta_max=args.thetamax,
+        N_ell=args.nbandpowers,
+        ell_min=args.ellmin,
+        ell_max=args.ellmax,
+        nbModes=args.nmaxcosebis,
+        nnAuto=True,
+        prefix_Flinc=None,
+        prefix_CosmoSIS=None,
+        scDict=scDict,
+        meanTag='file',
+        meanName=datavec,
+        covTag='file',
+        covName=covariance,
+        nobsTag='file',
+        nobsName=smfvec,
+        nOfZNameList=nOfZNameList,
+        nGalList=nGalList,
+        sigmaEpsList=sigmaEpsList,
+        saveName=outputFilename
+)
+
+wtp2.saveFitsTwoPoint(
+        nbTomoN=nBins_lens,
+        nbTomoG=nBins_source,
+        nbObs=nBins_obs,
+        N_theta=args.ntheta,
+        theta_min=args.thetamin,
+        theta_max=args.thetamax,
+        N_ell=args.nbandpowers,
+        ell_min=args.ellmin,
+        ell_max=args.ellmax,
+        nbModes=args.nmaxcosebis,
+        nnAuto=True,
+        prefix_Flinc=None,
+        prefix_CosmoSIS=None,
+        scDict=scDict,
+        meanTag='file',
+        meanName=datavec_no_mbias,
+        covTag='file',
+        covName=covariance,
+        nobsTag='file',
+        nobsName=smfvec,
+        nOfZNameList=nOfZNameList,
+        nGalList=nGalList,
+        sigmaEpsList=sigmaEpsList,
+        saveName=outputFilename_no_mbias
+)
+    
+statsList = stats_string.split()
 
 # Plots
 title='KiDS-Legacy'
@@ -646,26 +719,8 @@ plot_covariance(outputfile+'.fits',title,savename)
 savename=plotdir+'/'+statistic+'_correlation_matrix.pdf'
 plot_correlation_mat(outputfile+'.fits',title,savename)
 
-if statistic == 'cosebis': 
-    extname='En'
+for extname in statsList:
     savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
     plot_data(outputfile+'.fits',title,extname,savename)
-    extname='Bn'
-    savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
-    plot_data(outputfile+'.fits',title,extname,savename)
-elif statistic == 'bandpowers': 
-    extname='PeeE'
-    savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
-    plot_data(outputfile+'.fits',title,extname,savename)
-    extname='PeeB'
-    savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
-    plot_data(outputfile+'.fits',title,extname,savename)
-elif statistic == 'xipm': 
-    extname='xiP'
-    savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
-    plot_data(outputfile+'.fits',title,extname,savename)
-    extname='xiM'
-    savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
-    plot_data(outputfile+'.fits',title,extname,savename)
-
+    
 
