@@ -7,6 +7,10 @@
 #
 #=========================================
 
+contains() {
+    [[ $1 =~ (^|[[:space:]])$2($|[[:space:]]) ]] && exit(0) || exit(1)
+}
+
 #Statistic
 BOLTZMAN="@BV:BOLTZMAN@"
 if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
@@ -18,6 +22,9 @@ then
 elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020_NOFEEDBACK" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020_NOFEEDBACK" ]
 then
   non_linear_model=mead2020
+#elif [ "${BOLTZMAN^^}" == "HALO_MODEL" ]
+#then
+#  non_linear_model=halo_model
 else
   _message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
   exit 1
@@ -26,6 +33,7 @@ CHAINSUFFIX=@BV:CHAINSUFFIX@
 #Input data vector
 STATISTIC="@BV:STATISTIC@"
 ITERATION=@BV:ITERATION@
+MODES="@BV:MODES"
 if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 then
   input_datavector="@DB:cosebis_vec@"
@@ -109,14 +117,55 @@ then
 fi 
 #}}}
 
-NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
+if [[ " EE " =~ .*\ $MODES\ .* ]] || [[ " NE " =~ .*\ $MODES\ .* ]]
+then
+  NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
+  nz_source="@DB:nz_source@"
+  neffsource="@DB:cosmosis_neff_source@"
+  cosmosis_sigmae="@DB:cosmosis_sigmae@"
+else
+  NTOMO=0
+  nz_source=
+  neffsource=
+  cosmosis_sigmae=
+fi
+
+if [[ " NN " =~ .*\ $MODES\ .* ]] || [[ " NE " =~ .*\ $MODES\ .* ]]
+then
+  NLENS="@BV:NLENSBINS@"
+  nz_lens="@DB:nz_lens@"
+  nefflens="@DB:cosmosis_neff_lens@"
+else
+  NLENS=0
+  nz_lens=
+  nefflens=
+fi
+
+if [[ " OBS " =~ .*\ $MODES\ .* ]]
+then
+  NOBS="@BV:NSMFLENSBINS@"
+  nz_obs = "@DB:nz_obs@"
+  neffobs = "@DB:cosmosis_neff_obs@"
+  input_smfdatavector = "@DB:smf_datavec"
+else
+  NOBS=0
+  nz_obs=
+  neffobs=
+  input_smfdatavector=
+fi
+
+
 
 if [ "${STATISTIC^^}" != "XIEB" ] 
 then 
 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp_allstats.py \
   --datavector ${input_datavector} \
+  --smfdatavector ${input_smfdatavector}$ \
   --statistic @BV:STATISTIC@ \
-  --nz @DB:nz@ \
+  --mode @BV:MODES \
+  --nzsource ${nz_source} \
+  --nzlens ${nz_lens} \
+  --nzobs ${nz_obs} \
   --nmaxcosebis @BV:NMAXCOSEBIS@ \
   --nbandpowers @BV:NBANDPOWERS@ \
   --ntheta @BV:NTHETAREBIN@ \
@@ -125,8 +174,12 @@ then
   --thetamin @BV:THETAMIN@ \
   --thetamax @BV:THETAMAX@ \
   --ntomo ${NTOMO} \
-  --neff @DB:cosmosis_neff@ \
-  --sigmae @DB:cosmosis_sigmae@ \
+  --nlens ${NLENS} \
+  --nobs ${NOBS} \
+  --neff_source ${neffsource} \
+  --neff_lens   ${nefflens} \
+  --neff_obs    ${neffobs} \
+  --sigmae ${cosmosis_sigmae} \
   --covariance ${input_covariance} \
   --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model} \
   --plotdir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
@@ -135,8 +188,12 @@ if [ ! -z "$input_covariance_iterative" ]
 then
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp_allstats.py \
   --datavector ${input_datavector} \
+  --smfdatavector ${input_smfdatavector}$ \
   --statistic @BV:STATISTIC@ \
-  --nz @DB:nz@ \
+  --mode @BV:MODES \
+  --nzsource ${nz_source} \
+  --nzlens ${nz_lens} \
+  --nzobs ${nz_obs} \
   --nmaxcosebis @BV:NMAXCOSEBIS@ \
   --nbandpowers @BV:NBANDPOWERS@ \
   --ntheta @BV:NTHETAREBIN@ \
@@ -145,8 +202,12 @@ then
   --thetamin @BV:THETAMIN@ \
   --thetamax @BV:THETAMAX@ \
   --ntomo ${NTOMO} \
-  --neff @DB:cosmosis_neff@ \
-  --sigmae @DB:cosmosis_sigmae@ \
+  --nlens ${NLENS} \
+  --nobs ${NOBS} \
+  --neff_source @DB:cosmosis_neff_source@ \
+  --neff_lens   @DB:cosmosis_neff_lens@ \
+  --neff_obs    @DB:cosmosis_neff_obs@ \
+  --sigmae ${cosmosis_sigmae} \
   --covariance ${input_covariance_iterative} \
   --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}${filename_extension} \
   --plotdir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
@@ -156,8 +217,12 @@ _write_datablock "mcmc_inp_@BV:STATISTIC@" "MCMC_input_${non_linear_model}.fits"
 else
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp_allstats.py \
       --datavector ${input_datavector_E} \
+      --smfdatavector ${input_smfdatavector}$ \
       --statistic @BV:STATISTIC@ \
-      --nz @DB:nz@ \
+      --mode @BV:MODES \
+      --nzsource ${nz_source} \
+      --nzlens ${nz_lens} \
+      --nzobs ${nz_obs} \
       --nmaxcosebis @BV:NMAXCOSEBIS@ \
       --nbandpowers @BV:NBANDPOWERS@ \
       --ntheta @BV:NTHETAREBIN@ \
@@ -166,16 +231,24 @@ else
       --thetamin @BV:THETAMIN@ \
       --thetamax @BV:THETAMAX@ \
       --ntomo ${NTOMO} \
-      --neff @DB:cosmosis_neff@ \
-      --sigmae @DB:cosmosis_sigmae@ \
+      --nlens ${NLENS} \
+      --nobs ${NOBS} \
+      --neff_source @DB:cosmosis_neff_source@ \
+      --neff_lens   @DB:cosmosis_neff_lens@ \
+      --neff_obs    @DB:cosmosis_neff_obs@ \
+      --sigmae ${cosmosis_sigmae} \
       --covariance ${input_covariance_E} \
       --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_xiE/MCMC_input_${non_linear_model} \
       --plotdir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
 
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp_allstats.py \
     --datavector ${input_datavector_B} \
+    --smfdatavector ${input_smfdatavector}$ \
     --statistic @BV:STATISTIC@ \
-    --nz @DB:nz@ \
+    --mode @BV:MODES \
+    --nzsource ${nz_source} \
+    --nzlens ${nz_lens} \
+    --nzobs ${nz_obs} \
     --nmaxcosebis @BV:NMAXCOSEBIS@ \
     --nbandpowers @BV:NBANDPOWERS@ \
     --ntheta @BV:NTHETAREBIN@ \
@@ -184,8 +257,12 @@ else
     --thetamin @BV:THETAMIN@ \
     --thetamax @BV:THETAMAX@ \
     --ntomo ${NTOMO} \
-    --neff @DB:cosmosis_neff@ \
-    --sigmae @DB:cosmosis_sigmae@ \
+    --nlens ${NLENS} \
+    --nobs ${NOBS} \
+    --neff_source @DB:cosmosis_neff_source@ \
+    --neff_lens   @DB:cosmosis_neff_lens@ \
+    --neff_obs    @DB:cosmosis_neff_obs@ \
+    --sigmae ${cosmosis_sigmae} \
     --covariance ${input_covariance_B} \
     --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_xiB/MCMC_input_${non_linear_model} \
     --plotdir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/

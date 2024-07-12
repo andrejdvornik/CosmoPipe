@@ -22,6 +22,11 @@ sys.path.append("@RUNROOT@/@SCRIPTPATH@/")
 import wrapper_twopoint as wtp
 import wrapper_twopoint2 as wtp2
 
+def none_or_str(value):
+    if value == 'None':
+        return None
+    return value
+
 ###############################################################################
 ## Main functions
 #{{{
@@ -471,18 +476,18 @@ parser = ArgumentParser(description='Construct a cosmosis mcmc input file')
 parser.add_argument("--datavector", dest="DataVector",nargs=2,
     help="Full Input file names", metavar="DataVector",required=True)
 parser.add_argument("--smfdatavector", dest="smfvec",nargs=1,
-    help="SMF input file name", metavar="smfvec",required=False, default=None)
+    help="SMF input file name", metavar="smfvec",required=False, default=None, const=None)
 parser.add_argument("-s", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis','cosebis_dimless','bandpowers','2pcf','2pcfEB'],
     help="2pt statistic, must be either cosebis, bandpowers, or xipm")
 parser.add_argument("--m", dest="mode",nargs='+',type=str,
     help="list modes to calculate statistis for (EE, NE, NN or OBS)",required=True, default=['EE'])
     
 parser.add_argument("--nzsource", dest="NzList_source",nargs='+',type=str,
-    help="list of Nz per tomographic bin",required=False, default=None)
+    help="list of Nz per tomographic bin",required=False, default=None, const=None)
 parser.add_argument("--nzlens", dest="NzList_lens",nargs='+',type=str,
-    help="list of Nz per tomographic bin",required=False, default=None)
+    help="list of Nz per tomographic bin",required=False, default=None, const=None)
 parser.add_argument("--nzobs", dest="NzList_obs",nargs='+',type=str,
-    help="list of Nz per tomographic bin",required=False, default=None)
+    help="list of Nz per tomographic bin",required=False, default=None, const=None)
     
 parser.add_argument("--ntomo", dest="nTomo",type=int,
     help="Number of tomographic bins",required=False, default=0)
@@ -508,11 +513,11 @@ parser.add_argument("--ntheta", dest="ntheta",type=int,
     help="number of xipm bins",required=False, default=9)
     
 parser.add_argument("--neff_source", dest="NeffFileSource",nargs='+',
-    help="Neff values file for sources",required=False, default=None)
+    help="Neff values file for sources",required=False, default=None, const=None)
 parser.add_argument("--neff_lens", dest="NeffFileLens",nargs='+',
-    help="Neff values file for lenses",required=False, default=None)
+    help="Neff values file for lenses",required=False, default=None, const=None)
 parser.add_argument("--neff_obs", dest="NeffFileObs",nargs='+',
-    help="Neff values file for SMF",required=False, default=None)
+    help="Neff values file for SMF",required=False, default=None, const=None)
 parser.add_argument("--sigmae", dest="SigmaeFile",nargs='+',
     help="sigmae values file",required=False, default=None)
 parser.add_argument("--covariance", dest="covarianceFile",nargs=1,
