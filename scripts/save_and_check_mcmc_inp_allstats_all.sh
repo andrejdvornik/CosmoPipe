@@ -165,7 +165,7 @@ then
   --mode @BV:MODES \
   --nzsource ${nz_source} \
   --nzlens ${nz_lens} \
-  --nzobs ${nz_obs} \
+  --nzobs ${nz_obs} \
   --nmaxcosebis @BV:NMAXCOSEBIS@ \
   --nbandpowers @BV:NBANDPOWERS@ \
   --ntheta @BV:NTHETAREBIN@ \
@@ -193,7 +193,7 @@ then
   --mode @BV:MODES \
   --nzsource ${nz_source} \
   --nzlens ${nz_lens} \
-  --nzobs ${nz_obs} \
+  --nzobs ${nz_obs} \
   --nmaxcosebis @BV:NMAXCOSEBIS@ \
   --nbandpowers @BV:NBANDPOWERS@ \
   --ntheta @BV:NTHETAREBIN@ \
@@ -222,7 +222,7 @@ else
       --mode @BV:MODES \
       --nzsource ${nz_source} \
       --nzlens ${nz_lens} \
-      --nzobs ${nz_obs} \
+      --nzobs ${nz_obs} \
       --nmaxcosebis @BV:NMAXCOSEBIS@ \
       --nbandpowers @BV:NBANDPOWERS@ \
       --ntheta @BV:NTHETAREBIN@ \
@@ -248,7 +248,7 @@ else
     --mode @BV:MODES \
     --nzsource ${nz_source} \
     --nzlens ${nz_lens} \
-    --nzobs ${nz_obs} \
+    --nzobs ${nz_obs} \
     --nmaxcosebis @BV:NMAXCOSEBIS@ \
     --nbandpowers @BV:NBANDPOWERS@ \
     --ntheta @BV:NTHETAREBIN@ \
