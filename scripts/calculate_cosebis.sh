@@ -20,8 +20,8 @@ fi
 
 # check whether the pre-computed COSEBIS tables exist
 SRCLOC=@RUNROOT@/@CONFIGPATH@/cosebis
-normfile=${SRCLOC}/TLogsRootsAndNorms/Normalization_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
-rootfile=${SRCLOC}/TLogsRootsAndNorms/Root_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
+normfile=${SRCLOC}/TLogsRootsAndNorms/Normalization_@BV:THETAMIN@-@BV:THETAMAX@.table
+rootfile=${SRCLOC}/TLogsRootsAndNorms/Root_@BV:THETAMIN@-@BV:THETAMAX@.table
 
 if [ ! -f ${normfile} ] || [ ! -f ${rootfile} ]
 then 

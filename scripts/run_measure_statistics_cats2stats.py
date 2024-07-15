@@ -57,7 +57,7 @@ parser.add_argument('--save_kernels',dest="save_kernels",nargs='?',default=False
     help='Write kernels to disk. Default is FALSE.')
 
 # COSEBIs options
-parser.add_argument('-n','--nCOSEBIs', dest="nCOSEBIs", type=int, default=10, nargs='?',
+parser.add_argument('-n','--nCOSEBIs', dest="nCOSEBIs", type=int, default=10, nargs='?', required=False,
     help='number of COSEBIs modes to produce, default is 10')
 parser.add_argument('--tfoldername', dest="tfoldername", default="Tplus_minus", required=False,
     help='name and full address of the folder for Tplus Tminus files for COSEBIs, will make it if it does not exist')
@@ -457,7 +457,9 @@ elif mode == 'xipm':
     all_binned_data = np.vstack((ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock))
     print(all_binned_data.shape)
     # Write it out to a file and praise-be for Jarvis and his well documented code
-    treecorr.util.gen_write(xipmfileName, all_keys, all_binned_data, precision=12)
+    #treecorr.util.gen_write(xipmfileName, all_keys, all_binned_data, precision=12)
+    with treecorr.util.make_writer(xipmfileName, precision=12) as writer:
+        writer.write(all_keys, all_binned_data)
     
 elif mode == 'gt':
     if binning=='lin':
@@ -495,7 +497,9 @@ elif mode == 'gt':
     all_binned_data = np.vstack((ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock))
     print(all_binned_data.shape)
     # Write it out to a file and praise-be for Jarvis and his well documented code
-    treecorr.util.gen_write(gtfileName, all_keys, all_binned_data, precision=12)
+    #treecorr.util.gen_write(gtfileName, all_keys, all_binned_data, precision=12)
+    with treecorr.util.make_writer(gtfileName, precision=12) as writer:
+        writer.write(all_keys, all_binned_data)
     
 elif mode == 'wt':
     if binning=='lin':
@@ -533,7 +537,9 @@ elif mode == 'wt':
     all_binned_data = np.vstack((ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock))
     print(all_binned_data.shape)
     # Write it out to a file and praise-be for Jarvis and his well documented code
-    treecorr.util.gen_write(wtfileName, all_keys, all_binned_data, precision=12)
+    #treecorr.util.gen_write(wtfileName, all_keys, all_binned_data, precision=12)
+    with treecorr.util.make_writer(wtfileName, precision=12) as writer:
+        writer.write(all_keys, all_binned_data)
     
 else:
     raise Exception('Unknown mode!')

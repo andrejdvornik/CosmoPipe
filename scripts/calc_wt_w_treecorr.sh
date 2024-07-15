@@ -27,7 +27,7 @@ elif [ -f ${lensfiles} ]
 then
   lens_filelist=${lensfile}
 else
-  _message "${RED} - ERROR: Main input lens catalogue @BV:SMF_LENS_CATS@ does not exist!"
+  _message "${RED} - ERROR: Main input lens catalogue @BV:LENS_CATS@ does not exist!"
   exit -1
 fi
   
