@@ -77,22 +77,27 @@ THETAMINCOV="0.50"
 THETAMAXCOV="300.00"
 
 #Theta limits for xipm (can be highres for BP/COSEBIs)
-THETAMINXI="0.50"
+THETAMIN="0.50"
 #Theta limits for xipm (can be highres for BP/COSEBIs)
-THETAMAXXI="300.00"
+THETAMAX="300.00"
 #Number of Theta bins for xipm (can be highres for BP/COSEBIs)
-NTHETABINXI="1000"
-#Number of Xipm bins used for science 
-NXIPM=9 
+NTHETABIN="1000"
+#Number of Xipm bins used for science
+NTHETAREBIN=9
 #Maximum Theta for analysing Xim (arcmin)
 THETAMAXXIM=300
-#Minimum Theta for analysing Xim (arcmin) 
+#Minimum Theta for analysing Xim (arcmin)
 THETAMINXIM=4
 
 #Minimum Number of modes for COSEBIs
 NMINCOSEBIS=1
 #Maximum Number of modes for COSEBIs
 NMAXCOSEBIS=10
+
+#Minimum Number of modes for PSIstats
+NMINPSISTATS=1
+#Maximum Number of modes for PSIstats
+NMAXPSISTATS=10
 
 #Name of the lensing weight variable  
 WEIGHTNAME=weight

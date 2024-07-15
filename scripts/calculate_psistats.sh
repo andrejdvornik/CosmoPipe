@@ -8,7 +8,7 @@
 #Input file 
 input=@DB:DATAHEAD@
 #Psi stats mode: NE, or NN
-mode=@BV:PSISTATSMODE@
+mode=@BV:MODE@
 #Output file
 output=${input##*/}
 output=${output%_ggcorr*}
@@ -47,7 +47,7 @@ then
     -i ${input} \
     -t "meanr" -g "gamT" -q "gamX" \
     --psifoldername ${outfold} \
-    -o ${output} -b @BV:BINNING@ -nPsi @BV:NMAXPSISTATS@ -s @BV:THETAMIN@ \
+    -o ${output} -b @BINNING@ -nPsi @BV:NMAXPSISTATS@ -s @BV:THETAMIN@ \
     -l @BV:THETAMAX@ --filterfoldername ${SRCLOC} \
     -d "psi_gm" 2>&1
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
@@ -86,7 +86,7 @@ then
     -i ${input} \
     -t "meanr" -j "wtheta" \
     --psifoldername ${outfold} \
-    -o ${output} -b @BV:BINNING@ -nPsi @BV:NMAXPSISTATS@ -s @BV:THETAMIN@ \
+    -o ${output} -b @BINNING@ -nPsi @BV:NMAXPSISTATS@ -s @BV:THETAMIN@ \
     -l @BV:THETAMAX@ --filterfoldername ${SRCLOC} \
     -d "psi_gg" 2>&1
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"

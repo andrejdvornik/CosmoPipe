@@ -27,7 +27,7 @@ rootfile_dimless=${SRCLOC}/TLogsRootsAndNorms_dimless/Root_@BV:THETAMINXI@-@BV:T
 
 if [ ! -f ${normfile_dimless} ] || [ ! -f ${rootfile_dimless} ]
 then 
-  if [ "@BV:BINNING@" == "log" ]
+  if [ "@BINNING@" == "log" ]
   then
     _message "    -> @BLU@Computing COSEBIs root and norm files@DEF@"
     @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/cosebis_compute_log_weight.py \
@@ -65,7 +65,7 @@ _message "    -> @BLU@Computing COSEBIs for file @RED@${input##*/}@DEF@"
   -i ${input} \
   -t "meanr" -p "xip" -m "xim" \
   --cfoldername ${outfold} \
-  -o ${output} -b @BV:BINNING@ -n @BV:NMAXCOSEBIS@ -s @BV:THETAMIN@ \
+  -o ${output} -b @BINNING@ -n @BV:NMAXCOSEBIS@ -s @BV:THETAMIN@ \
   -l @BV:THETAMAX@ --tfoldername ${SRCLOC}/Tplus_minus_dimless \
   --norm ${normfile_dimless} --root ${rootfile_dimless} \
   -d "cosebis" 2>&1 

@@ -50,7 +50,7 @@ _message "    -> @BLU@Computing xi_E/B from COSEBIs@DEF@"
   --thetamin @BV:THETAMIN@ \
   --thetamax @BV:THETAMAX@ \
   --ntheta @BV:NTHETAREBIN@ \
-  --binning @BV:BINNING@ \
+  --binning @BINNING@ \
   --ntomo ${NTOMO} \
   --output_data_E @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xiE_vec \
   --output_data_B @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xiB_vec \

@@ -8,7 +8,7 @@
 #Input file 
 input=@DB:DATAHEAD@
 #Bandpower mode: EE, NE, or NN
-mode=@BV:BANDPOWERMODE@ 
+mode=@BV:MODE@ 
 #Output file 
 output=${input##*/}
 output=${output%_ggcorr*}
@@ -44,7 +44,7 @@ then
     -i ${input} \
     -t "meanr" -p "xip" -m "xim" \
     --cfoldername ${outfold} \
-    -o ${output} -b @BV:BINNING@ -s @BV:THETAMIN@ \
+    -o ${output} -b @BINNING@ -s @BV:THETAMIN@ \
     -l @BV:THETAMAX@ \
     -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
     -k @BV:NBANDPOWERS@ \
@@ -70,7 +70,7 @@ then
     -i ${input} \
     -t "meanr" -g "gamT" -q "gamX" \
     --cfoldername ${outfold} \
-    -o ${output} -b @BV:BINNING@ -s @BV:THETAMIN@ \
+    -o ${output} -b @BINNING@ -s @BV:THETAMIN@ \
     -l @BV:THETAMAX@ \
     -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
     -k @BV:NBANDPOWERS@ \
@@ -96,7 +96,7 @@ then
     -i ${input} \
     -t "meanr" -j "wtheta" \
     --cfoldername ${outfold} \
-    -o ${output} -b @BV:BINNING@ -s @BV:THETAMIN@ \
+    -o ${output} -b @BINNING@ -s @BV:THETAMIN@ \
     -l @BV:THETAMAX@ \
     -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
     -k @BV:NBANDPOWERS@ \
