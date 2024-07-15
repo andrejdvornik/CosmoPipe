@@ -163,7 +163,7 @@ do
         --nthreads @BV:NTHREADS@ 2>&1
       _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       #Add the correlation function to the datablock 
-      wtblock=`_read_datablock gt`
+      wtblock=`_read_datablock wt`
       _write_datablock wt "`_blockentry_to_filelist ${wtblock}` ${outname}"
       if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/jackknife_cov_wt/${covoutname} ]
       then

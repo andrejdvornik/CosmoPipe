@@ -9,16 +9,13 @@
 input=@DB:DATAHEAD@
 #Psi stats mode: NE, or NN
 mode=@BV:MODE@
-#Output file
-output=${input##*/}
-output=${output%_ggcorr*}
-output=${output%_gtcorr*}
-output=${output%_wtcorr*}
-output=${output}_psi_stats
-
 
 if [ "${mode^^}" == "NE" ]
 then
+  #Output file
+  output=${input##*/}
+  output=${output%_gtcorr*}
+  output=${output}_psi_stats
   #Output folder: psi_stats
   outfold=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/psi_stats_gm/
   if [ ! -d ${outfold} ]
@@ -42,7 +39,7 @@ then
   # location of the required pre-compution tables
   # --filterfoldername = Tplus_minus    # computes/saves the first time it is run for a fixed theta min/max
   
-  _message "    -> @BLU@Computing PSI stats for file @RED@${input##*/}@DEF@"
+  _message "    -> @BLU@Computing PSI GM stats for file @RED@${input##*/}@DEF@"
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/run_measure_statistics_cats2stats.py \
     -i ${input} \
     -t "meanr" -g "gamT" -q "gamX" \
@@ -59,6 +56,10 @@ then
   
 elif [ "${mode^^}" == "NN" ]
 then
+  #Output file
+  output=${input##*/}
+  output=${output%_wtcorr*}
+  output=${output}_psi_stats
   #Output folder: psi_stats
   outfold=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/psi_stats_gg/
   if [ ! -d ${outfold} ]
@@ -81,7 +82,7 @@ then
   # location of the required pre-compution tables
   # --filterfoldername = Tplus_minus    # computes/saves the first time it is run for a fixed theta min/max
   
-  _message "    -> @BLU@Computing PSI stats for file @RED@${input##*/}@DEF@"
+  _message "    -> @BLU@Computing PSI GG stats for file @RED@${input##*/}@DEF@"
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/run_measure_statistics_cats2stats.py \
     -i ${input} \
     -t "meanr" -j "wtheta" \

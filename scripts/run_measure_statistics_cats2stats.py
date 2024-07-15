@@ -23,7 +23,7 @@ import treecorr
 
 # Specify the input arguments
 parser = ArgumentParser(description='Take input 2pcfs files and calculate 2pt statistics')
-parser.add_argument("-d", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis', 'bandpowers_ee', 'bandpowers_ne', 'bandpowers_nn', 'xipm', 'psi_gg', 'psi_gm'],
+parser.add_argument("-d", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis', 'bandpowers_ee', 'bandpowers_ne', 'bandpowers_nn', 'xipm', 'psi_gg', 'psi_gm', 'gt', 'wt'],
     help="Desired 2pt statistic, must be either cosebis, bandpowers_ee, bandpowers_ne, bandpowers_nn, xipm, or psi")
 
 # Input file, columns, theta range, and other options
@@ -85,13 +85,9 @@ parser.add_argument('-x','--ellmax', dest="ellmax", type=float,default=1500, nar
 parser.add_argument('-k','--nbins_bp', dest="nbins_bp", type=int,default=8, nargs='?',
     help='number of logarithmic bandpowers bins between ellmin and ellmax to produce, default is 8')
 
-# xipm options
-parser.add_argument('--nbins_xipm', dest="nbins_xipm", type=int,default=9, nargs='?',
+# 2pcf options
+parser.add_argument('--nbins_2pcf', dest="nbins_2pcf", type=int,default=9, nargs='?',
     help='number of xipm bins to produce, default is 9')
-parser.add_argument('--nbins_gt', dest="nbins_gt", type=int,default=9, nargs='?',
-    help='number of gt bins to produce, default is 9')
-parser.add_argument('--nbins_wt', dest="nbins_wt", type=int,default=9, nargs='?',
-    help='number of wt bins to produce, default is 9')
 
 # psi options
 parser.add_argument('--filterfoldername', dest="filterfoldername", 
@@ -142,7 +138,7 @@ ellmax=args.ellmax
 nbins_bp=args.nbins_bp
 save_kernels=args.save_kernels
 # xipm options
-nbins_xipm=args.nbins_xipm
+nbins_2pcf=args.nbins_2pcf
 # psi options
 ufile=args.ufile
 qfile=args.qfile
@@ -401,7 +397,7 @@ elif mode == 'bandpowers_ne':
     CnBfileName=cfoldername+"/CnB_"+outputfile+".asc"
     np.savetxt(CnEfileName,CnE)
     np.savetxt(CnBfileName,CnB)
-    if save:
+    if save_kernels:
         FilterFileName=cfoldername+"/FilterNE_"+outputfile+".asc"
         np.savetxt(FilterFileName,filter)
 
@@ -444,7 +440,7 @@ elif mode == 'xipm':
     valueBlock[sigma_idx] = valueBlock[sigma_idx]**2
 
     ## Rebin
-    ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock = rebin(thetamin, thetamax, nbins_xipm, lin_not_log, meanr, meanlnr, weight, valueBlock, wgtBlock)
+    ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock = rebin(thetamin, thetamax, nbins_2pcf, lin_not_log, meanr, meanlnr, weight, valueBlock, wgtBlock)
 
     ## Turn sigma^2 into sigma
     valueBlock[sigma_idx] = np.sqrt(valueBlock[sigma_idx])
@@ -471,7 +467,7 @@ elif mode == 'gt':
     weight = tpcf_data['weight']
     keys = tpcf_data.keys()
     
-    wgtBlock_keys = ['weight', 'npairs', 'npairs_weighted']
+    wgtBlock_keys = ['weight', 'npairs']#, 'npairs_weighted']
     valueBlock_keys = [k for k in keys if (k not in wgtBlock_keys) and (k not in ['r_nom','meanr', 'meanlogr'])]
 
     valueBlock = np.array([tpcf_data[key] for key in valueBlock_keys])
@@ -484,7 +480,7 @@ elif mode == 'gt':
     valueBlock[sigma_idx] = valueBlock[sigma_idx]**2
 
     ## Rebin
-    ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock = rebin(thetamin, thetamax, nbins_gt, lin_not_log, meanr, meanlnr, weight, valueBlock, wgtBlock)
+    ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock = rebin(thetamin, thetamax, nbins_2pcf, lin_not_log, meanr, meanlnr, weight, valueBlock, wgtBlock)
 
     ## Turn sigma^2 into sigma
     valueBlock[sigma_idx] = np.sqrt(valueBlock[sigma_idx])
@@ -511,7 +507,7 @@ elif mode == 'wt':
     weight = tpcf_data['weight']
     keys = tpcf_data.keys()
     
-    wgtBlock_keys = ['weight', 'npairs', 'npairs_weighted']
+    wgtBlock_keys = ['weight', 'npairs']#, 'npairs_weighted']
     valueBlock_keys = [k for k in keys if (k not in wgtBlock_keys) and (k not in ['r_nom','meanr', 'meanlogr'])]
 
     valueBlock = np.array([tpcf_data[key] for key in valueBlock_keys])
@@ -524,7 +520,7 @@ elif mode == 'wt':
     valueBlock[sigma_idx] = valueBlock[sigma_idx]**2
 
     ## Rebin
-    ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock = rebin(thetamin, thetamax, nbins_wt, lin_not_log, meanr, meanlnr, weight, valueBlock, wgtBlock)
+    ctrBin, binned_r, binned_lnr, binned_valueBlock, binned_wgtBlock = rebin(thetamin, thetamax, nbins_2pcf, lin_not_log, meanr, meanlnr, weight, valueBlock, wgtBlock)
 
     ## Turn sigma^2 into sigma
     valueBlock[sigma_idx] = np.sqrt(valueBlock[sigma_idx])
