@@ -108,9 +108,9 @@ parser.add_argument("-s", "--statistic", dest="statistic", type=str, required=Tr
 parser.add_argument("-m", "--mbias", dest="mbias",nargs='+',
     help="multiplicative bias per tomographic bin",required=True)
 parser.add_argument("-t", "--tomobins", dest="tomoBins",nargs='+',
-    help="tomographic bin limits",required=True)
-parser.add_argument("-l", "--lensbins", dest="lensBins",nargs='+',
-    help="lens bin numbers",required=False, default=None)
+    help="tomographic bin limits",required=False, default=0)
+parser.add_argument("-l", "--lensbins", dest="lensBins",type=int,
+    help="number of lens bins",required=False, default=0)
 parser.add_argument("-o", "--outputfile", dest="outputFile",
     help="Full Output file name", metavar="outputFile",required=True)
 
@@ -118,12 +118,14 @@ args = parser.parse_args()
 statistic = args.statistic
 label = statistic
 
-if statistic == 'xipsf' or statistic == 'xigpsf': 
+print(args.lensBins)
+
+if statistic == 'xipsf' or statistic == 'xigpsf':
     statistic='xipm'
 if statistic == 'cosebis_dimless': 
     statistic='cosebis'
     
-if statistic in ['bandpower_ee', 'bandpower_ne', 'cosebis', 'psi_stats_gm', 'xipm', 'gt']:
+if statistic in ['bandpowers_ee', 'bandpowers_ne', 'cosebis', 'psi_stats_gm', 'xipm', 'gt']:
     nBins_source = len(args.tomoBins)-1
     tomoBins = [ str(i).replace(".","p") for i in args.tomoBins ]
 
@@ -131,14 +133,13 @@ if statistic in ['bandpower_ee', 'bandpower_ne', 'cosebis', 'psi_stats_gm', 'xip
     for bin in range(nBins_source):
         ZBstr[bin] = "ZB"+str(tomoBins[bin])+"t"+str(tomoBins[bin+1])
     
-if statistic in ['bandpower_ne', 'bandpowers_nn', 'psi_stats_gm', 'psi_stats_gg', 'gt', 'wt']:
-    nBins_lens = len(args.lensBins)-1
-    lensBins = [ str(i).replace(".","p") for i in args.lensBins ]
+if statistic in ['bandpowers_ne', 'bandpowers_nn', 'psi_stats_gm', 'psi_stats_gg', 'gt', 'wt']:
+    nBins_lens = args.lensBins
 
     LBstr = {}
     for bin in range(nBins_lens):
-        LBstr[bin] = "LB"+str(lensBins[bin])
-
+        LBstr[bin] = "LB"+str(bin+1)
+        
 # m-bias
 m = args.mbias
 #Check if mbias is a file or list of files or float 
@@ -157,7 +158,7 @@ for mval in m:
             raise ValueError(f"provided m {mval} is neither a valid file nor a float?!")
 
 print(mout)
-if statistic in ['bandpower_ee', 'cosebis', 'xipm']:
+if statistic in ['bandpowers_ee', 'cosebis', 'xipm']:
     m_corr_e  = []
     for bin1 in range(nBins_source):
         for bin2 in range(bin1,nBins_source):
@@ -173,11 +174,11 @@ if statistic in ['bandpower_ee', 'cosebis', 'xipm']:
     m_corr_arr_all = np.concatenate((m_corr_e,m_corr_e))
 
 # m correction for ggl
-if statistic in ['bandpower_ne', 'psi_stats_gm', 'gt']:
+if statistic in ['bandpowers_ne', 'psi_stats_gm', 'gt']:
     m_corr_ggl  = []
     for bin1 in range(nBins_lens):
         for bin2 in range(nBins_source):
-            m_corr = (1.+mout[bin2]))
+            m_corr = (1.+mout[bin2])
             m_corr_ggl.append(m_corr)
     m_corr_ggl = np.asarray(m_corr_ggl)
     print(m_corr_ggl)
@@ -191,7 +192,7 @@ if statistic in ['bandpowers_nn', 'psi_stats_gg', 'wt']:
     print(m_corr_clustering)
 
 # This is were the raw 2pt data is saved 
-print(args.DataFiles)
+#print(args.DataFiles)
 input_files = []
 if statistic == 'cosebis':
     matches_cosebis = np.array([ "En_" in i for i in args.DataFiles])
@@ -215,7 +216,7 @@ if statistic == 'cosebis':
     datavector_no_m_bias_all, datavector_with_m_bias_all  = make_2pt_vector(input_files,m_corr_arr_all)
     
 elif statistic == 'psi_stats_gm':
-    matches_psi = np.array([ "psi_gm" in i for i in args.DataFiles])
+    matches_psi = np.array([ "psi_gm_" in i for i in args.DataFiles])
     PsiDataFiles = np.array(args.DataFiles)[matches_psi]
     #Input file name list:
     for bin1 in range(nBins_lens):
@@ -228,7 +229,7 @@ elif statistic == 'psi_stats_gm':
     datavector_no_m_bias_all, datavector_with_m_bias_all  = make_2pt_vector(input_files,m_corr_ggl)
     
 elif statistic == 'psi_stats_gg':
-    matches_psi = np.array([ "psi_gg" in i for i in args.DataFiles])
+    matches_psi = np.array([ "psi_gg_" in i for i in args.DataFiles])
     PsiDataFiles = np.array(args.DataFiles)[matches_psi]
     #Input file name list:
     for bin1 in range(nBins_lens):
@@ -272,7 +273,7 @@ elif statistic == 'bandpowers_ne':
             match=np.array([tomoxcorrstr in i for i in CnEDataFiles])
             fileNameInput=CnEDataFiles[match][0]
             input_files.append(fileNameInput)
-    for bin1 in range(nBins_source):
+    for bin1 in range(nBins_lens):
         for bin2 in range(nBins_source):
             tomoxcorrstr="_"+LBstr[bin1]+"_"+ZBstr[bin2]+'_bandpowers.asc'
             match=np.array([tomoxcorrstr in i for i in CnBDataFiles])
@@ -291,6 +292,7 @@ elif statistic == 'bandpowers_nn':
         fileNameInput=CnnDataFiles[match][0]
         input_files.append(fileNameInput)
     datavector_no_m_bias, datavector_with_m_bias = make_2pt_vector(input_files,m_corr_clustering)
+    datavector_no_m_bias_all, datavector_with_m_bias_all  = make_2pt_vector(input_files,m_corr_clustering)
 
 elif statistic == 'xipm':
     matches_xipm = np.array([ "xipm_binned_" in i for i in args.DataFiles])

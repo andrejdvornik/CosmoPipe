@@ -34,13 +34,19 @@ do
     #This just makes sure that the files are added correctly
     for file in ${inputlist}
     do
-      #Save the output file to the list {{{
-      lens_filelist="${lens_filelist} ${lensfiles}${file}"
+      if [[ "$file" =~ .*"_${patch}_".* ]]
+      then
+        #Save the output file to the list {{{
+        lens_filelist="${lens_filelist} ${lensfiles}${file}"
+      fi
       #}}}
     done
   elif [ -f ${lensfiles} ]
   then
-    lens_filelist=${lensfile}
+    if [[ "$file" =~ .*"_${patch}_".* ]]
+    then
+      lens_filelist=${lensfile}
+    fi
   else
     _message "${RED} - ERROR: Main input lens catalogue @BV:LENS_CATS@ does not exist!"
     exit -1
@@ -53,20 +59,26 @@ do
     #This just makes sure that the files are added correctly
     for file in ${inputlist}
     do
-      #Save the output file to the list {{{
-      rand_filelist="${rand_filelist} ${randfiles}${file}"
+      if [[ "$file" =~ .*"_${patch}_".* ]]
+      then
+        #Save the output file to the list {{{
+        rand_filelist="${rand_filelist} ${randfiles}${file}"
+      fi
       #}}}
     done
   elif [ -f ${randfiles} ]
   then
-    rand_filelist=${randfile}
+    if [[ "$file" =~ .*"_${patch}_".* ]]
+    then
+      rand_filelist=${randfile}
+    fi
   else
     _message "${RED} - ERROR: Main input lens catalogue @BV:RAND_CATS@ does not exist!"
     exit -1
   fi
 
   #If we don't have any catalogues in the datahead for this patch
-  if [ "${source_filelist}" == "" ]
+  if [ "${source_filelist}" == "" ] || [ "${lens_filelist}" == "" ]
   then
     _message "  >> @RED@ NONE @DEF@ << \n"
     continue

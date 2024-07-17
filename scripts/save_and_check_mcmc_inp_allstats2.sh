@@ -7,10 +7,6 @@
 #
 #=========================================
 
-contains() {
-    [[ $1 =~ (^|[[:space:]])$2($|[[:space:]]) ]] && exit(0) || exit(1)
-}
-
 #Statistic
 BOLTZMAN="@BV:BOLTZMAN@"
 if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
@@ -120,9 +116,9 @@ fi
 if [[ " EE " =~ .*\ $MODES\ .* ]] || [[ " NE " =~ .*\ $MODES\ .* ]]
 then
   NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
-  nz_source="@DB:nz_source@"
-  neffsource="@DB:cosmosis_neff_source@"
-  cosmosis_sigmae="@DB:cosmosis_sigmae@"
+  nz_source=#"@DB:nz_source@"
+  neffsource=#"@DB:cosmosis_neff_source@"
+  cosmosis_sigmae=#"@DB:cosmosis_sigmae@"
 else
   NTOMO=0
   nz_source=
@@ -133,8 +129,8 @@ fi
 if [[ " NN " =~ .*\ $MODES\ .* ]] || [[ " NE " =~ .*\ $MODES\ .* ]]
 then
   NLENS="@BV:NLENSBINS@"
-  nz_lens="@DB:nz_lens@"
-  nefflens="@DB:cosmosis_neff_lens@"
+  nz_lens=#"@DB:nz_lens@"
+  nefflens=#"@DB:cosmosis_neff_lens@"
 else
   NLENS=0
   nz_lens=
@@ -144,9 +140,9 @@ fi
 if [[ " OBS " =~ .*\ $MODES\ .* ]]
 then
   NOBS="@BV:NSMFLENSBINS@"
-  nz_obs = "@DB:nz_obs@"
-  neffobs = "@DB:cosmosis_neff_obs@"
-  input_smfdatavector = "@DB:smf_datavec"
+  nz_obs=#"@DB:nz_obs@"
+  neffobs=#"@DB:cosmosis_neff_obs@"
+  input_smfdatavector=#"@DB:smf_datavec"
 else
   NOBS=0
   nz_obs=
@@ -204,9 +200,9 @@ then
   --ntomo ${NTOMO} \
   --nlens ${NLENS} \
   --nobs ${NOBS} \
-  --neff_source @DB:cosmosis_neff_source@ \
-  --neff_lens   @DB:cosmosis_neff_lens@ \
-  --neff_obs    @DB:cosmosis_neff_obs@ \
+  --neff_source ${neffsource} \
+  --neff_lens   ${nefflens} \
+  --neff_obs    ${neffobs} \
   --sigmae ${cosmosis_sigmae} \
   --covariance ${input_covariance_iterative} \
   --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}${filename_extension} \
@@ -233,9 +229,9 @@ else
       --ntomo ${NTOMO} \
       --nlens ${NLENS} \
       --nobs ${NOBS} \
-      --neff_source @DB:cosmosis_neff_source@ \
-      --neff_lens   @DB:cosmosis_neff_lens@ \
-      --neff_obs    @DB:cosmosis_neff_obs@ \
+      --neff_source ${neffsource} \
+      --neff_lens   ${nefflens} \
+      --neff_obs    ${neffobs} \
       --sigmae ${cosmosis_sigmae} \
       --covariance ${input_covariance_E} \
       --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_xiE/MCMC_input_${non_linear_model} \
@@ -259,9 +255,9 @@ else
     --ntomo ${NTOMO} \
     --nlens ${NLENS} \
     --nobs ${NOBS} \
-    --neff_source @DB:cosmosis_neff_source@ \
-    --neff_lens   @DB:cosmosis_neff_lens@ \
-    --neff_obs    @DB:cosmosis_neff_obs@ \
+    --neff_source ${neffsource} \
+    --neff_lens   ${nefflens} \
+    --neff_obs    ${neffobs} \
     --sigmae ${cosmosis_sigmae} \
     --covariance ${input_covariance_B} \
     --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_xiB/MCMC_input_${non_linear_model} \

@@ -62,7 +62,7 @@ fi
 #Input mbias files 
 mfiles="@DB:mbias@"
 for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
-do 
+do
   #Remove the 'comb' if needed 
   patchuse=${patch%comb}
   #Get the input files for this patch (there should be NTOMO catalogues)
@@ -72,7 +72,7 @@ do
   
   #Check if there are any matching files {{{
   if [ "${filelist}" == "" ] 
-  then 
+  then
     #If not, loop
     echo 
     continue
@@ -93,7 +93,8 @@ do
     --statistic @BV:STATISTIC@ \
     --mbias   ${biaslist}      \
     --tomobins @BV:TOMOLIMS@  \
-    --outputfile  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/@BV:STATISTIC@_vec_${patch}/combined_vector 
+    --lensbins @BV:NLENSBINS@ \
+    --outputfile  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/@BV:STATISTIC@_vec_${patch}/combined_vector
   _message "@RED@ - Done! (`date +'%a %H:%M'`)@DEF@\n"
   #}}}
 

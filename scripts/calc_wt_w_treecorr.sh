@@ -12,68 +12,90 @@ _message "Estimating galaxy-clustering correlation functions:"
 lensfiles="@BV:LENS_CATS@"
 randfiles="@BV:RAND_CATS@"
   
-if [ -d ${lensfiles} ]
-then
-  inputlist=`ls @BV:LENS_CATS@`
-  lens_filelist=""
-  #This just makes sure that the files are added correctly
-  for file in ${inputlist}
-  do
-    #Save the output file to the list {{{
-    lens_filelist="${lens_filelist} ${lensfiles}${file}"
-    #}}}
-  done
-elif [ -f ${lensfiles} ]
-then
-  lens_filelist=${lensfile}
-else
-  _message "${RED} - ERROR: Main input lens catalogue @BV:LENS_CATS@ does not exist!"
-  exit -1
-fi
-  
-if [ -d ${randfiles} ]
-then
-  inputlist=`ls @BV:RAND_CATS@`
-  rand_filelist=""
-  #This just makes sure that the files are added correctly
-  for file in ${inputlist}
-  do
-    #Save the output file to the list {{{
-    rand_filelist="${rand_filelist} ${randfiles}${file}"
-    #}}}
-  done
-elif [ -f ${randfiles} ]
-then
-  rand_filelist=${randfile}
-else
-  _message "${RED} - ERROR: Main input lens catalogue @BV:RAND_CATS@ does not exist!"
-  exit -1
-fi
-
-
-NBIN="@BV:NLENSBINS@"
-#Loop over tomographic/any other lens bins in this patch
-#For clustering we only do autocorrelations at this stage!
-for LBIN1 in `seq ${NBIN}`
+for patch in @ALLPATCH@ @PATCHLIST@
 do
-  appendstr="_LB${LBIN1}"
-  #Get the input file one
-  file_lens_one=`echo ${lens_filelist} | sed 's/ /\n/g' | grep ${appendstr} || echo `
-  file_rand_one=`echo ${rand_filelist} | sed 's/ /\n/g' | grep ${appendstr} || echo `
-  #Check that the file exists
-  if [ "${file_lens_one}" == "" ]
+  _message " > Patch ${patch} {\n"
+  #Select the catalogues from DATAHEAD in this patch
+    if [ -d ${lensfiles} ]
   then
-    _message "@RED@ - ERROR!\n"
-    _message "A lens file with the bin string @DEF@${appendstr}@RED@ does not exist in the data head\n"
-    exit 1
+    inputlist=`ls @BV:LENS_CATS@`
+    lens_filelist=""
+    #This just makes sure that the files are added correctly
+    for file in ${inputlist}
+    do
+      if [[ "$file" =~ .*"_${patch}_".* ]]
+      then
+        #Save the output file to the list {{{
+        lens_filelist="${lens_filelist} ${lensfiles}${file}"
+      fi
+      #}}}
+    done
+  elif [ -f ${lensfiles} ]
+  then
+    if [[ "$file" =~ .*"_${patch}_".* ]]
+    then
+      lens_filelist=${lensfile}
+    fi
+  else
+    _message "${RED} - ERROR: Main input lens catalogue @BV:LENS_CATS@ does not exist!"
+    exit -1
   fi
+  
+  if [ -d ${randfiles} ]
+  then
+    inputlist=`ls @BV:RAND_CATS@`
+    rand_filelist=""
+    #This just makes sure that the files are added correctly
+    for file in ${inputlist}
+    do
+      if [[ "$file" =~ .*"_${patch}_".* ]]
+      then
+        #Save the output file to the list {{{
+        rand_filelist="${rand_filelist} ${randfiles}${file}"
+      fi
+      #}}}
+    done
+  elif [ -f ${randfiles} ]
+  then
+    if [[ "$file" =~ .*"_${patch}_".* ]]
+    then
+      rand_filelist=${randfile}
+    fi
+  else
+    _message "${RED} - ERROR: Main input lens catalogue @BV:RAND_CATS@ does not exist!"
+    exit -1
+  fi
+
+  #If we don't have any catalogues in the datahead for this patch
+  if [ "${lens_filelist}" == "" ]
+  then
+    _message "  >> @RED@ NONE @DEF@ << \n"
+    continue
+  fi
+
+  NBIN="@BV:NLENSBINS@"
+  #Loop over tomographic/any other lens bins in this patch
+  #For clustering we only do autocorrelations at this stage!
+  for LBIN1 in `seq ${NBIN}`
+  do
+    appendstr="_LB${LBIN1}"
+    #Get the input file one
+    file_lens_one=`echo ${lens_filelist} | sed 's/ /\n/g' | grep ${appendstr} || echo `
+    file_rand_one=`echo ${rand_filelist} | sed 's/ /\n/g' | grep ${appendstr} || echo `
+    #Check that the file exists
+    if [ "${file_lens_one}" == "" ]
+    then
+      _message "@RED@ - ERROR!\n"
+      _message "A lens file with the bin string @DEF@${appendstr}@RED@ does not exist in the data head\n"
+      exit 1
+    fi
     
-  if [ "${file_rand_one}" == "" ]
-  then
-    _message "@RED@ - ERROR!\n"
-    _message "A randoms file with the bin string @DEF@${appendstr}@RED@ does not exist in the data head\n"
-    exit 1
-  fi
+    if [ "${file_rand_one}" == "" ]
+    then
+      _message "@RED@ - ERROR!\n"
+      _message "A randoms file with the bin string @DEF@${appendstr}@RED@ does not exist in the data head\n"
+      exit 1
+    fi
 	  ##Loop over tomographic/any other lens bins in this patch
 	  #for LBIN2 in `seq $LBIN1 ${NBIN}`
 	  #do
@@ -108,7 +130,7 @@ do
       then
         _message "    -> @BLU@Removing previous @RED@Bin $LBIN1@BLU@ x @RED@Bin $LBIN1@BLU@ galaxy clustering correlation function@DEF@"
         rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/gt/${outname}
-        gtblock=`_read_datablock wt`
+        wtblock=`_read_datablock wt`
         currentblock=`_blockentry_to_filelist ${wtblock}`
         currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname} | awk '{printf $0 " "}' || echo `
         _write_datablock wt "${currentblock}"
@@ -162,7 +184,7 @@ do
         --randra "@BV:RANDRANAME@" --randdec "@BV:RANDDECNAME@" \
         --nthreads @BV:NTHREADS@ 2>&1
       _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
-      #Add the correlation function to the datablock 
+      #Add the correlation function to the datablock
       wtblock=`_read_datablock wt`
       _write_datablock wt "`_blockentry_to_filelist ${wtblock}` ${outname}"
       if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/jackknife_cov_wt/${covoutname} ]
@@ -171,7 +193,7 @@ do
         jackknife_covblock=`_read_datablock jackknife_cov_wt`
         _write_datablock jackknife_cov "`_blockentry_to_filelist ${jackknife_covblock}` ${covoutname}"
       fi
-  #done
+    #done
+  done
 done
-
 #}}}

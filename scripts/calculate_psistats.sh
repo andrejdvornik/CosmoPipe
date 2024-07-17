@@ -52,7 +52,7 @@ then
   #Add the files to the datablock
   PSInefile="psi_gm_${output}.asc"
     psiblock=`_read_datablock psi_stats_gm`
-  _write_datablock cosebis "`_blockentry_to_filelist ${psiblock}` ${PSInefile}"
+  _write_datablock psi_stats_gm "`_blockentry_to_filelist ${psiblock}` ${PSInefile}"
   
 elif [ "${mode^^}" == "NN" ]
 then
@@ -95,7 +95,7 @@ then
   #Add the files to the datablock
   PSInnfile="psi_gg_${output}.asc"
   psiblock=`_read_datablock psi_stats_gg`
-  _write_datablock cosebis "`_blockentry_to_filelist ${psiblock}` ${PSInnfile}"
+  _write_datablock psi_stats_gg "`_blockentry_to_filelist ${psiblock}` ${PSInnfile}"
 
 
 else

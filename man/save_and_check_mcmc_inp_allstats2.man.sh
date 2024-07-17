@@ -1,5 +1,5 @@
 #
-# calc_smf.sh Documentation & Housekeeping functions
+# save_and_check_mcmc_inp_allstats2.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@==========================================@DEF@\n"
-    _message "@BLU@== @RED@ Running calc_smf.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@==========================================@DEF@\n"
+    _message "@BLU@===================================================@DEF@\n"
+    _message "@BLU@== @RED@ Running save_and_check_mcmc_inp_allstats2.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@===================================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Compute stellar mass function for all '
-  echo '# lens catalogues specified in the pipeline/variables.sh '
+  echo '# Construct the MCMC input file for all statistics'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,29 +42,29 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLU BV:NSMFBINS BV:MINMASS BV:MAXMASS BV:H0 BV:OMEGAM BV:OMEGAV BV:MINZ BV:MAXZ BV:REDSHIFT BV:STELLARMASS SURVEYAREADEG DATABLOCK DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  echo BLINDING BV:BOLTZMAN BV:CHAINSUFFIX BV:ITERATION BV:LMAXBANDPOWERS BV:LMINBANDPOWERS BV:NBANDPOWERS BV:NMAXCOSEBIS BV:NTHETAREBIN BV:STATISTIC BV:MODES BV:THETAMAX BV:THETAMIN BV:TOMOLIMS BV:NLENSBINS BV:NSMFLENSBINS DATABLOCK PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH SURVEY
 }
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo smf_lens_cats mass_lims
+  echo #@BV:STATISTIC@_vec covariance_@BV:STATISTIC@ cosmosis_neff_source cosmosis_neff_lens cosmosis_neff_obs smf_datavec cosmosis_sigmae nz_source nz_lens nz_obs
 }
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo smf vmax
-}
+  echo mcmc_inp_@BV:STATISTIC@
+} 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/calc_smf.sh
-}
+  echo bash @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp_allstats.sh
+} 
 #}}}
 
 # Unset Function command {{{ 

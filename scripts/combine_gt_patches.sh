@@ -1,28 +1,23 @@
 #=========================================
 #
-# File Name : combine_xi_patches.sh
-# Created By : awright
-# Creation Date : 30-03-2023
-# Last Modified : Wed Jan 10 05:11:12 2024
+# File Name : combine_gt_patches.sh
+# Created By : dvornik
+# Creation Date : 17-07-2024
+# Last Modified : Wed Jul 17 11:31:17 2024
 #
 #=========================================
 
 ### Combine the patch corrrelation functions ### {{{
-_message "Combining Cosmic Shear Correlation Functions by patch\n"
+_message "Combining Galaxy-galaxy Lensing Correlation Functions by patch\n"
 headfiles="@DB:ALLHEAD@"
 
+NBIN="@BV:NLENSBINS@"
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 #Loop over tomographic bins in this patch 
-for ZBIN1 in `seq ${NTOMO}`
+for LBIN in `seq ${NBIN}`
 do
-  #Define the Z_B limits from the TOMOLIMS {{{
-  ZB_lo=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN1 '{print $n}'`
-  ZB_hi=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN1 '{print $(n+1)}'`
-  #}}}
   #Define the string to append to the file names {{{
-  ZB_lo_str=`echo $ZB_lo | sed 's/\./p/g'`
-  ZB_hi_str=`echo $ZB_hi | sed 's/\./p/g'`
-  appendstr="_ZB${ZB_lo_str}t${ZB_hi_str}"
+  appendstr="_LB${LBIN}"
   #}}}
   
   for ZBIN2 in `seq $ZBIN1 ${NTOMO}`
@@ -34,7 +29,7 @@ do
     appendstr2="_ZB${ZB_lo_str2}t${ZB_hi_str2}"
 
     #Define the input file id 
-    filestr="${appendstr}${appendstr2}_ggcorr.txt"
+    filestr="${appendstr}${appendstr2}_gtscorr.txt"
 
     #Get the file list {{{
     filelist=''
@@ -57,9 +52,9 @@ do
     #}}}
 
     #Combine the patches for this bin 
-    _message "    -> @BLU@Bin $ZBIN1 ($ZB_lo < Z_B <= $ZB_hi) x Bin $ZBIN2 ($ZB_lo2 < Z_B <= $ZB_hi2)@DEF@"
+    _message "    -> @BLU@Bin $LBIN x Bin $ZBIN2 ($ZB_lo2 < Z_B <= $ZB_hi2)@DEF@"
     logfile=${outname##*/}
-    @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/combine_xi_patches.R \
+    @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/combine_gt_patches.R \
       -o ${outname} \
       -i ${filelist} \
       > @RUNROOT@/@LOGPATH@/${logfile//.txt/.log} 2>&1 

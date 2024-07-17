@@ -8,11 +8,7 @@
 #Input file 
 input=@DB:DATAHEAD@
 #Bandpower mode: EE, NE, or NN
-mode=@BV:MODE@ 
-#Output file 
-output=${input##*/}
-output=${output%_ggcorr*}
-output=${output}_bandpowers
+mode=@BV:MODE@
 
 
 # Now Integrate output from treecorr with bandpowers filter functions
@@ -33,6 +29,10 @@ output=${output}_bandpowers
 
 if [ "${mode^^}" == "EE" ]
 then
+  #Output file
+  output=${input##*/}
+  output=${output%_ggcorr*}
+  output=${output}_bandpowers
   #Output folder: bandpowers
   outfold=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/bandpowers_ee/
   if [ ! -d ${outfold} ]
@@ -55,10 +55,14 @@ then
   CEEfile="CEE_${output}.asc"
   CBBfile="CBB_${output}.asc"
   bandpowerblock=`_read_datablock bandpowers_ee`
-  _write_datablock bandpowers "`_blockentry_to_filelist ${bandpowerblock}` ${CEEfile} ${CBBfile}"
+  _write_datablock bandpowers_ee "`_blockentry_to_filelist ${bandpowerblock}` ${CEEfile} ${CBBfile}"
 
 elif [ "${mode^^}" == "NE" ]
 then
+  #Output file
+  output=${input##*/}
+  output=${output%_gtcorr*}
+  output=${output}_bandpowers
   #Output folder: bandpowers
   outfold=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/bandpowers_ne/
   if [ ! -d ${outfold} ]
@@ -81,10 +85,14 @@ then
   CnEfile="CnE_${output}.asc"
   CnBfile="CnB_${output}.asc"
   bandpowerblock=`_read_datablock bandpowers_ne`
-  _write_datablock bandpowers "`_blockentry_to_filelist ${bandpowerblock}` ${CnEfile} ${CnBfile}"
+  _write_datablock bandpowers_ne "`_blockentry_to_filelist ${bandpowerblock}` ${CnEfile} ${CnBfile}"
 
 elif [ "${mode^^}" == "NN" ]
 then
+  #Output file
+  output=${input##*/}
+  output=${output%_wtcorr*}
+  output=${output}_bandpowers
   #Output folder: bandpowers
   outfold=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/bandpowers_nn/
   if [ ! -d ${outfold} ]
@@ -106,7 +114,7 @@ then
   #Add the files to the datablock 
   Cnnfile="Cnn_${output}.asc"
   bandpowerblock=`_read_datablock bandpowers_nn`
-  _write_datablock bandpowers "`_blockentry_to_filelist ${bandpowerblock}` ${Cnnfile}"
+  _write_datablock bandpowers_nn "`_blockentry_to_filelist ${bandpowerblock}` ${Cnnfile}"
 
 else 
   _message "Bandpower mode unknown: ${mode^^}\n"

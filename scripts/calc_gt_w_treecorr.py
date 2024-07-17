@@ -303,7 +303,7 @@ if __name__ == '__main__':
             #Use treecorr to write out the output file and praise-be once more for Jarvis and his well documented code
             with treecorr.util.make_writer(outfile, precision=12) as writer:
                 writer.write(
-                    ['r_nom','meanr','meanlogr','gamT','gamX','sigma','weight','npairs', 'nocor_gamT', 'nocor_gamX',
+                    ['r_nom','meanr','meanlogr','gamT','gamX','sigma','weight','npairs_weighted', 'nocor_gamT', 'nocor_gamX',
                     'rangamT','rangamX','ransigma'],
                     [ ls.rnom,ls.meanr, ls.meanlogr, gamma_t, gamma_x, np.sqrt(ls.varxi), ls.weight, ls.npairs,
                     ls.xi, ls.xi_im, rs.xi, rs.xi_im, np.sqrt(rs.varxi)])
@@ -322,8 +322,8 @@ if __name__ == '__main__':
         #Use treecorr to write out the output file and praise-be once more for Jarvis and his well documented code
         with treecorr.util.make_writer(outfile, precision=12) as writer:
             writer.write(
-                ['r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs', 'nocor_wtheta'],
-                [ dd.rnom, dd.meanr, dd.meanlogr, wt, np.sqrt(dd.varxi), dd.weight, dd.npairs, dd.xi])
+                ['r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs_dd', 'npairs_dr', 'npairs_rd', 'npairs_rr', 'nocor_wtheta'],
+                [ dd.rnom, dd.meanr, dd.meanlogr, wt, np.sqrt(dd.varxi), dd.weight, dd.npairs, dr.npairs, rd.npairs, rr.npairs, dd.xi])
                 
         if center_file is not None:
             cov_wt = dd.estimate_cov(method='jackknife')
