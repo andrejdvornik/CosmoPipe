@@ -269,11 +269,14 @@ if __name__ == '__main__':
             #np.savetxt(outfile+'_gt_cov_samples_new.txt', samples_gt)
             #np.savetxt(outfile+'_gt_cov_w_new.txt', w_gt)
     
-        if weighted == 'true':
+        if weighted:
             # prepare the weighted_square catalogues - hack so that Treecorr returns the correct Npairs for a weighted sample
-    
+            if lenswname == None:
+                lenswnamesq = None
+            else:
+                lenswnamesq = lenswname+'_sq'
             lenscat_wsq = treecorr.Catalog(lenscat, ra_col=lensraname, dec_col=lensdecname, ra_units='deg', dec_units='deg',
-                                        w_col=wname_lens+'_sq')
+                                        w_col=lenswnamesq)
             sourcecat_wsq = treecorr.Catalog(sourcecat, ra_col=sourceraname, dec_col=sourcedecname, ra_units='deg', dec_units='deg',
                                         g1_col=e1name, g2_col=e2name, w_col=wname+'_sq')
     
