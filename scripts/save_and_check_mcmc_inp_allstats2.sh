@@ -35,7 +35,6 @@ then
   if [[ " EE " =~ .*\ $MODES\ .* ]]
   then
     input_datavector_ee="@DB:cosebis_vec@"
-    _message "${input_datavector_ee}\n"
   else
     input_datavector_ee=
   fi
@@ -178,13 +177,11 @@ then
   nz_source="@DB:nz_source@"
   neffsource="@DB:cosmosis_neff_source@"
   cosmosis_sigmae="@DB:cosmosis_sigmae@"
-  _message "Have sources \n"
 else
   NTOMO=0
   nz_source=
   neffsource=
   cosmosis_sigmae=
-  _message "No sources \n"
 fi
 
 if [[ " NN " =~ .*\ $MODES\ .* ]] || [[ " NE " =~ .*\ $MODES\ .* ]]
@@ -192,12 +189,10 @@ then
   NLENS="@BV:NLENSBINS@"
   nz_lens="@DB:nz_lens@"
   nefflens="@DB:cosmosis_neff_lens@"
-  _message "Have lenses \n"
 else
   NLENS=0
   nz_lens=
   nefflens=
-  _message "No lenses \n"
 fi
 
 if [[ " OBS " =~ .*\ $MODES\ .* ]]
@@ -206,13 +201,11 @@ then
   nz_obs="@DB:nz_obs@"
   neffobs="@DB:cosmosis_neff_obs@"
   input_smfdatavector="@DB:smf_datavec@"
-  _message "Have SMF \n"
 else
   NOBS=0
   nz_obs=
   neffobs=
   input_smfdatavector=
-  _message "No SMF \n"
 fi
 
 
