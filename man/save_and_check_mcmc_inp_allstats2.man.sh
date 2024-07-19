@@ -63,7 +63,7 @@ function _outputs {
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp_allstats.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp_allstats2.sh
 } 
 #}}}
 

@@ -17,8 +17,9 @@ import os
 from argparse import ArgumentParser
 
 # set the path to scale_cuts here
-sys.path.append("@RUNROOT@/INSTALL/kcap/modules/scale_cuts/")
+sys.path.append("@RUNROOT@/INSTALL/kcap/modules/scale_cuts_new/")
 sys.path.append("@RUNROOT@/@SCRIPTPATH@/")
+print(sys.path)
 import wrapper_twopoint as wtp
 import wrapper_twopoint2 as wtp2
 
@@ -466,6 +467,7 @@ def read_value_or_file(input):
                 values.append(float(tempval))
             except:
                 raise ValueError(f"provided input {tempval} is neither a valid file nor a float?!")
+    return values
 
 #}}}
 
@@ -473,20 +475,24 @@ def read_value_or_file(input):
 ### Making fits files for Phase-1 real data
 
 parser = ArgumentParser(description='Construct a cosmosis mcmc input file')
-parser.add_argument("--datavector", dest="DataVector",nargs=2,
-    help="Full Input file names", metavar="DataVector",required=True)
-parser.add_argument("--smfdatavector", dest="smfvec",nargs=1,
+parser.add_argument("--datavector_ee", dest="datavector_ee",nargs='*',
+    help="Full Input file names", metavar="datavector_ee",required=True, default=None, const=None)
+parser.add_argument("--datavector_ne", dest="datavector_ne",nargs='*',
+    help="Full Input file names", metavar="datavector_ne",required=True, default=None, const=None)
+parser.add_argument("--datavector_nn", dest="datavector_nn",nargs='*',
+    help="Full Input file names", metavar="datavector_nn",required=True, default=None, const=None)
+parser.add_argument("--smfdatavector", dest="smfvec",nargs='*',
     help="SMF input file name", metavar="smfvec",required=False, default=None, const=None)
 parser.add_argument("-s", "--statistic", dest="statistic", type=str, required=True, choices = ['cosebis','cosebis_dimless','bandpowers','2pcf','2pcfEB'],
     help="2pt statistic, must be either cosebis, bandpowers, or xipm")
-parser.add_argument("--m", dest="mode",nargs='+',type=str,
+parser.add_argument("--mode", dest="mode",nargs='+',type=str,
     help="list modes to calculate statistis for (EE, NE, NN or OBS)",required=True, default=['EE'])
     
-parser.add_argument("--nzsource", dest="NzList_source",nargs='+',type=str,
+parser.add_argument("--nzsource", dest="nzlist_source",nargs='*',type=str,
     help="list of Nz per tomographic bin",required=False, default=None, const=None)
-parser.add_argument("--nzlens", dest="NzList_lens",nargs='+',type=str,
+parser.add_argument("--nzlens", dest="nzlist_lens",nargs='*',type=str,
     help="list of Nz per tomographic bin",required=False, default=None, const=None)
-parser.add_argument("--nzobs", dest="NzList_obs",nargs='+',type=str,
+parser.add_argument("--nzobs", dest="nzlist_obs",nargs='*',type=str,
     help="list of Nz per tomographic bin",required=False, default=None, const=None)
     
 parser.add_argument("--ntomo", dest="nTomo",type=int,
@@ -512,13 +518,13 @@ parser.add_argument("--thetamax", dest="thetamax",type=float,
 parser.add_argument("--ntheta", dest="ntheta",type=int,
     help="number of xipm bins",required=False, default=9)
     
-parser.add_argument("--neff_source", dest="NeffFileSource",nargs='+',
+parser.add_argument("--neff_source", dest="NeffFileSource",nargs='*',
     help="Neff values file for sources",required=False, default=None, const=None)
-parser.add_argument("--neff_lens", dest="NeffFileLens",nargs='+',
+parser.add_argument("--neff_lens", dest="NeffFileLens",nargs='*',
     help="Neff values file for lenses",required=False, default=None, const=None)
-parser.add_argument("--neff_obs", dest="NeffFileObs",nargs='+',
+parser.add_argument("--neff_obs", dest="NeffFileObs",nargs='*',
     help="Neff values file for SMF",required=False, default=None, const=None)
-parser.add_argument("--sigmae", dest="SigmaeFile",nargs='+',
+parser.add_argument("--sigmae", dest="SigmaeFile",nargs='*',
     help="sigmae values file",required=False, default=None)
 parser.add_argument("--covariance", dest="covarianceFile",nargs=1,
     help="Covariance file",required=True)
@@ -554,107 +560,159 @@ nobs = args.nObs
 
 stats_string = ''
 nz={}
-if 'EE' or 'NE' in args.mode:
-    if ntomo > 0:
-        nBins_source = ntomo
-        for bin in range(nBins_source):
-            nz['source'+str(bin+1)] = nzlist_source[bin]
-        
-        if args.NeffFileSource is not None:
-            nGal_source = read_value_or_file(args.NeffFileSource)
+
+for mode in args.mode:
+    if 'EE' == mode or 'NE' == mode:
+        if ntomo > 0:
+            nBins_source = ntomo
+            for bin in range(nBins_source):
+                nz['source'+str(bin+1)] = nzlist_source[bin]
+            
+            if args.NeffFileSource is not None:
+                nGal_source = read_value_or_file(args.NeffFileSource)
+            else:
+                nGals_source = list(np.zeros(ntomo))
+            sigmaEpsList = read_value_or_file(args.SigmaeFile)
         else:
-            nGals_source = list(np.zeros(ntomo))
-        sigmaEpsList = read_value_or_file(args.SigmaeFile)
+            raise ValueError('At least one source bin expected!')
     else:
-        raise ValueError('At least one source bin expected!')
-else:
-    nBins_source = 0
-    nGal_source = []
-    sigmaEpsList = None
+        nBins_source = 0
+        nGal_source = []
+        sigmaEpsList = None
+        
+    if 'NE' == mode or 'NN' == mode:
+        if nlens > 0:
+            nBins_lens = nlens
+            for bin in range(nBins_lens):
+                nz['lens'+str(bin+1)] = nzlist_lens[bin]
+            
+            if args.NeffFileLens is not None:
+                nGal_lens = read_value_or_file(args.NeffFileLens)
+            else:
+                nGal_lens = list(np.zeros(nlens))
+        else:
+            raise ValueError('At least one lens bin expected!')
+    else:
+        nBins_lens = 0
+        nGal_lens = []
     
-if 'NE' or 'NN' in args.mode:
-    if nlens > 0:
-        nBins_lens = nlens
-        for bin in range(nBins_lens):
-            nz['lens'+str(bin+1)] = nzlist_lens[bin]
-        
-        if args.NeffFileLens is not None:
-            nGal_lens = read_value_or_file(args.NeffFileLens)
+    if 'OBS' == mode:
+        if nobs > 0:
+            nBins_obs = nobs
+            for bin in range(nBins_obs):
+                nz['obs'+str(bin+1)] = nzlist_obs[bin]
+    
+            if args.NeffFileLens is not None:
+                nGal_obs = read_value_or_file(args.NeffFileObs)
+            else:
+                nGal_obs = list(np.zeros(nobs))
         else:
-            nGal_lens = list(np.zeros(nlens))
+            raise ValueError('At least one SMF bin expected!')
     else:
-        raise ValueError('At least one lens bin expected!')
-else:
-    nBins_lens = 0
-    nGal_lens = []
-
-if 'OBS' in args.mode:
-    if nobs > 0:
-        nBins_obs = nobs
-        for bin in range(nBins_obs):
-            nz['obs'+str(bin+1)] = nzlist_obs[bin]
-
-        if args.NeffFileLens is not None:
-            nGal_obs = read_value_or_file(args.NeffFileObs)
-        else:
-            nGal_obs = list(np.zeros(nobs))
-    else:
-        raise ValueError('At least one SMF bin expected!')
-else:
-    nBins_obs = 0
-    nGal_obs = []
+        nBins_obs = 0
+        nGal_obs = []
     
 nGalList = nGal_source + nGal_lens + nGal_obs
-        
-datavec = args.DataVector[0]
-datavec_no_mbias = args.DataVector[1]
+
+if len(args.datavector_ee) > 0:
+    datavec_ee = list(np.genfromtxt(args.datavector_ee[0]))
+    datavec_ee_no_mbias = list(np.genfromtxt(args.datavector_ee[1]))
+else:
+    datavec_ee = []
+    datavec_ee_no_mbias = []
+    
+if len(args.datavector_ne) > 0:
+    datavec_ne = list(np.genfromtxt(args.datavector_ne[0]))
+    datavec_ne_no_mbias = list(np.genfromtxt(args.datavector_ne[1]))
+else:
+    datavec_ne = []
+    datavec_ne_no_mbias = []
+    
+if len(args.datavector_nn) > 0:
+    datavec_nn = list(np.genfromtxt(args.datavector_nn[0]))
+    datavec_nn_no_mbias = list(np.genfromtxt(args.datavector_nn[1]))
+else:
+    datavec_nn = []
+    datavec_nn_no_mbias = []
+    
+if len(args.datavector_nn) > 0:
+    smfvec = args.smfvec[0]
+    smftag = 'file'
+else:
+    smfvec=[]
+    smftag=None
+    
 covariance = args.covarianceFile[0]
 outputFilename = outputfile+'.fits'
 outputFilename_no_mbias = outputfile+'_no_m_bias.fits'
-smfvec = args.smfvec[0]
 
 # This probably needs to be a list in the first place to preserve order!
 nOfZNameList = list(nz.values())
 
+datavec = []
+datavec_no_mbias = []
 # Fits files
 if statistic == 'cosebis':
-    if 'EE' in args.mode:
-        stats_string = stats_string + 'En Bn '
-    if 'NE' in args.mode:
-        stats_string = stats_string + 'Psi_gm '
-    if 'NN' in args.mode:
-        stats_string = stats_string + 'Psi_gg '
-    if 'OBS' in args.mode:
-        stats_string = stats_string + '1pt '
+    for mode in args.mode:
+        if 'EE' == mode:
+            stats_string = stats_string + 'En Bn '
+            datavec.extend(datavec_ee)
+            datavec_no_mbias.extend(datavec_ee_no_mbias)
+        if 'NE' == mode:
+            stats_string = stats_string + 'Psi_gm '
+            datavec.extend(datavec_ne)
+            datavec_no_mbias.extend(datavec_ne_no_mbias)
+        if 'NN' == mode:
+            stats_string = stats_string + 'Psi_gg '
+            datavec.extend(datavec_nn)
+            datavec_no_mbias.extend(datavec_nn_no_mbias)
+        if 'OBS' == mode:
+            stats_string = stats_string + '1pt '
     scDict = {
         'use_stats': stats_string.lower()
         }
 elif statistic == 'bandpowers':
-    if 'EE' in args.mode:
-        stats_string = stats_string + 'PeeE PeeB '
-    if 'NE' in args.mode:
-        stats_string = stats_string + 'PneE PneB '
-    if 'NN' in args.mode:
-        stats_string = stats_string + 'Pnn '
-    if 'OBS' in args.mode:
-        stats_string = stats_string + '1pt '
+    for mode in args.mode:
+        if 'EE' == mode:
+            stats_string = stats_string + 'PeeE PeeB '
+            datavec.extend(datavec_ee)
+            datavec_no_mbias.extend(datavec_ee_no_mbias)
+        if 'NE' == mode:
+            stats_string = stats_string + 'PneE PneB '
+            datavec.extend(datavec_ne)
+            datavec_no_mbias.extend(datavec_ne_no_mbias)
+        if 'NN' == mode:
+            stats_string = stats_string + 'Pnn '
+            datavec.extend(datavec_nn)
+            datavec_no_mbias.extend(datavec_nn_no_mbias)
+        if 'OBS' == mode:
+            stats_string = stats_string + '1pt '
     scDict = {
         'use_stats': stats_string.lower()
         }
 elif statistic =='2pcf':
-    if 'EE' in args.mode:
-        stats_string = stats_string + 'xiP xiM '
-    if 'NE' in args.mode:
-        stats_string = stats_string + 'gT gX '
-    if 'NN' in args.mode:
-        stats_string = stats_string + 'wTh '
-    if 'OBS' in args.mode:
-        stats_string = stats_string + '1pt '
+    for mode in args.mode:
+        if 'EE' == mode:
+            stats_string = stats_string + 'xiP xiM '
+            datavec.extend(datavec_ee)
+            datavec_no_mbias.extend(datavec_ee_no_mbias)
+        if 'NE' == mode:
+            stats_string = stats_string + 'gT gX '
+            datavec.extend(datavec_ne)
+            datavec_no_mbias.extend(datavec_ne_no_mbias)
+        if 'NN' == mode:
+            stats_string = stats_string + 'wTh '
+            datavec.extend(datavec_nn)
+            datavec_no_mbias.extend(datavec_nn_no_mbias)
+        if 'OBS' == mode:
+            stats_string = stats_string + '1pt '
     scDict = {
         'use_stats': stats_string.lower()
         }
 else:
     raise Exception('Unknown statistic!')
+    
+print(scDict, datavec)
 
 wtp2.saveFitsTwoPoint(
         nbTomoN=nBins_lens,
@@ -671,11 +729,11 @@ wtp2.saveFitsTwoPoint(
         prefix_Flinc=None,
         prefix_CosmoSIS=None,
         scDict=scDict,
-        meanTag='file',
-        meanName=datavec,
+        meanTag='variable',
+        meanName=np.array(datavec),
         covTag='file',
         covName=covariance,
-        nobsTag='file',
+        nobsTag=smftag,
         nobsName=smfvec,
         nOfZNameList=nOfZNameList,
         nGalList=nGalList,
@@ -698,11 +756,11 @@ wtp2.saveFitsTwoPoint(
         prefix_Flinc=None,
         prefix_CosmoSIS=None,
         scDict=scDict,
-        meanTag='file',
-        meanName=datavec_no_mbias,
+        meanTag='variable',
+        meanName=np.array(datavec_no_mbias),
         covTag='file',
         covName=covariance,
-        nobsTag='file',
+        nobsTag=smftag,
         nobsName=smfvec,
         nOfZNameList=nOfZNameList,
         nGalList=nGalList,

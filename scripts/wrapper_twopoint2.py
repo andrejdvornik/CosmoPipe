@@ -39,6 +39,7 @@ class TwoPointBuilder:
         ## Tomographic bins
         self.nbTomoN = nbTomoN
         self.nbTomoG = nbTomoG
+        self.nbObs   = nbObs
         
         ## Define angular bin parameters
         self.N_theta   = N_theta
@@ -54,6 +55,7 @@ class TwoPointBuilder:
         self.verbose    = verbose
         self.mean       = None
         self.cov        = None
+        self.nobs       = None
         self.kernelList = None
         
         self.setAngBins()
@@ -89,9 +91,9 @@ class TwoPointBuilder:
         labConv = wtp.LabelConvention()
         tomoAngDict = { ## Don't touch the order of this list
             labConv.w:       [self.__pairListNN, self.N_theta, self.theta],
-            labConv.gamma_t: [self.__pairListNG, self.N_theta, self.theta_],
-            labConv.gamma_x: [self.__pairListNG, self.N_theta, self.theta_],
-            labConv.xi_p:    [self.__pairListGG, self.N_theta, self.theta_],
+            labConv.gamma_t: [self.__pairListNG, self.N_theta, self.theta],
+            labConv.gamma_x: [self.__pairListNG, self.N_theta, self.theta],
+            labConv.xi_p:    [self.__pairListGG, self.N_theta, self.theta],
             labConv.xi_m:    [self.__pairListGG, self.N_theta, self.theta],
             labConv.P_nn:    [self.__pairListNN, self.N_ell,   self.ell],
             labConv.P_ne_E:  [self.__pairListNG, self.N_ell,   self.ell],
@@ -630,7 +632,7 @@ class TwoPointBuilder:
         elif nbTomo == len(nGalList):
             nGalListN = nGalList[:self.nbTomoN]
             nGalListG = nGalList[self.nbTomoN:self.nbTomoG+self.nbTomoN]
-            nGalListO = nGalList[self.nbTomoG+self.nbTomoNs:]
+            nGalListO = nGalList[self.nbTomoG+self.nbTomoN:]
         else:
             raise AssertionError('Bad length of nGalList')
         

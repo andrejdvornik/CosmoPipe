@@ -40,7 +40,7 @@ while (length(inputs)!=0) {
   }
 }
 
-colnames<-c('r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs_dd', 'npairs_dr', 'npairs_rd', 'npairs_rr', 'nocor_wtheta')
+colnames<-c('r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs_dd', 'nocor_wtheta')
 
 for (i in 1:length(input.cats)) { 
   #Read the file 
@@ -51,39 +51,31 @@ for (i in 1:length(input.cats)) {
   
   #if we have the first file, use this as a template 
   if (i==1) { 
-    inter_cols<-c('r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs_dd', 'npairs_dr', 'npairs_rd', 'npairs_rr', 'nocor_wtheta')
+    inter_cols<-c('r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs_dd', 'nocor_wtheta', 'var', 'npairs_sq')
     #Set up the catalogue, but fill everything with zeros
     out<-tmp[,inter_cols]*0
   } 
   print(summary(out))
   #Otherwise, combine the values
   #Weighted sum of values (weight = npairs_weighted)
-  out$r_nom     = (out$r_nom    + tmp$r_nom   * tmp$npairs_weighted)
-  out$meanr     = (out$meanr    + tmp$meanr   * tmp$npairs_weighted)
-  out$meanlogr  = (out$meanlogr + tmp$meanlogr* tmp$npairs_weighted)
-  out$xip       = (out$xip      + tmp$xip     * tmp$npairs_weighted)
-  out$xim       = (out$xim      + tmp$xim     * tmp$npairs_weighted)
-  out$xip_im    = (out$xip_im   + tmp$xip_im  * tmp$npairs_weighted)
-  out$xim_im    = (out$xim_im   + tmp$xim_im  * tmp$npairs_weighted)
-  out$xim_im_sq = out$xim_im_sq + tmp$xim_im_sq 
-  out$var_xip = out$var_xip+tmp$var_xip
-  out$var_xim = out$var_xim+tmp$var_xim 
+  out$r_nom     = (out$r_nom    + tmp$r_nom   * tmp$npairs_dd)
+  out$meanr     = (out$meanr    + tmp$meanr   * tmp$npairs_dd)
+  out$meanlogr  = (out$meanlogr + tmp$meanlogr* tmp$npairs_dd)
+  out$wtheta    = (out$wtheta   + tmp$wtheta  * tmp$npairs_dd)
+  out$nocor_wtheta = (out$nocor_wtheta   + tmp$nocor_wtheta  * tmp$npairs_dd)
+  out$var       = out$var + tmp$var
   out$npairs_sq = out$npairs_sq+tmp$npairs_sq 
   out$weight = out$weight+tmp$weight
-  out$npairs_weighted = out$npairs_weighted+tmp$npairs_weighted
+  out$npairs_dd = out$npairs_dd+tmp$npairs_dd
 }
 print(summary(out))
 #Construct the output columns 
-out$r_nom     = out$r_nom/out$npairs_weighted
-out$meanr     = out$meanr/out$npairs_weighted
-out$meanlogr  = out$meanlogr/out$npairs_weighted
-out$xip       = out$xip/out$npairs_weighted
-out$xim       = out$xim/out$npairs_weighted
-out$xip_im    = out$xip_im/out$npairs_weighted
-out$xim_im    = out$xim_im/out$npairs_weighted
-out$xim_im_sq = out$xim_im_sq + tmp$xim_im_sq 
-out$sigma_xip = sqrt(out$var_xip)
-out$sigma_xim = sqrt(out$var_xim)
+out$r_nom        = out$r_nom/out$npairs_weighted
+out$meanr        = out$meanr/out$npairs_weighted
+out$meanlogr     = out$meanlogr/out$npairs_weighted
+out$wtheta       = out$wtheta/out$npairs_weighted
+out$nocor_wtheta = out$nocor_wtheta/out$npairs_weighted
+out$sigma = sqrt(out$var)
 out$npairs = sqrt(out$npairs_sq) 
 #Remove the intermediate columns and sort into the original order 
 out<-data.table::as.data.table(out)
