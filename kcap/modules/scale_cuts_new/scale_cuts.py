@@ -6,6 +6,7 @@ import numpy as np
 import twopoint
 import wrapper_twopoint as wtp
 
+# New scale cuts supporting 1pt statistics
 
 def setup(options):
     config = {}
