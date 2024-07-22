@@ -50,7 +50,7 @@ then
   else
     input_datavector_nn=
   fi
-  "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_cosebis/covariance_matrix_${non_linear_model}.mat"
+  input_covariance="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_cosebis/covariance_matrix_${non_linear_model}.mat"
   if [ -n "$ITERATION" ] && [ "$ITERATION" -eq "$ITERATION" ]
   then
     filename_extension=${CHAINSUFFIX}_iteration_${ITERATION}
@@ -89,8 +89,7 @@ then
   else
     input_datavector_nn=
   fi
-  input_covariance="@DB:covariance_bandpowers@"
-  #input_covariance="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_bandpowers/covariance_matrix_${non_linear_model}.mat"
+  input_covariance="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_bandpowers/covariance_matrix_${non_linear_model}.mat"
   if [ -n "$ITERATION" ] && [ "$ITERATION" -eq "$ITERATION" ]
   then
     filename_extension=${CHAINSUFFIX}_iteration_${ITERATION}
