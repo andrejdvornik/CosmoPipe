@@ -10,6 +10,7 @@
 
 import sys
 
+import collections as clt
 import numpy as np
 import scipy.interpolate as itp
 import astropy.io.fits as fits
@@ -19,7 +20,6 @@ from argparse import ArgumentParser
 # set the path to scale_cuts here
 sys.path.append("@RUNROOT@/INSTALL/kcap/modules/scale_cuts_new/")
 sys.path.append("@RUNROOT@/@SCRIPTPATH@/")
-print(sys.path)
 import wrapper_twopoint as wtp
 import wrapper_twopoint2 as wtp2
 
@@ -553,89 +553,107 @@ ntomo = args.nTomo
 nlens = args.nLens
 nobs = args.nObs
 
-#Check that provided files have compatible dimensions: len(datavec)==len(cov) 
+#Check that provided files have compatible dimensions: len(datavec)==len(cov)
 # if not len(args.DataVector_cosebis) == len(args.covarianceFile_cosebis): 
 #     raise ValueError('Number of data vectors must be the same as the number of covariances! %s != %s' % 
 #             (str(len(args.DataVector_cosebis)),str(len(args.covarianceFile_cosebis))))
 
 stats_string = ''
-nz={}
+#nz={}
+nz=clt.OrderedDict()
 
-for mode in args.mode:
-    if 'EE' == mode or 'NE' == mode:
-        if ntomo > 0:
-            nBins_source = ntomo
-            for bin in range(nBins_source):
-                nz['source'+str(bin+1)] = nzlist_source[bin]
-            
-            if args.NeffFileSource is not None:
-                nGal_source = read_value_or_file(args.NeffFileSource)
-            else:
-                nGals_source = list(np.zeros(ntomo))
-            sigmaEpsList = read_value_or_file(args.SigmaeFile)
-        else:
-            raise ValueError('At least one source bin expected!')
-    else:
-        nBins_source = 0
-        nGal_source = []
-        sigmaEpsList = None
+if 'NE' in args.mode or 'NN' in args.mode:
+    if nlens > 0:
+        nBins_lens = nlens
+        for bin in range(nBins_lens):
+            nz['lens'+str(bin+1)] = nzlist_lens[bin]
         
-    if 'NE' == mode or 'NN' == mode:
-        if nlens > 0:
-            nBins_lens = nlens
-            for bin in range(nBins_lens):
-                nz['lens'+str(bin+1)] = nzlist_lens[bin]
-            
-            if args.NeffFileLens is not None:
-                nGal_lens = read_value_or_file(args.NeffFileLens)
-            else:
-                nGal_lens = list(np.zeros(nlens))
+        if args.NeffFileLens is not None:
+            nGal_lens = read_value_or_file(args.NeffFileLens)
         else:
-            raise ValueError('At least one lens bin expected!')
+            nGal_lens = list(np.zeros(nlens))
     else:
-        nBins_lens = 0
-        nGal_lens = []
-    
-    if 'OBS' == mode:
-        if nobs > 0:
-            nBins_obs = nobs
-            for bin in range(nBins_obs):
-                nz['obs'+str(bin+1)] = nzlist_obs[bin]
-    
-            if args.NeffFileLens is not None:
-                nGal_obs = read_value_or_file(args.NeffFileObs)
-            else:
-                nGal_obs = list(np.zeros(nobs))
-        else:
-            raise ValueError('At least one SMF bin expected!')
-    else:
-        nBins_obs = 0
-        nGal_obs = []
-    
-nGalList = nGal_source + nGal_lens + nGal_obs
+        raise ValueError('At least one lens bin expected!')
+else:
+    nBins_lens = 0
+    nGal_lens = []
 
-if len(args.datavector_ee) > 0:
+if 'EE' in args.mode or 'NE' in args.mode:
+    if ntomo > 0:
+        nBins_source = ntomo
+        for bin in range(nBins_source):
+            nz['source'+str(bin+1)] = nzlist_source[bin]
+        
+        if args.NeffFileSource is not None:
+            nGal_source = read_value_or_file(args.NeffFileSource)
+        else:
+            nGals_source = list(np.zeros(ntomo))
+        sigmaEpsList = read_value_or_file(args.SigmaeFile)
+    else:
+        raise ValueError('At least one source bin expected!')
+else:
+    nBins_source = 0
+    nGal_source = []
+    sigmaEpsList = None
+
+if 'OBS' in args.mode:
+    if nobs > 0:
+        nBins_obs = nobs
+        for bin in range(nBins_obs):
+            nz['obs'+str(bin+1)] = nzlist_obs[bin]
+
+        if args.NeffFileLens is not None:
+            nGal_obs = read_value_or_file(args.NeffFileObs)
+        else:
+            nGal_obs = list(np.zeros(nobs))
+    else:
+        raise ValueError('At least one SMF bin expected!')
+else:
+    nBins_obs = 0
+    nGal_obs = []
+    
+nGalList = nGal_lens + nGal_source + nGal_obs
+
+if len(args.datavector_ee) == 2:
     datavec_ee = list(np.genfromtxt(args.datavector_ee[0]))
     datavec_ee_no_mbias = list(np.genfromtxt(args.datavector_ee[1]))
+    no_m_bias_ee = True
+elif len(args.datavector_ee) == 1:
+    datavec_ee = list(np.genfromtxt(args.datavector_ee[0]))
+    datavec_ee_no_mbias = []
+    no_m_bias_ee = False
 else:
     datavec_ee = []
     datavec_ee_no_mbias = []
+    no_m_bias_ee = False
     
-if len(args.datavector_ne) > 0:
+if len(args.datavector_ne) == 2:
     datavec_ne = list(np.genfromtxt(args.datavector_ne[0]))
     datavec_ne_no_mbias = list(np.genfromtxt(args.datavector_ne[1]))
+    no_m_bias_ne = True
+elif len(args.datavector_ne) == 1:
+    datavec_ne = list(np.genfromtxt(args.datavector_ne[0]))
+    datavec_ne_no_mbias = []
+    no_m_bias_ne = False
 else:
     datavec_ne = []
     datavec_ne_no_mbias = []
+    no_m_bias_ne = False
     
-if len(args.datavector_nn) > 0:
+if len(args.datavector_nn) == 2:
     datavec_nn = list(np.genfromtxt(args.datavector_nn[0]))
     datavec_nn_no_mbias = list(np.genfromtxt(args.datavector_nn[1]))
+    no_m_bias_nn = True
+elif len(args.datavector_nn) == 1:
+    datavec_nn = list(np.genfromtxt(args.datavector_nn[0]))
+    datavec_nn_no_mbias = []
+    no_m_bias_nn = False
 else:
     datavec_nn = []
     datavec_nn_no_mbias = []
+    no_m_bias_nn = False
     
-if len(args.datavector_nn) > 0:
+if len(args.smfvec) == 1:
     smfvec = args.smfvec[0]
     smftag = 'file'
 else:
@@ -653,66 +671,62 @@ datavec = []
 datavec_no_mbias = []
 # Fits files
 if statistic == 'cosebis':
-    for mode in args.mode:
-        if 'EE' == mode:
-            stats_string = stats_string + 'En Bn '
-            datavec.extend(datavec_ee)
-            datavec_no_mbias.extend(datavec_ee_no_mbias)
-        if 'NE' == mode:
-            stats_string = stats_string + 'Psi_gm '
-            datavec.extend(datavec_ne)
-            datavec_no_mbias.extend(datavec_ne_no_mbias)
-        if 'NN' == mode:
-            stats_string = stats_string + 'Psi_gg '
-            datavec.extend(datavec_nn)
-            datavec_no_mbias.extend(datavec_nn_no_mbias)
-        if 'OBS' == mode:
-            stats_string = stats_string + '1pt '
+    if 'NN' in args.mode:
+        stats_string = stats_string + 'Psi_gg '
+        datavec.extend(datavec_nn)
+        datavec_no_mbias.extend(datavec_nn_no_mbias)
+    if 'NE' in args.mode:
+        stats_string = stats_string + 'Psi_gm '
+        datavec.extend(datavec_ne)
+        datavec_no_mbias.extend(datavec_ne_no_mbias)
+    if 'EE' in args.mode:
+        stats_string = stats_string + 'En Bn '
+        datavec.extend(datavec_ee)
+        datavec_no_mbias.extend(datavec_ee_no_mbias)
+    if 'OBS' in args.mode:
+        stats_string = stats_string + '1pt '
     scDict = {
         'use_stats': stats_string.lower()
         }
 elif statistic == 'bandpowers':
-    for mode in args.mode:
-        if 'EE' == mode:
-            stats_string = stats_string + 'PeeE PeeB '
-            datavec.extend(datavec_ee)
-            datavec_no_mbias.extend(datavec_ee_no_mbias)
-        if 'NE' == mode:
-            stats_string = stats_string + 'PneE PneB '
-            datavec.extend(datavec_ne)
-            datavec_no_mbias.extend(datavec_ne_no_mbias)
-        if 'NN' == mode:
-            stats_string = stats_string + 'Pnn '
-            datavec.extend(datavec_nn)
-            datavec_no_mbias.extend(datavec_nn_no_mbias)
-        if 'OBS' == mode:
-            stats_string = stats_string + '1pt '
+    if 'NN' in args.mode:
+        stats_string = stats_string + 'Pnn '
+        datavec.extend(datavec_nn)
+        datavec_no_mbias.extend(datavec_nn_no_mbias)
+    if 'NE' in args.mode:
+        stats_string = stats_string + 'PneE PneB '
+        datavec.extend(datavec_ne)
+        datavec_no_mbias.extend(datavec_ne_no_mbias)
+    if 'EE' in args.mode:
+        stats_string = stats_string + 'PeeE PeeB '
+        datavec.extend(datavec_ee)
+        datavec_no_mbias.extend(datavec_ee_no_mbias)
+    if 'OBS' in args.mode:
+        stats_string = stats_string + '1pt '
     scDict = {
         'use_stats': stats_string.lower()
         }
 elif statistic =='2pcf':
-    for mode in args.mode:
-        if 'EE' == mode:
-            stats_string = stats_string + 'xiP xiM '
-            datavec.extend(datavec_ee)
-            datavec_no_mbias.extend(datavec_ee_no_mbias)
-        if 'NE' == mode:
-            stats_string = stats_string + 'gT gX '
-            datavec.extend(datavec_ne)
-            datavec_no_mbias.extend(datavec_ne_no_mbias)
-        if 'NN' == mode:
-            stats_string = stats_string + 'wTh '
-            datavec.extend(datavec_nn)
-            datavec_no_mbias.extend(datavec_nn_no_mbias)
-        if 'OBS' == mode:
-            stats_string = stats_string + '1pt '
+    if 'NN' in args.mode:
+        stats_string = stats_string + 'wTh '
+        datavec.extend(datavec_nn)
+        datavec_no_mbias.extend(datavec_nn_no_mbias)
+    if 'NE' in args.mode:
+        stats_string = stats_string + 'gT gX '
+        datavec.extend(datavec_ne)
+        datavec_no_mbias.extend(datavec_ne_no_mbias)
+    if 'EE' in args.mode:
+        stats_string = stats_string + 'xiP xiM '
+        datavec.extend(datavec_ee)
+        datavec_no_mbias.extend(datavec_ee_no_mbias)
+    if 'OBS' in args.mode:
+        stats_string = stats_string + '1pt '
     scDict = {
         'use_stats': stats_string.lower()
         }
 else:
     raise Exception('Unknown statistic!')
     
-print(scDict, datavec)
 
 wtp2.saveFitsTwoPoint(
         nbTomoN=nBins_lens,
@@ -741,7 +755,8 @@ wtp2.saveFitsTwoPoint(
         saveName=outputFilename
 )
 
-wtp2.saveFitsTwoPoint(
+if no_m_bias_ee == True and no_m_bias_ne == True and no_m_bias_nn == True:
+    wtp2.saveFitsTwoPoint(
         nbTomoN=nBins_lens,
         nbTomoG=nBins_source,
         nbObs=nBins_obs,
@@ -766,7 +781,7 @@ wtp2.saveFitsTwoPoint(
         nGalList=nGalList,
         sigmaEpsList=sigmaEpsList,
         saveName=outputFilename_no_mbias
-)
+    )
     
 statsList = stats_string.split()
 

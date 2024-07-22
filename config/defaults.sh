@@ -107,6 +107,8 @@ CALIBWEIGHTNAME=PriorWeight
 
 #Name to base the Nz labels on 
 NZNAME_BASEBLOCK=som_weight_calib_cats
+NZNAME_BASEBLOCK_LENS=som_weight_calib_cats
+NZNAME_BASEBLOCK_OBS=som_weight_calib_cats
 
 #Name of the base file for cosmosis/onecov
 NPAIRBASE=XI_KiDS_1000_NScomb_nBins_5

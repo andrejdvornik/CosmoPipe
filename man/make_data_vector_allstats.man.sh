@@ -56,13 +56,37 @@ function _inp_data {
   then
     input="cosebis"
   #}}}
-  elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
-  then 
-    input="bandpowers"
+  elif [ "${STATISTIC^^}" == "PSI_STATS_GM" ] #{{{
+  then
+    input="psi_stats_gm"
+  #}}}
+  elif [ "${STATISTIC^^}" == "PSI_STATS_GG" ] #{{{
+  then
+    input="psi_stats_gg"
+  #}}}
+  elif [ "${STATISTIC^^}" == "BANDPOWERS_EE" ] #{{{
+  then
+    input="bandpowers_ee"
+  #}}}
+  elif [ "${STATISTIC^^}" == "BANDPOWERS_NE" ] #{{{
+  then
+    input="bandpowers_ne"
+  #}}}
+  elif [ "${STATISTIC^^}" == "BANDPOWERS_NN" ] #{{{
+  then
+    input="bandpowers_nn"
   #}}}
   elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
   then 
     input="xipm_binned"
+  #}}}
+  elif [ "${STATISTIC^^}" == "GT" ] #{{{
+  then
+    input="gt_binned"
+  #}}}
+  elif [ "${STATISTIC^^}" == "WT" ] #{{{
+  then
+    input="wt_binned"
   fi
   #}}}
   echo ${input} mbias

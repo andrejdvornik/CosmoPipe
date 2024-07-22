@@ -1,5 +1,5 @@
 #
-# save_and_check_mcmc_inp_allstats2.sh Documentation & Housekeeping functions
+# add_nz.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@===================================================@DEF@\n"
-    _message "@BLU@== @RED@ Running save_and_check_mcmc_inp_allstats2.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@===================================================@DEF@\n"
+    _message "@BLU@==============================@DEF@\n"
+    _message "@BLU@== @RED@ Running add_nz_obs.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@==============================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,7 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Construct the MCMC input file for all statistics'
+  echo '# Add pre-existing Nz to the data block'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -42,30 +42,29 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLINDING BV:BOLTZMAN BV:CHAINSUFFIX BV:ITERATION BV:LMAXBANDPOWERS BV:LMINBANDPOWERS BV:NBANDPOWERS BV:NMAXCOSEBIS BV:NTHETAREBIN BV:STATISTIC BV:MODES BV:THETAMAX BV:THETAMIN BV:TOMOLIMS BV:NLENSBINS BV:NSMFLENSBINS DATABLOCK PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH SURVEY
+  echo BLU BV:NZNAME_BASEBLOCK_OBS DATABLOCK DEF NZFILESUFFIX NZPATH_LENS RUNROOT STORAGEPATH
 }
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo
-  #@BV:STATISTIC@_vec covariance_@BV:STATISTIC@ cosmosis_neff_source cosmosis_neff_lens cosmosis_neff_obs smf_datavec cosmosis_sigmae nz_source nz_lens nz_obs
-}
+  echo 
+} 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo mcmc_inp_@BV:STATISTIC@
+  echo nz_obs
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp_allstats2.sh
-} 
+  echo bash @RUNROOT@/@SCRIPTPATH@/add_nz_obs.sh
+}
 #}}}
 
 # Unset Function command {{{ 

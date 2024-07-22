@@ -39,11 +39,12 @@ trap '_abort' 0
 set -e 
 #}}}
 
-# Input variables {{{ 
-function _inp_var { 
+# Input variables {{{
+function _inp_var {
   #Variable inputs (leave blank if none)
-  echo COSEBIDATAVEC DATABLOCK RUNROOT STORAGEPATH
-} 
+  
+  echo BV:INPUT_DATAVEC DATABLOCK RUNROOT STORAGEPATH BV:STATISTIC
+}
 #}}}
 
 # Input data {{{ 
@@ -56,8 +57,50 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo cosebis_vec
-} 
+  STATISTIC=@BV:STATISTIC@
+  if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
+  then
+    output="cosebis_vec"
+  #}}}
+  elif [ "${STATISTIC^^}" == "PSI_STATS_GM" ] #{{{
+  then
+    output="psi_stats_gm_vec"
+  #}}}
+  elif [ "${STATISTIC^^}" == "PSI_STATS_GG" ] #{{{
+  then
+    output="psi_stats_gg_vec"
+  #}}}
+  elif [ "${STATISTIC^^}" == "BANDPOWERS_EE" ] #{{{
+  then
+    output="bandpowers_ee_vec"
+  #}}}
+  elif [ "${STATISTIC^^}" == "BANDPOWERS_NE" ] #{{{
+  then
+    output="bandpowers_ne_vec"
+  #}}}
+  elif [ "${STATISTIC^^}" == "BANDPOWERS_NN" ] #{{{
+  then
+    output="bandpowers_nn_vec"
+  #}}}
+  elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
+  then
+    output="xipm_vec"
+  #}}}
+  elif [ "${STATISTIC^^}" == "GT" ] #{{{
+  then
+    output="gt_vec"
+  #}}}
+  elif [ "${STATISTIC^^}" == "WT" ] #{{{
+  then
+    output="wt_vec"
+  #}}}
+  elif [ "${STATISTIC^^}" == "OBS" ] #{{{
+  then
+    output="obs_vec"
+  fi
+  #}}}
+  echo ${output}
+}
 #}}}
 
 # Execution command {{{ 

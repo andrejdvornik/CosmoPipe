@@ -32,26 +32,25 @@ ITERATION=@BV:ITERATION@
 MODES="@BV:MODES@"
 if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 then
-  if [[ " EE " =~ .*\ $MODES\ .* ]]
+  if [[ .*\ $MODES\ .* =~ " EE " ]]
   then
     input_datavector_ee="@DB:cosebis_vec@"
   else
     input_datavector_ee=
   fi
-  if [[ " NE " =~ .*\ $MODES\ .* ]]
+  if [[ .*\ $MODES\ .* =~ " NE " ]]
   then
     input_datavector_ne="@DB:psi_stats_gm_vec@"
   else
     input_datavector_ne=
   fi
-  if [[ " NN " =~ .*\ $MODES\ .* ]]
+  if [[ .*\ $MODES\ .* =~ " NN " ]]
   then
     input_datavector_nn="@DB:psi_stats_gg_vec@"
   else
     input_datavector_nn=
   fi
-  input_covariance="@DB:covariance_cosebis@"
-  #"@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_cosebis/covariance_matrix_${non_linear_model}.mat"
+  "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_cosebis/covariance_matrix_${non_linear_model}.mat"
   if [ -n "$ITERATION" ] && [ "$ITERATION" -eq "$ITERATION" ]
   then
     filename_extension=${CHAINSUFFIX}_iteration_${ITERATION}
@@ -72,25 +71,26 @@ then
 #}}}
 elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
 then
-  if [[ " EE " =~ .*\ $MODES\ .* ]]
+  if [[ .*\ $MODES\ .* =~ " EE " ]]
   then
     input_datavector_ee="@DB:bandpowers_ee_vec@"
   else
     input_datavector_ee=
   fi
-  if [[ " NE " =~ .*\ $MODES\ .* ]]
+  if [[ .*\ $MODES\ .* =~ " NE " ]]
   then
     input_datavector_ne="@DB:bandpowers_ne_vec@"
   else
     input_datavector_ne=
   fi
-  if [[ " NN " =~ .*\ $MODES\ .* ]]
+  if [[ .*\ $MODES\ .* =~ " NN " ]]
   then
     input_datavector_nn="@DB:bandpowers_nn_vec@"
   else
     input_datavector_nn=
   fi
-  input_covariance="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_bandpowers/covariance_matrix_${non_linear_model}.mat"
+  input_covariance="@DB:covariance_bandpowers@"
+  #input_covariance="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_bandpowers/covariance_matrix_${non_linear_model}.mat"
   if [ -n "$ITERATION" ] && [ "$ITERATION" -eq "$ITERATION" ]
   then
     filename_extension=${CHAINSUFFIX}_iteration_${ITERATION}
@@ -99,31 +99,31 @@ then
 #}}}
 elif [ "${STATISTIC^^}" == "2PCF" ] #{{{
 then
-  if [[ " EE " =~ .*\ $MODES\ .* ]]
+  if [[ .*\ $MODES\ .* =~ " EE " ]]
   then
     input_datavector_ee="@DB:xipm_vec@"
   else
     input_datavector_ee=
   fi
-  if [[ " NE " =~ .*\ $MODES\ .* ]]
+  if [[ .*\ $MODES\ .* =~ " NE " ]]
   then
     input_datavector_ne="@DB:gt_vec@"
   else
     input_datavector_ne=
   fi
-  if [[ " NN " =~ .*\ $MODES\ .* ]]
+  if [[ .*\ $MODES\ .* =~ " NN " ]]
   then
     input_datavector_nn="@DB:gg_vec@"
   else
     input_datavector_nn=
   fi
-  input_covariance="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_xipm/covariance_matrix_${non_linear_model}.mat"
+  input_covariance="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_2pcf/covariance_matrix_${non_linear_model}.mat"
   if [ -n "$ITERATION" ] && [ "$ITERATION" -eq "$ITERATION" ]
   then
     filename_extension=${CHAINSUFFIX}_iteration_${ITERATION}
     input_covariance_iterative=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_xipm/covariance_matrix_${non_linear_model}${filename_extension}.mat
   fi
-elif [ "${STATISTIC^^}" == "2PCFEB" ] #{{{
+elif [ "${STATISTIC^^}" == "XIEB" ] #{{{
 then
   input_datavector_E="@DB:xiE_vec@"
   input_datavector_ne=
@@ -149,7 +149,7 @@ then
   non_linear_model=mead2020_feedback
 fi
 #If needed, create the output directory {{{
-if [ "${STATISTIC^^}" == "2PCFEB" ] #{{{
+if [ "${STATISTIC^^}" == "XIEB" ] #{{{
 then
   if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_xiE ]
   then
@@ -171,7 +171,8 @@ then
 fi 
 #}}}
 
-if [[ " EE " =~ .*\ $MODES\ .* ]] || [[ " NE " =~ .*\ $MODES\ .* ]]
+
+if [[ .*\ $MODES\ .* =~ " EE " ]] || [[ .*\ $MODES\ .* =~ " NE " ]]
 then
   NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
   nz_source="@DB:nz_source@"
@@ -184,7 +185,7 @@ else
   cosmosis_sigmae=
 fi
 
-if [[ " NN " =~ .*\ $MODES\ .* ]] || [[ " NE " =~ .*\ $MODES\ .* ]]
+if [[ .*\ $MODES\ .* =~ " NN " ]] || [[ .*\ $MODES\ .* =~ " NE " ]]
 then
   NLENS="@BV:NLENSBINS@"
   nz_lens="@DB:nz_lens@"
@@ -195,7 +196,7 @@ else
   nefflens=
 fi
 
-if [[ " OBS " =~ .*\ $MODES\ .* ]]
+if [[ .*\ $MODES\ .* =~ " OBS " ]]
 then
   NOBS="@BV:NSMFLENSBINS@"
   nz_obs="@DB:nz_obs@"
@@ -216,7 +217,7 @@ then
   --datavector_ee ${input_datavector_ee} \
   --datavector_ne ${input_datavector_ne} \
   --datavector_nn ${input_datavector_nn} \
-  --smfdatavector ${input_smfdatavector}$ \
+  --smfdatavector ${input_smfdatavector} \
   --statistic @BV:STATISTIC@ \
   --mode @BV:MODES@ \
   --nzsource ${nz_source} \
@@ -246,7 +247,7 @@ then
   --datavector_ee ${input_datavector_ee} \
   --datavector_ne ${input_datavector_ne} \
   --datavector_nn ${input_datavector_nn} \
-  --smfdatavector ${input_smfdatavector}$ \
+  --smfdatavector ${input_smfdatavector} \
   --statistic @BV:STATISTIC@ \
   --mode @BV:MODES@ \
   --nzsource ${nz_source} \
@@ -277,7 +278,7 @@ else
       --datavector_ee ${input_datavector_E} \
       --datavector_ne ${input_datavector_ne} \
       --datavector_nn ${input_datavector_nn} \
-      --smfdatavector ${input_smfdatavector}$ \
+      --smfdatavector ${input_smfdatavector} \
       --statistic @BV:STATISTIC@ \
       --mode @BV:MODES@ \
       --nzsource ${nz_source} \
@@ -305,7 +306,7 @@ else
     --datavector ${input_datavector_B} \
     --datavector_ne ${input_datavector_ne} \
     --datavector_nn ${input_datavector_nn} \
-    --smfdatavector ${input_smfdatavector}$ \
+    --smfdatavector ${input_smfdatavector} \
     --statistic @BV:STATISTIC@ \
     --mode @BV:MODES@ \
     --nzsource ${nz_source} \

@@ -197,8 +197,12 @@ input_files = []
 if statistic == 'cosebis':
     matches_cosebis = np.array([ "En_" in i for i in args.DataFiles])
     EnDataFiles = np.array(args.DataFiles)[matches_cosebis]
-    matches_cosebis_b = np.array([ "Bn_" in i for i in args.DataFiles])
-    BnDataFiles = np.array(args.DataFiles)[matches_cosebis_b]
+    try:
+        matches_cosebis_b = np.array([ "Bn_" in i for i in args.DataFiles])
+        BnDataFiles = np.array(args.DataFiles)[matches_cosebis_b]
+    except:
+        matches_cosebis_b = np.array([ "En_" in i for i in args.DataFiles])
+        BnDataFiles = np.array(args.DataFiles)[matches_cosebis_b]
     #Input file name list: E-modes first, then B-modes. There's probably a smarter way to do this.
     for bin1 in range(nBins_source):
         for bin2 in range(bin1,nBins_source):
@@ -243,8 +247,12 @@ elif statistic == 'psi_stats_gg':
 elif statistic == 'bandpowers_ee':
     matches_bandpowers = np.array([ "CEE_" in i for i in args.DataFiles])
     CEEDataFiles = np.array(args.DataFiles)[matches_bandpowers]
-    matches_bandpowers_B = np.array([ "CBB_" in i for i in args.DataFiles])
-    CBBDataFiles = np.array(args.DataFiles)[matches_bandpowers_B]
+    try:
+        matches_bandpowers_B = np.array([ "CBB_" in i for i in args.DataFiles])
+        CBBDataFiles = np.array(args.DataFiles)[matches_bandpowers_B]
+    except:
+        matches_bandpowers_B = np.array([ "CEE_" in i for i in args.DataFiles])
+        CBBDataFiles = np.array(args.DataFiles)[matches_bandpowers_B]
     #Input file name list: E-modes first, then B-modes. There's probably a smarter way to do this.
     for bin1 in range(nBins_source):
         for bin2 in range(bin1,nBins_source):
@@ -264,8 +272,12 @@ elif statistic == 'bandpowers_ee':
 elif statistic == 'bandpowers_ne':
     matches_bandpowers = np.array([ "CnE_" in i for i in args.DataFiles])
     CnEDataFiles = np.array(args.DataFiles)[matches_bandpowers]
-    matches_bandpowers_B = np.array([ "CnB_" in i for i in args.DataFiles])
-    CnBDataFiles = np.array(args.DataFiles)[matches_bandpowers_B]
+    try:
+        matches_bandpowers_B = np.array([ "CnB_" in i for i in args.DataFiles])
+        CnBDataFiles = np.array(args.DataFiles)[matches_bandpowers_B]
+    except:
+        matches_bandpowers_B = np.array([ "CnE_" in i for i in args.DataFiles])
+        CnBDataFiles = np.array(args.DataFiles)[matches_bandpowers_B]
     #Input file name list:
     for bin1 in range(nBins_lens):
         for bin2 in range(nBins_source):
