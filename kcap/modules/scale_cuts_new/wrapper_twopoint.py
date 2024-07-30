@@ -95,11 +95,11 @@ class LabelConvention:
         self.kernelTypeDict[P_ne_E]  = [self.lens,   self.source, tpType4, tpType5, None] 
         self.kernelTypeDict[P_ne_B]  = [self.lens,   self.source, tpType4, tpType6, None] 
         self.kernelTypeDict[P_ee_E]  = [self.source, self.source, tpType5, tpType5, None] 
-        self.kernelTypeDict[P_ee_B]  = [self.source, self.source, tpType6, tpType6, None]
-        self.kernelTypeDict[Psi_gg]  = [self.lens,   self.lens,   tpType4, tpType4, None]
-        self.kernelTypeDict[Psi_gm]  = [self.lens,   self.source, tpType4, tpType5, None]
-        self.kernelTypeDict[E_n]     = [self.source, self.source, tpType5, tpType6, None]
+        self.kernelTypeDict[P_ee_B]  = [self.source, self.source, tpType6, tpType6, None] 
+        self.kernelTypeDict[E_n]     = [self.source, self.source, tpType5, tpType6, None] 
         self.kernelTypeDict[B_n]     = [self.source, self.source, tpType6, tpType5, None]
+        self.kernelTypeDict[Psi_gm]  = [self.lens,   self.source, tpType4, tpType5, None]
+        self.kernelTypeDict[Psi_gg]  = [self.lens,   self.lens,   tpType4, tpType4, None]
         return
     
     def defaultToCustomStatsTag(self, statsTag):
@@ -180,6 +180,10 @@ class SpectrumBuilder():
         self.aIL     = []
         self.angList = []
         self.valList = []
+        self.nobs = []
+        self.obs = []
+        self.obs_name = []
+        self.nbin = []
         return
     
     def addTomo(self, tomoInd1, tomoInd2, angle, value):
@@ -191,6 +195,13 @@ class SpectrumBuilder():
         self.angList.append(angle)
         self.valList.append(value)
         return
+        
+    def add_one_point(self, obs_name, nbin, x, angbin, values):
+        self.obs_name.append(obs_name)
+        self.nbin.append(nbin)
+        self.obs.append(x)
+        self.nobs.append(values)
+        #self.angbin.append(angbin)
     
     def makeSpectrum(self, name, types, angle_unit, kernels=(None, None)):
         self.tIL1    = np.concatenate(self.tIL1)

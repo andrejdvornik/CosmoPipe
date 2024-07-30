@@ -565,10 +565,14 @@ class TwoPointBuilder:
         obs_high = []
         obs_middle = []
         for xobs in obsArr:
-            d_obs = np.log10(xobs[1]) - np.log10(xobs[0])
-            obs_low.append(10.0**(np.log10(xobs) - 0.5 * d_obs))
-            obs_high.append(10.0**(np.log10(xobs) + 0.5 * d_obs))
+            #d_obs = np.log10(xobs[1]) - np.log10(xobs[0])
+            #obs_low.append(10.0**(np.log10(xobs) - 0.5 * d_obs))
+            #obs_high.append(10.0**(np.log10(xobs) + 0.5 * d_obs))
             obs_middle.append(xobs)
+        if obs_low == []:
+            obs_low = None
+        if obs_high == []:
+            obs_high = None
         nobs = twopoint.OnePointMeasurement(name, obs_middle, nobsList, obs_low, obs_high)
         return nobs
      
@@ -713,7 +717,8 @@ class TwoPointBuilder:
     def _makeTwoPoint_withoutCov(self, labConv, statsTag_c):
         tomoAngDict = self.makeTomoAngDict()
         statsList_c  = statsTag_c.split('+')
-        statsList_c_complete = labConv.kernelTypeDict.keys()
+        statsList_c_complete = list(labConv.kernelTypeDict.keys())
+        statsList_c_complete.append(labConv.onept)
         
         for stats_c in statsList_c:
             if stats_c not in statsList_c_complete:
@@ -741,11 +746,11 @@ class TwoPointBuilder:
             for obs in self.nobs:
                 if obs.name in statsList_c:
                     for i in range(obs.nbin):
-                        for angInd in range(sum(obs.nsample[i])):
+                        for angInd in range(obs.nsample[i]):
                             x = obs.obs[i][angInd]
                             y = obs.nobs[i][angInd]
                             binInd += 1
-                            scBuilder.add_one_point(obs.name, i+1, x, angInd+1, y)
+                            sBuilder.add_one_point(obs.name, i+1, x, angInd+1, y)
         
         ## Make
         TP = wtp.TwoPointWrapper.from_spectra(spectra, kernels=self.kernelList, nobs=self.nobs, covmat_info=None) ## kernels & covmat_info can be None
