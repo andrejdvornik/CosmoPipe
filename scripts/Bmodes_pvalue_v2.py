@@ -153,7 +153,7 @@ if statistic == 'cosebis':
     if mult:
         plot_bmodes(x_data=B_data['ANG'], y_data=B_data['VALUE'], y_data_plot=B_data['VALUE']*1e10, y_error=B_std*1e10, cov=B_cov, bin1_data=B_data['BIN1'], bin2_data=B_data['BIN2'], angbin=B_data['ANGBIN'], outfile=outfile, ylabel=ylabel, ntomo = ntomo, mult=mult)
 if statistic == 'bandpowers':
-    plot_bmodes(x_data=B_data['ANG'], y_datat=B_data['VALUE'], y_data_plot=B_data['VALUE']/B_data['ANG']*1e7, y_error=B_std/B_data['ANG']*1e7, cov=B_cov, bin1_data=B_data['BIN1'], bin2_data=B_data['BIN2'], angbin=B_data['ANGBIN'], outfile=outfile, ylabel=ylabel, ntomo = ntomo)
+    plot_bmodes(x_data=B_data['ANG'], y_data=B_data['VALUE'], y_data_plot=B_data['VALUE']/B_data['ANG']*1e7, y_error=B_std/B_data['ANG']*1e7, cov=B_cov, bin1_data=B_data['BIN1'], bin2_data=B_data['BIN2'], angbin=B_data['ANGBIN'], outfile=outfile, ylabel=ylabel, ntomo = ntomo)
     if mult:
         plot_bmodes(x_data=B_data['ANG'], y_datat=B_data['VALUE'], y_data_plot=B_data['VALUE']/B_data['ANG']*1e7, y_error=B_std/B_data['ANG']*1e7, cov=B_cov, bin1_data=B_data['BIN1'], bin2_data=B_data['BIN2'], angbin=B_data['ANGBIN'], outfile=outfile, ylabel=ylabel, ntomo = ntomo, mult=mult)
 
