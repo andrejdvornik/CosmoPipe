@@ -34,6 +34,56 @@ MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 @PYTHON3BIN@ -m blind_
     --key_path @BV:KEYPATH@ \
     --file_path @BV:BLINDFILE@ 2>&1
 
-# Add blinds to datablock
+mbias = `ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/`
+if [[ ${mbias} =~ .*"no_m_bias".* ]]
+then
+  MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 @PYTHON3BIN@ -m blind_2pt_cosmosis \
+    -i @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_@BV:STATISTIC@.ini \
+    -u @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}_no_m_bias.fits \
+    -b \
+    --key_path @BV:KEYPATH@ \
+    --file_path @BV:BLINDFILE@ 2>&1
+fi
+
+# Remove the block entries, but not the datablock data as the _delete_blockitem function does
+grep -v "^mcmc_inp_@BV:STATISTIC@=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt | \
+  awk '{ print $0 }' \
+  > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt
+mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block_$$.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/block.txt
+
+inputlist=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/`
+#This just makes sure that the files are added correctly
+for file in ${inputlist}
+do
+  _message "${file}\n"
+  if [[ ! "${file}" =~ "MCMC_input_${non_linear_model}.fits" ]] && [[ ! "${file}" =~ "MCMC_input_${non_linear_model}_no_m_bias.fits" ]]
+  then
+    _message "Adding to datablock\n"
+    # Add blinds to datablock
+    blinded_block=`_read_datablock mcmc_inp_@BV:STATISTIC@`
+    _write_datablock "mcmc_inp_@BV:STATISTIC@" "`_blockentry_to_filelist ${blinded_block}` ${file}"
+  fi
+done
+
 # Remove all the previous statistic files / datavectors / everything after treecorr runs
-_write_datablock "mcmc_inp_@BV:STATISTIC@" "MCMC_input_${non_linear_model}.fits"
+datablock_names="`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/`"
+to_delete="gt wt xipm cosebis bandpowers psi_stats" # Add more if we figure out that is needed
+for name in ${datablock_names}
+do
+  for del in ${to_delete}
+  do
+    if [[ "${name}" =~ ^"${del}".* ]]
+    then
+      #_message "Trying to delete ${name}\n"
+      name=`_parse_blockvars ${name}`
+      _delete_blockitem "${name}"
+    fi
+  done
+  if [[ "smf" =~ "${name}" ]]
+  then
+    _message "Trying to delete ${name}\n"
+    #name=`_parse_blockvars ${name}`
+    #_delete_blockitem "${name}"
+  fi
+done
+
