@@ -1,5 +1,5 @@
 #
-# compute_nz_weights.sh Documentation & Housekeeping functions
+# assign_matching_label_onsky.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@==========================================@DEF@\n"
-    _message "@BLU@== @RED@ Running compute_nz_weights.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@==========================================@DEF@\n"
+    _message "@BLU@===================================================@DEF@\n"
+    _message "@BLU@== @RED@ Running assign_matching_label_onsky.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@===================================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,10 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Compute the Nz calibration weights, with quality '
-  echo '# control, for each of the tomographic bins'
+  echo '# Assign a label from a training catalogue to the '
+  echo '# catalogue(s) in DATAHEAD using BV:RALABEL and '
+  echo '# BV:DECLABEL sky coordinates in both catalogues '
+  echo '# (nearest neighbour)'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,28 +45,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:ADDITIONALFLAGS BV:CALIBWEIGHTNAME BV:MINNHC BV:NTHREADS BV:OPTIMISE BV:REFMAGNAME BV:SOMFEATURES BV:WEIGHTNAME BV:ZPHOTNAME BV:ZSPECNAME DATABLOCK DEF P_RSCRIPT RED RUNROOT STORAGEPATH
+  echo BLU BV:DECNAME BV:LABELNAME BV:RANAME DEF MACHINE P_RSCRIPT RED RUNROOT SCRIPTPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo ALLHEAD som_weight_reference som_weight_training
+  echo ALLHEAD match_base
 } 
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo som_weight_calib_cats som_weight_refr_cats nz_hc_optim
+  echo ALLHEAD match_base
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/compute_nz_weights.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/assign_matching_label_onsky.sh
 } 
 #}}}
 

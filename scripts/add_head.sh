@@ -3,7 +3,7 @@
 # File Name : add_head.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Wed 13 Mar 2024 03:23:08 PM CET
+# Last Modified : Fri Jul 19 03:16:27 2024
 #
 #=========================================
 
@@ -18,6 +18,8 @@ fi
 outlist=""
 if [ -f @BV:INPUTS@ ]
 then 
+  file="@BV:INPUTS@"
+  file=${file##*/}
   cp @BV:INPUTS@ @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${file}
   outlist=${file}
 elif [ -d @BV:INPUTS@ ]

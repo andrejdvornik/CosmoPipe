@@ -3,7 +3,7 @@
 # File Name : combine_cats.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Wed Jan 10 05:10:34 2024
+# Last Modified : Thu May 23 20:15:33 2024
 #
 #=========================================
 
@@ -48,14 +48,63 @@ then
   fi 
   
   #Construct the output name 
-  outname=${output:0:${i}}_comb.${ext}
+  outname=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${output:0:${i}}_comb.${ext}
+
+  #Check if input file lengths are ok {{{
+  links="FALSE"
+  for file in ${input} ${outname}
+  do 
+    if [ ${#file} -gt 255 ] 
+    then 
+      links="TRUE"
+    fi 
+  done 
+  
+  if [ "${links}" == "TRUE" ] 
+  then
+    #Remove existing infile links 
+    if [ -e infile_$$.lnk ] || [ -h infile_$$.lnk ]
+    then 
+      rm infile_$$.lnk
+    fi 
+    #Remove existing outfile links 
+    if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
+    then 
+      rm outfile_$$.lnk
+    fi
+    #Create input link
+    originp=${input}
+    input=''
+    count=0
+    for file in ${originp}
+    do 
+      ((count+=1))
+      ln -s ${file} infile_$$_$count.lnk 
+      input="${input} infile_$$_$count.lnk"
+    done 
+    #Create output links 
+    ln -s ${outname} outfile_$$.lnk
+    origout=${outname}
+    outname=outfile_$$.lnk
+  fi 
+  #}}}
   
   #Combine the DATAHEAD catalogues into one 
   _message "   > @BLU@Constructing combined catalogue @DEF@${outname}@DEF@ "
   @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacpaste \
     -i ${input} \
-    -o @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${outname} 2>&1 
+    -o ${outname} 2>&1 
   _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
+
+  #If using links, replace them {{{
+  if [ "${links}" == "TRUE" ] 
+  then 
+    rm ${input} ${outname}
+    input=${originp}
+    outname=${origout}
+  fi 
+  #}}}
+  
   
   #Update datahead 
   for _file in ${input}

@@ -268,7 +268,7 @@ corrmatrix_plot = correlation_coefficient${filename_extension}.pdf
 save_configs = save_configs.ini
 save_Cells = True
 save_trispectra = False
-save_alms = True
+save_alms = False
 use_tex = False
 
 [covELLspace settings]
