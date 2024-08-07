@@ -32,20 +32,20 @@ then
       _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
     else 
       _message "- ERROR!\n"
-      _message "COSEBIS pre-computed table ${normfile} or ${rootfile} is missing, and pipeline cannot compute them for linear binning. Download from gitrepo!"
+      _message "COSEBIS pre-computed table ${normfile} or ${rootfile} is missing, and pipeline cannot compute them for linear binning. Download from gitrepo!\n"
       exit 1
     fi 
   fi
   # check whether the precomputed WnLog files exist
   nfiles=@BV:NMAXCOSEBIS@
-  basefile=${SRCLOC}/WnLog/WnLog?_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
-  for i in $(seq -f "%02g" 1 $nfiles)
+  basefile="${SRCLOC}/WnLog/WnLogBIN-@BV:THETAMINXI@-@BV:THETAMAXXI@.table"
+  for i in $(seq -f "%01g" 1 $nfiles)
   do
-    file=`echo ${basefile} | sed "s/?/${i}/g"`
+    file=`echo ${basefile} | sed "s/BIN/${i}/g"`
     if [ ! -f ${file} ]
     then
       _message "- ERROR!\n"
-      _message "Pre-computed WnLog file ${file} is missing!"
+      _message "Pre-computed WnLog file ${file} is missing!\n"
       exit 1
     fi
   done
