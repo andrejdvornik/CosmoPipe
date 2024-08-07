@@ -16,8 +16,8 @@ if [ "${STATISTIC^^}" == "COSEBIS" ]
 then
   # check whether the pre-computed COSEBIS tables exist 
   SRCLOC=@RUNROOT@/@CONFIGPATH@/cosebis
-  normfile=${SRCLOC}/TLogsRootsAndNorms/Normalization_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
-  rootfile=${SRCLOC}/TLogsRootsAndNorms/Root_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
+  normfile=${SRCLOC}/TLogsRootsAndNorms/Normalization_@BV:THETAMIN@-@BV:THETAMAXXI@.table
+  rootfile=${SRCLOC}/TLogsRootsAndNorms/Root_@BV:THETAMINXI@-@BV:THETAMAX@.table
 
   if [ ! -f ${normfile} ] || [ ! -f ${rootfile} ]
   then 
@@ -25,8 +25,8 @@ then
     then 
       _message "    -> @BLU@Computing COSEBIs root and norm files@DEF@"
       @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/cosebis_compute_log_weight.py \
-        --thetamin @BV:THETAMINXI@ \
-        --thetamax @BV:THETAMAXXI@ \
+        --thetamin @BV:THETAMIN@ \
+        --thetamax @BV:THETAMAX@ \
         --nmax @BV:NMAXCOSEBIS@ \
         --outputbase ${SRCLOC}/TLogsRootsAndNorms/ 2>&1
       _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
