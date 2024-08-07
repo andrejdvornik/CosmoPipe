@@ -44,9 +44,7 @@ then
     file=`echo ${basefile} | sed "s/BIN/${i}/g"`
     if [ ! -f ${file} ]
     then
-      _message "- ERROR!\n"
-      _message "Pre-computed WnLog file ${file} is missing!\n"
-      exit 1
+      _message "Pre-computed WnLog file ${file} is missing! Calculating on the fly!\n"
     fi
   done
 fi
