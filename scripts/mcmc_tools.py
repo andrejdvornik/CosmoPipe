@@ -47,6 +47,16 @@ cosmosis_names={
     'A_bary_shared':'halo_model_parameters_shared--a',
     'A_IA_shared':'intrinsic_alignment_parameters_shared--a',
     'AIA_shared':'intrinsic_alignment_parameters_shared--a',
+    'A_IA_derived_shared':'INTRINSIC_ALIGNMENT_PARAMETERS_SHARED--A',
+    'beta_derived_shared':'INTRINSIC_ALIGNMENT_PARAMETERS_SHARED--BETA',
+    'uncorr_AIA_shared':'intrinsic_alignment_parameters_shared--uncorr_a',
+    'uncorr_beta_shared':'intrinsic_alignment_parameters_shared--uncorr_beta',
+    'M1_shared':'intrinsic_alignment_parameters_shared--log10_m_mean_1',
+    'M2_shared':'intrinsic_alignment_parameters_shared--log10_m_mean_2',
+    'M3_shared':'intrinsic_alignment_parameters_shared--log10_m_mean_3',
+    'M4_shared':'intrinsic_alignment_parameters_shared--log10_m_mean_4',
+    'M5_shared':'intrinsic_alignment_parameters_shared--log10_m_mean_5',
+    'M6_shared':'intrinsic_alignment_parameters_shared--log10_m_mean_6',
     'log_T_AGN_shared':'halo_model_parameters_shared--log_t_agn',
     'deltaz_uncorr_1':'nofz_shifts--uncorr_bias_1',
     'deltaz_uncorr_2':'nofz_shifts--uncorr_bias_2',
@@ -137,6 +147,16 @@ latex_names={
     'A_bary_shared':r'$A_{\rm bary}$', 
     'A_IA_shared':r'$A_{\rm IA}$',
     'AIA_shared':r'$A_{\rm IA}$',
+    'A_IA_derived_shared':r'$A_{\rm IA}$',
+    'beta_derived_shared':r'$\beta$',
+    'uncorr_AIA_shared':r'$A_{\rm IA}$',
+    'uncorr_beta_shared':r'$\beta$',
+    'M1_shared':r'$\log_{10}M_1$',
+    'M2_shared':r'$\log_{10}M_2$',
+    'M3_shared':r'$\log_{10}M_3$',
+    'M4_shared':r'$\log_{10}M_4$',
+    'M5_shared':r'$\log_{10}M_5$',
+    'M6_shared':r'$\log_{10}M_6$',
     'log_T_AGN_shared':r'$\log{T_{\rm AGN}}$',
     'deltaz_1':r'$\delta_{\rm z, 1}$', 
     'deltaz_2':r'$\delta_{\rm z, 2}$', 
@@ -304,16 +324,31 @@ def analyse_nautilus(basename):
         logZ = logsumexp(shell_log_v+shell_log_l)
     # Bayesian model dimensionality 
     if two_cosmo:
-        d = BMD(data_shared['like'], data_shared['weight'])
+        d_var = BMD(data_shared['like'], data_shared['weight'])
         d_l = d_like(data_shared['like'], data_shared['weight'])
         d_p = d_post(data_shared['like'], data_shared['post'], data_shared['weight'])
     else:
-        d = BMD(data['like'], data['weight'])
+        d_var = BMD(data['like'], data['weight'])
         d_l = d_like(data['like'], data['weight'])
         d_p = d_post(data['like'], data['post'], data['weight'])
+    d_eff = (d_l + d_p)/2
     # KL divergence
     D_KL = KL_nautilus(logZ, shell_log_v, shell_log_l)
     # Bayesian model dimensionality from Nautilus output (should be consistent with estimate from chain)
     d_nautilus = BMD_nautilus(logZ, shell_log_v, shell_log_l, D_KL)
 
-    return(logZ, d, d_l, d_p, d_nautilus, D_KL)
+    return(logZ, d_var, d_l, d_p, d_eff, d_nautilus, D_KL)
+
+def read_best_fit_chi2(path, no_like = False, tc=False):
+    if tc == True:
+        df = load_chain(path)[3]
+    else:
+        df = load_chain(path)[0]
+    if no_like:
+        chi2 = -2*(df.iloc[-1]['post'] - df.iloc[-1]['prior'])
+    else:
+        chi2 = -2*df.iloc[-1]['like']
+    post = -2*df.iloc[-1]['post']
+    # prior = -2*df.iloc[-1]['prior']
+    prior = 0
+    return(chi2, post, prior)
