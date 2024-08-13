@@ -23,9 +23,9 @@ then
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/get_weights_cosebis.py \
     --ncores @BV:NTHREADS@ \
     --nmax @BV:NMAXCOSEBIS@ \
-    --tmin @BV:THETAMINXI@ \
-    --tmax @BV:THETAMAXXI@ \
-    --ntheta @BV:NTHETABINXI@ \
+    --tmin @BV:THETAMIN@ \
+    --tmax @BV:THETAMAX@ \
+    --ntheta @BV:NTHETABIN@ \
     --outputdir @RUNROOT@/@CONFIGPATH@/cosebis/ \
     --computeWn False \
     --ReFactor False 2>&1 
@@ -37,9 +37,9 @@ fi
   --ncores @BV:NTHREADS@ \
   --ntomo ${NTOMO} \
   --nmodes @BV:NMAXCOSEBIS@ \
-  --thetamin @BV:THETAMINXI@ \
-  --thetamax @BV:THETAMAXXI@ \
-  --ntheta @BV:NTHETABINXI@ \
+  --thetamin @BV:THETAMIN@ \
+  --thetamax @BV:THETAMAX@ \
+  --ntheta @BV:NTHETABIN@ \
   --binning @BINNING@ \
   --output_cov_EB @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ \
   --filename_cov ${output} \

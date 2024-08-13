@@ -85,9 +85,9 @@ NTHETABIN="1000"
 #Number of Xipm bins used for science
 NTHETAREBIN=9
 #Maximum Theta for analysing Xim (arcmin)
-THETAMAXXIM=300
+THETAMAXM=300
 #Minimum Theta for analysing Xim (arcmin)
-THETAMINXIM=4
+THETAMINM=4
 
 #Minimum Number of modes for COSEBIs
 NMINCOSEBIS=1

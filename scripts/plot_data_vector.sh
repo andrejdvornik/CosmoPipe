@@ -29,7 +29,7 @@ case "@BV:STATISTIC@" in
     xlabel="Radial Bin i" 
     ylabel_upper="Xi[p]" 
     ylabel_lower="Xi[m]" 
-    ndata=@BV:NXIPM@
+    ndata=@BV:NTHETAREBIN@
     datavec="@DB:xipm_vec@"
     covariance="@DB:covariance_xipm@"
     ;;

@@ -37,8 +37,8 @@ then
   --inputfile ${inputfile} \
   --statistic @BV:STATISTIC@ \
   --ntomo ${NTOMO} \
-  --thetamin @BV:THETAMINXI@ \
-  --thetamax @BV:THETAMAXXI@ \
+  --thetamin @BV:THETAMIN@ \
+  --thetamax @BV:THETAMAX@ \
   --title "@SURVEY@" \
   --suffix "@BV:CHAINSUFFIX@" \
   --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
@@ -47,8 +47,8 @@ else
   --inputfile ${inputfile_E} \
   --statistic xiE \
   --ntomo ${NTOMO} \
-  --thetamin @BV:THETAMINXI@ \
-  --thetamax @BV:THETAMAXXI@ \
+  --thetamin @BV:THETAMIN@ \
+  --thetamax @BV:THETAMAX@ \
   --title "@SURVEY@" \
   --suffix "@BV:CHAINSUFFIX@E" \
   --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
@@ -57,8 +57,8 @@ else
   --inputfile ${inputfile_B} \
   --statistic xiB \
   --ntomo ${NTOMO} \
-  --thetamin @BV:THETAMINXI@ \
-  --thetamax @BV:THETAMAXXI@ \
+  --thetamin @BV:THETAMIN@ \
+  --thetamax @BV:THETAMAX@ \
   --title "@SURVEY@" \
   --suffix "@BV:CHAINSUFFIX@B" \
   --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/

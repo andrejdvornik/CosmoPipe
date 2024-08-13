@@ -150,8 +150,8 @@ fi
 #Base variables {{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 ;COSEBIs settings
-tmin_cosebis = @BV:THETAMINXI@
-tmax_cosebis = @BV:THETAMAXXI@
+tmin_cosebis = @BV:THETAMIN@
+tmax_cosebis = @BV:THETAMAX@
 nmax_cosebis = @BV:NMAXCOSEBIS@
 WnLogPath = ${cosebis_configpath}/WnLog/
 
@@ -230,8 +230,8 @@ EOF
 fi
 fi
 #}}}
-theta_lo=`echo 'e(l(@BV:THETAMINXI@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-theta_up=`echo 'e(l(@BV:THETAMAXXI@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+theta_lo=`echo 'e(l(@BV:THETAMIN@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+theta_up=`echo 'e(l(@BV:THETAMAX@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
 #Statistic {{{
 if [ "${STATISTIC^^}" == "BANDPOWERS" ]
 then 
@@ -300,12 +300,12 @@ then
   if [ "${SAMPLER^^}" == "LIST" ]
   then 
     #Keep consistency between plus and minus 
-    ximinus_min=@BV:THETAMINXI@
-    ximinus_max=@BV:THETAMAXXI@
+    ximinus_min=@BV:THETAMIN@
+    ximinus_max=@BV:THETAMAX@
   else 
     #Use the appropriate scale cut  
-    ximinus_min=@BV:THETAMINXIM@
-    ximinus_max=@BV:THETAMAXXIM@
+    ximinus_min=@BV:THETAMINM@
+    ximinus_max=@BV:THETAMAXM@
   fi 
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 use_stats = xiP xiM
@@ -313,7 +313,7 @@ xi_plus_extension_name = xiP
 xi_minus_extension_name = xiM
 xi_plus_section_name = shear_xi_plus_binned
 xi_minus_section_name = shear_xi_minus_binned
-keep_ang_xiP  = @BV:THETAMINXI@ @BV:THETAMAXXI@ 
+keep_ang_xiP  = @BV:THETAMIN@ @BV:THETAMAX@
 keep_ang_xiM  = ${ximinus_min}  ${ximinus_max}
 
 EOF
@@ -336,9 +336,9 @@ output_section_name= shear_xi_plus_binned
 input_section_name= shear_xi_plus 
 type=plus 
 
-theta_min=@BV:THETAMINXI@
-theta_max=@BV:THETAMAXXI@
-nTheta=@BV:NXIPM@
+theta_min=@BV:THETAMIN@
+theta_max=@BV:THETAMAX@
+nTheta=@BV:NTHETAREBIN@
 
 weighted_binning = 1 
 
@@ -357,9 +357,9 @@ output_section_name = shear_xi_minus_binned
 type = minus 
 input_section_name = shear_xi_minus
 
-theta_min = @BV:THETAMINXI@
-theta_max = @BV:THETAMAXXI@
-nTheta = @BV:NXIPM@
+theta_min = @BV:THETAMIN@
+theta_max = @BV:THETAMAX@
+nTheta = @BV:NTHETAREBIN@
 
 weighted_binning = 1 
 InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/@BV:NPAIRBASE@
@@ -515,7 +515,7 @@ then
 	ndat=`echo "$ncombinations @BV:NBANDPOWERS@" | awk '{printf "%u", $1*$2 }'`
   elif [ "${STATISTIC^^}" == "XIPM" ]
   then 
-	ndat=`echo "$ncombinations @BV:NXIPM@" | awk '{printf "%u", $1*$2*2 }'`
+	ndat=`echo "$ncombinations @BV:NTHETAREBIN@" | awk '{printf "%u", $1*$2*2 }'`
   fi
   listparam="scale_cuts_output/theory#${ndat}"
   list_input="@BV:LIST_INPUT_SAMPLER@"
@@ -649,7 +649,7 @@ do
             tpdparams="${tpdparams} cosebis/bin_${tomo2}_${tomo1}#@BV:NMAXCOSEBIS@"
         elif [ "${STATISTIC^^}" == "XIPM" ] 
         then
-            tpdparams="${tpdparams} shear_xi_plus_binned/bin_${tomo2}_${tomo1}#@BV:NXIPM@ shear_xi_minus_binned/bin_${tomo2}_${tomo1}#@BV:NXIPM@"
+            tpdparams="${tpdparams} shear_xi_plus_binned/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@ shear_xi_minus_binned/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@"
         fi
     done
 done

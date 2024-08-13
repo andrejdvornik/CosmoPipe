@@ -33,7 +33,7 @@ done
   --inputs ${inputs} \
   --patchlist @PATCHLIST@ \
   --allpatch @ALLPATCH@ \
-  --ntheta @BV:NTHETABINXI@ \
+  --ntheta @BV:NTHETABIN@ \
   --outputbase @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ \
   --binstrings ${binstrings} 2>&1 
 #}}}

@@ -120,6 +120,8 @@ fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 use_stats = ${stats}
 keep_ang_En   = ${lo} ${hi}
+keep_ang_Psi_gm   = ${lo} ${hi}
+keep_ang_Psi_gg   = ${lo} ${hi}
 cosebis_extension_name = En
 psi_stats_gm_extension_name = Psi_gm
 psi_stats_gg_extension_name = Psi_gg
@@ -159,6 +161,8 @@ fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini <<- EOF
 use_stats = ${stats}
 keep_ang_En   = ${lo} ${hi}
+keep_ang_Psi_gm   = ${lo} ${hi}
+keep_ang_Psi_gg   = ${lo} ${hi}
 psi_stats_gm_extension_name = Psi_gm
 psi_stats_gg_extension_name = Psi_gg
 onepoint_extension_name = 1pt
@@ -296,6 +300,8 @@ bandpower_ggl_section_name = bandpower_ggl
 bandpower_e_cosmic_shear_section_name = bandpower_shear_e
 onepoint_section_name = one_point
 keep_ang_PeeE = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
+keep_ang_PneE = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
+keep_ang_Pnn  = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
 
 EOF
 
@@ -329,6 +335,8 @@ bandpower_b_ggl_section_name = bandpower_ggl_b
 bandpower_b_cosmic_shear_section_name = bandpower_shear_b
 onepoint_section_name = one_point
 keep_ang_PeeE = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
+keep_ang_PneE = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
+keep_ang_Pnn  = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
 
 EOF
 fi
@@ -497,7 +505,7 @@ fi
 
 
 #}}}
-elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
+elif [ "${STATISTIC^^}" == "2PCF" ] #{{{
 then 
   #scale cut {{{
   if [ "${SAMPLER^^}" == "LIST" ]
@@ -507,65 +515,102 @@ then
     ximinus_max=@BV:THETAMAXXI@
   else 
     #Use the appropriate scale cut  
-    ximinus_min=@BV:THETAMINXIM@
-    ximinus_max=@BV:THETAMAXXIM@
-  fi 
+    ximinus_min=@BV:THETAMINM@
+    ximinus_max=@BV:THETAMAXM@
+  fi
+  
+  stats=""
+  if [[ .*\ $MODES\ .* =~ " EE " ]]
+  then
+   stats = "${use_stats} xiP xiM "
+  fi
+  if [[ .*\ $MODES\ .* =~ " NE " ]]
+  then
+    stats = "${use_stats} gT "
+  fi
+  if [[ .*\ $MODES\ .* =~ " NN " ]]
+  then
+    stats = "${use_stats} wTh "
+  fi
+  if [[ .*\ $MODES\ .* =~ " OBS " ]]
+  then
+   stats = "${use_stats} 1pt "
+  fi
+  
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
-use_stats = xiP xiM
+use_stats = ${stats}
+wt_extension_name = wTh
+gt_extension_name = gT
 xi_plus_extension_name = xiP
 xi_minus_extension_name = xiM
+onepoint_extension_name = 1pt
+wt_section_name = galaxy_xi_binned
+gt_section_name = galaxy_shear_xi_binned
 xi_plus_section_name = shear_xi_plus_binned
 xi_minus_section_name = shear_xi_minus_binned
-keep_ang_xiP  = @BV:THETAMIN@ @BV:THETAMAX@ 
+onepoint_section_name = one_point
+keep_ang_wTh  = @BV:THETAMIN@ @BV:THETAMAX@
+keep_ang_gT   = @BV:THETAMIN@ @BV:THETAMAX@
+keep_ang_xiP  = @BV:THETAMIN@ @BV:THETAMAX@
 keep_ang_xiM  = ${ximinus_min}  ${ximinus_max}
 
 EOF
 #}}}
 
 #statistic {{{
+if [[ .*\ $MODES\ .* =~ " EE " ]]
+then
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
-[xip_binned]
-file = %(2PT_STATS_PATH)s/bin_xi/bin_xi_interface.so
-output_section_name= shear_xi_plus_binned 
-input_section_name= shear_xi_plus 
-type=plus 
-
-theta_min=@BV:THETAMIN@
-theta_max=@BV:THETAMAX@
-nTheta=@BV:NXIPM@
-
-weighted_binning = 1 
-
-InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/@BV:NPAIRBASE@
-InputNpair_suffix = .ascii
-Column_theta_Name = meanr 
-Column_Npair_Name = npairs_weighted
-nBins_in = ${NTOMO}
-
-add_2D_cterm = 0 
-add_c_term = 0  
-
-[xim_binned]
-file = %(2PT_STATS_PATH)s/bin_xi/bin_xi_interface.so
-output_section_name = shear_xi_minus_binned 
-type = minus 
-input_section_name = shear_xi_minus
-
+[xi]
+file = %(CSL_PATH)s/shear/cl_to_xi_fullsky/cl_to_xi_interface.py
+n_theta_bins = @BV:NTHETAREBIN@
 theta_min = @BV:THETAMIN@
 theta_max = @BV:THETAMAX@
-nTheta = @BV:NXIPM@
-
-weighted_binning = 1 
-InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/@BV:NPAIRBASE@
-InputNpair_suffix = .ascii
-Column_theta_Name = meanr 
-Column_Npair_Name = npairs_weighted
-nBins_in = ${NTOMO} 
-
-add_2D_cterm = 0
-add_c_term = 0 
+ell_max = 40000
+xi_type = '22'
+theta_file = %(data_file)s
+bin_avg = F
+input_section_name = shear_cl
+output_section_name = shear_xi_plus_binned  shear_xi_minus_binned
 
 EOF
+fi
+
+if [[ .*\ $MODES\ .* =~ " NE " ]]
+then
+cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+[gt]
+file = %(CSL_PATH)s/shear/cl_to_xi_fullsky/cl_to_xi_interface.py
+n_theta_bins = @BV:NTHETAREBIN@
+theta_min = @BV:THETAMIN@
+theta_max = @BV:THETAMAX@
+ell_max = 40000
+xi_type = '02'
+theta_file = %%(data_file)s
+bin_avg = F
+input_section_name = galaxy_shear_cl
+output_section_name = galaxy_shear_xi_binned
+
+EOF
+fi
+
+if [[ .*\ $MODES\ .* =~ " NN " ]]
+then
+cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+[wth]
+file = %(CSL_PATH)s/shear/cl_to_xi_fullsky/cl_to_xi_interface.py
+n_theta_bins = @BV:NTHETAREBIN@
+theta_min = @BV:THETAMIN@
+theta_max = @BV:THETAMAX@
+ell_max = 40000
+xi_type = '00'
+theta_file = %(data_file)s
+bin_avg = F
+input_section_name = galaxy_cl
+output_section_name = galaxy_xi_binned
+
+EOF
+fi
 #}}}
 
 #}}}
@@ -707,9 +752,9 @@ then
   elif [ "${STATISTIC^^}" == "BANDPOWERS" ] 
   then 
 	ndat=`echo "$ncombinations @BV:NBANDPOWERS@" | awk '{printf "%u", $1*$2 }'`
-  elif [ "${STATISTIC^^}" == "XIPM" ]
+  elif [ "${STATISTIC^^}" == "2PCF" ]
   then 
-	ndat=`echo "$ncombinations @BV:NXIPM@" | awk '{printf "%u", $1*$2*2 }'`
+	ndat=`echo "$ncombinations @BV:NTHETAREBIN@" | awk '{printf "%u", $1*$2*2 }'`
   fi
   listparam="scale_cuts_output/theory#${ndat}"
   list_input="@BV:LIST_INPUT_SAMPLER@"
@@ -738,17 +783,23 @@ fi
 
 #Prepare the pipeline section {{{ 
 extraparams="cosmological_parameters/S_8 cosmological_parameters/sigma_8 cosmological_parameters/A_s cosmological_parameters/omega_m cosmological_parameters/omega_nu cosmological_parameters/omega_lambda cosmological_parameters/cosmomc_theta"
-if [ "${IAMODEL^^}" == "MASSDEP" ] 
-then
-  extraparams=="${extraparams} intrinsic_alignment_parameters/a intrinsic_alignment_parameters/beta"
-fi
-#Add nz shift values to outputs {{{
-shifts=""
+
+#Add source nz shift values to outputs {{{
+shifts_source=""
 for i in `seq ${NTOMO}`
 do 
-   shifts="${shifts} nofz_shifts/bias_${i}"
+   shifts_source="${shifts_source} nofz_shifts/bias_${i}"
 done
 #}}}
+
+#Add lens nz shift values to outputs {{{
+shifts_lens=""
+for i in `seq ${NLENSBINS}`
+do
+   shifts_lens="${shifts_lens} nofz_shifts_lens/bias_${i}"
+done
+#}}}
+
 #Add the values information #{{{
 if [  "@BV:COSMOSIS_PIPELINE@" == "default" ]
 then
@@ -769,6 +820,9 @@ then
 	elif [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
 	then
 		boltzmann_pipeline="one_parameter_hmcode camb"
+    elif [ "${BOLTZMAN^^}" == "HALO_MODEL" ]
+    then
+        boltzmann_pipeline="camb"
 	else
 		_message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
   		exit 1
@@ -786,7 +840,10 @@ then
 	elif [ "${IAMODEL^^}" == "MASSDEP" ] 
 	then
 		iamodel_pipeline="correlated_massdep_priors linear_alignment projection mass_dependence_for_ia add_intrinsic"
-	else
+    elif [ "${IAMODEL^^}" == "HALO_MODEL" ]
+    then
+        iamodel_pipeline=""
+    else
 		_message "Intrinsic alignment model not implemented: ${IAMODEL^^}\n"
   		exit 1
 	fi
@@ -806,7 +863,7 @@ then
 	elif [ "${STATISTIC^^}" == "BANDPOWERS_B" ] #{{{
 	then 
 		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} bandpowers scale_cuts bandpowers_b scale_cuts_b likelihood likelihood_b"
-	elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
+	elif [ "${STATISTIC^^}" == "2PCF" ] #{{{
 	then 
 		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} cl2xi xip_binned xim_binned scale_cuts likelihood"
 	fi
@@ -841,9 +898,9 @@ do
         elif [ "${STATISTIC^^}" == "COSEBIS" ] 
         then
             tpdparams="${tpdparams} cosebis/bin_${tomo2}_${tomo1}#@BV:NMAXCOSEBIS@"
-        elif [ "${STATISTIC^^}" == "XIPM" ] 
+        elif [ "${STATISTIC^^}" == "2PCF" ] 
         then
-            tpdparams="${tpdparams} shear_xi_plus_binned/bin_${tomo2}_${tomo1}#@BV:NXIPM@ shear_xi_minus_binned/bin_${tomo2}_${tomo1}#@BV:NXIPM@"
+            tpdparams="${tpdparams} shear_xi_plus_binned/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@ shear_xi_minus_binned/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@"
         fi
     done
 done
