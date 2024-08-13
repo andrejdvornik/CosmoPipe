@@ -1101,18 +1101,18 @@ do
 			EOF
 			;; #}}}
     "correlated_dz_priors") #{{{
-      shifts=""
+      shifts_source=""
       unc_shifts=""
       for i in `seq ${NTOMO}`
       do 
-         shifts="${shifts} nofz_shifts/bias_${i}"
+         shifts_source="${shifts_source} nofz_shifts/bias_${i}"
          unc_shifts="${unc_shifts} nofz_shifts/uncorr_bias_${i}"
       done
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(KCAP_PATH)s/utils/correlated_priors.py
 			uncorrelated_parameters = ${unc_shifts}
-			output_parameters = ${shifts}
+			output_parameters = ${shifts_source}
 			covariance = @DB:nzcov@
 			
 			EOF
