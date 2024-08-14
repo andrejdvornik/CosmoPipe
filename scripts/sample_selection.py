@@ -181,11 +181,13 @@ if __name__ == '__main__':
                 details['y_lims_lo'] = y_bins[j]
                 details['y_lims_hi'] = y_bins[j+1]
                 if slice_in_m:
-                    details['x_med'] = np.median(x_data[idx])
-                    details['y_med'] = np.log10(np.median(10.0**y_data[idx]))
-                if slice_in_z:
                     details['x_med'] = np.log10(np.median(10.0**x_data[idx]))
                     details['y_med'] = np.median(y_data[idx])
+                    details['slice_in'] = 'obs'
+                if slice_in_z:
+                    details['x_med'] = np.median(x_data[idx])
+                    details['y_med'] = np.log10(np.median(10.0**y_data[idx]))
+                    details['slice_in'] = 'z'
                 with open(f'{outpath}/stats_LB{count+1}.txt', 'w') as f:
                     for key, value in details.items():
                         f.write(f'{key}\t{value}\n')
@@ -268,11 +270,13 @@ if __name__ == '__main__':
                 details['y_lims_lo'] = y_bins[j]
                 details['y_lims_hi'] = y_bins[j+1]
                 if slice_in_m:
-                    details['x_med'] = np.median(x_data[idx])
-                    details['y_med'] = np.log10(np.median(10.0**y_data[idx]))
-                if slice_in_z:
                     details['x_med'] = np.log10(np.median(10.0**x_data[idx]))
                     details['y_med'] = np.median(y_data[idx])
+                    details['slice_in'] = 'obs'
+                if slice_in_z:
+                    details['x_med'] = np.median(x_data[idx])
+                    details['y_med'] = np.log10(np.median(10.0**y_data[idx]))
+                    details['slice_in'] = 'z'
                 with open(f'{outpath}/stats_LB{count+1}.txt', 'w') as f:
                     for key, value in details.items():
                         f.write(f'{key}\t{value}\n')
