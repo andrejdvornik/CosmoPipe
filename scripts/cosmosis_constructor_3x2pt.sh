@@ -811,13 +811,13 @@ then
         iamodel_pipeline="correlated_massdep_priors linear_alignment projection mass_dependence_for_ia add_intrinsic"
     elif [ "${IAMODEL^^}" == "HALO_MODEL" ]
     then
-        iamodel_pipeline="hod_ia pk_ia add_and_upsample_ia projection add_intrinsic"
+        iamodel_pipeline="hod_ia_red hod_ia_blue alignment_red alignment_blue radial_satellite_alignment_red radial_satellite_alignment_blue pk_ia_red pk_ia_blue add_and_upsample_ia projection add_intrinsic"
     else
         _message "Intrinsic alignment model not implemented: ${IAMODEL^^}\n"
           exit 1
     fi
     
-    COSMOSIS_PIPELINE="correlated_dz_priors load_nz_fits consistency camb extrapolate halo_model_ingredients hod bnl pk add_and_upsample source_photoz_bias ${iamodel_pipeline} ${twopt_modules} bnl_delete"
+    COSMOSIS_PIPELINE="correlated_dz_priors load_nz_fits consistency camb extrapolate halo_model_ingredients hod bnl pk add_and_upsample ${iamodel_pipeline} source_photoz_bias ${twopt_modules} bnl_delete"
 else
 	COSMOSIS_PIPELINE="@BV:COSMOSIS_PIPELINE@"
 fi
@@ -1124,7 +1124,7 @@ do
             
             EOF
             ;; #}}}
-    "hod_ia") #{{{
+    "hod_ia_red") #{{{
             cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
             [$module]
             file = %(HMPATH)s/hod_interface.py
@@ -1132,7 +1132,26 @@ do
             observable_section_name = stellar_mass_function
             save_observable = False
             do_galaxy_linear_bias = False
-            hod_section_name = hod_ia
+            hod_section_name = hod_ia_red
+            values_name = hod_parameters_ia
+            nobs = 200
+            nz = %(nz_def)s
+            log_mass_min = %(logmassmin_def)s
+            log_mass_max = %(logmassmax_def)s
+            nmass = %(nmass_def)s
+            observable_mode = obs_onebin
+            
+            EOF
+            ;; #}}}
+    "hod_ia_blue") #{{{
+            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+            [$module]
+            file = %(HMPATH)s/hod_interface.py
+            observables_file = path_to_smf_function??
+            observable_section_name = stellar_mass_function
+            save_observable = False
+            do_galaxy_linear_bias = False
+            hod_section_name = hod_ia_blue
             values_name = hod_parameters_ia
             nobs = 200
             nz = %(nz_def)s
@@ -1268,7 +1287,7 @@ do
             
             EOF
             ;; #}}}
-    "pk_ia") #{{{
+    "pk_ia_red") #{{{
             if [[ .*\ $MODES\ .* =~ " EE " ]]
             then
                 ee="True"
@@ -1299,8 +1318,47 @@ do
             p_mI = ${ee}
             p_II = ${ee}
             two_halo_only = False
-            hod_section_name = hod_ia
-            output_suffix = ia
+            hod_section_name = hod_ia_red
+            output_suffix = ia_red
+            poisson_type = scalar
+            point_mass = False
+            dewiggle = True
+            
+            EOF
+            ;; #}}}
+    "pk_ia_blue") #{{{
+            if [[ .*\ $MODES\ .* =~ " EE " ]]
+            then
+                ee="True"
+            else
+                ee="False"
+            fi
+            if [[ .*\ $MODES\ .* =~ " NE " ]]
+            then
+                ne="True"
+            else
+                ne="False"
+            fi
+            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+            [$module]
+            file= %(HMPATH)s/pk_interface.py
+            log_mass_min = %(logmassmin_def)s
+            log_mass_max = %(logmassmax_def)s
+            nmass = %(nmass_def)s
+            zmin = %(zmin_def)s
+            zmax = %(zmax_def)s
+            nz = %(nz_def)s
+            nk = %(nk_def)s
+            bnl =  %(beta_nl)s
+            p_mm = False
+            p_gg = False
+            p_gm = False
+            p_gI = ${ne}
+            p_mI = ${ee}
+            p_II = ${ee}
+            two_halo_only = False
+            hod_section_name = hod_ia_blue
+            output_suffix = ia_blue
             poisson_type = scalar
             point_mass = False
             dewiggle = True
@@ -1311,7 +1369,7 @@ do
             cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
             [$module]
             file = %(HMPATH)s/add_and_upsample.py
-            f_red_file = %(data_path)s/input_files/f_red.txt ; two columns: z f_red(z)
+            ; f_red_file =
             do_p_mm = extrapolate
             do_p_gg = extrapolate
             do_p_gm = extrapolate
@@ -1334,12 +1392,12 @@ do
             do_p_gI = add_and_extrapolate
             do_p_mI = add_and_extrapolate
             do_p_II = add_and_extrapolate
-            input_power_suffix_extrap = ia
-            input_power_suffix_red = ia
-            input_power_suffix_blue = ia
-            hod_section_name_extrap = hod_ia
-            hod_section_name_red = hod_ia
-            hod_section_name_blue = hod_ia
+            input_power_suffix_extrap = ia_red
+            input_power_suffix_red = ia_red
+            input_power_suffix_blue = ia_blue
+            hod_section_name_extrap = hod_ia_red
+            hod_section_name_red = hod_ia_red
+            hod_section_name_blue = hod_ia_blue
             
             EOF
             ;; #}}}
@@ -1352,7 +1410,7 @@ do
             zmin= %(zmin_def)s
             zmax= %(zmax_def)s
             nz = %(nz_def)s
-            output_suffix = ia
+            output_suffix = ia_red
             
             EOF
             ;; #}}}
@@ -1369,19 +1427,37 @@ do
             ; kmin = 0.0001
             ; kmax = 1000.
             ; nk = 1000
-            output_suffix = ia
+            output_suffix = ia_red
             
             EOF
             ;; #}}}
     "alignment_blue") #{{{
             cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
             [$module]
+            file = %(HMPATH)s/ia_amplitudes.py
+            central_IA_depends_on = halo_mass
+            satellite_IA_depends_on = halo_mass
+            zmin= %(zmin_def)s
+            zmax= %(zmax_def)s
+            nz = %(nz_def)s
+            output_suffix = ia_blue
             
             EOF
             ;; #}}}
     "radial_satellite_alignment_blue") #{{{
             cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
             [$module]
+            file = %(HMPATH)s/ia_radial_interface.py
+            zmin = %(zmin_def)s
+            zmax = %(zmax_def)s
+            nz = %(nz_def)s
+            log_mass_min = %(logmassmin_def)s
+            log_mass_max = %(logmassmax_def)s
+            ; nmass = %(nmass_def)s
+            ; kmin = 0.0001
+            ; kmax = 1000.
+            ; nk = 1000
+            output_suffix = ia_blue
             
             EOF
             ;; #}}}
