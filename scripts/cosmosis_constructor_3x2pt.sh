@@ -748,17 +748,53 @@ then
 
 #}}}
 elif [ "${SAMPLER^^}" == "LIST" ] #{{{
-then 
-  ncombinations=`echo "$NTOMO" | awk '{printf "%u", $1*($1+1)/2 }'`
+then
+  if [[ .*\ $MODES\ .* =~ " EE " ]]
+  then
+    ncombinations_ee=`echo "$NTOMO" | awk '{printf "%u", $1*($1+1)/2 }'`
+  else
+    ncombinations_ee=0
+  fi
+  if [[ .*\ $MODES\ .* =~ " NE " ]]
+  then
+    ncombinations_ne=`echo "$NLENSBINS" "$NTOMO" | awk '{printf "%u", $1*$2 }'`
+  else
+    ncombinations_ne=
+  fi
+  if [[ .*\ $MODES\ .* =~ " NN " ]]
+  then
+    # No cross terms here!
+    ncombinations_nn=`echo "$NLENSBINS" | awk '{printf "%u", $1 }'`
+  else
+    ncombinations_nn=0
+  fi
+  if [[ .*\ $MODES\ .* =~ " OBS " ]]
+  then
+    ncombinations_obs=`echo "$NSMFLENSBINS" | awk '{printf "%u", $1 }'`
+  else
+    ncombinations_obs=0
+  fi
+  ncombinations=$(($ncombinations_ee + $ncombinations_ne + $ncombinations_nn))
+  
+  if [[ .*\ $MODES\ .* =~ " OBS " ]]
+  then
+    ndat_obs=`echo "$ncombinations_obs @BV:NSMFBINS@" | awk '{printf "%u", $1*$2 }'`
+  else
+    ndat_obs=0
+  fi
+  
   if [ "${STATISTIC^^}" == "COSEBIS" ]
   then
-    ndat=`echo "$ncombinations @BV:NMAXCOSEBIS@" | awk '{printf "%u", $1*$2 }'`
-  elif [ "${STATISTIC^^}" == "BANDPOWERS" ] 
+    ndat_=`echo "$ncombinations @BV:NMAXCOSEBIS@" | awk '{printf "%u", $1*$2 }'`
+    ndat=$(($ndat_ + $ndat_obs))
+  elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
   then 
-	ndat=`echo "$ncombinations @BV:NBANDPOWERS@" | awk '{printf "%u", $1*$2 }'`
+	ndat_=`echo "$ncombinations @BV:NBANDPOWERS@" | awk '{printf "%u", $1*$2 }'`
+    ndat=$(($ndat_ + $ndat_obs))
   elif [ "${STATISTIC^^}" == "2PCF" ]
   then 
-	ndat=`echo "$ncombinations @BV:NTHETAREBIN@" | awk '{printf "%u", $1*$2*2 }'`
+	ndat_=`echo "$ncombinations @BV:NTHETAREBIN@" | awk '{printf "%u", $1*$2*2 }'`
+    ndat=$(($ndat_ + $ndat_obs))
   fi
   listparam="scale_cuts_output/theory#${ndat}"
   list_input="@BV:LIST_INPUT_SAMPLER@"
@@ -852,22 +888,68 @@ fi
 tpdparams=""
 if [ "@BV:SAVE_TPDS@" == "True" ]
 then
-for tomo1 in `seq ${NTOMO}` 
-do
-    for tomo2 in `seq ${tomo1} ${NTOMO}` 
-    do 
-        if [ "${STATISTIC^^}" == "BANDPOWERS" ] 
-        then
-            tpdparams="${tpdparams} bandpower_shear_e/bin_${tomo2}_${tomo1}#@BV:NBANDPOWERS@"
-        elif [ "${STATISTIC^^}" == "COSEBIS" ] 
-        then
-            tpdparams="${tpdparams} cosebis/bin_${tomo2}_${tomo1}#@BV:NMAXCOSEBIS@"
-        elif [ "${STATISTIC^^}" == "2PCF" ] 
-        then
-            tpdparams="${tpdparams} shear_xi_plus_binned/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@ shear_xi_minus_binned/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@"
-        fi
-    done
-done
+	if [[ .*\ $MODES\ .* =~ " EE " ]]
+	then
+		for tomo1 in `seq ${NTOMO}`
+		do
+			for tomo2 in `seq ${tomo1} ${NTOMO}`
+			do
+				if [ "${STATISTIC^^}" == "BANDPOWERS" ]
+				then
+					tpdparams="${tpdparams} bandpower_shear_e/bin_${tomo2}_${tomo1}#@BV:NBANDPOWERS@"
+				elif [ "${STATISTIC^^}" == "COSEBIS" ]
+				then
+					tpdparams="${tpdparams} cosebis/bin_${tomo2}_${tomo1}#@BV:NMAXCOSEBIS@"
+				elif [ "${STATISTIC^^}" == "2PCF" ]
+				then
+					tpdparams="${tpdparams} shear_xi_plus_binned/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@ shear_xi_minus_binned/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@"
+				fi
+			done
+		done
+	fi
+	if [[ .*\ $MODES\ .* =~ " NE " ]]
+	then
+		for tomo1 in `seq ${NLENSBINS}`
+		do
+			for tomo2 in `seq ${NTOMO}`
+			do
+				if [ "${STATISTIC^^}" == "BANDPOWERS" ]
+				then
+					tpdparams="${tpdparams} bandpower_ggl/bin_${tomo1}_${tomo2}#@BV:NBANDPOWERS@"
+				elif [ "${STATISTIC^^}" == "COSEBIS" ]
+				then
+					tpdparams="${tpdparams} psi_stats_gm/bin_${tomo1}_${tomo2}#@BV:NMAXCOSEBIS@"
+				elif [ "${STATISTIC^^}" == "2PCF" ]
+				then
+					tpdparams="${tpdparams} galaxy_shear_xi_binned/bin_${tomo1}_${tomo2}#@BV:NTHETAREBIN@"
+				fi
+			done
+		done
+	fi
+	if [[ .*\ $MODES\ .* =~ " NN " ]]
+	then
+		for tomo1 in `seq ${NLENSBINS}`
+		do
+			# If we also want to use cross-terms here we need to enable them!
+			if [ "${STATISTIC^^}" == "BANDPOWERS" ]
+			then
+				tpdparams="${tpdparams} bandpower_clustering/bin_${tomo1}_${tomo1}#@BV:NBANDPOWERS@"
+			elif [ "${STATISTIC^^}" == "COSEBIS" ]
+			then
+				tpdparams="${tpdparams} psi_stats_gg/bin_${tomo1}_${tomo1}#@BV:NMAXCOSEBIS@"
+			elif [ "${STATISTIC^^}" == "2PCF" ]
+			then
+				tpdparams="${tpdparams} galaxy_xi_binned/bin_${tomo1}_${tomo1}#@BV:NTHETAREBIN@"
+			fi
+		done
+	fi
+	if [[ .*\ $MODES\ .* =~ " OBS " ]]
+	then
+		for tomo1 in `seq ${NSMFLENSBINS}`
+		do
+			tpdparams="${tpdparams} one_point/bin_${tomo1}#@BV:NSMFBINS@"
+		done
+	fi
 fi
 #}}}
 
