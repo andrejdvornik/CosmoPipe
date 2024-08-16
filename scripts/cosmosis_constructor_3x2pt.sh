@@ -1,13 +1,19 @@
 #=========================================
 #
-# File Name : cosmosis_constructor.sh
-# Created By : awright
-# Creation Date : 14-04-2023
-# Last Modified : Sun 03 Mar 2024 05:07:25 PM CET
+# File Name : cosmosis_constructor_3x2pt.sh
+# Created By : dvornik
+# Creation Date : 09-08-2024
+# Last Modified : Fri 16 Aug 2024 02:07:25 PM CEST
 #
 #=========================================
 #Script to generate a cosmosis .ini, values, & priors file 
 #Prepare the starting items {{{
+
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/ ]
+then
+    mkdir -p @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/
+fi
+
 IAMODEL="@BV:IAMODEL@"
 CHAINSUFFIX=@BV:CHAINSUFFIX@
 
@@ -51,6 +57,10 @@ STATISTIC="@BV:STATISTIC@"
 SAMPLER="@BV:SAMPLER@"
 BOLTZMAN="@BV:BOLTZMAN@"
 MODES="@BV:MODES@"
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
+NLENSBINS="@BV:NLENSBINS@"
+NSMFLENSBINS="@BV:NSMFLENSBINS@"
+NSMFBINS="@BV:NSMFBINS@"
 #Define the data file name {{{
 if [ "${BOLTZMAN^^}" == "HALO_MODEL" ]
 then
@@ -105,22 +115,22 @@ stats=""
 twopt_modules=""
 if [[ .*\ $MODES\ .* =~ " EE " ]]
 then
-  stats="${use_stats} En"
+  stats="${stats} En"
   twopt_modules="${twopt_modules} cosebis"
 fi
 if [[ .*\ $MODES\ .* =~ " NE " ]]
 then
-  stats="${use_stats} Psi_gm"
+  stats="${stats} Psi_gm"
   twopt_modules="${twopt_modules} psi_gm"
 fi
 if [[ .*\ $MODES\ .* =~ " NN " ]]
 then
-  stats="${use_stats} Psi_gg"
+  stats="${stats} Psi_gg"
   twopt_modules="${twopt_modules} psi_gg"
 fi
 if [[ .*\ $MODES\ .* =~ " OBS " ]]
 then
-  stats="${use_stats} 1pt"
+  stats="${stats} 1pt"
   twopt_modules="${twopt_modules} predict_observable"
 fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
@@ -172,10 +182,11 @@ WnLogPath = ${cosebis_configpath}/WnLog/
 EOF
 #}}}
 
+echo > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini
 #statistic {{{
 if [[ .*\ $MODES\ .* =~ " EE " ]]
 then
-cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [cosebis]
 file = %(2PT_STATS_PATH)s/cl_to_cosebis/cl_to_cosebis_interface.so
 theta_min = %(tmin_cosebis)s
@@ -184,7 +195,7 @@ n_max = %(nmax_cosebis)s
 Roots_n_Norms_FolderName = ${cosebis_configpath}/TLogsRootsAndNorms/
 Wn_Output_FolderName = %(WnLogPath)s
 Tn_Output_FolderName = %(2PT_STATS_PATH)s/TpnLog/
-output_section_name =  cosebis
+output_section_name = cosebis
 input_section_name = shear_cl
 add_2D_cterm = 0 ; (optional) DEFAULT is 0: do not add it
 add_c_term = 0
@@ -201,7 +212,7 @@ n_max = %(nmax_cosebis)s
 Roots_n_Norms_FolderName = ${cosebis_configpath}/TLogsRootsAndNorms/
 Wn_Output_FolderName = %(WnLogPath)s
 Tn_Output_FolderName = %(2PT_STATS_PATH)s/TpnLog/
-output_section_name =  cosebis_b
+output_section_name = cosebis_b
 input_section_name = shear_cl_bb
 add_2D_cterm = 0 ; (optional) DEFAULT is 0: do not add it
 add_c_term = 0
@@ -212,7 +223,7 @@ fi
 
 if [[ .*\ $MODES\ .* =~ " NE " ]]
 then
-cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [psi_gm]
 file = %(2PT_STATS_PATH)s/cl_to_psi/cl_to_psi_interface.so
 type = gm
@@ -224,7 +235,7 @@ n_max = %(nmax_cosebis)s
 ; l_max = 1e6
 W_output_folder_name = %(WnLogPath)s/WFilters/
 W_file_name = W_Psi
-output_section_name =  psi_stats_gm
+output_section_name = psi_stats_gm
 input_section_name = galaxy_shear_cl
 
 
@@ -233,7 +244,7 @@ fi
 
 if [[ .*\ $MODES\ .* =~ " NN " ]]
 then
-cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [psi_gg]
 file = %(2PT_STATS_PATH)s/cl_to_psi/cl_to_psi_interface.so
 type = gg
@@ -245,7 +256,7 @@ n_max = %(nmax_cosebis)s
 ; l_max = 1e6
 W_output_folder_name = %(WnLogPath)s/WFilters/
 W_file_name = W_Psi
-output_section_name =  psi_stats_gg
+output_section_name = psi_stats_gg
 input_section_name = galaxy_cl
 
 
@@ -262,26 +273,26 @@ stats=""
 twopt_modules=""
 if [[ .*\ $MODES\ .* =~ " EE " ]]
 then
-  stats="${use_stats} PeeE"
+  stats="${stats} PeeE"
   twopt_modules="${twopt_modules} bandpower_shear_e"
 fi
 if [[ .*\ $MODES\ .* =~ " NE " ]]
 then
-  stats="${use_stats} PneE"
+  stats="${stats} PneE"
   twopt_modules="${twopt_modules} bandpower_ggl"
 fi
 if [[ .*\ $MODES\ .* =~ " NN " ]]
 then
-  stats="${use_stats} Pnn"
+  stats="${stats} Pnn"
   twopt_modules="${twopt_modules} bandpower_clustering"
 fi
 if [[ .*\ $MODES\ .* =~ " OBS " ]]
 then
-  stats="${use_stats} 1pt"
+  stats="${stats} 1pt"
   twopt_modules="${twopt_modules} predict_observable"
 fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
-use_stats = %{stats}
+use_stats = ${stats}
 bandpower_clustering_extension_name = Pnn
 bandpower_ggl_extension_name = PneE
 bandpower_e_cosmic_shear_extension_name = PeeE
@@ -303,12 +314,12 @@ stats=""
 twopt_modules=""
 if [[ .*\ $MODES\ .* =~ " EE " ]]
 then
-  stats="${use_stats} PnnB"
+  stats="${stats} PnnB"
   twopt_modules="${twopt_modules} bandpower_shear_b"
 fi
 if [[ .*\ $MODES\ .* =~ " NE " ]]
 then
-  stats="${use_stats} PneB"
+  stats="${stats} PneB"
   twopt_modules="${twopt_modules} bandpower_ggl_b"
 fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini <<- EOF
@@ -328,12 +339,13 @@ fi
 theta_lo=`echo 'e(l(@BV:THETAMIN@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
 theta_up=`echo 'e(l(@BV:THETAMAX@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
 
+echo > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini
 if [[ .*\ $MODES\ .* =~ " EE " ]]
 then
 #Statistic {{{
 if [ "${STATISTIC^^}" == "BANDPOWERS" ]
 then 
-cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [bandpower_shear_e]
 file = %(2PT_STATS_PATH)s/band_powers/band_powers_interface.so
 type = cosmic_shear_e
@@ -353,7 +365,7 @@ input_section_name = shear_cl
 EOF
 elif [ "${STATISTIC^^}" == "BANDPOWERS_B" ]
 then 
-cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [bandpower_shear_e]
 file = %(2PT_STATS_PATH)s/band_powers/band_powers_interface.so
 type = cosmic_shear_e
@@ -401,7 +413,7 @@ then
 #Statistic {{{
 if [ "${STATISTIC^^}" == "BANDPOWERS" ]
 then
-cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [bandpower_ggl]
 file = %(2PT_STATS_PATH)s/band_powers/band_powers_interface.so
 type = ggl
@@ -421,7 +433,7 @@ input_section_name = galaxy_shear_cl
 EOF
 elif [ "${STATISTIC^^}" == "BANDPOWERS_B" ]
 then
-cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [bandpower_ggl]
 file = %(2PT_STATS_PATH)s/band_powers/band_powers_interface.so
 type = ggl
@@ -466,7 +478,7 @@ fi
 if [[ .*\ $MODES\ .* =~ " NN " ]]
 then
 #Statistic {{{
-cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [bandpower_clustering]
 file = %(2PT_STATS_PATH)s/band_powers/band_powers_interface.so
 type = clustering
@@ -495,8 +507,8 @@ then
   if [ "${SAMPLER^^}" == "LIST" ]
   then 
     #Keep consistency between plus and minus 
-    ximinus_min=@BV:THETAMINXI@
-    ximinus_max=@BV:THETAMAXXI@
+    ximinus_min=@BV:THETAMIN@
+    ximinus_max=@BV:THETAMAX@
   else 
     #Use the appropriate scale cut  
     ximinus_min=@BV:THETAMINM@
@@ -507,22 +519,22 @@ then
   twopt_modules=""
   if [[ .*\ $MODES\ .* =~ " EE " ]]
   then
-    stats="${use_stats} xiP xiM"
+    stats="${stats} xiP xiM"
     twopt_modules="${twopt_modules} xi"
   fi
   if [[ .*\ $MODES\ .* =~ " NE " ]]
   then
-    stats="${use_stats} gT"
+    stats="${stats} gT"
     twopt_modules="${twopt_modules} gt"
   fi
   if [[ .*\ $MODES\ .* =~ " NN " ]]
   then
-    stats="${use_stats} wTh"
+    stats="${stats} wTh"
     twopt_modules="${twopt_modules} wth"
   fi
   if [[ .*\ $MODES\ .* =~ " OBS " ]]
   then
-    stats="${use_stats} 1pt"
+    stats="${stats} 1pt"
     twopt_modules="${twopt_modules} predict_observable"
   fi
   
@@ -548,10 +560,11 @@ keep_ang_xiM  = ${ximinus_min}  ${ximinus_max}
 EOF
 #}}}
 
+echo > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini
 #statistic {{{
 if [[ .*\ $MODES\ .* =~ " EE " ]]
 then
-cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [xi]
 file = %(CSL_PATH)s/shear/cl_to_xi_fullsky/cl_to_xi_interface.py
 n_theta_bins = @BV:NTHETAREBIN@
@@ -569,7 +582,7 @@ fi
 
 if [[ .*\ $MODES\ .* =~ " NE " ]]
 then
-cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [gt]
 file = %(CSL_PATH)s/shear/cl_to_xi_fullsky/cl_to_xi_interface.py
 n_theta_bins = @BV:NTHETAREBIN@
@@ -587,7 +600,7 @@ fi
 
 if [[ .*\ $MODES\ .* =~ " NN " ]]
 then
-cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
+cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [wth]
 file = %(CSL_PATH)s/shear/cl_to_xi_fullsky/cl_to_xi_interface.py
 n_theta_bins = @BV:NTHETAREBIN@
@@ -719,7 +732,7 @@ then
     #if [ "${var}" == "s_8_input" ] || [ "${var}" == "omch2" ] || [ "${var}" == "ombh2" ] || [ "${var:0:1}" == "[" ] || [ "${var}" == "" ] 
     if [ "${var}" == "s_8_input" ] || [ "${var}" == "omch2" ] || [ "${var:0:1}" == "[" ] || [ "${var}" == "" ] 
     then 
-      #we have a variable we want, or a block definition, or an empty line: Reproduce the line 
+      #we have a variable we want, or a block definition, or an empty line: Reproduce the line
       echo ${line} >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values_fixed.ini
     else 
       #we have a variable we don't want: Print the variable with the expectation value only 
@@ -923,56 +936,56 @@ modulelist=`echo ${COSMOSIS_PIPELINE} | sed 's/ /\n/g' | sort | uniq | awk '{pri
 for module in ${modulelist}
 do 
   case ${module} in
-    "correlated_dz_priors") #{{{
-            shifts_source=""
-            unc_shifts=""
-            for i in `seq ${NTOMO}`
-            do
-                shifts_source="${shifts_source} nofz_shifts/bias_${i}"
-                unc_shifts="${unc_shifts} nofz_shifts/uncorr_bias_${i}"
-            done
+	"correlated_dz_priors") #{{{
+			shifts_source=""
+			unc_shifts=""
+			for i in `seq ${NTOMO}`
+			do
+				shifts_source="${shifts_source} nofz_shifts/bias_${i}"
+				unc_shifts="${unc_shifts} nofz_shifts/uncorr_bias_${i}"
+			done
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(KCAP_PATH)s/utils/correlated_priors.py
 			uncorrelated_parameters = ${unc_shifts}
 			output_parameters = ${shifts_source}
-			covariance = @DB:nzcov@
+			#covariance = @DB:nzcov@
 			
 			EOF
 			;; #}}}
-    "extrapolate") #{{{
+	"extrapolate") #{{{
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(CSL_PATH)s/boltzmann/extrapolate/extrapolate_power.py
 			kmax = 1e8
-            nmax = 0
+			nmax = 0
 			
 			EOF
 			;; #}}}
-    "load_nz_fits") #{{{
-            sets=""
-            if [[ .*\ $MODES\ .* =~ " EE " ]] || [[ .*\ $MODES\ .* =~ " NE " ]]
-            then
-                sets="${sets} %(redshift_name)s"
-            fi
-            if [[ .*\ $MODES\ .* =~ " NE " ]] || [[ .*\ $MODES\ .* =~ " NN " ]]
-            then
-                sets="${sets} %(redshift_name_lens)s"
-            fi
-            if [[ .*\ $MODES\ .* =~ " OBS " ]]
-            then
-                sets="${sets} %(redshift_name_obs)s"
-            fi
+	"load_nz_fits") #{{{
+			sets=""
+			if [[ .*\ $MODES\ .* =~ " EE " ]] || [[ .*\ $MODES\ .* =~ " NE " ]]
+			then
+			    sets="${sets} %(redshift_name)s"
+			fi
+			if [[ .*\ $MODES\ .* =~ " NE " ]] || [[ .*\ $MODES\ .* =~ " NN " ]]
+			then
+			    sets="${sets} %(redshift_name_lens)s"
+			fi
+			if [[ .*\ $MODES\ .* =~ " OBS " ]]
+			then
+			    sets="${sets} %(redshift_name_obs)s"
+			fi
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(CSL_PATH)s/number_density/load_nz_fits/load_nz_fits.py
 			nz_file = %(data_file)s
-			data_sets = ${sets}
+			data_sets =${sets}
 			
 			EOF
 			;; #}}}
-    "source_photoz_bias") #{{{
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+	"source_photoz_bias") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(CSL_PATH)s/number_density/photoz_bias/photoz_bias.py
 			mode = additive
@@ -984,505 +997,520 @@ do
 			
 			EOF
 			;; #}}}
-    "halo_model_ingredients") #{{{
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file = %(HMPATH)s/halo_model_ingredients.py
-            log_mass_min = %(logmassmin_def)s
-            log_mass_max = %(logmassmax_def)s
-            nmass = %(nmass_def)s
-            zmin= %(zmin_def)s
-            zmax= %(zmax_def)s
-            nz= %(nz_def)s
-            hmf_model =  Tinker10
-            bias_model =  Tinker10
-            mdef_model =  SOMean
-            overdensity = 200
-            delta_c = 1.686
-            cm_model = duffy08
-            use_mead2020_corrections = fit_feedback
-            nk = %(nk_def)s
-            profile = NFW ; Not yet implemented here
-            
-            EOF
-            ;; #}}}
-    "halo_model_ingredients_halomod") #{{{
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file = %(HMPATH)s/halo_model_ingredients_halomod.py
-            log_mass_min = %(logmassmin_def)s
-            log_mass_max = %(logmassmax_def)s
-            nmass = %(nmass_def)s
-            zmin= %(zmin_def)s
-            zmax= %(zmax_def)s
-            nz= %(nz_def)s
-            hmf_model =  Tinker10
-            bias_model =  Tinker10
-            mdef_model =  SOMean
-            overdensity = 200
-            delta_c = 1.686
-            cm_model = duffy08
-            use_mead2020_corrections = fit_feedback
-            nk = %(nk_def)s
-            profile = NFW
-            
-            EOF
-            ;; #}}}
-    "hod") #{{{
-            obs_mins=""
-            obs_maxs=""
-            z_mins=""
-            z_maxs=""
-            slice=`grep '^slice_in' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB1.txt | awk '{printf $2}'`
-            if [ "${slice}" == "obs" ]
-            then
-                for i in `seq ${NSMFLENSBINS}`
-                do
-                    obs_mins="${obs_mins} `grep '^x_lims_lo' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                    obs_maxs="${obs_maxs} `grep '^x_lims_hi' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                    z_mins="${z_mins} `grep '^y_lims_lo' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                    z_maxs="${z_maxs} `grep '^y_lims_hi' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-            elif [ "${slice}" == "z" ]
-            then
-                for i in `seq ${NSMFLENSBINS}`
-                do
-                    obs_mins="${obs_mins} `grep '^y_lims_lo' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                    obs_maxs="${obs_maxs} `grep '^y_lims_hi' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                    z_mins="${z_mins} `grep '^x_lims_lo' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                    z_maxs="${z_maxs} `grep '^x_lims_hi' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-            else
-                _message "Got wrong or no information about slicing of the lens sample.\n"
-                exit 1
-            fi
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file = %(HMPATH)s/hod_interface.py
-            observable_section_name = stellar_mass_function
-            save_observable = False
-            do_galaxy_linear_bias = False
-            hod_section_name = hod
-            values_name = hod_parameters
-            nobs = 200
-            obs_min = ${obs_mins}
-            obs_max = ${obs_maxs}
-            zmin = ${z_mins}
-            zmax = ${z_maxs}
-            nz = %(nz_def)s
-            log_mass_min = %(logmassmin_def)s
-            log_mass_max = %(logmassmax_def)s
-            nmass = %(nmass_def)s
-            observable_mode = obs_z
-            
-            EOF
-            ;; #}}}
-    "hod_smf") #{{{
-            obs_mins=""
-            obs_maxs=""
-            z_mins=""
-            z_maxs=""
-            slice=`grep '^slice_in' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB1.txt | awk '{printf $2}'`
-            if [ "${slice}" == "obs" ]
-            then
-                for i in `seq ${NSMFLENSBINS}`
-                do
-                    obs_mins="${obs_mins} `grep '^x_lims_lo' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                    obs_maxs="${obs_maxs} `grep '^x_lims_hi' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                    z_mins="${z_mins} `grep '^y_lims_lo' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                    z_maxs="${z_maxs} `grep '^y_lims_hi' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                done
-            elif [ "${slice}" == "z" ]
-            then
-                for i in `seq ${NSMFLENSBINS}`
-                do
-                    obs_mins="${obs_mins} `grep '^y_lims_lo' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                    obs_maxs="${obs_maxs} `grep '^y_lims_hi' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                    z_mins="${z_mins} `grep '^x_lims_lo' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                    z_maxs="${z_maxs} `grep '^x_lims_hi' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                done
-            else
-                _message "Got wrong or no information about slicing of the lens sample.\n"
-                exit 1
-            fi
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file = %(HMPATH)s/hod_interface.py
-            observable_section_name = stellar_mass_function
-            save_observable = True
-            do_galaxy_linear_bias = False
-            hod_section_name = hod_smf
-            values_name = hod_parameters
-            nobs = 200
-            obs_min = ${obs_mins}
-            obs_max = ${obs_maxs}
-            zmin = ${z_mins}
-            zmax = ${z_maxs}
-            nz = %(nz_def)s
-            log_mass_min = %(logmassmin_def)s
-            log_mass_max = %(logmassmax_def)s
-            nmass = %(nmass_def)s
-            observable_mode = obs_z
-            
-            EOF
-            ;; #}}}
-    "hod_ia_red") #{{{
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file = %(HMPATH)s/hod_interface.py
-            observables_file = path_to_smf_function??
-            observable_section_name = stellar_mass_function
-            save_observable = False
-            do_galaxy_linear_bias = False
-            hod_section_name = hod_ia_red
-            values_name = hod_parameters_ia
-            nobs = 200
-            nz = %(nz_def)s
-            log_mass_min = %(logmassmin_def)s
-            log_mass_max = %(logmassmax_def)s
-            nmass = %(nmass_def)s
-            observable_mode = obs_onebin
-            
-            EOF
-            ;; #}}}
-    "hod_ia_blue") #{{{
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file = %(HMPATH)s/hod_interface.py
-            observables_file = path_to_smf_function??
-            observable_section_name = stellar_mass_function
-            save_observable = False
-            do_galaxy_linear_bias = False
-            hod_section_name = hod_ia_blue
-            values_name = hod_parameters_ia
-            nobs = 200
-            nz = %(nz_def)s
-            log_mass_min = %(logmassmin_def)s
-            log_mass_max = %(logmassmax_def)s
-            nmass = %(nmass_def)s
-            observable_mode = obs_onebin
-            
-            EOF
-            ;; #}}}
-    "predict_observable") #{{{
-            obs_mins=""
-            obs_maxs=""
-            slice=`grep '^slice_in' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB1.txt | awk '{printf $2}'`
-            suffix=`seq -s ' ' ${NSMFLENSBINS}`
-            if [ "${slice}" == "obs" ]
-            then
-                for i in `seq ${NSMFLENSBINS}`
-                do
-                    obs_mins="${obs_mins} `grep '^x_lims_lo' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                    obs_maxs="${obs_maxs} `grep '^x_lims_hi' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                done
-            elif [ "${slice}" == "z" ]
-            then
-                for i in `seq ${NSMFLENSBINS}`
-                do
-                    obs_mins="${obs_mins} `grep '^y_lims_lo' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                    obs_maxs="${obs_maxs} `grep '^y_lims_hi' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt | awk '{printf $2}'`"
-                done
-            else
-                _message "Got wrong or no information about slicing of the lens sample.\n"
-                exit 1
-            fi
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file = %(HMPATH)s/predict_observable.py
-            input_section_name = stellar_mass_function
-            output_section_name = one_point
-            suffixes = ${suffix}
-            sample = nz_obs
-            obs_min = ${obs_mins}
-            obs_max = ${obs_maxs}
-            n_obs = ${NSMFBINS}
-            edges = True
-            
-            EOF
-            ;; #}}}
-    "bnl") #{{{
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file= %(HMPATH)s/bnl_interface.py
-            log_mass_min = %(logmassmin_def)s
-            log_mass_max = %(logmassmax_def)s
-            nmass = %(nmass_def)s
-            zmin = %(zmin_def)s
-            zmax = %(zmax_def)s
-            nz = %(nz_def)s
-            nk = %(nk_def)s
-            bnl = %(beta_nl)s
-            interpolate_bnl = True
-            update_bnl = 10
-            
-            EOF
-            ;; #}}}
-    "bnl_cosmopower") #{{{
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file= %(HMPATH)s/bnl_interface_cosmopower.py
-            log_mass_min = %(logmassmin_def)s
-            log_mass_max = %(logmassmax_def)s
-            nmass = %(nmass_def)s
-            zmin = %(zmin_def)s
-            zmax = %(zmax_def)s
-            nz = %(nz_def)s
-            kmax = 10.0
-            kmin = 1e-5
-            nk = %(nk_def)s
-            use_specific_k_modes = True
-            path_2_trained_emulator = path/to/bnl_emulator_v3
-            bnl = %(beta_nl)s
-            
-            EOF
-            ;; #}}}
-    "bnl_delete") #{{{
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file = %(HMPATH)s/bnl_interface_delete.py
-            
-            EOF
-            ;; #}}}
-    "pk") #{{{
-            if [[ .*\ $MODES\ .* =~ " EE " ]]
-            then
-                ee="True"
-            else
-                ee="False"
-            fi
-            if [[ .*\ $MODES\ .* =~ " NE " ]]
-            then
-                ne="True"
-            else
-                ne="False"
-            fi
-            if [[ .*\ $MODES\ .* =~ " NN " ]]
-            then
-                nn="True"
-            else
-                nn="False"
-            fi
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file= %(HMPATH)s/pk_interface.py
-            log_mass_min = %(logmassmin_def)s
-            log_mass_max = %(logmassmax_def)s
-            nmass = %(nmass_def)s
-            zmin = %(zmin_def)s
-            zmax = %(zmax_def)s
-            nz = %(nz_def)s
-            nk = %(nk_def)s
-            bnl =  %(beta_nl)s
-            p_mm = ${ee}
-            p_gg = ${nn}
-            p_gm = ${ne}
-            p_gI = False
-            p_mI = False
-            p_II = False
-            two_halo_only = False
-            hod_section_name = hod
-            output_suffix =
-            poisson_type = scalar
-            point_mass = True
-            dewiggle = True
-            
-            EOF
-            ;; #}}}
-    "pk_ia_red") #{{{
-            if [[ .*\ $MODES\ .* =~ " EE " ]]
-            then
-                ee="True"
-            else
-                ee="False"
-            fi
-            if [[ .*\ $MODES\ .* =~ " NE " ]]
-            then
-                ne="True"
-            else
-                ne="False"
-            fi
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file= %(HMPATH)s/pk_interface.py
-            log_mass_min = %(logmassmin_def)s
-            log_mass_max = %(logmassmax_def)s
-            nmass = %(nmass_def)s
-            zmin = %(zmin_def)s
-            zmax = %(zmax_def)s
-            nz = %(nz_def)s
-            nk = %(nk_def)s
-            bnl =  %(beta_nl)s
-            p_mm = False
-            p_gg = False
-            p_gm = False
-            p_gI = ${ne}
-            p_mI = ${ee}
-            p_II = ${ee}
-            two_halo_only = False
-            hod_section_name = hod_ia_red
-            output_suffix = ia_red
-            poisson_type = scalar
-            point_mass = False
-            dewiggle = True
-            
-            EOF
-            ;; #}}}
-    "pk_ia_blue") #{{{
-            if [[ .*\ $MODES\ .* =~ " EE " ]]
-            then
-                ee="True"
-            else
-                ee="False"
-            fi
-            if [[ .*\ $MODES\ .* =~ " NE " ]]
-            then
-                ne="True"
-            else
-                ne="False"
-            fi
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file= %(HMPATH)s/pk_interface.py
-            log_mass_min = %(logmassmin_def)s
-            log_mass_max = %(logmassmax_def)s
-            nmass = %(nmass_def)s
-            zmin = %(zmin_def)s
-            zmax = %(zmax_def)s
-            nz = %(nz_def)s
-            nk = %(nk_def)s
-            bnl =  %(beta_nl)s
-            p_mm = False
-            p_gg = False
-            p_gm = False
-            p_gI = ${ne}
-            p_mI = ${ee}
-            p_II = ${ee}
-            two_halo_only = False
-            hod_section_name = hod_ia_blue
-            output_suffix = ia_blue
-            poisson_type = scalar
-            point_mass = False
-            dewiggle = True
-            
-            EOF
-            ;; #}}}
-    "add_and_upsample") #{{{
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file = %(HMPATH)s/add_and_upsample.py
-            ; f_red_file =
-            do_p_mm = extrapolate
-            do_p_gg = extrapolate
-            do_p_gm = extrapolate
-            do_p_gI = False
-            do_p_mI = False
-            do_p_II = False
-            input_power_suffix_extrap = hod
-            hod_section_name_extrap =
-            
-            EOF
-            ;; #}}}
-    "add_and_upsample_ia") #{{{
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file = %(HMPATH)s/add_and_upsample.py
-            f_red_file = path/to/red_fraction_file ; two columns: z f_red(z)
-            do_p_mm = False
-            do_p_gg = False
-            do_p_gm = False
-            do_p_gI = add_and_extrapolate
-            do_p_mI = add_and_extrapolate
-            do_p_II = add_and_extrapolate
-            input_power_suffix_extrap = ia_red
-            input_power_suffix_red = ia_red
-            input_power_suffix_blue = ia_blue
-            hod_section_name_extrap = hod_ia_red
-            hod_section_name_red = hod_ia_red
-            hod_section_name_blue = hod_ia_blue
-            
-            EOF
-            ;; #}}}
-    "alignment_red") #{{{
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file = %(HMPATH)s/ia_amplitudes.py
-            central_IA_depends_on = halo_mass
-            satellite_IA_depends_on = halo_mass
-            zmin= %(zmin_def)s
-            zmax= %(zmax_def)s
-            nz = %(nz_def)s
-            output_suffix = ia_red
-            
-            EOF
-            ;; #}}}
-    "radial_satellite_alignment_red") #{{{
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file = %(HMPATH)s/ia_radial_interface.py
-            zmin = %(zmin_def)s
-            zmax = %(zmax_def)s
-            nz = %(nz_def)s
-            log_mass_min = %(logmassmin_def)s
-            log_mass_max = %(logmassmax_def)s
-            ; nmass = %(nmass_def)s
-            ; kmin = 0.0001
-            ; kmax = 1000.
-            ; nk = 1000
-            output_suffix = ia_red
-            
-            EOF
-            ;; #}}}
-    "alignment_blue") #{{{
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file = %(HMPATH)s/ia_amplitudes.py
-            central_IA_depends_on = halo_mass
-            satellite_IA_depends_on = halo_mass
-            zmin= %(zmin_def)s
-            zmax= %(zmax_def)s
-            nz = %(nz_def)s
-            output_suffix = ia_blue
-            
-            EOF
-            ;; #}}}
-    "radial_satellite_alignment_blue") #{{{
-            cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-            [$module]
-            file = %(HMPATH)s/ia_radial_interface.py
-            zmin = %(zmin_def)s
-            zmax = %(zmax_def)s
-            nz = %(nz_def)s
-            log_mass_min = %(logmassmin_def)s
-            log_mass_max = %(logmassmax_def)s
-            ; nmass = %(nmass_def)s
-            ; kmin = 0.0001
-            ; kmax = 1000.
-            ; nk = 1000
-            output_suffix = ia_blue
-            
-            EOF
-            ;; #}}}
-    "linear_alignment") #{{{
-            if [[ .*\ $MODES\ .* =~ " NE " ]]
-            then
-                ne="True"
-            else
-                ne="False"
-            fi
+	"halo_model_ingredients") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(HMPATH)s/halo_model_ingredients.py
+			log_mass_min = %(logmassmin_def)s
+			log_mass_max = %(logmassmax_def)s
+			nmass = %(nmass_def)s
+			zmin= %(zmin_def)s
+			zmax= %(zmax_def)s
+			nz= %(nz_def)s
+			hmf_model =  Tinker10
+			bias_model =  Tinker10
+			mdef_model =  SOMean
+			overdensity = 200
+			delta_c = 1.686
+			cm_model = duffy08
+			use_mead2020_corrections = fit_feedback
+			nk = %(nk_def)s
+			profile = NFW ; Not yet implemented here
+			
+			EOF
+			;; #}}}
+	"halo_model_ingredients_halomod") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(HMPATH)s/halo_model_ingredients_halomod.py
+			log_mass_min = %(logmassmin_def)s
+			log_mass_max = %(logmassmax_def)s
+			nmass = %(nmass_def)s
+			zmin= %(zmin_def)s
+			zmax= %(zmax_def)s
+			nz= %(nz_def)s
+			hmf_model =  Tinker10
+			bias_model =  Tinker10
+			mdef_model =  SOMean
+			overdensity = 200
+			delta_c = 1.686
+			cm_model = duffy08
+			use_mead2020_corrections = fit_feedback
+			nk = %(nk_def)s
+			profile = NFW
+			
+			EOF
+			;; #}}}
+	"hod") #{{{
+			obs_mins=""
+			obs_maxs=""
+			z_mins=""
+			z_maxs=""
+			file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB1.txt"
+			slice=`grep '^slice_in' ${file1} | awk '{printf $2}'`
+			if [ "${slice}" == "obs" ]
+			then
+				for i in `seq ${NLENSBINS}`
+				do
+					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt"
+					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
+					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
+					obs_mins="${obs_mins} ${x_lo}"
+					obs_maxs="${obs_maxs} ${x_hi}"
+					z_mins="${z_mins} ${y_lo}"
+					z_maxs="${z_maxs} ${y_hi}"
+				done
+			elif [ "${slice}" == "z" ]
+			then
+				for i in `seq ${NLENSBINS}`
+				do
+					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt"
+					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
+					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
+					obs_mins="${obs_mins} ${y_lo}"
+					obs_maxs="${obs_maxs} ${y_hi}"
+					z_mins="${z_mins} ${x_lo}"
+					z_maxs="${z_maxs} ${x_hi}"
+				done
+			else
+				_message "Got wrong or no information about slicing of the lens sample.\n"
+				#exit 1
+			fi
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(HMPATH)s/hod_interface.py
+			observable_section_name = stellar_mass_function
+			save_observable = False
+			do_galaxy_linear_bias = False
+			hod_section_name = hod
+			values_name = hod_parameters
+			nobs = 200
+			obs_min =${obs_mins}
+			obs_max =${obs_maxs}
+			zmin =${z_mins}
+			zmax =${z_maxs}
+			nz = %(nz_def)s
+			log_mass_min = %(logmassmin_def)s
+			log_mass_max = %(logmassmax_def)s
+			nmass = %(nmass_def)s
+			observable_mode = obs_z
+			
+			EOF
+			;; #}}}
+	"hod_smf") #{{{
+			obs_mins=""
+			obs_maxs=""
+			z_mins=""
+			z_maxs=""
+			file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB1.txt"
+			slice=`grep '^slice_in' ${file1} | awk '{printf $2}'`
+			if [ "${slice}" == "obs" ]
+			then
+				for i in `seq ${NSMFLENSBINS}`
+				do
+					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
+					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
+					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
+					obs_mins="${obs_mins} ${x_lo}"
+					obs_maxs="${obs_maxs} ${x_hi}"
+					z_mins="${z_mins} ${y_lo}"
+					z_maxs="${z_maxs} ${y_hi}"
+				done
+			elif [ "${slice}" == "z" ]
+			then
+				for i in `seq ${NSMFLENSBINS}`
+				do
+					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
+					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
+					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
+					obs_mins="${obs_mins} ${y_lo}"
+					obs_maxs="${obs_maxs} ${y_hi}"
+					z_mins="${z_mins} ${x_lo}"
+					z_maxs="${z_maxs} ${x_hi}"
+				done
+			else
+				_message "Got wrong or no information about slicing of the lens sample.\n"
+				#exit 1
+			fi
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(HMPATH)s/hod_interface.py
+			observable_section_name = stellar_mass_function
+			save_observable = True
+			do_galaxy_linear_bias = False
+			hod_section_name = hod_smf
+			values_name = hod_parameters
+			nobs = 200
+			obs_min = ${obs_mins}
+			obs_max = ${obs_maxs}
+			zmin = ${z_mins}
+			zmax = ${z_maxs}
+			nz = %(nz_def)s
+			log_mass_min = %(logmassmin_def)s
+			log_mass_max = %(logmassmax_def)s
+			nmass = %(nmass_def)s
+			observable_mode = obs_z
+			
+			EOF
+			;; #}}}
+	"hod_ia_red") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(HMPATH)s/hod_interface.py
+			observables_file = path_to_smf_function??
+			observable_section_name = stellar_mass_function
+			save_observable = False
+			do_galaxy_linear_bias = False
+			hod_section_name = hod_ia_red
+			values_name = hod_parameters_ia
+			nobs = 200
+			nz = %(nz_def)s
+			log_mass_min = %(logmassmin_def)s
+			log_mass_max = %(logmassmax_def)s
+			nmass = %(nmass_def)s
+			observable_mode = obs_onebin
+			
+			EOF
+			;; #}}}
+	"hod_ia_blue") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(HMPATH)s/hod_interface.py
+			observables_file = path_to_smf_function??
+			observable_section_name = stellar_mass_function
+			save_observable = False
+			do_galaxy_linear_bias = False
+			hod_section_name = hod_ia_blue
+			values_name = hod_parameters_ia
+			nobs = 200
+			nz = %(nz_def)s
+			log_mass_min = %(logmassmin_def)s
+			log_mass_max = %(logmassmax_def)s
+			nmass = %(nmass_def)s
+			observable_mode = obs_onebin
+			
+			EOF
+			;; #}}}
+	"predict_observable") #{{{
+			obs_mins=""
+			obs_maxs=""
+			suffix=`seq -s ' ' ${NSMFLENSBINS}`
+			file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB1.txt"
+			slice=`grep '^slice_in' ${file1} | awk '{printf $2}'`
+			if [ "${slice}" == "obs" ]
+			then
+				for i in `seq ${NSMFLENSBINS}`
+				do
+					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
+					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
+					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
+					obs_mins="${obs_mins} ${x_lo}"
+					obs_maxs="${obs_maxs} ${x_hi}"
+					z_mins="${z_mins} ${y_lo}"
+					z_maxs="${z_maxs} ${y_hi}"
+				done
+			elif [ "${slice}" == "z" ]
+			then
+				for i in `seq ${NSMFLENSBINS}`
+				do
+					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
+					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
+					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
+					obs_mins="${obs_mins} ${y_lo}"
+					obs_maxs="${obs_maxs} ${y_hi}"
+					z_mins="${z_mins} ${x_lo}"
+					z_maxs="${z_maxs} ${x_hi}"
+				done
+			else
+				_message "Got wrong or no information about slicing of the lens sample.\n"
+				#exit 1
+			fi
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(HMPATH)s/predict_observable.py
+			input_section_name = stellar_mass_function
+			output_section_name = one_point
+			suffixes = ${suffix}
+			sample = nz_obs
+			obs_min =${obs_mins}
+			obs_max =${obs_maxs}
+			n_obs = ${NSMFBINS}
+			edges = True
+			
+			EOF
+			;; #}}}
+	"bnl") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file= %(HMPATH)s/bnl_interface.py
+			log_mass_min = %(logmassmin_def)s
+			log_mass_max = %(logmassmax_def)s
+			nmass = %(nmass_def)s
+			zmin = %(zmin_def)s
+			zmax = %(zmax_def)s
+			nz = %(nz_def)s
+			nk = %(nk_def)s
+			bnl = %(beta_nl)s
+			interpolate_bnl = True
+			update_bnl = 10
+			
+			EOF
+			;; #}}}
+	"bnl_cosmopower") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file= %(HMPATH)s/bnl_interface_cosmopower.py
+			log_mass_min = %(logmassmin_def)s
+			log_mass_max = %(logmassmax_def)s
+			nmass = %(nmass_def)s
+			zmin = %(zmin_def)s
+			zmax = %(zmax_def)s
+			nz = %(nz_def)s
+			kmax = 10.0
+			kmin = 1e-5
+			nk = %(nk_def)s
+			use_specific_k_modes = True
+			path_2_trained_emulator = path/to/bnl_emulator_v3
+			bnl = %(beta_nl)s
+			
+			EOF
+			;; #}}}
+	"bnl_delete") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(HMPATH)s/bnl_interface_delete.py
+			
+			EOF
+			;; #}}}
+	"pk") #{{{
+			if [[ .*\ $MODES\ .* =~ " EE " ]]
+			then
+				ee="True"
+			else
+				ee="False"
+			fi
+			if [[ .*\ $MODES\ .* =~ " NE " ]]
+			then
+				ne="True"
+			else
+				ne="False"
+			fi
+			if [[ .*\ $MODES\ .* =~ " NN " ]]
+			then
+				nn="True"
+			else
+				nn="False"
+			fi
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file= %(HMPATH)s/pk_interface.py
+			bnl =  %(beta_nl)s
+			p_mm = ${ee}
+			p_gg = ${nn}
+			p_gm = ${ne}
+			p_gI = False
+			p_mI = False
+			p_II = False
+			hod_section_name = hod
+			output_suffix =
+			poisson_type = scalar
+			point_mass = True
+			dewiggle = True
+			
+			EOF
+			;; #}}}
+	"pk_ia_red") #{{{
+			if [[ .*\ $MODES\ .* =~ " EE " ]]
+			then
+				ee="True"
+			else
+				ee="False"
+			fi
+			if [[ .*\ $MODES\ .* =~ " NE " ]]
+			then
+				ne="True"
+			else
+				ne="False"
+			fi
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file= %(HMPATH)s/pk_interface.py
+			bnl =  %(beta_nl)s
+			p_mm = False
+			p_gg = False
+			p_gm = False
+			p_gI = ${ne}
+			p_mI = ${ee}
+			p_II = ${ee}
+			hod_section_name = hod_ia_red
+			output_suffix = ia_red
+			poisson_type = scalar
+			point_mass = False
+			dewiggle = True
+			
+			EOF
+			;; #}}}
+	"pk_ia_blue") #{{{
+			if [[ .*\ $MODES\ .* =~ " EE " ]]
+			then
+				ee="True"
+			else
+				ee="False"
+			fi
+			if [[ .*\ $MODES\ .* =~ " NE " ]]
+			then
+				ne="True"
+			else
+				ne="False"
+			fi
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file= %(HMPATH)s/pk_interface.py
+			bnl =  %(beta_nl)s
+			p_mm = False
+			p_gg = False
+			p_gm = False
+			p_gI = ${ne}
+			p_mI = ${ee}
+			p_II = ${ee}
+			hod_section_name = hod_ia_blue
+			output_suffix = ia_blue
+			poisson_type = scalar
+			point_mass = False
+			dewiggle = True
+			
+			EOF
+			;; #}}}
+	"add_and_upsample") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(HMPATH)s/add_and_upsample.py
+			; f_red_file =
+			do_p_mm = extrapolate
+			do_p_gg = extrapolate
+			do_p_gm = extrapolate
+			do_p_gI = False
+			do_p_mI = False
+			do_p_II = False
+			input_power_suffix_extrap = hod
+			hod_section_name_extrap =
+			
+			EOF
+			;; #}}}
+	"add_and_upsample_ia") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(HMPATH)s/add_and_upsample.py
+			f_red_file = path/to/red_fraction_file ; two columns: z f_red(z)
+			do_p_mm = False
+			do_p_gg = False
+			do_p_gm = False
+			do_p_gI = add_and_extrapolate
+			do_p_mI = add_and_extrapolate
+			do_p_II = add_and_extrapolate
+			input_power_suffix_extrap = ia_red
+			input_power_suffix_red = ia_red
+			input_power_suffix_blue = ia_blue
+			hod_section_name_extrap = hod_ia_red
+			hod_section_name_red = hod_ia_red
+			hod_section_name_blue = hod_ia_blue
+			
+			EOF
+			;; #}}}
+	"alignment_red") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(HMPATH)s/ia_amplitudes.py
+			central_IA_depends_on = halo_mass
+			satellite_IA_depends_on = halo_mass
+			zmin= %(zmin_def)s
+			zmax= %(zmax_def)s
+			nz = %(nz_def)s
+			output_suffix = ia_red
+			
+			EOF
+			;; #}}}
+	"radial_satellite_alignment_red") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(HMPATH)s/ia_radial_interface.py
+			zmin = %(zmin_def)s
+			zmax = %(zmax_def)s
+			nz = %(nz_def)s
+			log_mass_min = %(logmassmin_def)s
+			log_mass_max = %(logmassmax_def)s
+			; nmass = %(nmass_def)s
+			; kmin = 0.0001
+			; kmax = 1000.
+			; nk = 1000
+			output_suffix = ia_red
+			
+			EOF
+			;; #}}}
+	"alignment_blue") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(HMPATH)s/ia_amplitudes.py
+			central_IA_depends_on = halo_mass
+			satellite_IA_depends_on = halo_mass
+			zmin= %(zmin_def)s
+			zmax= %(zmax_def)s
+			nz = %(nz_def)s
+			output_suffix = ia_blue
+			
+			EOF
+			;; #}}}
+	"radial_satellite_alignment_blue") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(HMPATH)s/ia_radial_interface.py
+			zmin = %(zmin_def)s
+			zmax = %(zmax_def)s
+			nz = %(nz_def)s
+			log_mass_min = %(logmassmin_def)s
+			log_mass_max = %(logmassmax_def)s
+			; nmass = %(nmass_def)s
+			; kmin = 0.0001
+			; kmax = 1000.
+			; nk = 1000
+			output_suffix = ia_blue
+			
+			EOF
+			;; #}}}
+	"linear_alignment") #{{{
+			if [[ .*\ $MODES\ .* =~ " NE " ]]
+			then
+				ne="True"
+			else
+				ne="False"
+			fi
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(CSL_PATH)s/intrinsic_alignments/la_model/linear_alignments_interface.py
 			method = bk_corrected
-            do_galaxy_intrinsic=${ne}
+			do_galaxy_intrinsic=${ne}
 			
 			EOF
 			;; #}}}
 	"tatt") #{{{
-            if [[ .*\ $MODES\ .* =~ " NE " ]]
-            then
-                ne="True"
-            else
-                ne="False"
-            fi
+			if [[ .*\ $MODES\ .* =~ " NE " ]]
+			then
+				ne="True"
+			else
+				ne="False"
+			fi
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(CSL_PATH)s/intrinsic_alignments/tatt/tatt_interface.py
@@ -1506,7 +1534,7 @@ do
 			file = @RUNROOT@/INSTALL/ia_models/mass_dependent_ia/mass_dependent_ia_model.py
 			
 			EOF
-			;; #}}}		
+			;; #}}}
 	"fast_pt") #{{{
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
@@ -1518,18 +1546,18 @@ do
 			EOF
 			;; #}}}
 	"add_intrinsic") #{{{
-            if [[ .*\ $MODES\ .* =~ " EE " ]]
-            then
-                ee="True"
-            else
-                ee="False"
-            fi
-            if [[ .*\ $MODES\ .* =~ " NE " ]]
-            then
-                ne="True"
-            else
-                ne="False"
-            fi
+			if [[ .*\ $MODES\ .* =~ " EE " ]]
+			then
+				ee="True"
+			else
+				ee="False"
+			fi
+			if [[ .*\ $MODES\ .* =~ " NE " ]]
+			then
+				ne="True"
+			else
+				ne="False"
+			fi
 			add_intrinsic=True
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
@@ -1540,7 +1568,7 @@ do
 			
 			EOF
 			;; #}}}
-    "projection") #{{{
+	"projection") #{{{
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(CSL_PATH)s/structure/projection/project_2d.py
@@ -1549,54 +1577,68 @@ do
 			n_ell_logspaced = 50
 			verbose = F
 			get_kernel_peaks = F
+			
 			EOF
 			if [ "$add_intrinsic" == "True" ]
 			then
-                if [[ .*\ $MODES\ .* =~ " EE " ]]
-                then
-                    cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-                    shear-shear = %(redshift_name)s-%(redshift_name)s
-                    shear-intrinsic = %(redshift_name)s-%(redshift_name)s
-                    intrinsic-intrinsic = %(redshift_name)s-%(redshift_name)s
-                    #intrinsicb-intrinsicb = %(redshift_name)s-%(redshift_name)s
-                    EOF
-                fi
-                if [[ .*\ $MODES\ .* =~ " NE " ]]
-                then
-                    cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-                    GenericClustering-Shear = %(redshift_name_lens)s-%(redshift_name)s:{1-${NLENSBINS}}:
-                    GenericClustering-Intrinsic = %(redshift_name_lens)s-%(redshift_name)s
-                    EOF
-                fi
-                if [[ .*\ $MODES\ .* =~ " NE " ]]
-                    cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-                    auto_only = genericclustering-genericclustering
-                    GenericClustering-GenericClustering = %(redshift_name_lens)s-%(redshift_name_lens)s:{1-${NLENSBINS}}:
-                    EOF
-                fi
-    
+				if [[ .*\ $MODES\ .* =~ " EE " ]]
+				then
+					cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+					; Cosmic shear projections
+					shear-shear = %(redshift_name)s-%(redshift_name)s
+					shear-intrinsic = %(redshift_name)s-%(redshift_name)s
+					intrinsic-intrinsic = %(redshift_name)s-%(redshift_name)s
+					intrinsicb-intrinsicb = %(redshift_name)s-%(redshift_name)s
+			
+					EOF
+				fi
+				if [[ .*\ $MODES\ .* =~ " NE " ]]
+				then
+					cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+					; GGL projections
+					GenericClustering-Shear = %(redshift_name_lens)s-%(redshift_name)s:{1-${NLENSBINS}}:
+					GenericClustering-Intrinsic = %(redshift_name_lens)s-%(redshift_name)s
+			
+					EOF
+				fi
+				if [[ .*\ $MODES\ .* =~ " NE " ]]
+				then
+					cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+					; Clustering projections
+					auto_only = genericclustering-genericclustering
+					GenericClustering-GenericClustering = %(redshift_name_lens)s-%(redshift_name_lens)s:{1-${NLENSBINS}}:
+			
+					EOF
+				fi
 			else
-                if [[ .*\ $MODES\ .* =~ " EE " ]]
-                then
-                    cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-                    shear-shear = %(redshift_name)s-%(redshift_name)s
-                    EOF
-                fi
-                if [[ .*\ $MODES\ .* =~ " NE " ]]
-                then
-                    cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-                    GenericClustering-Shear = %(redshift_name_lens)s-%(redshift_name)s:{1-${NLENSBINS}}:
-                    EOF
-                fi
-                if [[ .*\ $MODES\ .* =~ " NE " ]]
-                    cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-                    auto_only = genericclustering-genericclustering
-                    GenericClustering-GenericClustering = %(redshift_name_lens)s-%(redshift_name_lens)s:{1-${NLENSBINS}}:
-                    EOF
-                fi
+				if [[ .*\ $MODES\ .* =~ " EE " ]]
+				then
+					cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+					; Cosmic shear projections
+					shear-shear = %(redshift_name)s-%(redshift_name)s
+				
+					EOF
+				fi
+				if [[ .*\ $MODES\ .* =~ " NE " ]]
+				then
+					cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+					; GGL projections
+					GenericClustering-Shear = %(redshift_name_lens)s-%(redshift_name)s:{1-${NLENSBINS}}:
+			
+					EOF
+				fi
+				if [[ .*\ $MODES\ .* =~ " NE " ]]
+				then
+					cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+					; Clustering projections
+					auto_only = genericclustering-genericclustering
+					GenericClustering-GenericClustering = %(redshift_name_lens)s-%(redshift_name_lens)s:{1-${NLENSBINS}}:
+			
+					EOF
+				fi
 			fi
 			;; #}}}
-    "likelihood") #{{{
+	"likelihood") #{{{
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(KCAP_PATH)s/utils/mini_like.py
@@ -1604,16 +1646,16 @@ do
 			like_name = loglike
 
 			EOF
-    	;; #}}}
+			;; #}}}
 	"likelihood_b") #{{{
-		cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-		[$module]
-		file = %(KCAP_PATH)s/utils/mini_like.py
-		input_section_name = scale_cuts_output_b
-		like_name = loglike_b
-
-		EOF
-	;; #}}}
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			$module]
+			file = %(KCAP_PATH)s/utils/mini_like.py
+			input_section_name = scale_cuts_output_b
+			like_name = loglike_b
+			
+			EOF
+			;; #}}}
   esac
 done
 #}}}
