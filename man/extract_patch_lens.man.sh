@@ -1,5 +1,5 @@
 #
-# apply_fluxscale.sh Documentation & Housekeeping functions
+# extract_patch_lens.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@==========================================@DEF@\n"
-    _message "@BLU@== @RED@ Running apply_fluxscale.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@==========================================@DEF@\n"
+    _message "@BLU@=====================================@DEF@\n"
+    _message "@BLU@== @RED@ Running extract_patch_lens.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@=====================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Apply fluxscale correction to LePhare stellar masses for KiDS Bright sample '
-  echo '# for catalogue specified in the pipeline/variables.sh '
+  echo '# Extract the individual patches from the lens catalogues'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,28 +42,28 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:H0_IN DATABLOCK DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
-}
+  echo ALLPATCH BLU DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH
+} 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo LENS_CATS
+  echo DATAHEAD
 }
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo fluxscale_corrected
-}
+  echo DATAHEAD
+} 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/apply_fluxscale.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/extract_patch_lens.sh
 } 
 #}}}
 

@@ -38,7 +38,7 @@ MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/apply_fluxscale.py \
   --file ${file_one} \
   --output_file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/fluxscale_corrected/${outname} \
-  --h0 "@BV:H0@" 2>&1
+  --h0 "@BV:H0_IN@" 2>&1
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 #Add the fluxscale catalogue to the datablock

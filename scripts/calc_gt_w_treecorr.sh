@@ -43,9 +43,9 @@ do
     done
   elif [ -f ${lensfiles} ]
   then
-    if [[ "$file" =~ .*"_${patch}_".* ]]
+    if [[ "$lensfiles" =~ .*"_${patch}_".* ]]
     then
-      lens_filelist=${lensfile}
+      lens_filelist=${lensfiles}
     fi
   else
     _message "${RED} - ERROR: Main input lens catalogue @BV:LENS_CATS@ does not exist!"
@@ -68,9 +68,9 @@ do
     done
   elif [ -f ${randfiles} ]
   then
-    if [[ "$file" =~ .*"_${patch}_".* ]]
+    if [[ "$randfiles" =~ .*"_${patch}_".* ]]
     then
-      rand_filelist=${randfile}
+      rand_filelist=${randfiles}
     fi
   else
     _message "${RED} - ERROR: Main input lens catalogue @BV:RAND_CATS@ does not exist!"
