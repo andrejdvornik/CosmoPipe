@@ -20,7 +20,7 @@ do
   appendstr="_LB${LBIN}"
   #}}}
   
-  for ZBIN2 in `seq $ZBIN1 ${NTOMO}`
+  for ZBIN2 in `seq ${NTOMO}`
   do
     ZB_lo2=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN2 '{print $n}'`
     ZB_hi2=`echo @BV:TOMOLIMS@ | awk -v n=$ZBIN2 '{print $(n+1)}'`
@@ -29,7 +29,7 @@ do
     appendstr2="_ZB${ZB_lo_str2}t${ZB_hi_str2}"
 
     #Define the input file id 
-    filestr="${appendstr}${appendstr2}_gtscorr.txt"
+    filestr="${appendstr}${appendstr2}_gtcorr.txt"
 
     #Get the file list {{{
     filelist=''

@@ -14,30 +14,20 @@ decname=@BV:DECNAME@
 extn=${inputfile##*.}
 #}}}
 
-if [ -d ${inputfile} ]
-then
-  inputlist=`ls @BV:DATAHEAD@`
+
+  inputlist=@DB:DATAHEAD@
   lens_filelist=""
   #This just makes sure that the files are added correctly
   for file in ${inputlist}
   do
-    if [[ "$file" =~ .*"_${patch}_".* ]]
+    if [[ "$file" =~ .*"_NS_".* ]]
     then
       #Save the output file to the list {{{
-      lens_filelist="${lens_filelist} ${inputfile}${file}"
+      lens_filelist="${lens_filelist} ${file}"
     fi
     #}}}
   done
-elif [ -f ${inputfile} ]
-then
-  if [[ "$inputfile" =~ .*"_${patch}_".* ]]
-  then
-    lens_filelist=${inputfile}
-  fi
-else
-  _message "${RED} - ERROR: Main input lens catalogue @BV:DATAHEAD@ does not exist!"
-  exit -1
-fi
+
 
 
 #Notify

@@ -10,9 +10,9 @@ def make_2pt_vector(input_files, m_corr,col=1, xipm=False, correlations='EE'):
     if xipm==False:
         for rp in range(len(input_files)):
             file= open(input_files[rp])
-            print(input_files[rp])
+            #print(input_files[rp])
             data=np.loadtxt(file,comments='#')
-            print(m_corr[rp])
+            #print(m_corr[rp])
             if data.ndim==1:
                 if rp==0:
                     data_all      = data.copy()
@@ -118,8 +118,6 @@ args = parser.parse_args()
 statistic = args.statistic
 label = statistic
 
-print(args.lensBins)
-
 if statistic == 'xipsf' or statistic == 'xigpsf':
     statistic='xipm'
 if statistic == 'cosebis_dimless': 
@@ -157,7 +155,7 @@ for mval in m:
         except:
             raise ValueError(f"provided m {mval} is neither a valid file nor a float?!")
 
-print(mout)
+#print(mout)
 if statistic in ['bandpowers_ee', 'cosebis', 'xipm']:
     m_corr_e  = []
     for bin1 in range(nBins_source):
@@ -165,7 +163,7 @@ if statistic in ['bandpowers_ee', 'cosebis', 'xipm']:
             m_corr = (1.+mout[bin2])*(1.+mout[bin1])
             m_corr_e.append(m_corr)
     m_corr_e = np.asarray(m_corr_e)
-    print(m_corr_e)
+    #print(m_corr_e)
     # no b-bias correction for b-modes. Just fill an array with ones
     m_corr_b=np.ones(m_corr_e.shape)
 
@@ -181,7 +179,7 @@ if statistic in ['bandpowers_ne', 'psi_stats_gm', 'gt']:
             m_corr = (1.+mout[bin2])
             m_corr_ggl.append(m_corr)
     m_corr_ggl = np.asarray(m_corr_ggl)
-    print(m_corr_ggl)
+    #print(m_corr_ggl)
     
 # dummy m correction for clustering
 if statistic in ['bandpowers_nn', 'psi_stats_gg', 'wt']:
@@ -189,7 +187,7 @@ if statistic in ['bandpowers_nn', 'psi_stats_gg', 'wt']:
     for bin1 in range(nBins_lens):
         m_corr_clustering.append(1.0)
     m_corr_clustering = np.asarray(m_corr_clustering)
-    print(m_corr_clustering)
+    #print(m_corr_clustering)
 
 # This is were the raw 2pt data is saved 
 #print(args.DataFiles)
@@ -297,6 +295,8 @@ elif statistic == 'bandpowers_ne':
 elif statistic == 'bandpowers_nn':
     matches_bandpowers = np.array([ "Cnn_" in i for i in args.DataFiles])
     CnnDataFiles = np.array(args.DataFiles)[matches_bandpowers]
+    print(args.DataFiles)
+    print(CnnDataFiles)
     #Input file name list:
     for bin1 in range(nBins_lens):
         tomoxcorrstr="_"+LBstr[bin1]+'_bandpowers.asc'

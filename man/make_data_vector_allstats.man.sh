@@ -43,8 +43,8 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLU BV:STATISTIC BV:TOMOLIMS DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
-} 
+  echo ALLPATCH BLU BV:STATISTIC BV:MODES BV:TOMOLIMS BV:NLENSBINS DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+}
 #}}}
 
 # Input data {{{ 
@@ -52,55 +52,141 @@ function _inp_data {
   #Data inputs (leave blank if none)
   #Input data vectors
   STATISTIC=@BV:STATISTIC@
+  MODES=@BV:MODES@
+  inputs=""
   if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
   then
-    input="cosebis"
+	if [[ .*\ $MODES\ .* =~ " EE " ]]
+	then
+	  inputs="${inputs} cosebis"
+	fi
+	if [[ .*\ $MODES\ .* =~ " NE " ]]
+	then
+	  inputs="${inputs} psi_stats_gm"
+	fi
+	if [[ .*\ $MODES\ .* =~ " NN " ]]
+	then
+	  inputs="${inputs} psi_stats_gg"
+	fi
   #}}}
-  elif [ "${STATISTIC^^}" == "PSI_STATS_GM" ] #{{{
+  elif [ "${STATISTIC^^}" == "COSEBIS_DIMLESS" ] #{{{
   then
-    input="psi_stats_gm"
-  #}}}
-  elif [ "${STATISTIC^^}" == "PSI_STATS_GG" ] #{{{
-  then
-    input="psi_stats_gg"
+   inputs="${inputs} cosebis_dimless"
   #}}}
   elif [ "${STATISTIC^^}" == "BANDPOWERS_EE" ] #{{{
   then
-    input="bandpowers_ee"
+	if [[ .*\ $MODES\ .* =~ " EE " ]]
+	then
+	  inputs="${inputs} bandpowers_ee"
+	fi
+	if [[ .*\ $MODES\ .* =~ " NE " ]]
+	then
+	  inputs="${inputs} bandpowers_ne"
+	fi
+	if [[ .*\ $MODES\ .* =~ " NN " ]]
+	then
+	  inputs="${inputs} bandpowers_nn"
+	fi
   #}}}
-  elif [ "${STATISTIC^^}" == "BANDPOWERS_NE" ] #{{{
+  elif [ "${STATISTIC^^}" == "XIPSF" ] #{{{
   then
-    input="bandpowers_ne"
+	inputs="${inputs} xipsf_binned"
   #}}}
-  elif [ "${STATISTIC^^}" == "BANDPOWERS_NN" ] #{{{
+  elif [ "${STATISTIC^^}" == "XIGPSF" ] #{{{
   then
-    input="bandpowers_nn"
+	inputs="${inputs} xigpsf_binned"
   #}}}
-  elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
-  then 
-    input="xipm_binned"
-  #}}}
-  elif [ "${STATISTIC^^}" == "GT" ] #{{{
+  elif [ "${STATISTIC^^}" == "2PCF" ] #{{{
   then
-    input="gt_binned"
+	if [[ .*\ $MODES\ .* =~ " EE " ]]
+	then
+	  inputs="${inputs} xipm_binned"
+	fi
+	if [[ .*\ $MODES\ .* =~ " NE " ]]
+	then
+	  inputs="${inputs} gt_binned"
+	fi
+	if [[ .*\ $MODES\ .* =~ " NN " ]]
+	then
+	  inputs="${inputs} wt_binned"
+	fi
   #}}}
-  elif [ "${STATISTIC^^}" == "WT" ] #{{{
-  then
-    input="wt_binned"
   fi
   #}}}
-  echo ${input} mbias
-} 
+  echo ${inputs} mbias
+}
 #}}}
 
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
+  outputs=""
+  if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
+  then
+	if [[ .*\ $MODES\ .* =~ " EE " ]]
+	then
+	  outputs="${outputs} cosebis"
+	fi
+	if [[ .*\ $MODES\ .* =~ " NE " ]]
+	then
+	  outputs="${outputs} psi_stats_gm"
+	fi
+	if [[ .*\ $MODES\ .* =~ " NN " ]]
+	then
+	  outputs="${outputs} psi_stats_gg"
+	fi
+  #}}}
+  elif [ "${STATISTIC^^}" == "COSEBIS_DIMLESS" ] #{{{
+  then
+   outputs="${outputs} cosebis_dimless"
+  #}}}
+  elif [ "${STATISTIC^^}" == "BANDPOWERS_EE" ] #{{{
+  then
+	if [[ .*\ $MODES\ .* =~ " EE " ]]
+	then
+	  outputs="${outputs} bandpowers_ee"
+	fi
+	if [[ .*\ $MODES\ .* =~ " NE " ]]
+	then
+	  outputs="${outputs} bandpowers_ne"
+	fi
+	if [[ .*\ $MODES\ .* =~ " NN " ]]
+	then
+	  outputs="${outputs} bandpowers_nn"
+	fi
+  #}}}
+  elif [ "${STATISTIC^^}" == "XIPSF" ] #{{{
+  then
+	outputs="${outputs} xipsf_binned"
+  #}}}
+  elif [ "${STATISTIC^^}" == "XIGPSF" ] #{{{
+  then
+	outputs="${outputs} xigpsf_binned"
+  #}}}
+  elif [ "${STATISTIC^^}" == "2PCF" ] #{{{
+  then
+	if [[ .*\ $MODES\ .* =~ " EE " ]]
+	then
+	  outputs="${outputs} xipm_binned"
+	fi
+	if [[ .*\ $MODES\ .* =~ " NE " ]]
+	then
+	  outputs="${outputs} gt_binned"
+	fi
+	if [[ .*\ $MODES\ .* =~ " NN " ]]
+	then
+	  outputs="${outputs} wt_binned"
+	fi
+  #}}}
+  fi
   outlist=''
   for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
-  do 
-    outlist="${outlist} @BV:STATISTIC@_vec_${patch}"
-  done 
+  do
+    for out in outputs
+    do
+      outlist="${outlist} ${out}_vec_${patch}"
+	done
+  done
   echo ${outlist}
 } 
 #}}}

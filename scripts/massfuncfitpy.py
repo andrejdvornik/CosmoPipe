@@ -30,10 +30,10 @@ if __name__ == '__main__':
     parser.add_argument('--h0', type=float, help='h0 from LePhare or other stellar mass code estimation routine', nargs='?', default=1.0, const=1.0)
     parser.add_argument('--omegam', type=float, help='Om_m from LePhare or other stellar mass code estimation routine', nargs='?', default=0.3, const=0.3)
     parser.add_argument('--omegav', type=float, help='Om_v from LePhare or other stellar mass code estimation routine', nargs='?', default=0.7, const=0.7)
-    #parser.add_argument('--min_mass', type=float, help='Minimum stellar mass to determine mass limit', nargs='?', default=6.0, const=6.0)
-    #parser.add_argument('--max_mass', type=float, help='Maximum stellar mass to determine mass limit', nargs='?', default=12.0, const=12.0)
-    #parser.add_argument('--min_z', type=float, help='Minimum redshift to determine mass limit', nargs='?', default=0.0, const=0.0)
-    #parser.add_argument('--max_z', type=float, help='Maximum redshift to determine mass limit', nargs='?', default=0.6, const=0.6)
+    parser.add_argument('--min_mass', type=float, help='Minimum stellar mass to determine mass limit', nargs='?', default=6.0, const=6.0)
+    parser.add_argument('--max_mass', type=float, help='Maximum stellar mass to determine mass limit', nargs='?', default=12.0, const=12.0)
+    parser.add_argument('--min_z', type=float, help='Minimum redshift to determine mass limit', nargs='?', default=0.0, const=0.0)
+    parser.add_argument('--max_z', type=float, help='Maximum redshift to determine mass limit', nargs='?', default=0.6, const=0.6)
     parser.add_argument('--stellar_mass_column', type=str, help='Stellar mass column', default='stellar_mass_fluxscale_corrected', required=True)
     parser.add_argument('--z_column', type=str, help='Redshift column', default='z_ANNZ_KV', required=True)
     parser.add_argument('--file', type=str, help='Input catalogue', default='fluxscale_fixed.fits', required=True)
@@ -50,10 +50,10 @@ if __name__ == '__main__':
     omegav = args.omegav
     
     
-    #min_mass = args.min_mass
-    #max_mass = args.max_mass
-    #min_z = args.min_z
-    #max_z = args.max_z
+    min_mass = args.min_mass
+    max_mass = args.max_mass
+    min_z = args.min_z
+    max_z = args.max_z
     
     stellar_mass_column = args.stellar_mass_column
     z_column = args.z_column
@@ -92,11 +92,6 @@ if __name__ == '__main__':
     
     stellar_mass_in = data[stellar_mass_column]
     z_in = data[z_column]
-    
-    min_mass = np.min(stellar_mass_in)
-    max_mass = np.max(stellar_mass_in)
-    min_z = np.min(z_in)
-    max_x = np.max(z_in)
     
     comoving_distances_in = cosmo_model.comoving_distance(z_in).to('Mpc').value
     

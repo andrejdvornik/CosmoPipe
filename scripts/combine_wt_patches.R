@@ -40,33 +40,33 @@ while (length(inputs)!=0) {
   }
 }
 
-colnames<-c('r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs_dd', 'nocor_wtheta')
+colnames<-c('r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs_weighted','nocor_wtheta')
 
 for (i in 1:length(input.cats)) { 
   #Read the file 
   tmp<-helpRfuncs::read.file(input.cats[i],data.table=FALSE)
   #Add new values
   tmp$var <- tmp$sigma^2
-  tmp$npairs_sq <- tmp$npairs_dd^2
+  tmp$npairs_sq <- tmp$npairs_weighted^2
   
   #if we have the first file, use this as a template 
   if (i==1) { 
-    inter_cols<-c('r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs_dd', 'nocor_wtheta', 'var', 'npairs_sq')
+    inter_cols<-c('r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs_weighted','nocor_wtheta','var','npairs_sq')
     #Set up the catalogue, but fill everything with zeros
     out<-tmp[,inter_cols]*0
   } 
   print(summary(out))
   #Otherwise, combine the values
   #Weighted sum of values (weight = npairs_weighted)
-  out$r_nom     = (out$r_nom    + tmp$r_nom   * tmp$npairs_dd)
-  out$meanr     = (out$meanr    + tmp$meanr   * tmp$npairs_dd)
-  out$meanlogr  = (out$meanlogr + tmp$meanlogr* tmp$npairs_dd)
-  out$wtheta    = (out$wtheta   + tmp$wtheta  * tmp$npairs_dd)
-  out$nocor_wtheta = (out$nocor_wtheta   + tmp$nocor_wtheta  * tmp$npairs_dd)
+  out$r_nom     = (out$r_nom    + tmp$r_nom   * tmp$npairs_weighted)
+  out$meanr     = (out$meanr    + tmp$meanr   * tmp$npairs_weighted)
+  out$meanlogr  = (out$meanlogr + tmp$meanlogr* tmp$npairs_weighted)
+  out$wtheta    = (out$wtheta   + tmp$wtheta  * tmp$npairs_weighted)
+  out$nocor_wtheta = (out$nocor_wtheta   + tmp$nocor_wtheta  * tmp$npairs_weighted)
   out$var       = out$var + tmp$var
   out$npairs_sq = out$npairs_sq+tmp$npairs_sq 
   out$weight = out$weight+tmp$weight
-  out$npairs_dd = out$npairs_dd+tmp$npairs_dd
+  out$npairs_weighted = out$npairs_weighted+tmp$npairs_weighted
 }
 print(summary(out))
 #Construct the output columns 

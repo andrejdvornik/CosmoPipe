@@ -9,96 +9,158 @@
 
 #Statistic
 STATISTIC="@BV:STATISTIC@"
+MODES="@BV:MODES@"
 #Input data vectors
+inputs=""
+stat_out=""
 if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 then
-  inputs="@DB:cosebis@"
+  if [[ .*\ $MODES\ .* =~ " EE " ]]
+  then
+	inputs="${inputs} @DB:cosebis@"
+	stat_out="${stat_out} cosebis"
+  fi
+  if [[ .*\ $MODES\ .* =~ " NE " ]]
+  then
+	inputs="${inputs} @DB:psi_stats_gm@"
+	stat_out="${stat_out} psi_stats_gm"
+  fi
+  if [[ .*\ $MODES\ .* =~ " NN " ]]
+  then
+	inputs="${inputs} @DB:psi_stats_gg@"
+	stat_out="${stat_out} psi_stats_gg"
+  fi
 #}}}
 elif [ "${STATISTIC^^}" == "COSEBIS_DIMLESS" ] #{{{
 then
-  inputs="@DB:cosebis_dimless@"
+  if [[ .*\ $MODES\ .* =~ " EE " ]]
+  then
+	inputs="${inputs} @DB:cosebis_dimless@"
+	stat_out="${stat_out} cosebis_dimless"
+  fi
+  if [[ .*\ $MODES\ .* =~ " NE " ]]
+  then
+	_message "NE mode not implemented for ${STATISTIC}, pipeline might break down the line!"
+  fi
+  if [[ .*\ $MODES\ .* =~ " NN " ]]
+  then
+	_message "NN mode not implemented for ${STATISTIC}, pipeline might break down the line!"
+  fi
 #}}}
-elif [ "${STATISTIC^^}" == "PSI_STATS_GM" ] #{{{
+elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
 then
-  inputs="@DB:psi_stats_gm@"
-#}}}
-elif [ "${STATISTIC^^}" == "PSI_STATS_GG" ] #{{{
-then
-  inputs="@DB:psi_stats_gg@"
-#}}}
-elif [ "${STATISTIC^^}" == "BANDPOWERS_EE" ] #{{{
-then
-  inputs="@DB:bandpowers_ee@"
-#}}}
-elif [ "${STATISTIC^^}" == "BANDPOWERS_NE" ] #{{{
-then
-  inputs="@DB:bandpowers_ne@"
-#}}}
-elif [ "${STATISTIC^^}" == "BANDPOWERS_NN" ] #{{{
-then
-  inputs="@DB:bandpowers_nn@"
+  if [[ .*\ $MODES\ .* =~ " EE " ]]
+  then
+	inputs="${inputs} @DB:bandpowers_ee@"
+	stat_out="${stat_out} bandpowers_ee"
+  fi
+  if [[ .*\ $MODES\ .* =~ " NE " ]]
+  then
+	inputs="${inputs} @DB:bandpowers_ne@"
+	stat_out="${stat_out} bandpowers_ne"
+  fi
+  if [[ .*\ $MODES\ .* =~ " NN " ]]
+  then
+	inputs="${inputs} @DB:bandpowers_nn@"
+	stat_out="${stat_out} bandpowers_nn"
+	_message "\nTEST\n@DB:bandpowers_nn@\n"
+  fi
 #}}}
 elif [ "${STATISTIC^^}" == "XIPSF" ] #{{{
-then 
-  inputs="@DB:xipsf_binned@"
+then
+  if [[ .*\ $MODES\ .* =~ " EE " ]]
+  then
+	inputs="${inputs} @DB:xipsf_binned@"
+	stat_out="${stat_out} xipsf"
+  fi
+  if [[ .*\ $MODES\ .* =~ " NE " ]]
+  then
+	_message "NE mode not implemented for ${STATISTIC}, pipeline might break down the line!"
+  fi
+  if [[ .*\ $MODES\ .* =~ " NN " ]]
+  then
+	_message "NN mode not implemented for ${STATISTIC}, pipeline might break down the line!"
+  fi
 #}}}
 elif [ "${STATISTIC^^}" == "XIGPSF" ] #{{{
-then 
-  inputs="@DB:xigpsf_binned@"
-#}}}
-elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
-then 
-  inputs="@DB:xipm_binned@"
-#}}}
-elif [ "${STATISTIC^^}" == "GT" ] #{{{
 then
-  inputs="@DB:gt_binned@"
+  if [[ .*\ $MODES\ .* =~ " EE " ]]
+  then
+	inputs="${inputs} @DB:xigpsf_binned@"
+	stat_out="${stat_out} xigpsf"
+  fi
+  if [[ .*\ $MODES\ .* =~ " NE " ]]
+  then
+	_message "NE mode not implemented for ${STATISTIC}, pipeline might break down the line!"
+  fi
+  if [[ .*\ $MODES\ .* =~ " NN " ]]
+  then
+	_message "NN mode not implemented for ${STATISTIC}, pipeline might break down the line!"
+  fi
 #}}}
-elif [ "${STATISTIC^^}" == "WT" ] #{{{
+elif [ "${STATISTIC^^}" == "2PCF" ] #{{{
 then
-  inputs="@DB:wt_binned@"
+  if [[ .*\ $MODES\ .* =~ " EE " ]]
+  then
+	inputs="${inputs} @DB:xipm_binned@"
+	stat_out="${stat_out} xipm"
+  fi
+  if [[ .*\ $MODES\ .* =~ " NE " ]]
+  then
+	inputs="${inputs} @DB:gt_binned@"
+	stat_out="${stat_out} gt"
+  fi
+  if [[ .*\ $MODES\ .* =~ " NN " ]]
+  then
+	inputs="${inputs} @DB:wt_binned@"
+	stat_out="${stat_out} wt"
+  fi
 #}}}
 fi
-#Input mbias files 
+
+#Input mbias files
 mfiles="@DB:mbias@"
 for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
 do
-  #Remove the 'comb' if needed 
-  patchuse=${patch%comb}
-  #Get the input files for this patch (there should be NTOMO catalogues)
-  filelist=`echo ${inputs} | sed 's/ /\n/g' | grep "_${patch}_" || echo `
-  #Get the m-bias file for this patch (there should be one, with NTOMO entries)
-  biaslist=`echo ${mfiles} | sed 's/ /\n/g' | grep "_biases" || echo `
+  for stat in ${stat_out}
+  do
+    #Remove the 'comb' if needed
+    patchuse=${patch%comb}
+    #Get the input files for this patch (there should be NTOMO catalogues)
+    filelist=`echo ${inputs} | sed 's/ /\n/g' | grep "_${patch}_" || echo `
+    #Get the m-bias file for this patch (there should be one, with NTOMO entries)
+    biaslist=`echo ${mfiles} | sed 's/ /\n/g' | grep "_biases" || echo `
+    
+    #Check if there are any matching files {{{
+    if [ "${filelist}" == "" ]
+    then
+      #If not, loop
+      echo
+      continue
+    fi
+    #}}}
   
-  #Check if there are any matching files {{{
-  if [ "${filelist}" == "" ] 
-  then
-    #If not, loop
-    echo 
-    continue
-  fi 
-  #}}}
-
-  #If needed, create the output directory {{{
-  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/@BV:STATISTIC@_vec_${patch} ]
-  then 
-    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/@BV:STATISTIC@_vec_${patch}/
-  fi
-  #}}}
-
-  #Construct the data vector for cosebis and bandpowers{{{
-  _message " >@BLU@ Constructing data vector for patch ${patch}@DEF@"
-  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/make_data_vector_allstats.py \
-    --inputfiles ${filelist}   \
-    --statistic @BV:STATISTIC@ \
-    --mbias   ${biaslist}      \
-    --tomobins @BV:TOMOLIMS@  \
-    --lensbins @BV:NLENSBINS@ \
-    --outputfile  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/@BV:STATISTIC@_vec_${patch}/combined_vector
-  _message "@RED@ - Done! (`date +'%a %H:%M'`)@DEF@\n"
-  #}}}
-
-  #Update the datablock 
-  _write_datablock "@BV:STATISTIC@_vec_${patch}" "combined_vector.txt combined_vector_no_m_bias.txt"
+    #If needed, create the output directory {{{
+    if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${stat}_vec_${patch} ]
+    then
+      mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${stat}_vec_${patch}/
+    fi
+    #}}}
+    
+    #Construct the data vector for cosebis and bandpowers{{{
+    _message " >@BLU@ Constructing data vector for patch ${patch}@DEF@"
+    @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/make_data_vector_allstats.py \
+      --inputfiles ${filelist}   \
+      --statistic ${stat} \
+      --mbias   ${biaslist}      \
+      --tomobins @BV:TOMOLIMS@  \
+      --lensbins @BV:NLENSBINS@ \
+      --outputfile  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${stat}_vec_${patch}/combined_vector
+    _message "@RED@ - Done! (`date +'%a %H:%M'`)@DEF@\n"
+    #}}}
+  
+    #Update the datablock
+    _write_datablock "${stat}_vec_${patch}" "combined_vector.txt combined_vector_no_m_bias.txt"
+  done
 done
 

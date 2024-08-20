@@ -90,9 +90,6 @@ if __name__ == '__main__':
     theta_min = args.theta_min
     theta_max = args.theta_max
     binning = args.binning
-    lenscat = args.lenscat
-    randcat = args.randcat
-    sourcecat = args.sourcecat
     outfile = args.outfile
     covoutfile = args.covoutfile
     weighted = args.weighted
@@ -159,16 +156,16 @@ if __name__ == '__main__':
 
     if center_file:
 
-        lenscat = treecorr.Catalog(lenscat, ra_col=lensraname, dec_col=lensdecname, ra_units='deg', dec_units='deg', w_col=lenswname, patch_centers=center_file)
-        rancat = treecorr.Catalog(randcat, ra_col=randraname, dec_col=randdecname, ra_units='deg', dec_units='deg', patch_centers=lenscat.patch_centers)
+        lenscat = treecorr.Catalog(args.lenscat, ra_col=lensraname, dec_col=lensdecname, ra_units='deg', dec_units='deg', w_col=lenswname, patch_centers=center_file)
+        rancat = treecorr.Catalog(args.randcat, ra_col=randraname, dec_col=randdecname, ra_units='deg', dec_units='deg', patch_centers=lenscat.patch_centers)
         if lensing:
-            sourcecat = treecorr.Catalog(sourcecat, ra_col=sourceraname, dec_col=sourcedecname,
+            sourcecat = treecorr.Catalog(args.sourcecat, ra_col=sourceraname, dec_col=sourcedecname,
                                     ra_units='deg', dec_units='deg', g1_col=e1name, g2_col=e2name, w_col=sourcewname, patch_centers=lenscat.patch_centers)
     else:
-        lenscat = treecorr.Catalog(lenscat, ra_col=lensraname, dec_col=lensdecname, ra_units='deg', dec_units='deg', w_col=lenswname)
-        rancat = treecorr.Catalog(randcat, ra_col=randraname, dec_col=randdecname, ra_units='deg', dec_units='deg')
+        lenscat = treecorr.Catalog(args.lenscat, ra_col=lensraname, dec_col=lensdecname, ra_units='deg', dec_units='deg', w_col=lenswname)
+        rancat = treecorr.Catalog(args.randcat, ra_col=randraname, dec_col=randdecname, ra_units='deg', dec_units='deg')
         if lensing:
-            sourcecat = treecorr.Catalog(sourcecat, ra_col=sourceraname, dec_col=sourcedecname,
+            sourcecat = treecorr.Catalog(args.sourcecat, ra_col=sourceraname, dec_col=sourcedecname,
                                     ra_units='deg', dec_units='deg', g1_col=e1name, g2_col=e2name, w_col=sourcewname)
     
         
@@ -275,10 +272,10 @@ if __name__ == '__main__':
                 lenswnamesq = None
             else:
                 lenswnamesq = lenswname+'_sq'
-            lenscat_wsq = treecorr.Catalog(lenscat, ra_col=lensraname, dec_col=lensdecname, ra_units='deg', dec_units='deg',
+            lenscat_wsq = treecorr.Catalog(args.lenscat, ra_col=lensraname, dec_col=lensdecname, ra_units='deg', dec_units='deg',
                                         w_col=lenswnamesq)
-            sourcecat_wsq = treecorr.Catalog(sourcecat, ra_col=sourceraname, dec_col=sourcedecname, ra_units='deg', dec_units='deg',
-                                        g1_col=e1name, g2_col=e2name, w_col=wname+'_sq')
+            sourcecat_wsq = treecorr.Catalog(args.sourcecat, ra_col=sourceraname, dec_col=sourcedecname, ra_units='deg', dec_units='deg',
+                                        g1_col=e1name, g2_col=e2name, w_col=sourcewname+'_sq')
     
             # Define the binning based on command line input
         
@@ -299,8 +296,8 @@ if __name__ == '__main__':
                 writer.write(
                     ['r_nom','meanr','meanlogr','gamT','gamX','sigma','weight','npairs_weighted', 'nocor_gamT', 'nocor_gamX',
                     'rangamT','rangamX','ransigma'],
-                    [ ls.rnom,ls.meanr, ls.meanlogr, gamma_t, gamma_x, np.sqrt(ls.varxi), npairs_weighted, ls.npairs,
-                    ls.xi, ls.xi_im, rs.xi, rs.xi_im, np.sqrt(rs.varxi)])
+                    np.nan_to_num([ ls.rnom,ls.meanr, ls.meanlogr, gamma_t, gamma_x, np.sqrt(ls.varxi), npairs_weighted, ls.npairs,
+                    ls.xi, ls.xi_im, rs.xi, rs.xi_im, np.sqrt(rs.varxi)], nan=0.0, posinf=0.0, neginf=0.0))
     
         else:
             #Use treecorr to write out the output file and praise-be once more for Jarvis and his well documented code
@@ -308,8 +305,8 @@ if __name__ == '__main__':
                 writer.write(
                     ['r_nom','meanr','meanlogr','gamT','gamX','sigma','weight','npairs_weighted', 'nocor_gamT', 'nocor_gamX',
                     'rangamT','rangamX','ransigma'],
-                    [ ls.rnom,ls.meanr, ls.meanlogr, gamma_t, gamma_x, np.sqrt(ls.varxi), ls.weight, ls.npairs,
-                    ls.xi, ls.xi_im, rs.xi, rs.xi_im, np.sqrt(rs.varxi)])
+                    np.nan_to_num([ ls.rnom,ls.meanr, ls.meanlogr, gamma_t, gamma_x, np.sqrt(ls.varxi), ls.weight, ls.npairs,
+                    ls.xi, ls.xi_im, rs.xi, rs.xi_im, np.sqrt(rs.varxi)], nan=0.0, posinf=0.0, neginf=0.0))
             
             
     if clustering:
@@ -325,8 +322,8 @@ if __name__ == '__main__':
         #Use treecorr to write out the output file and praise-be once more for Jarvis and his well documented code
         with treecorr.util.make_writer(outfile, precision=12) as writer:
             writer.write(
-                ['r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs_dd', 'nocor_wtheta'],
-                [ dd.rnom, dd.meanr, dd.meanlogr, wt, np.sqrt(dd.varxi), dd.weight, dd.npairs, dd.xi])
+                ['r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs_weighted', 'nocor_wtheta'],
+                np.nan_to_num([ dd.rnom, dd.meanr, dd.meanlogr, wt, np.sqrt(dd.varxi), dd.weight, dd.npairs, dd.xi], nan=0.0, posinf=0.0, neginf=0.0))
                 
         if center_file is not None:
             cov_wt = dd.estimate_cov(method='jackknife')
