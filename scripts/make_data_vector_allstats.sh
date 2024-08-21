@@ -63,7 +63,6 @@ then
   then
 	inputs="${inputs} @DB:bandpowers_nn@"
 	stat_out="${stat_out} bandpowers_nn"
-	_message "\nTEST\n@DB:bandpowers_nn@\n"
   fi
 #}}}
 elif [ "${STATISTIC^^}" == "XIPSF" ] #{{{

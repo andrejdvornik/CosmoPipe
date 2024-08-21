@@ -62,11 +62,18 @@ NLENSBINS="@BV:NLENSBINS@"
 NSMFLENSBINS="@BV:NSMFLENSBINS@"
 NSMFBINS="@BV:NSMFBINS@"
 #Define the data file name {{{
-if [ "${BOLTZMAN^^}" == "HALO_MODEL" ]
+if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
 then
-  non_linear_model=halo_model
+  non_linear_model=mead2020_feedback
+elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
+then
+  non_linear_model=mead2015
+elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ]
+then
+  _message "The ${BOLTZMAN^^} Emulator is broken: it produces S_8 constraints that are systematically high.\nUse 'COSMOPOWER_HM2015_S8'\n"
+  exit 1
 else
-  _message "For 3x2pt only the halo model is implemented as boltzman code\n"
+  _message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
   exit 1
 fi
 
@@ -982,8 +989,8 @@ EOF
 #}}}
 
 #Requested boltzman {{{
-if [ "${BOLTZMAN^^}" == "HALO_MODEL" ] #{{{
-then
+#if [ "${BOLTZMAN^^}" == "HALO_MODEL" ] #{{{
+#then
 
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_boltzman.ini <<- EOF
 [camb]
@@ -1005,11 +1012,11 @@ nz_background = 6000
 
 EOF
 #}}}
-else 
-  #ERROR: unknown boltzman code 
-  _message "For 3x2pt only the halo model is implemented as boltzman code\n"
-  exit 1
-fi
+#else
+#  #ERROR: unknown boltzman code
+#  _message "For 3x2pt only the halo model is implemented as boltzman code\n"
+#  exit 1
+#fi
 #}}}
 
 #Additional Modules {{{

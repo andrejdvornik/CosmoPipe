@@ -19,9 +19,6 @@ then
 elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020_NOFEEDBACK" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020_NOFEEDBACK" ]
 then
   non_linear_model=mead2020
-elif [ "${BOLTZMAN^^}" == "HALO_MODEL" ]
-then
-  non_linear_model=halo_model
 else
   _message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
   exit 1
