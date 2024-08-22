@@ -43,8 +43,8 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLU BV:COSMOSIS_PATCHLIST BV:TOMOLIMS BV:TOMOLIMS DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
-} 
+  echo ALLPATCH BLU BV:COSMOSIS_PATCHLIST BV:TOMOLIMS BV:TOMOLIMS BV:NLENSBINS BV:NSMFLENSBINS DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+}
 #}}}
 
 # Input data {{{ 
@@ -65,8 +65,8 @@ function _inp_data {
   for patch in ${patchlist}
   do 
     #>&2 echo ${patch}
-    outlist="${outlist} cosmosis_neff nz_${patch}"
-  done 
+    outlist="${outlist} cosmosis_neff nz_source_${patch}"
+  done
   echo ${outlist}
 } 
 #}}}
@@ -77,7 +77,7 @@ function _outputs {
   outlist=''
   for patch in @PATCHLIST@ @ALLPATCH@ 
   do 
-    outlist="${outlist} cosmosis_nz_${patch}"
+    outlist="${outlist} cosmosis_nz_source_${patch}"
   done 
   echo ${outlist}
 } 

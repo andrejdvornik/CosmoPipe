@@ -40,7 +40,7 @@ while (length(inputs)!=0) {
   }
 }
 
-colnames<-c('r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs_weighted','nocor_wtheta')
+colnames<-c('r_nom','meanr','meanlogr','wtheta','sigma','weight','nocor_wtheta','npairs_weighted')
 
 for (i in 1:length(input.cats)) { 
   #Read the file 
@@ -51,7 +51,7 @@ for (i in 1:length(input.cats)) {
   
   #if we have the first file, use this as a template 
   if (i==1) { 
-    inter_cols<-c('r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs_weighted','nocor_wtheta','var','npairs_sq')
+    inter_cols<-c('r_nom','meanr','meanlogr','wtheta','sigma','weight','nocor_wtheta','var','npairs_sq','npairs_weighted')
     #Set up the catalogue, but fill everything with zeros
     out<-tmp[,inter_cols]*0
   } 

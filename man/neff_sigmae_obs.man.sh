@@ -1,5 +1,5 @@
 #
-# add_neff.sh Documentation & Housekeeping functions
+# neff_sigmae_obs.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@================================@DEF@\n"
-    _message "@BLU@== @RED@ Running add_neff.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@================================@DEF@\n"
+    _message "@BLU@===================================@DEF@\n"
+    _message "@BLU@== @RED@ Running neff_sigmae_obs.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@===================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,7 +17,8 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Add existing n_effective values to the datablock'
+  echo '# Compute neff for all catalogues in '
+  echo '# DATAHEAD'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -42,8 +43,13 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BV:TOMOLIMS DATABLOCK NEFFLIST RUNROOT STORAGEPATH
-} 
+  list=''
+  for patch in @PATCHLIST@ @ALLPATCH@ 
+  do 
+    list="${list} BV:SURVEYAREA_${patch}"
+  done
+  echo ALLPATCH BLU BV:BLIND BV:LENSWEIGHTNAME DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH ${list}
+}
 #}}}
 
 # Input data {{{ 
@@ -56,14 +62,19 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo neff_source
+  outlist=''
+  for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+  do 
+    outlist="${outlist} cov_inp_${patch}_@BV:BLIND@ neff_obs_${patch}_@BV:BLIND@"
+  done
+  echo ${outlist}
 } 
 #}}}
 
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/add_neff.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/neff_sigmae_obs.sh
 } 
 #}}}
 

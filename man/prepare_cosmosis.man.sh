@@ -41,16 +41,16 @@ set -e
 #}}}
 
 # Input variables {{{ 
-function _inp_var { 
+function _inp_var {
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLU BV:BLIND BV:COSMOSIS_PATCHLIST BV:TOMOLIMS DATABLOCK DEF PATCHLIST RED RUNROOT STORAGEPATH SURVEY
-} 
+  echo ALLPATCH BLU BV:HEADFILES_XI BV:HEADFILES_GT BV:HEADFILES_WT BV:BLIND BV:COSMOSIS_PATCHLIST BV:MODES BV:TOMOLIMS BV:NLENSBINS DATABLOCK DEF PATCHLIST RED RUNROOT STORAGEPATH SURVEY
+}
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo ALLHEAD
+  echo
 } 
 #}}}
 
@@ -71,8 +71,8 @@ function _outputs {
   #}}}
   for patch in ${patchlist}
   do 
-    outlist="${outlist} cosmosis_neff_${patch}_@BV:BLIND@ cosmosis_sigmae_${patch}_@BV:BLIND@ cosmosis_xipm_${patch}_@BV:BLIND@"
-  done 
+    outlist="${outlist} cosmosis_neff_source_${patch}_@BV:BLIND@ cosmosis_neff_lens_${patch}_@BV:BLIND@ cosmosis_neff_obs_${patch}_@BV:BLIND@ cosmosis_sigmae_${patch}_@BV:BLIND@ cosmosis_npair_${patch}_@BV:BLIND@"
+  done
   echo ${outlist} cosmosis_inputs
 } 
 #}}}

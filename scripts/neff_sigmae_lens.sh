@@ -1,9 +1,9 @@
 #=========================================
 #
-# File Name : neff_sigmae.sh
-# Created By : awright
-# Creation Date : 28-03-2023
-# Last Modified : Sun 10 Dec 2023 09:51:35 PM CET
+# File Name : neff_sigmae_lens.sh
+# Created By : dvornik
+# Creation Date : 22-08-2024
+# Last Modified : Thu 22 Aug 2024 01:51:35 PM CEST
 #
 #=========================================
 
@@ -47,12 +47,8 @@ do
   SurveyArea=${SurveyArea/\{/}
   #Get the mbiases for this patch 
   usepatch=${patch//comb/}
-  mfiles="`_read_datablock mbias_${usepatch}_@BV:BLIND@`"
-  mfiles="`_blockentry_to_filelist ${mfiles}`"
-  mbiasfile=`echo ${mfiles} | sed 's/ /\n/g' | grep "_biases" || echo `
-  mbiasfile="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${usepatch}_@BV:BLIND@/${mbiasfile}"
   
-  _message " ->@BLU@ Patch @RED@${patch}@BLU@, Blind @RED@@BV:BLIND@@DEF@\n"
+  _message " ->@BLU@ Patch @RED@${patch}@BLU@\n"
   _message " -> @BLU@Use effective area for patch: @RED@${SurveyArea} square arcmin@DEF@\n"
   
   #If doesn't exist, make the output folder
@@ -61,15 +57,10 @@ do
     mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cov_input_${patch}_@BV:BLIND@
   fi 
   #If doesn't exist, make the neff folder
-  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/neff_source_${patch}_@BV:BLIND@ ]
+  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/neff_lens_${patch}_@BV:BLIND@ ]
   then
-    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/neff_source_${patch}_@BV:BLIND@
+    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/neff_lens_${patch}_@BV:BLIND@
   fi
-  #If doesn't exist, make the output folder
-  if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/sigmae_${patch}_@BV:BLIND@ ]
-  then 
-    mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/sigmae_${patch}_@BV:BLIND@
-  fi 
 
   patchlist=''
   for catname in ${headlist} 
@@ -88,38 +79,28 @@ do
   
   count=0
   patchoutlist_neff=''
-  patchoutlist_sigmae=''
   for catfull in ${patchlist}
   do 
     catname=${catfull##*/}
     catbase=${catname%.*}
     count=$((count+1))
-    _message " -> @DEF@ ${catname}" 
-    mbias=`cat $mbiasfile | awk '{printf $0 " "}' | awk -v count=${count} '{print $count}'`
-    _message "@BLU@ (m=@DEF@$mbias@BLU@)@DEF@" 
+    _message " -> @DEF@ ${catname}"
     #Prepare the neff & ellipticity dispersion file
-    @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/neff_sigmae.py \
+    @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/neff_sigmae_lens.py \
       -i ${catfull} \
-      --e1name @BV:E1NAME@ \
-      --e2name @BV:E2NAME@ \
-      --wname @BV:WEIGHTNAME@ \
-      --mbias ${mbias} \
-      --area ${SurveyArea} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cov_input_${patch}_@BV:BLIND@/${catbase}_neff_sigmae.txt 
-    #Construct the separated files 
-    tail -n +2 @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cov_input_${patch}_@BV:BLIND@/${catbase}_neff_sigmae.txt \
-      | awk '{ printf $2" " }' >  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/neff_source_${patch}_@BV:BLIND@/${catbase}_neff.txt
-    tail -n +2 @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cov_input_${patch}_@BV:BLIND@/${catbase}_neff_sigmae.txt \
-      | awk '{ printf $7" " }' > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/sigmae_${patch}_@BV:BLIND@/${catbase}_sigmae.txt 
-    #Save the output names 
+      --wname @BV:LENSWEIGHTNAME@ \
+      --area ${SurveyArea} > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cov_input_${patch}_@BV:BLIND@/${catbase}_neff_lens.txt
+    #Construct the separated files
+    tail -n +2 @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cov_input_${patch}_@BV:BLIND@/${catbase}_neff_lens.txt \
+      | awk '{ printf $2" " }' >  @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/neff_lens_${patch}_@BV:BLIND@/${catbase}_neff.txt
+    #Save the output names
     patchoutlist_neff="${patchoutlist_neff} ${catbase}_neff.txt"
-    patchoutlist_sigmae="${patchoutlist_sigmae} ${catbase}_sigmae.txt"
-    #Notify 
+    #Notify
     _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
   done 
   
   #Add the new file to the datablock 
-  _write_datablock neff_source_${patch}_@BV:BLIND@ "${patchoutlist_neff}"
-  _write_datablock sigmae_${patch}_@BV:BLIND@ "${patchoutlist_sigmae}"
+  _write_datablock neff_lens_${patch}_@BV:BLIND@ "${patchoutlist_neff}"
 
 done 
 

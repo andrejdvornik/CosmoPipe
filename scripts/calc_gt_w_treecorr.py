@@ -303,10 +303,10 @@ if __name__ == '__main__':
             #Use treecorr to write out the output file and praise-be once more for Jarvis and his well documented code
             with treecorr.util.make_writer(outfile, precision=12) as writer:
                 writer.write(
-                    ['r_nom','meanr','meanlogr','gamT','gamX','sigma','weight','npairs_weighted', 'nocor_gamT', 'nocor_gamX',
-                    'rangamT','rangamX','ransigma'],
-                    np.nan_to_num([ ls.rnom,ls.meanr, ls.meanlogr, gamma_t, gamma_x, np.sqrt(ls.varxi), ls.weight, ls.npairs,
-                    ls.xi, ls.xi_im, rs.xi, rs.xi_im, np.sqrt(rs.varxi)], nan=0.0, posinf=0.0, neginf=0.0))
+                    ['r_nom','meanr','meanlogr','gamT','gamX','sigma','weight', 'nocor_gamT', 'nocor_gamX',
+                    'rangamT','rangamX','ransigma','npairs_weighted'],
+                    np.nan_to_num([ ls.rnom,ls.meanr, ls.meanlogr, gamma_t, gamma_x, np.sqrt(ls.varxi), ls.weight,
+                    ls.xi, ls.xi_im, rs.xi, rs.xi_im, np.sqrt(rs.varxi), ls.npairs], nan=0.0, posinf=0.0, neginf=0.0))
             
             
     if clustering:
@@ -322,8 +322,8 @@ if __name__ == '__main__':
         #Use treecorr to write out the output file and praise-be once more for Jarvis and his well documented code
         with treecorr.util.make_writer(outfile, precision=12) as writer:
             writer.write(
-                ['r_nom','meanr','meanlogr','wtheta','sigma','weight','npairs_weighted', 'nocor_wtheta'],
-                np.nan_to_num([ dd.rnom, dd.meanr, dd.meanlogr, wt, np.sqrt(dd.varxi), dd.weight, dd.npairs, dd.xi], nan=0.0, posinf=0.0, neginf=0.0))
+                ['r_nom','meanr','meanlogr','wtheta','sigma','weight', 'nocor_wtheta', 'npairs_weighted'],
+                np.nan_to_num([ dd.rnom, dd.meanr, dd.meanlogr, wt, np.sqrt(dd.varxi), dd.weight, dd.xi, dd.npairs], nan=0.0, posinf=0.0, neginf=0.0))
                 
         if center_file is not None:
             cov_wt = dd.estimate_cov(method='jackknife')
