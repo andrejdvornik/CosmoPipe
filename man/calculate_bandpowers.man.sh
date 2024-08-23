@@ -56,7 +56,7 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo bandpowers
+  echo bandpowers_ee bandpowers_ne bandpowers_nn
 } 
 #}}}
 

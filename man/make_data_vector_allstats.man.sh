@@ -51,65 +51,65 @@ function _inp_var {
 function _inp_data { 
   #Data inputs (leave blank if none)
   #Input data vectors
-  STATISTIC=@BV:STATISTIC@
-  MODES=@BV:MODES@
+  STATISTIC=`_parse_blockvars @BV:STATISTIC@`
+  MODES=`_parse_blockvars @BV:MODES@`
   inputs=""
   if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
   then
-	if [[ .*\ $MODES\ .* =~ " EE " ]]
-	then
-	  inputs="${inputs} cosebis"
-	fi
-	if [[ .*\ $MODES\ .* =~ " NE " ]]
-	then
-	  inputs="${inputs} psi_stats_gm"
-	fi
-	if [[ .*\ $MODES\ .* =~ " NN " ]]
-	then
-	  inputs="${inputs} psi_stats_gg"
-	fi
+    if [[ .*\ $MODES\ .* =~ " EE " ]]
+    then
+      inputs="${inputs} cosebis"
+    fi
+    if [[ .*\ $MODES\ .* =~ " NE " ]]
+    then
+      inputs="${inputs} psi_stats_gm"
+    fi
+    if [[ .*\ $MODES\ .* =~ " NN " ]]
+    then
+      inputs="${inputs} psi_stats_gg"
+    fi
   #}}}
   elif [ "${STATISTIC^^}" == "COSEBIS_DIMLESS" ] #{{{
   then
-   inputs="${inputs} cosebis_dimless"
+    inputs="${inputs} cosebis_dimless"
   #}}}
-  elif [ "${STATISTIC^^}" == "BANDPOWERS_EE" ] #{{{
+  elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
   then
-	if [[ .*\ $MODES\ .* =~ " EE " ]]
-	then
-	  inputs="${inputs} bandpowers_ee"
-	fi
-	if [[ .*\ $MODES\ .* =~ " NE " ]]
-	then
-	  inputs="${inputs} bandpowers_ne"
-	fi
-	if [[ .*\ $MODES\ .* =~ " NN " ]]
-	then
-	  inputs="${inputs} bandpowers_nn"
-	fi
+    if [[ .*\ $MODES\ .* =~ " EE " ]]
+    then
+      inputs="${inputs} bandpowers_ee"
+    fi
+    if [[ .*\ $MODES\ .* =~ " NE " ]]
+    then
+      inputs="${inputs} bandpowers_ne"
+    fi
+    if [[ .*\ $MODES\ .* =~ " NN " ]]
+    then
+      inputs="${inputs} bandpowers_nn"
+    fi
   #}}}
   elif [ "${STATISTIC^^}" == "XIPSF" ] #{{{
   then
-	inputs="${inputs} xipsf_binned"
+    inputs="${inputs} xipsf_binned"
   #}}}
   elif [ "${STATISTIC^^}" == "XIGPSF" ] #{{{
   then
-	inputs="${inputs} xigpsf_binned"
+    inputs="${inputs} xigpsf_binned"
   #}}}
   elif [ "${STATISTIC^^}" == "2PCF" ] #{{{
   then
-	if [[ .*\ $MODES\ .* =~ " EE " ]]
-	then
-	  inputs="${inputs} xipm_binned"
-	fi
-	if [[ .*\ $MODES\ .* =~ " NE " ]]
-	then
-	  inputs="${inputs} gt_binned"
-	fi
-	if [[ .*\ $MODES\ .* =~ " NN " ]]
-	then
-	  inputs="${inputs} wt_binned"
-	fi
+    if [[ .*\ $MODES\ .* =~ " EE " ]]
+    then
+      inputs="${inputs} xipm_binned"
+    fi
+    if [[ .*\ $MODES\ .* =~ " NE " ]]
+    then
+      inputs="${inputs} gt_binned"
+    fi
+    if [[ .*\ $MODES\ .* =~ " NN " ]]
+    then
+      inputs="${inputs} wt_binned"
+    fi
   #}}}
   fi
   #}}}
@@ -120,75 +120,77 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
+  STATISTIC=`_parse_blockvars @BV:STATISTIC@`
+  MODES=`_parse_blockvars @BV:MODES@`
   outputs=""
   if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
   then
-	if [[ .*\ $MODES\ .* =~ " EE " ]]
-	then
-	  outputs="${outputs} cosebis"
-	fi
-	if [[ .*\ $MODES\ .* =~ " NE " ]]
-	then
-	  outputs="${outputs} psi_stats_gm"
-	fi
-	if [[ .*\ $MODES\ .* =~ " NN " ]]
-	then
-	  outputs="${outputs} psi_stats_gg"
-	fi
+    if [[ .*\ $MODES\ .* =~ " EE " ]]
+    then
+      outputs="${outputs} cosebis"
+    fi
+    if [[ .*\ $MODES\ .* =~ " NE " ]]
+    then
+      outputs="${outputs} psi_stats_gm"
+    fi
+    if [[ .*\ $MODES\ .* =~ " NN " ]]
+    then
+      outputs="${outputs} psi_stats_gg"
+    fi
   #}}}
   elif [ "${STATISTIC^^}" == "COSEBIS_DIMLESS" ] #{{{
   then
-   outputs="${outputs} cosebis_dimless"
+    outputs="${outputs} cosebis_dimless"
   #}}}
-  elif [ "${STATISTIC^^}" == "BANDPOWERS_EE" ] #{{{
+  elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
   then
-	if [[ .*\ $MODES\ .* =~ " EE " ]]
-	then
-	  outputs="${outputs} bandpowers_ee"
-	fi
-	if [[ .*\ $MODES\ .* =~ " NE " ]]
-	then
-	  outputs="${outputs} bandpowers_ne"
-	fi
-	if [[ .*\ $MODES\ .* =~ " NN " ]]
-	then
-	  outputs="${outputs} bandpowers_nn"
-	fi
+    if [[ .*\ $MODES\ .* =~ " EE " ]]
+    then
+      outputs="${outputs} bandpowers_ee"
+    fi
+    if [[ .*\ $MODES\ .* =~ " NE " ]]
+    then
+      outputs="${outputs} bandpowers_ne"
+    fi
+    if [[ .*\ $MODES\ .* =~ " NN " ]]
+    then
+      outputs="${outputs} bandpowers_nn"
+    fi
   #}}}
   elif [ "${STATISTIC^^}" == "XIPSF" ] #{{{
   then
-	outputs="${outputs} xipsf_binned"
+    outputs="${outputs} xipsf_binned"
   #}}}
   elif [ "${STATISTIC^^}" == "XIGPSF" ] #{{{
   then
-	outputs="${outputs} xigpsf_binned"
+    outputs="${outputs} xigpsf_binned"
   #}}}
   elif [ "${STATISTIC^^}" == "2PCF" ] #{{{
   then
-	if [[ .*\ $MODES\ .* =~ " EE " ]]
-	then
-	  outputs="${outputs} xipm_binned"
-	fi
-	if [[ .*\ $MODES\ .* =~ " NE " ]]
-	then
-	  outputs="${outputs} gt_binned"
-	fi
-	if [[ .*\ $MODES\ .* =~ " NN " ]]
-	then
-	  outputs="${outputs} wt_binned"
-	fi
+    if [[ .*\ $MODES\ .* =~ " EE " ]]
+    then
+      outputs="${outputs} xipm_binned"
+    fi
+    if [[ .*\ $MODES\ .* =~ " NE " ]]
+    then
+      outputs="${outputs} gt_binned"
+    fi
+    if [[ .*\ $MODES\ .* =~ " NN " ]]
+    then
+      outputs="${outputs} wt_binned"
+    fi
   #}}}
   fi
-  outlist=''
+  outlist=""
   for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
   do
-    for out in outputs
+    for out in ${outputs}
     do
       outlist="${outlist} ${out}_vec_${patch}"
-	done
+    done
   done
-  echo ${outlist}
-} 
+  echo "${outlist}"
+}
 #}}}
 
 # Execution command {{{ 

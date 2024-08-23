@@ -94,11 +94,6 @@ NMINCOSEBIS=1
 #Maximum Number of modes for COSEBIs
 NMAXCOSEBIS=10
 
-#Minimum Number of modes for PSIstats
-NMINPSISTATS=1
-#Maximum Number of modes for PSIstats
-NMAXPSISTATS=10
-
 #Name of the lensing weight variable  
 WEIGHTNAME=weight
 

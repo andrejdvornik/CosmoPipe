@@ -115,16 +115,20 @@ _write_blockvars "N${prefix^^}LENSBINS" `awk '{print $2}' @RUNROOT@/@STORAGEPATH
 NBIN=`awk '{print $2}' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${append_prefix}lens_cats_metadata/nbins.txt`
 outlist=""
 outlist_rand=""
+outlist_meta=""
 for LBIN in `seq ${NBIN}`
 do
   outlist="${outlist} ${outname}${LBIN}.fits"
   outlist_rand="${outlist_rand} ${outname}${LBIN}_rand.fits"
+  outlist_meta="${outlist_meta} stats_LB${LBIN}.txt"
 done
 #Add the binned catalogues to the datablock
 _write_datablock ${append_prefix}lens_cats "${outlist}"
 _write_datablock ${append_prefix}rand_cats "${outlist_rand}"
+_write_datablock ${append_prefix}lens_cats_metadata "${outlist_meta}"
 
 _write_blockvars "${append_prefix_var}LENS_CATS" "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${append_prefix}lens_cats/"
 _write_blockvars "${append_prefix_var}RAND_CATS" "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${append_prefix}rand_cats/"
+_write_blockvars "${append_prefix_var}LENS_CATS_METADATA" "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${append_prefix}lens_cats_metadata/"
 _write_blockvars "LENSPREFIX" ""
 # We reset the prefix in the script

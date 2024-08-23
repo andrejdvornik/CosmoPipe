@@ -37,6 +37,7 @@ if __name__ == '__main__':
     parser.add_argument('--compare_to_gama', type=bool, help='Plot comparison figures', nargs='?', default=False, const=True)
     parser.add_argument('--output_path', type=str, help='Output path', required=True)
     parser.add_argument('--output_name', type=str, help='Output name', required=True)
+    parser.add_argument('--f_tomo', type=float, help='Fraction of galaxies in this bin', required=True)
     args = parser.parse_args()
 
     compare_to_gama = args.compare_to_gama
@@ -44,6 +45,7 @@ if __name__ == '__main__':
     
     area_kids = args.area
     frac = (area_kids/41253.0)
+    f_tomo = args.f_tomo
     
 
     nbins = args.nbins
@@ -131,8 +133,9 @@ if __name__ == '__main__':
     data_out = np.array([10.0**M_center, phi_bins/step, np.ones_like(phi_bins)]).T
     vmax_out = np.array([M_center, vmax_out]).T
     
-    np.savetxt(f"{out_path}{outname}_smf.txt", data_out)
-    np.savetxt(f"{out_path}{outname}_vmax.txt", vmax_out)
+    np.savetxt(f"{out_path}/smf/{outname}_smf.txt", data_out)
+    np.savetxt(f"{out_path}/vmax/{outname}_vmax.txt", vmax_out)
+    np.savetxt(f"{out_path}/f_tomo/{outname}_vmax.txt", np.array([f_tomo]))
     
     
     if compare_to_gama:
@@ -168,7 +171,7 @@ if __name__ == '__main__':
         ax.set_xlabel(r'$\log(M_{\star}/h^{2}M_{\odot})$')
         ax.set_ylabel(r'$\phi (\mathrm{dex}^{-1}\,h^{3}\,\mathrm{Mpc}^{-3})$')
         ax.legend()
-        pl.savefig(f"{out_path}{outname}_smf_comp.png")
+        pl.savefig(f"{out_path}/smf/{outname}_smf_comp.png")
         pl.clf()
         pl.close()
     

@@ -13,8 +13,8 @@ file_one="@BV:FLUXSCALE_CORRECTED@"
 #Define the output filename
 outname=${file_one##*/}
 outname=${outname%%.*}
-outname1=mass_lim.npy
-outname2=mass_lim_low.npy
+outname1="mass_lim.npy"
+outname2="mass_lim_low.npy"
 
 #If needed, make the output folder
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mass_lims/ ]
@@ -60,10 +60,10 @@ _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 #--min_mass "@BV:MINMASS@" --max_mass "@BV:MAXMASS@" --min_z "@BV:MINZ@" --max_z "@BV:MAXZ@" 
 
 outlist=""
-outlist="${outlist} ${outname_1}"
-outlist="${outlist} ${outname_2}"
+outlist="${outlist} ${outname1}"
+outlist="${outlist} ${outname2}"
 #Add the mass limit functions to the datablock
 _write_datablock mass_lims "${outlist}"
-
+_write_blockvars "MASS_LIMS" "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mass_lims/"
 
 #}}}

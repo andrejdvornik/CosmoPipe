@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLU BV:NSMFBINS BV:MINMASS BV:MAXMASS BV:H0 BV:OMEGAM BV:OMEGAV BV:MINZ BV:MAXZ BV:REDSHIFT BV:STELLARMASS SURVEYAREADEG DATABLOCK DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  echo ALLPATCH BLU BV:NSMFBINS BV:MINMASS BV:MAXMASS BV:H0_IN BV:OMEGAM_IN BV:OMEGAV_IN BV:MINZ BV:MAXZ BV:REDSHIFT BV:STELLARMASS SURVEYAREADEG DATABLOCK DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
 }
 #}}}
 
@@ -57,7 +57,7 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo smf vmax
+  echo smf vmax f_tomo
 }
 #}}}
 

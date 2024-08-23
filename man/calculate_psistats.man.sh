@@ -56,7 +56,7 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo psi_stats
+  echo psi_stats_gm psi_stats_gg
 }
 #}}}
 

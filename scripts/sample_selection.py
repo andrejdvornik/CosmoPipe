@@ -184,10 +184,12 @@ if __name__ == '__main__':
                     details['x_med'] = np.log10(np.median(10.0**x_data[idx]))
                     details['y_med'] = np.median(y_data[idx])
                     details['slice_in'] = 'obs'
+                    details['f_tomo'] = len(x_data[idx])/len(x_data)
                 if slice_in_z:
                     details['x_med'] = np.median(x_data[idx])
                     details['y_med'] = np.log10(np.median(10.0**y_data[idx]))
                     details['slice_in'] = 'z'
+                    details['f_tomo'] = len(y_data[idx])/len(y_data)
                 with open(f'{outpath}/stats_LB{count+1}.txt', 'w') as f:
                     for key, value in details.items():
                         f.write(f'{key}\t{value}\n')
@@ -273,10 +275,12 @@ if __name__ == '__main__':
                     details['x_med'] = np.log10(np.median(10.0**x_data[idx]))
                     details['y_med'] = np.median(y_data[idx])
                     details['slice_in'] = 'obs'
+                    details['f_tomo'] = len(x_data[idx])/len(x_data)
                 if slice_in_z:
                     details['x_med'] = np.median(x_data[idx])
                     details['y_med'] = np.log10(np.median(10.0**y_data[idx]))
                     details['slice_in'] = 'z'
+                    details['f_tomo'] = len(y_data[idx])/len(y_data)
                 with open(f'{outpath}/stats_LB{count+1}.txt', 'w') as f:
                     for key, value in details.items():
                         f.write(f'{key}\t{value}\n')
