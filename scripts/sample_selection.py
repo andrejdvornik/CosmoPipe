@@ -15,9 +15,8 @@ from astropy.units import eV
 import astropy.units as u
 from astropy.cosmology import FlatLambdaCDM, Flatw0waCDM, LambdaCDM, z_at_value
 from astropy.stats import sigma_clip
-import scipy.stats as ss
 from scipy.signal import find_peaks
-from scipy.stats import gaussian_kde
+from scipy.stats import gaussian_kde, norm
 from sklearn.neighbors import KernelDensity
 import matplotlib.patheffects as pe
 import matplotlib.patches as mpatches
@@ -26,7 +25,17 @@ import dill as pickle
 import argparse
 import os
 
+def create_nz(x_array, z_array, sigma, zdep):
 
+    nz = np.zeros_like(x_array)
+    for z in z_array:
+        if zdep:
+            rv = norm(loc=z, scale=(sigma / (1.0+z)))
+        else:
+            rv = norm(loc=z, scale=sigma)
+        nz += rv.pdf(x_array)
+        nz = nz / sum(nz) # normalise
+    return nz
 
 if __name__ == '__main__':
 
@@ -47,7 +56,13 @@ if __name__ == '__main__':
     parser.add_argument('--output_path', type=str, help='Output path', required=True)
     parser.add_argument('--output_name', type=str, help='Output file', required=True)
     parser.add_argument('--output_name_rand', type=str, help='Output file randoms', required=True)
+    parser.add_argument('--output_name_nz', type=str, help='Output nz file', required=True)
     parser.add_argument('--volume_limited', type=str, help='Create volume limited samples', required=True)
+    parser.add_argument('--stacked_nz', type=str, help='Create stacked n(z) from aNNZ redshifts and their uncertainty', required=True, default='False')
+    parser.add_argument('--z_dependent_error', type=str, help='If uncertanty on z_aNNz is dependent on redhshift or now', required=False, default='True')
+    parser.add_argument('--z_sigma', type=float, help='Redshift uncertainty', required=False, default=0.018)
+    parser.add_argument('--nz_step', type=float, help='Redshift step size', required=False, default=0.05)
+    
     
     args = parser.parse_args()
     
@@ -80,10 +95,21 @@ if __name__ == '__main__':
     path = args.path
     outpath = args.output_path
     outname = args.output_name
+    outname_nz = args.output_name_nz
     outname_rand = args.output_name_rand
     percentiles_in = args.percentiles #[25, 50, 75]
     percentiles = np.array([float(i) for i in percentiles_in])
 
+    
+    stacked_nz = args.stacked_nz
+    stacked_nz = stacked_nz.lower() in ["true","t","1","y","yes"]
+    
+    z_dependent_error = args.z_dependent_error
+    z_dependent_error = z_dependent_error.lower() in ["true","t","1","y","yes"]
+    
+    z_sigma = args.z_sigma
+    nz_step = args.nz_step
+    
     
     file_in = fits.open(args.file, memmap=True)
     data = file_in[1].data
@@ -185,15 +211,22 @@ if __name__ == '__main__':
                     details['y_med'] = np.median(y_data[idx])
                     details['slice_in'] = 'obs'
                     details['f_tomo'] = len(x_data[idx])/len(x_data)
+                    if stacked_nz:
+                        centers = np.arange(0.0, 6.0, step=nz_step)
+                        nz = create_nz(centers, y_data[idx], z_sigma, z_dependent_error)
+                        np.savetxt(f'{outname_nz}{count+1}.txt', np.column_stack([centers, nz]), header='binstart, density')
                 if slice_in_z:
                     details['x_med'] = np.median(x_data[idx])
                     details['y_med'] = np.log10(np.median(10.0**y_data[idx]))
                     details['slice_in'] = 'z'
                     details['f_tomo'] = len(y_data[idx])/len(y_data)
+                    if stacked_nz:
+                        centers = np.arange(0.0, 6.0, step=nz_step)
+                        nz = create_nz(centers, x_data[idx], z_sigma, z_dependent_error)
+                        np.savetxt(f'{outname_nz}{count+1}.txt', np.column_stack([centers, nz]), header='binstart, density')
                 with open(f'{outpath}/stats_LB{count+1}.txt', 'w') as f:
                     for key, value in details.items():
                         f.write(f'{key}\t{value}\n')
-    
     
                 if random:
                     print('\nApplying selection to randoms...')
@@ -276,11 +309,19 @@ if __name__ == '__main__':
                     details['y_med'] = np.median(y_data[idx])
                     details['slice_in'] = 'obs'
                     details['f_tomo'] = len(x_data[idx])/len(x_data)
+                    if stacked_nz:
+                        centers = np.arange(0.0, 6.0, step=nz_step)
+                        nz = create_nz(centers, y_data[idx], z_sigma, z_dependent_error)
+                        np.savetxt(f'{outname_nz}{count+1}.txt', np.column_stack([centers, nz]), header='binstart, density')
                 if slice_in_z:
                     details['x_med'] = np.median(x_data[idx])
                     details['y_med'] = np.log10(np.median(10.0**y_data[idx]))
                     details['slice_in'] = 'z'
                     details['f_tomo'] = len(y_data[idx])/len(y_data)
+                    if stacked_nz:
+                        centers = np.arange(0.0, 6.0, step=nz_step)
+                        nz = create_nz(centers, x_data[idx], z_sigma, z_dependent_error)
+                        np.savetxt(f'{outname_nz}{count+1}.txt', np.column_stack([centers, nz]), header='binstart, density')
                 with open(f'{outpath}/stats_LB{count+1}.txt', 'w') as f:
                     for key, value in details.items():
                         f.write(f'{key}\t{value}\n')

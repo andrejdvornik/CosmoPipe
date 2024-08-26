@@ -12,6 +12,8 @@ _message "Applying selections to the lens catalogue and constructing lens bins:"
 
 lensfile="@BV:FLUXSCALE_CORRECTED@"
 randfile="@BV:RAND_CATS@"
+stacked_nz="@BV:STACKED_NZ@"
+
 if [ -f ${lensfile} ]
 then
   lens_filelist=${lensfile}
@@ -51,6 +53,7 @@ fi
 #Define the output filename
 outname=${lensfile##*/}
 outname=${outname%%.*}
+outname_nz=${outname}_nz_LB
 outname=${outname}_LB
 
 
@@ -91,6 +94,51 @@ do
   fi
 done
 
+if [ "${stacked_nz}" == "True" ]
+then
+  if [ "${prefix,,}" == "smf" ]
+  then
+    #If needed, make the output folder
+    if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_obs/ ]
+    then
+      mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_obs
+    fi
+    output_name_nz="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_obs/${outname_nz}"
+    nz_catsblock=`_read_datablock nz_obs`
+  elif [ "${prefix,,}" == "" ]
+  then
+    #If needed, make the output folder
+    if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_lens/ ]
+    then
+      mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_lens
+    fi
+    output_name_nz="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_lens/${outname_nz}"
+    nz_catsblock=`_read_datablock nz_lens`
+  else
+    #If needed, make the output folder
+    if [ ! -d "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_${prefix,,}/" ]
+    then
+      mkdir "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_${prefix,,}"
+    fi
+    output_name_nz="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_${prefix,,}/${outname_nz}"
+    nz_catsblock=`_read_datablock nz_${append_prefix}`
+  fi
+
+  for LBIN in `seq ${NBIN}`
+  do
+    #Check if the output file exists
+    if [ -f "${output_name_nz}${LBIN}.txt" ]
+    then
+      _message "    -> @BLU@Removing previous @RED@Bin $LBIN@BLU@ n(z)@DEF@"
+      rm -f "${output_name_nz}${LBIN}.txt"
+      currentblock=`_blockentry_to_filelist ${nz_catsblock}`
+      currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v "${outname_nz}${LBIN}.txt" | awk '{printf $0 " "}' || echo `
+      _write_datablock ${nz_catsblock} "${currentblock}"
+      _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
+    fi
+  done
+fi
+
 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/sample_selection.py \
   --file ${lensfile} \
@@ -98,6 +146,7 @@ MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
   --output_path @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${append_prefix}lens_cats_metadata/ \
   --output_name @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${append_prefix}lens_cats/${outname} \
   --output_name_rand @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${append_prefix}rand_cats/${outname} \
+  --output_name_nz ${output_name_nz} \
   --stellar_mass_column @BV:STELLARMASS@ \
   --z_column @BV:REDSHIFT@ \
   --slice_in @BV:SLICEIN@ \
@@ -106,7 +155,11 @@ MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
   --volume_limited @BV:VOLUMELIMITED@ \
   --path @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mass_lims \
   --m_bins @BV:LENSLIMSX@ \
-  --z_bins @BV:LENSLIMSY@ 2>&1
+  --z_bins @BV:LENSLIMSY@ \
+  --stacked_nz ${stacked_nz} \
+  --z_dependent_error @BV:ZDEPERR@ \
+  --z_sigma @BV:ZSIGMA@ \
+  --nz_step @BV:NZSTEP@ 2>&1
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 _write_blockvars "N${prefix^^}LENSBINS" `awk '{print $2}' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${append_prefix}lens_cats_metadata/nbins.txt`
@@ -131,4 +184,24 @@ _write_blockvars "${append_prefix_var}LENS_CATS" "@RUNROOT@/@STORAGEPATH@/@DATAB
 _write_blockvars "${append_prefix_var}RAND_CATS" "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${append_prefix}rand_cats/"
 _write_blockvars "${append_prefix_var}LENS_CATS_METADATA" "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${append_prefix}lens_cats_metadata/"
 _write_blockvars "LENSPREFIX" ""
+
+if [ "${stacked_nz}" == "True" ]
+then
+  outlist_nz=""
+  for LBIN in `seq ${NBIN}`
+  do
+    outlist_nz="${outlist_nz} ${outname_nz}${LBIN}.txt"
+  done
+  #Add the binned catalogues to the datablock
+  if [ "${prefix,,}" == "smf" ]
+  then
+    _write_datablock nz_obs "${outlist_nz}"
+  elif [ "${prefix,,}" == "" ]
+  then
+    _write_datablock nz_lens "${outlist_nz}"
+  else
+    _write_datablock "nz_${prefix,,}" "${outlist_nz}"
+  fi
+fi
+
 # We reset the prefix in the script
