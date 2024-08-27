@@ -31,7 +31,7 @@ fi
 # Infer statistic {{{
 STATISTIC="@BV:STATISTIC@"
 SECONDSTATISTIC="@BV:SECONDSTATISTIC@"
-if [ "${STATISTIC^^}" == "XIPM" ]
+if [ "${STATISTIC^^}" == "2PCF" ]
 then
   est_shear=xi_pm
   n_arb=@BV:NTHETAREBIN@
@@ -105,7 +105,7 @@ then
 else
   mixterm=""
 fi
-if [ "${SECONDSTATISTIC^^}" == "XIPM" ] || [ "${SECONDSTATISTIC^^}" == "COSEBIS" ] || [ "${SECONDSTATISTIC^^}" == "BANDPOWERS" ]
+if [ "${SECONDSTATISTIC^^}" == "2PCF" ] || [ "${SECONDSTATISTIC^^}" == "COSEBIS" ] || [ "${SECONDSTATISTIC^^}" == "BANDPOWERS" ]
 then
   if [ "${STATISTIC^^}" == "${SECONDSTATISTIC^^}" ]
   then
@@ -301,7 +301,7 @@ cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_c
 
 EOF
 
-if [ "${STATISTIC^^}" == "XIPM" ] || [ "${SECONDSTATISTIC^^}" == "XIPM" ]
+if [ "${STATISTIC^^}" == "2PCF" ] || [ "${SECONDSTATISTIC^^}" == "2PCF" ]
 then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covTHETAspace settings]
@@ -497,8 +497,8 @@ lower_calc_limit = 1e-200
 num_cores = @BV:COVNCORES@
 
 [tabulated inputs files]
-npair_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/
-npair_mm_file = @BV:NPAIRBASE@_nBins_${NTOMO}_Bin?_Bin?.ascii
+npair_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_npair/
+npair_mm_file = @BV:NPAIRBASE_XI@_nBins_${NTOMO}_Bin?_Bin?.ascii
 # These files should not be required anymore.
 # cosebi_directory = @RUNROOT@/@CONFIGPATH@/cosebis/
 # wn_log_file = ${WnLog_filelist}
@@ -515,7 +515,7 @@ EOF
 # Covariance between summary statistics {{{
 if [ "${cov_between_stats}" == "True" ]
 then
-    if [ "${SECONDSTATISTIC^^}" == "XIPM" ]
+    if [ "${SECONDSTATISTIC^^}" == "2PCF" ]
     then
       n_arb2=@BV:NTHETAREBIN@
       arb_fourier_filter_mmE_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_mm_p_@BV:THETAMIN@-@BV:THETAMAX@_?.table"

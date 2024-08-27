@@ -25,7 +25,7 @@ then
       datavec=`echo @DB:bandpowers_vec@ | awk '{print $1}'`
       covariance=@DB:covariance_bandpowers@
       ;;
-    "xipm") 
+    "2pcf") 
       xlabel="Radial Bin i" 
       ylabel="Xi[pm]" 
       datavec=`echo @DB:xipm_vec@ | awk '{print $1}'`

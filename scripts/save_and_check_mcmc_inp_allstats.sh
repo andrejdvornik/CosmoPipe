@@ -56,8 +56,8 @@ then
     input_covariance_iterative=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_bandpowers/covariance_matrix_${non_linear_model}${filename_extension}.mat
   fi 
 #}}}
-elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
-then 
+elif [ "${STATISTIC^^}" == "2PCF" ] #{{{
+then
   input_datavector="@DB:xipm_vec@"
   input_covariance="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_xipm/covariance_matrix_${non_linear_model}.mat"
   if [ -n "$ITERATION" ] && [ "$ITERATION" -eq "$ITERATION" ]

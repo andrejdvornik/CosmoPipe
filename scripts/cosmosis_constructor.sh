@@ -294,7 +294,7 @@ fi
 #}}}
 
 #}}}
-elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
+elif [ "${STATISTIC^^}" == "2PCF" ] #{{{
 then 
   #scale cut {{{
   if [ "${SAMPLER^^}" == "LIST" ]
@@ -342,7 +342,7 @@ nTheta=@BV:NTHETAREBIN@
 
 weighted_binning = 1 
 
-InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/@BV:NPAIRBASE@
+InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_npair/@BV:NPAIRBASE_XI@
 InputNpair_suffix = .ascii
 Column_theta_Name = meanr 
 Column_Npair_Name = npairs_weighted
@@ -362,7 +362,7 @@ theta_max = @BV:THETAMAX@
 nTheta = @BV:NTHETAREBIN@
 
 weighted_binning = 1 
-InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/@BV:NPAIRBASE@
+InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_npair/@BV:NPAIRBASE_XI@
 InputNpair_suffix = .ascii
 Column_theta_Name = meanr 
 Column_Npair_Name = npairs_weighted
@@ -513,7 +513,7 @@ then
   elif [ "${STATISTIC^^}" == "BANDPOWERS" ] 
   then 
 	ndat=`echo "$ncombinations @BV:NBANDPOWERS@" | awk '{printf "%u", $1*$2 }'`
-  elif [ "${STATISTIC^^}" == "XIPM" ]
+  elif [ "${STATISTIC^^}" == "2PCF" ]
   then 
 	ndat=`echo "$ncombinations @BV:NTHETAREBIN@" | awk '{printf "%u", $1*$2*2 }'`
   fi
@@ -612,7 +612,7 @@ then
 	elif [ "${STATISTIC^^}" == "BANDPOWERS_B" ] #{{{
 	then 
 		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} bandpowers scale_cuts bandpowers_b scale_cuts_b likelihood likelihood_b"
-	elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
+	elif [ "${STATISTIC^^}" == "2PCF" ] #{{{
 	then 
 		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} cl2xi xip_binned xim_binned scale_cuts likelihood"
 	fi
@@ -647,7 +647,7 @@ do
         elif [ "${STATISTIC^^}" == "COSEBIS" ] 
         then
             tpdparams="${tpdparams} cosebis/bin_${tomo2}_${tomo1}#@BV:NMAXCOSEBIS@"
-        elif [ "${STATISTIC^^}" == "XIPM" ] 
+        elif [ "${STATISTIC^^}" == "2PCF" ] 
         then
             tpdparams="${tpdparams} shear_xi_plus_binned/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@ shear_xi_minus_binned/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@"
         fi

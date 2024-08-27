@@ -117,7 +117,7 @@ then
   if [ -n "$ITERATION" ] && [ "$ITERATION" -eq "$ITERATION" ]
   then
     filename_extension=${CHAINSUFFIX}_iteration_${ITERATION}
-    input_covariance_iterative=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_xipm/covariance_matrix_${non_linear_model}${filename_extension}.mat
+    input_covariance_iterative=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_2pcf/covariance_matrix_${non_linear_model}${filename_extension}.mat
   fi
 elif [ "${STATISTIC^^}" == "XIEB" ] #{{{
 then
