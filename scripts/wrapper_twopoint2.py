@@ -840,7 +840,7 @@ def saveFitsTwoPoint(
         
     ## Make
     TPBuilder.setMean(meanTag, name=meanName, statsTag=statsTag)
-    #TPBuilder.setCov(covTag, name=covName, statsTag=statsTag)
+    TPBuilder.setCov(covTag, name=covName, statsTag=statsTag)
     TPBuilder.setNOfZ(nOfZNameList, nGalList=nGalList, sigmaEpsList=sigmaEpsList)
     TPBuilder.setNobs(nobsTag, name=nobsName)
     TP = TPBuilder.makeTwoPoint(labConv, statsTag_c)

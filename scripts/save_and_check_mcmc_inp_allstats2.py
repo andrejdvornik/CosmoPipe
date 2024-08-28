@@ -789,14 +789,14 @@ statsList = stats_string.split()
 title='KiDS-Legacy'
 savename=plotdir+'/only_source_Nz.pdf'
 plot_redshift(outputfile+'.fits',title,savename)
-"""
+
 title=statistic
 savename=plotdir+'/'+statistic+'_covariance.pdf'
 plot_covariance(outputfile+'.fits',title,savename)
 
 savename=plotdir+'/'+statistic+'_correlation_matrix.pdf'
 plot_correlation_mat(outputfile+'.fits',title,savename)
-"""
+
 for extname in statsList:
     savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
     if extname != '1pt':
