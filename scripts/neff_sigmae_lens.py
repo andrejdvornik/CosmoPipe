@@ -13,18 +13,20 @@ parser.add_argument('--area', dest="area", type=float,required=True,
          help='Area of the survey in square arcmin')
 
 args = parser.parse_args()
+
+wname = args.wname
 try:
     catalogue=pyfits.open(args.input)[1].data
     if wname in ["None","none",""]:
         weight=1.0*catalogue.shape[0]
-    else
+    else:
         weight=catalogue.field(args.wname)
 except Exception:
     ldac_cat = ldac.LDACCat(args.input)
     catalogue = ldac_cat['OBJECTS']
     if wname in ["None","none",""]:
         weight=1.0*catalogue.shape[0]
-    else
+    else:
         weight=catalogue[args.wname]
 
 area=args.area
@@ -42,5 +44,5 @@ n_eff = (
     area)
 
 
-print(number, n_eff, sigma_e1, sigma_e2, sigma_e1_wsq, sigma_e2_wsq, sigma_eps, sigma_e)
+print(number, n_eff)
 

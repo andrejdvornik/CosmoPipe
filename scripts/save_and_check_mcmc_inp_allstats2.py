@@ -345,8 +345,8 @@ def plot_data_1pt(filename,title,extname,savename):
     plt.title(title)
     for i in range(1, 99999):
         try:
-            data = ext.data['BIN{}'.format(i)]
-            x_val = ext.data['OBS{}'.format(i)]
+            data = ext.data['VALUE{}'.format(i)]
+            x_val = ext.data['ANG{}'.format(i)]
             #print(x_val, data)
             plt.plot(x_val,data)
         except:
@@ -789,16 +789,18 @@ statsList = stats_string.split()
 title='KiDS-Legacy'
 savename=plotdir+'/only_source_Nz.pdf'
 plot_redshift(outputfile+'.fits',title,savename)
-
+"""
 title=statistic
 savename=plotdir+'/'+statistic+'_covariance.pdf'
 plot_covariance(outputfile+'.fits',title,savename)
 
 savename=plotdir+'/'+statistic+'_correlation_matrix.pdf'
 plot_correlation_mat(outputfile+'.fits',title,savename)
-
+"""
 for extname in statsList:
     savename=plotdir+'/'+statistic+'_data_'+extname+'.pdf'
-    plot_data(outputfile+'.fits',title,extname,savename)
-    
+    if extname != '1pt':
+        plot_data(outputfile+'.fits',title,extname,savename)
+    else:
+        plot_data_1pt(outputfile+'.fits',title,extname,savename)
 

@@ -197,7 +197,7 @@ then
   NOBS="@BV:NSMFLENSBINS@"
   nz_obs="@DB:nz_obs@"
   neffobs="@DB:cosmosis_neff_obs@"
-  input_smfdatavector="@DB:smf_datavec@"
+  input_smfdatavector="@DB:smf_vec@"
 else
   NOBS=0
   nz_obs=

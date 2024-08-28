@@ -81,7 +81,7 @@ if __name__ == '__main__':
             scaling_ne = 1e10
         if nn:
             extension_nn = 'Psi_gg'
-            ylabel_ne = r'$\Psi_{\rm gg,n}[10^{-10}{\rm rad}^2]$'
+            ylabel_nn = r'$\Psi_{\rm gg,n}[10^{-10}{\rm rad}^2]$'
             xlabel = r'n'
             xscale = 'linear'
             scaling_nn = 1e10
@@ -138,29 +138,47 @@ if __name__ == '__main__':
             xlabel = r'$\theta$'
             xscale = 'log'
             scaling_nn = 1e4
+    if obs:
+        extension_obs = '1pt'
+        ylabel_obs = r'$\phi (\mathrm{dex}^{-1}\,h^{3}\,\mathrm{Mpc}^{-3})$'
+        xlabel_obs = r'$\log(M_{\star}/h^{2}M_{\odot})$'
+        xscale_obs = 'log'
+        yscale_obs = 'log'
+        scaling_obs = 1
     
     with fits.open(inputfile) as f:
         if ee:
             eeE_data = f[extension_eeE].data
             eeB_data = f[extension_eeB].data
             n_data_ee = len(eeE_data)
-            eeE_cov = f['COVMAT'].data[:n_data_ee,:][:,:n_data_ee]
-            eeB_cov = f['COVMAT'].data[n_data_ee:,:][:,n_data_ee:]
+            #eeE_cov = f['COVMAT'].data[:n_data_ee,:][:,:n_data_ee]
+            #eeB_cov = f['COVMAT'].data[n_data_ee:,:][:,n_data_ee:]
+            eeE_cov = np.eye(n_data_ee)
+            eeB_cov = np.eye(n_data_ee)
             eeE_std = np.sqrt(np.diag(eeE_cov))
             eeB_std = np.sqrt(np.diag(eeB_cov))
         if ne:
             neE_data = f[extension_neE].data
             neB_data = f[extension_neB].data
             n_data_ne = len(neE_data)
-            neE_cov = f['COVMAT'].data[:n_data_ne,:][:,:n_data_ne]
-            neB_cov = f['COVMAT'].data[n_data_ne:,:][:,n_data_ne:]
+            #neE_cov = f['COVMAT'].data[:n_data_ne,:][:,:n_data_ne]
+            #neB_cov = f['COVMAT'].data[n_data_ne:,:][:,n_data_ne:]đ
+            neE_cov = np.eye(n_data_ne)
+            neB_cov = np.eye(n_data_ne)
             neE_std = np.sqrt(np.diag(neE_cov))
             neB_std = np.sqrt(np.diag(neB_cov))
         if nn:
             nn_data = f[extension_nn].data
             n_data_nn = len(nn_data)
-            nn_cov = f['COVMAT'].data[:n_data_nn,:][:,:n_data_nn]
+            #nn_cov = f['COVMAT'].data[:n_data_nn,:][:,:n_data_nn]
+            nn_cov = np.eye(n_data_nn)
             nn_std = np.sqrt(np.diag(nn_cov))
+        if obs:
+            obs_data = f[extension_obs].data
+            n_data_obs = len(obs_data)
+            #nn_cov = f['COVMAT'].data[:n_data_nn,:][:,:n_data_nn]
+            obs_cov = np.eye(n_data_obs)
+            obs_std = np.sqrt(np.diag(obs_cov))
 
     
     if (statistic == 'xiE') or (statistic == 'xiB'):
@@ -210,38 +228,39 @@ if __name__ == '__main__':
         n_combinations_nn = nlens # Currently only auto correlations
         n_data_per_bin_nn = int(n_data_nn / n_combinations_nn)
     
-    # plotting sizes
-    yprops=dict(rotation=90, horizontalalignment='center',verticalalignment='center', x=10,labelpad=20, fontsize=15)
-    leg1=Rectangle((0,0),0,0,alpha=0.0)
-    formatter = ScalarFormatter(useMathText=True)
-    formatter.set_scientific(True)
-    fig_width_pt = 246.0*3.5 # Get this from LaTex using \the\columnwidth
-    inches_per_pt = 1.0/72.27
-    golden_mean = (np.sqrt(5)-1.0)/2.0
-    fig_width  = fig_width_pt*inches_per_pt # width in inches
-    fig_height = fig_width*golden_mean # height in inches
-    fig_size = [fig_width, fig_height*1.5]
-    fontsize=15
-    params = {'axes.labelsize':15,
-            'font.size':10,
-            'legend.fontsize':17,
-            'xtick.labelsize':12,
-            'ytick.labelsize':12,
-            'figure.figsize':fig_size,
-            'font.family': 'serif'}
-    pl.rcParams.update(params)
-    pl.rc('text',usetex=True)
-    pl.subplots_adjust(wspace=0.075,hspace=0.075) # you can add spaces between the block here
-    pl.clf()
-    fig = pl.figure(1, figsize = (20,20))
-    pl.clf()
     
     if ee:
+        # plotting sizes
+        yprops=dict(rotation=90, horizontalalignment='center',verticalalignment='center', x=10,labelpad=20, fontsize=15)
+        leg1=Rectangle((0,0),0,0,alpha=0.0)
+        formatter = ScalarFormatter(useMathText=True)
+        formatter.set_scientific(True)
+        fig_width_pt = 246.0*3.5 # Get this from LaTex using \the\columnwidth
+        inches_per_pt = 1.0/72.27
+        golden_mean = (np.sqrt(5)-1.0)/2.0
+        fig_width  = fig_width_pt*inches_per_pt # width in inches
+        fig_height = fig_width*golden_mean # height in inches
+        fig_size = [fig_width, fig_height*1.5]
+        fontsize=15
+        params = {'axes.labelsize':15,
+                'font.size':10,
+                'legend.fontsize':17,
+                'xtick.labelsize':12,
+                'ytick.labelsize':12,
+                'figure.figsize':fig_size,
+                'font.family': 'serif'}
+        pl.rcParams.update(params)
+        pl.rc('text',usetex=True)
+        pl.subplots_adjust(wspace=0.075,hspace=0.075) # you can add spaces between the block here
+        pl.clf()
+        fig = pl.figure()#1, figsize = (fig_width, fig_height*1.5))
+        pl.clf()
         # Plotting
-        for bin1 in range(1,ntomo+1):
-            for bin2 in range(bin1,ntomo+1):
-                index=int(ntomo*(bin1-1)-(bin1-1)*(bin1-1-1)/2+(bin2-1)-(bin1-1))
-                ax=pl.subplot(ntomo+1,ntomo+1,(bin1-1)*(ntomo+1)+(bin2-1)+2) # use this for upper triangle
+        for bin1 in range(1, ntomo+1):
+            for bin2 in range(bin1, ntomo+1):
+                index = int(ntomo*(bin1-1) - (bin1-1)*(bin1-1 - 1)/2 + (bin2-1) - (bin1-1))
+                ax = pl.subplot(ntomo+1, ntomo+1, (bin1-1)*(ntomo+1) + (bin2-1) + 2) # use this for upper triangle
+                ax.set_box_aspect(1)
                 ax.set_ylim(ymin_eeE,ymax_eeE)
                 pl.xscale(xscale)
                 idx = np.where((eeE_data['BIN1']==bin1) & (eeE_data['BIN2']==bin2))[0]
@@ -283,6 +302,7 @@ if __name__ == '__main__':
                 #################################################################
                 # lower triangle for B-modes
                 ax=pl.subplot(ntomo+1,ntomo+1,(bin2-1)*(ntomo+1)+(bin1-1)+ntomo+2)
+                ax.set_box_aspect(1)
                 ax.tick_params(bottom=True, top=False, left=False, right=True, which='both')
                 ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=False)
                 if bin2==ntomo:
@@ -322,17 +342,43 @@ if __name__ == '__main__':
                 #     lg.draw_frame(False)
         fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
         if suffix:
-            pl.savefig(output_dir+'/cosmic_shear_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix))
+            pl.savefig(output_dir+'/cosmic_shear_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
         else:
-            pl.savefig(output_dir+'/cosmic_shear_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax))
+            pl.savefig(output_dir+'/cosmic_shear_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax), bbox_inches="tight")
         pl.close()
-    
-    
+        pl.clf()
+        pl.rcParams.update()
     if ne:
-        for bin1 in range(1,nlens+1):
-            for bin2 in range(1,ntomo+1):
-                index=int(ntomo*(bin1-1)-(bin1-1)*(bin1-1-1)/2+(bin2-1))
-                ax=pl.subplot(ntomo+1,nlens+1,(bin2-1)*(ntomo+1)+(bin1-1)+1) # use this for upper triangle
+        # plotting sizes
+        yprops=dict(rotation=90, horizontalalignment='center',verticalalignment='center', x=10,labelpad=20, fontsize=15)
+        leg1=Rectangle((0,0),0,0,alpha=0.0)
+        formatter = ScalarFormatter(useMathText=True)
+        formatter.set_scientific(True)
+        fig_width_pt = 246.0*3.5 # Get this from LaTex using \the\columnwidth
+        inches_per_pt = 1.0/72.27
+        golden_mean = (np.sqrt(5)-1.0)/2.0
+        fig_width  = fig_width_pt*inches_per_pt # width in inches
+        fig_height = fig_width*golden_mean # height in inches
+        fig_size = [fig_width*nlens/ntomo, fig_height*1.5]
+        fontsize=15
+        params = {'axes.labelsize':15,
+                'font.size':10,
+                'legend.fontsize':17,
+                'xtick.labelsize':12,
+                'ytick.labelsize':12,
+                'figure.figsize':fig_size,
+                'font.family': 'serif'}
+        pl.rcParams.update(params)
+        pl.rc('text',usetex=True)
+        pl.subplots_adjust(wspace=0.075,hspace=0.075) # you can add spaces between the block here
+        pl.clf()
+        fig = pl.figure()
+        pl.clf()
+        for bin1 in range(1, nlens+1):
+            for bin2 in range(1, ntomo+1):
+                index = int(ntomo*(bin1-1) - (bin1-1)*(bin1-1 - 1)/2 + (bin2-1))
+                ax = pl.subplot(ntomo, nlens, (bin2-1)*(nlens) + (bin1-1) + 1)
+                ax.set_box_aspect(1)
                 ax.set_ylim(ymin_neE,ymax_neE)
                 pl.xscale(xscale)
                 idx = np.where((neE_data['BIN1']==bin1) & (neE_data['BIN2']==bin2))[0]
@@ -364,23 +410,95 @@ if __name__ == '__main__':
                 lg = pl.legend([leg1],[r'$\mathrm{{L}}{{{0}}}-\mathrm{{S}}{{{1}}}$'.format(bin1,bin2)],loc='upper right',
                             handlelength=0,borderpad=0,labelspacing=0.,ncol=3,prop={'size':fontsize}
                             ,columnspacing=0,frameon=None)
-                lg.draw_frame(False)
+                #lg.draw_frame(False)
                 
         fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
         if suffix:
-            pl.savefig(output_dir+'/ggl_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix))
+            pl.savefig(output_dir+'/ggl_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
         else:
-            pl.savefig(output_dir+'/ggl_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax))
+            pl.savefig(output_dir+'/ggl_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax), bbox_inches="tight")
         pl.close()
-
+        pl.clf()
+        
+        if (statistic == 'bandpowers') or (statistic == '2pcf'):
+            for bin1 in range(1, nlens+1):
+                for bin2 in range(1, ntomo+1):
+                    index = int(ntomo*(bin1-1) - (bin1-1)*(bin1-1 - 1)/2 + (bin2-1))
+                    ax = pl.subplot(ntomo, nlens, (bin2-1)*(nlens) + (bin1-1) + 1)
+                    ax.set_box_aspect(1)
+                    ax.set_ylim(ymin_neE,ymax_neE)
+                    pl.xscale(xscale)
+                    idx = np.where((neB_data['BIN1']==bin1) & (neB_data['BIN2']==bin2))[0]
+                    # Plot data
+                    if (statistic == 'bandpowers'):
+                        ax.errorbar(neB_data['ANG'][idx], neB_data['VALUE'][idx]/neB_data['ANG'][idx]*scaling_ne, neB_std[idx]/neB_data['ANG'][idx]*scaling_ne, linestyle = 'None',     marker = '.', markersize=5)
+                    elif statistic == '2pcf':
+                        ax.errorbar(neB_data['ANG'][idx],neB_data['ANG'][idx]*neB_data['VALUE'][idx]*scaling_ne, yerr=neB_data['ANG'][idx]*neB_std[idx]*scaling_ne,         fmt='d',markeredgecolor='C0',mew=1,markerfacecolor='C0', color='C0', markersize=4)
+            
+                    ax.axhline(y=0, color='k', ls=':',label='')
+                    ax.tick_params(bottom=True, top=False, left=True, right=False, which='both')
+                    ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=False)
+            
+                    if bin2==ntomo:
+                        ax.set_xlabel(xlabel)
+                        ax.tick_params(bottom=True, top=False, left=True, right=False, which='both')
+                        ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=False)
+                        ax.xaxis.set_label_position('bottom')
+                    if bin1==nlens:
+                        ax.set_ylabel(ylabel_neB,**yprops)
+                        ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
+                        ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=True)
+                        ax.yaxis.set_label_position('right')
+                    if bin1==nlens and bin2==ntomo:
+                        ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
+                        ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=True)
+                    lg = pl.legend([leg1],[r'$\mathrm{{L}}{{{0}}}-\mathrm{{S}}{{{1}}}$'.format(bin1,bin2)],loc='upper right',
+                                handlelength=0,borderpad=0,labelspacing=0.,ncol=3,prop={'size':fontsize}
+                                ,columnspacing=0,frameon=None)
+                    #lg.draw_frame(False)
+            
+            fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
+            if suffix:
+                pl.savefig(output_dir+'/ggl_B_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
+            else:
+                pl.savefig(output_dir+'/ggl_B_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax), bbox_inches="tight")
+            pl.close()
+            pl.clf()
+        pl.rcParams.update()
     
     if nn:
-        for bin1 in range(1,nlens+1):
-            for bin2 in range(1,nlens+1):
+        # plotting sizes
+        yprops=dict(rotation=90, horizontalalignment='center',verticalalignment='center', x=10,labelpad=20, fontsize=15)
+        leg1=Rectangle((0,0),0,0,alpha=0.0)
+        formatter = ScalarFormatter(useMathText=True)
+        formatter.set_scientific(True)
+        fig_width_pt = 246.0*3.5 # Get this from LaTex using \the\columnwidth
+        inches_per_pt = 1.0/72.27
+        golden_mean = (np.sqrt(5)-1.0)/2.0
+        fig_width  = fig_width_pt*inches_per_pt # width in inches
+        fig_height = fig_width*golden_mean # height in inches
+        fig_size = [fig_width/nlens, fig_height*1.5]
+        fontsize=15
+        params = {'axes.labelsize':15,
+                'font.size':10,
+                'legend.fontsize':17,
+                'xtick.labelsize':12,
+                'ytick.labelsize':12,
+                'figure.figsize':fig_size,
+                'font.family': 'serif'}
+        pl.rcParams.update(params)
+        pl.rc('text',usetex=True)
+        pl.subplots_adjust(wspace=0.075,hspace=0.075) # you can add spaces between the block here
+        pl.clf()
+        fig = pl.figure()
+        pl.clf()
+        for bin1 in range(1, nlens+1):
+            for bin2 in range(1, nlens+1):
                 if bin1!=bin2:
                     continue
-                index=int(nlens*(bin1-1)-(bin1-1))
-                ax=pl.subplot(nlens+1,nlens+1,(bin1-1)*(nlens+1)+1) # use this for upper triangle
+                index = int(nlens*(bin1-1) - (bin1-1))
+                ax = pl.subplot(nlens, 1, bin1)#(bin1-1)*(nlens) + 1) # use this for upper triangle
+                ax.set_box_aspect(1)
                 ax.set_ylim(ymin_nn,ymax_nn)
                 pl.xscale(xscale)
                 idx = np.where((nn_data['BIN1']==bin1) & (nn_data['BIN2']==bin2))[0]
@@ -395,19 +513,17 @@ if __name__ == '__main__':
                 ax.axhline(y=0, color='k', ls=':',label='')
                 ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
                 ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=False)
-                
+                ax.set_ylabel(ylabel_nn,**yprops)
                 if bin2==nlens:
                     ax.set_xlabel(xlabel)
                     ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
                     ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=True)
                     ax.xaxis.set_label_position('bottom')
                 if bin1==1:
-                    ax.set_ylabel(ylabel_neE,**yprops)
                     ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
                     ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=True)
                     ax.yaxis.set_label_position('right')
                 if bin1==nlens and bin2==nlens:
-                    ax.set_ylabel(r'$\mathcal{C}_{\ell} / \ell\, [10^{-2}]$',**yprops)
                     ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
                     ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=True)
                     ax.yaxis.set_label_position('right')
@@ -418,12 +534,75 @@ if __name__ == '__main__':
                 
         fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
         if suffix:
-            pl.savefig(output_dir+'/clustering_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix))
+            pl.savefig(output_dir+'/clustering_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
         else:
-            pl.savefig(output_dir+'/clustering_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax))
+            pl.savefig(output_dir+'/clustering_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax), bbox_inches="tight")
         pl.close()
+        pl.clf()
+        pl.rcParams.update()
     if obs:
-        pass
+        # plotting sizes
+        yprops=dict(rotation=90, horizontalalignment='center',verticalalignment='center', x=10,labelpad=20, fontsize=15)
+        leg1=Rectangle((0,0),0,0,alpha=0.0)
+        formatter = ScalarFormatter(useMathText=True)
+        formatter.set_scientific(True)
+        fig_width_pt = 246.0*3.5 # Get this from LaTex using \the\columnwidth
+        inches_per_pt = 1.0/72.27
+        golden_mean = (np.sqrt(5)-1.0)/2.0
+        fig_width  = fig_width_pt*inches_per_pt # width in inches
+        fig_height = fig_width*golden_mean # height in inches
+        fig_size = [fig_width/nlens, fig_height*1.5]
+        fontsize=15
+        params = {'axes.labelsize':15,
+                'font.size':10,
+                'legend.fontsize':17,
+                'xtick.labelsize':12,
+                'ytick.labelsize':12,
+                'figure.figsize':fig_size,
+                'font.family': 'serif'}
+        pl.rcParams.update(params)
+        pl.rc('text',usetex=True)
+        pl.subplots_adjust(wspace=0.075,hspace=0.075) # you can add spaces between the block here
+        pl.clf()
+        fig = pl.figure()
+        pl.clf()
+        for bin1 in range(1, nobs+1):
+            index = int(nobs*(bin1-1) - (bin1-1))
+            ax = pl.subplot(nobs, 1, bin1)#(bin1-1)*(nlens) + 1) # use this for upper triangle
+            ax.set_box_aspect(1)
+            #ax.set_ylim(ymin_obs,ymax_obs)
+            pl.xscale(xscale_obs)
+            pl.yscale(yscale_obs)
+            # Plot data
+            ax.errorbar(obs_data[f'ANG{bin1}'], obs_data[f'VALUE{bin1}']*scaling_obs, obs_std*scaling_obs, linestyle = 'None', marker = '.', markersize=5)
+        
+            #ax.axhline(y=0, color='k', ls=':',label='')
+            ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
+            ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=False)
+            ax.set_ylabel(ylabel_obs,**yprops)
+            if bin1==nobs:
+                ax.set_xlabel(xlabel_obs)
+                ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
+                ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=True)
+                ax.xaxis.set_label_position('bottom')
+                ax.yaxis.set_label_position('right')
+            if bin1==1:
+                ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
+                ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=True)
+                ax.yaxis.set_label_position('right')
+            lg = pl.legend([leg1],[r'$\mathrm{{O}}{{{0}}}$'.format(bin1)],loc='upper right',
+                        handlelength=0,borderpad=0,labelspacing=0.,ncol=3,prop={'size':fontsize}
+                        ,columnspacing=0,frameon=None)
+            #lg.draw_frame(False)
+                
+        fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
+        if suffix:
+            pl.savefig(output_dir+'/smf_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
+        else:
+            pl.savefig(output_dir+'/smf_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax), bbox_inches="tight")
+        pl.close()
+        pl.clf()
+        pl.rcParams.update()
 
 
 

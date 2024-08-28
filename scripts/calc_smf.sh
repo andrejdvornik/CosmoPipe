@@ -51,6 +51,11 @@ else
   meta_filelist=""
 fi
 
+#If needed, make the output folder
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_vec/ ]
+then
+  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_vec
+fi
 
 #If needed, make the output folder
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/ ]
@@ -104,14 +109,14 @@ do
   if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/${outname1}_smf.txt ]
   then
     _message "    -> @BLU@Removing previous @RED@Bin $LBIN@BLU@ stellar mass function function@DEF@"
-    rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/${outname1}_smf.txt
+    rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_vec/${outname1}_smf.txt
     rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vmax/${outname1}_vmax.txt
     rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/${outname1}_smf_comp.png
     rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/f_tomo/${outname1}_f_tomo.txt
-    smfblock=`_read_datablock smf`
+    smfblock=`_read_datablock smf_vec`
     currentblock=`_blockentry_to_filelist ${smfblock}`
     currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname} | awk '{printf $0 " "}' || echo `
-    _write_datablock smf "${currentblock}"
+    _write_datablock smf_vec "${currentblock}"
     
     vmaxblock=`_read_datablock vmax`
     currentblock=`_blockentry_to_filelist ${vmaxblock}`
@@ -144,12 +149,12 @@ do
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       
   #Add the smf function to the datablock
-  smfblock=`_read_datablock smf`
+  smfblock=`_read_datablock smf_vec`
   vmaxblock=`_read_datablock vmax`
   ftomoblock=`_read_datablock f_tomo`
-  _write_datablock smf "`_blockentry_to_filelist ${smfblock}` ${outname}_smf.txt"
-  _write_datablock vmax "`_blockentry_to_filelist ${vmaxblock}` ${outname}_vmax.txt"
-  _write_datablock f_tomo "`_blockentry_to_filelist ${ftomoblock}` ${outname}_f_tomo.txt"
+  _write_datablock smf_vec "`_blockentry_to_filelist ${smfblock}` ${outname1}_smf.txt"
+  _write_datablock vmax "`_blockentry_to_filelist ${vmaxblock}` ${outname1}_vmax.txt"
+  _write_datablock f_tomo "`_blockentry_to_filelist ${ftomoblock}` ${outname1}_f_tomo.txt"
 done
 _message "  }\n"
 #}}}
