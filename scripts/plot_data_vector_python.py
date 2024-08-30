@@ -523,44 +523,48 @@ if __name__ == '__main__':
         fig = pl.figure()
         pl.clf()
         for bin1 in range(1, nlens+1):
-            for bin2 in range(1, nlens+1):
-                if bin1!=bin2:
-                    continue
-                index = int(nlens*(bin1-1) - (bin1-1))
-                ax = pl.subplot(nlens, 1, bin1)#(bin1-1)*(nlens) + 1) # use this for upper triangle
-                ax.set_box_aspect(1)
-                ax.set_ylim(ymin_nn,ymax_nn)
-                ax.set_xscale(xscale)
-                idx = np.where((nn_data['BIN1']==bin1) & (nn_data['BIN2']==bin2))[0]
-                # Plot data
-                if (statistic == 'bandpowers'):
-                    ax.errorbar(nn_data['ANG'][idx], nn_data['VALUE'][idx]/nn_data['ANG'][idx]*scaling_nn, nn_std[idx]/nn_data['ANG'][idx]*scaling_nn, linestyle='None', marker='.', markersize=5)
-                elif (statistic == 'cosebis'):
-                    ax.errorbar(nn_data['ANG'][idx],nn_data['VALUE'][idx]*scaling_nn, yerr=nn_std[idx]*scaling_nn, fmt='d', markeredgecolor='C0', mew=1, markerfacecolor='C0', color='C0', markersize=4)
-                elif statistic == '2pcf':
-                    ax.errorbar(nn_data['ANG'][idx],nn_data['ANG'][idx]*nn_data['VALUE'][idx]*scaling_nn, yerr=nn_data['ANG'][idx]*nn_std[idx]*scaling_nn, fmt='d', markeredgecolor='C0', mew=1, markerfacecolor='C0', color='C0', markersize=4)
+            #for bin2 in range(1, nlens+1):
+            #    if bin1!=bin2:
+            #        continue
+            index = int(nlens*(bin1-1) - (bin1-1))
+            ax = pl.subplot(nlens, 1, bin1)#(bin1-1)*(nlens) + 1) # use this for upper triangle
+            ax.set_box_aspect(1)
+            ax.set_ylim(ymin_nn,ymax_nn)
+            ax.set_xscale(xscale)
+            #idx = np.where((nn_data['BIN1']==bin1) & (nn_data['BIN2']==bin2))[0]
+            idx = np.where((nn_data['BIN1']==bin1) & (nn_data['BIN2']==bin1))[0]
+            # Plot data
+            if (statistic == 'bandpowers'):
+                ax.errorbar(nn_data['ANG'][idx], nn_data['VALUE'][idx]/nn_data['ANG'][idx]*scaling_nn, nn_std[idx]/nn_data['ANG'][idx]*scaling_nn, linestyle='None', marker='.', markersize=5)
+            elif (statistic == 'cosebis'):
+                ax.errorbar(nn_data['ANG'][idx],nn_data['VALUE'][idx]*scaling_nn, yerr=nn_std[idx]*scaling_nn, fmt='d', markeredgecolor='C0', mew=1, markerfacecolor='C0', color='C0', markersize=4)
+            elif statistic == '2pcf':
+                ax.errorbar(nn_data['ANG'][idx],nn_data['ANG'][idx]*nn_data['VALUE'][idx]*scaling_nn, yerr=nn_data['ANG'][idx]*nn_std[idx]*scaling_nn, fmt='d', markeredgecolor='C0', mew=1, markerfacecolor='C0', color='C0', markersize=4)
         
-                ax.axhline(y=0, color='k', ls=':',label='')
+            ax.axhline(y=0, color='k', ls=':',label='')
+            #ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
+            #ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=False)
+            ax.set_ylabel(ylabel_nn,**yprops)
+            #if bin1==1:
+            ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
+            ax.tick_params(labelbottom=False, labeltop=False, labelleft=True, labelright=False)
+            ax.yaxis.set_label_position('left')
+            #if bin2==nlens:
+            #    ax.set_xlabel(xlabel)
+            #    ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
+            #    ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=False)
+            #    ax.xaxis.set_label_position('bottom')
+            #if bin1==1 and bin2==nlens:
+            if bin1==nlens:
                 ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
-                ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=False)
-                ax.set_ylabel(ylabel_nn,**yprops)
-                if bin2==nlens:
-                    ax.set_xlabel(xlabel)
-                    ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
-                    ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=False)
-                    ax.xaxis.set_label_position('bottom')
-                if bin1==1:
-                    ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
-                    ax.tick_params(labelbottom=False, labeltop=False, labelleft=True, labelright=False)
-                    ax.yaxis.set_label_position('left')
-                if bin1==1 and bin2==nlens:
-                    ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
-                    ax.tick_params(labelbottom=True, labeltop=False, labelleft=True, labelright=False)
-                    ax.yaxis.set_label_position('left')
-                lg = pl.legend([leg1],[r'$\mathrm{{L}}{{{0}}}-\mathrm{{L}}{{{1}}}$'.format(bin1,bin2)], loc='upper right',
+                ax.tick_params(labelbottom=True, labeltop=False, labelleft=True, labelright=False)
+                ax.yaxis.set_label_position('left')
+                ax.xaxis.set_label_position('bottom')
+                ax.set_xlabel(xlabel)
+            lg = pl.legend([leg1],[r'$\mathrm{{L}}{{{0}}}-\mathrm{{L}}{{{1}}}$'.format(bin1,bin1)], loc='upper right',
                             handlelength=0, borderpad=0, labelspacing=0., ncol=3,
                             prop={'size':fontsize}, columnspacing=0, frameon=None)
-                #lg.draw_frame(False)
+            #lg.draw_frame(False)
                 
         fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
         if suffix:
