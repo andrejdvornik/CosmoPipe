@@ -71,6 +71,7 @@ if __name__ == '__main__':
             xlabel = r'n'
             xscale = 'linear'
             scaling_ee = 1e10
+            statistic_mm = 'cosebis'
         if ne:
             extension_neE = 'Psi_gm'
             extension_neB = 'Psi_gm'
@@ -79,12 +80,14 @@ if __name__ == '__main__':
             xlabel = r'n'
             xscale = 'linear'
             scaling_ne = 1e10
+            statistic_gm = 'psi stats'
         if nn:
             extension_nn = 'Psi_gg'
             ylabel_nn = r'$\Psi_{\rm gg,n}[10^{-10}{\rm rad}^2]$'
             xlabel = r'n'
             xscale = 'linear'
             scaling_nn = 1e10
+            statistic_gg = 'psi stats'
     if statistic == 'bandpowers':
         if ee:
             extension_eeE = 'PeeE'
@@ -94,6 +97,7 @@ if __name__ == '__main__':
             xlabel = r'$\ell$'
             xscale = 'log'
             scaling_ee = 1e7
+            statistic_mm = 'bandpowers'
         if ne:
             extension_neE = 'PneE'
             extension_neB = 'PneB'
@@ -102,12 +106,14 @@ if __name__ == '__main__':
             xlabel = r'$\ell$'
             xscale = 'log'
             scaling_ne = 1e7
+            statistic_gm = 'bandpowers'
         if nn:
             extension_nn = 'Pnn'
             ylabel_nn = r'$\mathcal{C}_{\rm NN}(\ell)/\ell\;[10^{-7}]$'
             xlabel = r'$\ell$'
             xscale = 'log'
             scaling_nn = 1e7
+            statistic_gg = 'bandpowers'
     if (statistic == 'xiE') or (statistic == 'xiB') or (statistic == '2pcf'):
         if ee:
             extension_eeE = 'xiP'
@@ -115,12 +121,15 @@ if __name__ == '__main__':
             if statistic == 'xipm':
                 ylabel_eeE = r'$\theta\xi_+[10^{-4}{\rm arcmin}]$'
                 ylabel_eeB = r'$\theta\xi_-[10^{-4}{\rm arcmin}]$'
+                statistic_mm = 'xipm'
             if statistic == 'xiE':
                 ylabel_eeE = r'$\theta\xi^{\rm E}_+[10^{-4}{\rm arcmin}]$'
                 ylabel_eeB = r'$\theta\xi^{\rm E}_-[10^{-4}{\rm arcmin}]$'
+                statistic_mm = 'xiE'
             if statistic == 'xiB':
                 ylabel_eeE = r'$\theta\xi^{\rm B}_+[10^{-4}{\rm arcmin}]$'
                 ylabel_eeB = r'$\theta\xi^{\rm B}_-[10^{-4}{\rm arcmin}]$'
+                statistic_mm = 'xiB'
             xlabel = r'$\theta$'
             xscale = 'log'
             scaling_ee = 1e4
@@ -132,12 +141,14 @@ if __name__ == '__main__':
             xlabel = r'$\theta$'
             xscale = 'log'
             scaling_ne = 1e4
+            statistic_gm = 'gamma_t'
         if nn:
             extension_nn = 'wT'
             ylabel_nn = r'$\theta\w(\theta}[10^{-4}{\rm arcmin}]$'
             xlabel = r'$\theta$'
             xscale = 'log'
             scaling_nn = 1e4
+            statistic_gg = 'w'
     if obs:
         extension_obs = '1pt'
         ylabel_obs = r'$\phi (\mathrm{dex}^{-1}\,h^{3}\,\mathrm{Mpc}^{-3})$'
@@ -367,7 +378,7 @@ if __name__ == '__main__':
                     #     lg = pl.legend(bbox_to_anchor=(-0.1, 0.5),handlelength=1,borderpad=0,labelspacing=0.1,ncol=1,prop={'size':fontsize}
                     #         ,columnspacing=0,frameon=None)
                     #     lg.draw_frame(False)
-        fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
+        fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic_mm,thetamin,thetamax), fontsize=20)
         if suffix:
             pl.savefig(output_dir+'/cosmic_shear_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
         else:
@@ -440,7 +451,7 @@ if __name__ == '__main__':
                             prop={'size':fontsize}, columnspacing=0, frameon=None)
                 #lg.draw_frame(False)
                 
-        fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
+        fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic_gm,thetamin,thetamax), fontsize=20)
         if suffix:
             pl.savefig(output_dir+'/ggl_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
         else:
@@ -486,7 +497,7 @@ if __name__ == '__main__':
                                 prop={'size':fontsize}, columnspacing=0, frameon=None)
                         #lg.draw_frame(False)
             
-                fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
+                fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic_gm,thetamin,thetamax), fontsize=20)
                 if suffix:
                     pl.savefig(output_dir+'/ggl_B_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
                 else:
@@ -566,7 +577,7 @@ if __name__ == '__main__':
                             prop={'size':fontsize}, columnspacing=0, frameon=None)
             #lg.draw_frame(False)
                 
-        fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
+        fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic_gg,thetamin,thetamax), fontsize=20)
         if suffix:
             pl.savefig(output_dir+'/clustering_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
         else:
@@ -625,7 +636,7 @@ if __name__ == '__main__':
                             prop={'size':fontsize}, columnspacing=0, frameon=None)
             #lg.draw_frame(False)
                 
-        fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
+        fig.suptitle(r'%s %s %s'%(title,suffix,'1pt'), fontsize=20)
         if suffix:
             pl.savefig(output_dir+'/smf_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
         else:
