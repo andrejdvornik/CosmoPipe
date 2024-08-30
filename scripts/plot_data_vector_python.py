@@ -74,7 +74,7 @@ if __name__ == '__main__':
             statistic_mm = 'cosebis'
         if ne:
             extension_neE = 'Psi_gm'
-            extension_neB = 'Psi_gm'
+            extension_neB = ''
             ylabel_neE = r'$\Psi_{\rm gm,n}[10^{-10}{\rm rad}^2]$'
             ylabel_neB = r'$\Psi_{\rm gm,n}[10^{-10}{\rm rad}^2]$'
             xlabel = r'n'
