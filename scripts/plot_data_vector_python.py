@@ -147,36 +147,53 @@ if __name__ == '__main__':
         scaling_obs = 1
     
     with fits.open(inputfile) as f:
-        if ee:
-            eeE_data = f[extension_eeE].data
-            eeB_data = f[extension_eeB].data
-            n_data_ee = len(eeE_data)
-            #eeE_cov = f['COVMAT'].data[:n_data_ee,:][:,:n_data_ee]
-            #eeB_cov = f['COVMAT'].data[n_data_ee:,:][:,n_data_ee:]
-            eeE_cov = np.eye(n_data_ee)
-            eeB_cov = np.eye(n_data_ee)
-            eeE_std = np.sqrt(np.diag(eeE_cov))
-            eeB_std = np.sqrt(np.diag(eeB_cov))
-        if ne:
-            neE_data = f[extension_neE].data
-            neB_data = f[extension_neB].data
-            n_data_ne = len(neE_data)
-            #neE_cov = f['COVMAT'].data[:n_data_ne,:][:,:n_data_ne]
-            #neB_cov = f['COVMAT'].data[n_data_ne:,:][:,n_data_ne:]đ
-            neE_cov = np.eye(n_data_ne)
-            neB_cov = np.eye(n_data_ne)
-            neE_std = np.sqrt(np.diag(neE_cov))
-            neB_std = np.sqrt(np.diag(neB_cov))
+        n_data_ee = 0
+        n_data_bb = 0
+        n_data_ne = 0
+        n_data_nb = 0
+        n_data_nn = 0
         if nn:
             nn_data = f[extension_nn].data
             n_data_nn = len(nn_data)
-            #nn_cov = f['COVMAT'].data[:n_data_nn,:][:,:n_data_nn]
+            #nn_cov = f['COVMAT'].data[0:n_data_nn,:][:,0:n_data_nn]
             nn_cov = np.eye(n_data_nn)
             nn_std = np.sqrt(np.diag(nn_cov))
+        if ne:
+            neE_data = f[extension_neE].data
+            n_data_ne = len(neE_data)
+            #neE_cov = f['COVMAT'].data[n_data_nn:n_data_nn+n_data_ne,:][:,n_data_nn:n_data_nn+n_data_ne]
+            neE_cov = np.eye(n_data_ne)
+            neE_std = np.sqrt(np.diag(neE_cov))
+            try:
+                neB_data = f[extension_neB].data
+                n_data_nb = len(neB_data)
+                #neB_cov = f['COVMAT'].data[n_data_nn+n_data_ne:n_data_nn+n_data_ne+n_data_nb,:][:,n_data_nn+n_data_ne:n_data_nn+n_data_ne+n_data_nb]
+                neB_cov = np.eye(n_data_ne)
+                neB_std = np.sqrt(np.diag(neB_cov))
+            except:
+                neB_data = None
+                neb_cov = None
+                neb_std = None
+        if ee:
+            eeE_data = f[extension_eeE].data
+            n_data_ee = len(eeE_data)
+            #eeE_cov = f['COVMAT'].data[n_data_nn+n_data_ne+n_data_nb:n_data_nn+n_data_ne+n_data_nb+n_data_ee,:][:,n_data_nn+n_data_ne+n_data_nb:n_data_nn+n_data_ne+n_data_nb+n_data_ee]
+            eeE_cov = np.eye(n_data_ee)
+            eeE_std = np.sqrt(np.diag(eeE_cov))
+            try:
+                eeB_data = f[extension_eeB].data
+                n_data_bb = len(eeB_data)
+                #eeB_cov = f['COVMAT'].data[n_data_nn+n_data_ne+n_data_nb+n_data_ee:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb,:][:,n_data_nn+n_data_ne+n_data_nb+n_data_ee:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb]
+                eeB_cov = np.eye(n_data_ee)
+                eeB_std = np.sqrt(np.diag(eeB_cov))
+            except:
+                eeB_data = None
+                eeB_cov = None
+                eeB_std = None
         if obs:
             obs_data = f[extension_obs].data
-            n_data_obs = len(obs_data)
-            #nn_cov = f['COVMAT'].data[:n_data_nn,:][:,:n_data_nn]
+            n_data_obs = np.sum([len(obs_data[f'ANG{i+1}']) for i in range(nobs)])
+            #nn_cov = f['COVMAT'].data[n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb+n_data_nn,:][:,n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb+n_data_nn]
             obs_cov = np.eye(n_data_obs)
             obs_std = np.sqrt(np.diag(obs_cov))
 
@@ -185,19 +202,22 @@ if __name__ == '__main__':
         if ee:
             ymax_eeE = np.max(eeE_data['ANG']*eeE_data['VALUE']*scaling_ee*1.3)
             ymin_eeE = np.min(eeE_data['ANG']*eeE_data['VALUE']*scaling_ee*1.3)
-            ymax_eeB = np.max(eeB_data['ANG']*eeB_data['VALUE']*scaling_ee*1.3)
-            ymin_eeB = np.min(eeB_data['ANG']*eeB_data['VALUE']*scaling_ee*1.3)
+            if eeB_data is not None:
+                ymax_eeB = np.max(eeB_data['ANG']*eeB_data['VALUE']*scaling_ee*1.3)
+                ymin_eeB = np.min(eeB_data['ANG']*eeB_data['VALUE']*scaling_ee*1.3)
     elif statistic == 'bandpowers':
         if ee:
             ymax_eeE = np.max(eeE_data['VALUE']/eeE_data['ANG']*scaling_ee*1.3)
             ymin_eeE = np.min(eeE_data['VALUE']/eeE_data['ANG']*scaling_ee*1.3)
-            ymax_eeB = np.max(eeB_data['VALUE']/eeB_data['ANG']*scaling_ee*1.3)
-            ymin_eeB = np.min(eeB_data['VALUE']/eeB_data['ANG']*scaling_ee*1.3)
+            if eeB_data is not None:
+                ymax_eeB = np.max(eeB_data['VALUE']/eeB_data['ANG']*scaling_ee*1.3)
+                ymin_eeB = np.min(eeB_data['VALUE']/eeB_data['ANG']*scaling_ee*1.3)
         if ne:
             ymax_neE = np.max(neE_data['VALUE']/neE_data['ANG']*scaling_ne*1.3)
             ymin_neE = np.min(neE_data['VALUE']/neE_data['ANG']*scaling_ne*1.3)
-            ymax_neB = np.max(neB_data['VALUE']/neB_data['ANG']*scaling_ne*1.3)
-            ymin_neB = np.min(neB_data['VALUE']/neB_data['ANG']*scaling_ne*1.3)
+            if neB_data is not None:
+                ymax_neB = np.max(neB_data['VALUE']/neB_data['ANG']*scaling_ne*1.3)
+                ymin_neB = np.min(neB_data['VALUE']/neB_data['ANG']*scaling_ne*1.3)
         if nn:
             ymax_nn = np.max(nn_data['VALUE']/nn_data['ANG']*scaling_nn*1.3)
             ymin_nb = np.min(nn_data['VALUE']/nn_data['ANG']*scaling_nn*1.3)
@@ -205,13 +225,15 @@ if __name__ == '__main__':
         if ee:
             ymax_eeE = np.max(eeE_data['VALUE']*scaling_ee*1.3)
             ymin_eeE = np.min(eeE_data['VALUE']*scaling_ee*1.3)
-            ymax_eeB = np.max(eeB_data['VALUE']*scaling_ee*1.3)
-            ymin_eeB = np.min(eeB_data['VALUE']*scaling_ee*1.3)
+            if eeB_data is not None:
+                ymax_eeB = np.max(eeB_data['VALUE']*scaling_ee*1.3)
+                ymin_eeB = np.min(eeB_data['VALUE']*scaling_ee*1.3)
         if ne:
             ymax_neE = np.max(neE_data['VALUE']*scaling_ne*1.3)
             ymin_neE = np.min(neE_data['VALUE']*scaling_ne*1.3)
-            ymax_neB = np.max(neB_data['VALUE']*scaling_ne*1.3)
-            ymin_neB = np.min(neB_data['VALUE']*scaling_ne*1.3)
+            if neB_data is not None:
+                ymax_neB = np.max(neB_data['VALUE']*scaling_ne*1.3)
+                ymin_neB = np.min(neB_data['VALUE']*scaling_ne*1.3)
         if nn:
             ymax_nn = np.max(nn_data['VALUE']*scaling_nn*1.3)
             ymin_nn = np.min(nn_data['VALUE']*scaling_nn*1.3)
@@ -227,20 +249,30 @@ if __name__ == '__main__':
     if nn:
         n_combinations_nn = nlens # Currently only auto correlations
         n_data_per_bin_nn = int(n_data_nn / n_combinations_nn)
-    
+    if obs:
+        obs_x = []
+        obs_y = []
+        for i in range(nobs):
+            obs_x.append(obs_data[f'ANG{i+1}'])
+            obs_y.append(obs_data[f'VALUE{i+1}'])
+        xmax_obs = np.max(obs_x)
+        xmin_obs = np.min(obs_x)
+        ymax_obs = np.max(obs_y)
+        ymin_obs = np.min(obs_y)
     
     if ee:
         # plotting sizes
-        yprops=dict(rotation=90, horizontalalignment='center',verticalalignment='center', x=10,labelpad=20, fontsize=15)
+        pl.rcParams.update(pl.rcParamsDefault)
+        yprops=dict(rotation=90, horizontalalignment='center', verticalalignment='center', x=10, labelpad=20, fontsize=15)
         leg1=Rectangle((0,0),0,0,alpha=0.0)
         formatter = ScalarFormatter(useMathText=True)
         formatter.set_scientific(True)
         fig_width_pt = 246.0*3.5 # Get this from LaTex using \the\columnwidth
         inches_per_pt = 1.0/72.27
         golden_mean = (np.sqrt(5)-1.0)/2.0
-        fig_width  = fig_width_pt*inches_per_pt # width in inches
-        fig_height = fig_width*golden_mean # height in inches
-        fig_size = [fig_width, fig_height*1.5]
+        fig_width  = 2.5#fig_width_pt*inches_per_pt # width in inches
+        fig_height = fig_width#/golden_mean # height in inches
+        fig_size = [fig_width*ntomo, fig_height*ntomo]
         fontsize=15
         params = {'axes.labelsize':15,
                 'font.size':10,
@@ -250,8 +282,8 @@ if __name__ == '__main__':
                 'figure.figsize':fig_size,
                 'font.family': 'serif'}
         pl.rcParams.update(params)
-        pl.rc('text',usetex=True)
-        pl.subplots_adjust(wspace=0.075,hspace=0.075) # you can add spaces between the block here
+        pl.rc('text', usetex=True)
+        pl.subplots_adjust(wspace=0.075, hspace=0.075) # you can add spaces between the block here
         pl.clf()
         fig = pl.figure()#1, figsize = (fig_width, fig_height*1.5))
         pl.clf()
@@ -262,15 +294,15 @@ if __name__ == '__main__':
                 ax = pl.subplot(ntomo+1, ntomo+1, (bin1-1)*(ntomo+1) + (bin2-1) + 2) # use this for upper triangle
                 ax.set_box_aspect(1)
                 ax.set_ylim(ymin_eeE,ymax_eeE)
-                pl.xscale(xscale)
+                ax.set_xscale(xscale)
                 idx = np.where((eeE_data['BIN1']==bin1) & (eeE_data['BIN2']==bin2))[0]
                 # Plot data
                 if (statistic == 'bandpowers'):
-                    ax.errorbar(eeE_data['ANG'][idx], eeE_data['VALUE'][idx]/eeE_data['ANG'][idx]*scaling_ee, eeE_std[idx]/eeE_data['ANG'][idx]*scaling_ee, linestyle = 'None', marker = '.', markersize=5)
+                    ax.errorbar(eeE_data['ANG'][idx], eeE_data['VALUE'][idx]/eeE_data['ANG'][idx]*scaling_ee, eeE_std[idx]/eeE_data['ANG'][idx]*scaling_ee, linestyle='None', marker='.', markersize=5)
                 elif (statistic == 'cosebis'):
-                    ax.errorbar(eeE_data['ANG'][idx],eeE_data['VALUE'][idx]*scaling_ee, yerr=eeE_std[idx]*scaling_ee, fmt='d',markeredgecolor='C0',mew=1,markerfacecolor='C0', color='C0', markersize=4)
+                    ax.errorbar(eeE_data['ANG'][idx],eeE_data['VALUE'][idx]*scaling_ee, yerr=eeE_std[idx]*scaling_ee, fmt='d', markeredgecolor='C0', mew=1, markerfacecolor='C0', color='C0', markersize=4)
                 elif (statistic == 'xiE') or (statistic == 'xiB') or (statistic == '2pcf'):
-                    ax.errorbar(eeE_data['ANG'][idx],eeE_data['ANG'][idx]*eeE_data['VALUE'][idx]*scaling_ee, yerr=eeE_data['ANG'][idx]*eeE_std[idx]*scaling_ee,     fmt='d',markeredgecolor='C0',mew=1,markerfacecolor='C0', color='C0', markersize=4)
+                    ax.errorbar(eeE_data['ANG'][idx],eeE_data['ANG'][idx]*eeE_data['VALUE'][idx]*scaling_ee, yerr=eeE_data['ANG'][idx]*eeE_std[idx]*scaling_ee, fmt='d', markeredgecolor='C0', mew=1, markerfacecolor='C0', color='C0', markersize=4)
         
     
                 ax.axhline(y=0, color='k', ls=':',label='')
@@ -289,9 +321,9 @@ if __name__ == '__main__':
                 if bin1==1 and bin2==ntomo:
                     ax.tick_params(bottom=True, top=True, left=True, right=True, which='both')
                     ax.tick_params(labelbottom=False, labeltop=True, labelleft=False, labelright=True)
-                lg = pl.legend([leg1],[r'$\mathrm{{S}}{{{0}}}-\mathrm{{S}}{{{1}}}$'.format(bin1,bin2)],loc='upper right',
-                            handlelength=0,borderpad=0,labelspacing=0.,ncol=3,prop={'size':fontsize}
-                            ,columnspacing=0,frameon=None)
+                lg = pl.legend([leg1],[r'$\mathrm{{S}}{{{0}}}-\mathrm{{S}}{{{1}}}$'.format(bin1,bin2)], loc='upper right',
+                                        handlelength=0, borderpad=0, labelspacing=0., ncol=3,
+                                        prop={'size':fontsize}, columnspacing=0, frameon=None)
                 #lg.draw_frame(False)
                 # pl.gca().add_artist(lg)
                 # if((bin1==1) & (bin2==bin1)):
@@ -301,45 +333,46 @@ if __name__ == '__main__':
                     
                 #################################################################
                 # lower triangle for B-modes
-                ax=pl.subplot(ntomo+1,ntomo+1,(bin2-1)*(ntomo+1)+(bin1-1)+ntomo+2)
-                ax.set_box_aspect(1)
-                ax.tick_params(bottom=True, top=False, left=False, right=True, which='both')
-                ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=False)
-                if bin2==ntomo:
-                    ax.set_xlabel(xlabel)
-                    ax.tick_params(bottom=True, top=True, left=False, right=True, which='both')
-                    ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=False)
-                if bin1==1:
-                    ax.set_ylabel(ylabel_eeB,**yprops)
-                    ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
-                    ax.tick_params(labelbottom=False, labeltop=False, labelleft=True, labelright=False)
-                if bin1==1 and bin2==ntomo:
-                    ax.tick_params(bottom=True, top=True, left=True, right=True, which='both')
-                    ax.tick_params(labelbottom=True, labeltop=False, labelleft=True, labelright=False)
+                if eeB_data is not None:
+                    ax=pl.subplot(ntomo+1,ntomo+1,(bin2-1)*(ntomo+1)+(bin1-1)+ntomo+2)
+                    ax.set_box_aspect(1)
+                    ax.tick_params(bottom=True, top=False, left=False, right=True, which='both')
+                    ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=False)
+                    if bin2==ntomo:
+                        ax.set_xlabel(xlabel)
+                        ax.tick_params(bottom=True, top=True, left=False, right=True, which='both')
+                        ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=False)
+                    if bin1==1:
+                        ax.set_ylabel(ylabel_eeB,**yprops)
+                        ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
+                        ax.tick_params(labelbottom=False, labeltop=False, labelleft=True, labelright=False)
+                    if bin1==1 and bin2==ntomo:
+                        ax.tick_params(bottom=True, top=True, left=True, right=True, which='both')
+                        ax.tick_params(labelbottom=True, labeltop=False, labelleft=True, labelright=False)
                     
-                # ax.set_ylim(ymin_eeB,ymax_eeB)
-                ax.set_ylim(ymin_eeE,ymax_eeE)
-                pl.xscale(xscale)
+                    # ax.set_ylim(ymin_eeB,ymax_eeB)
+                    ax.set_ylim(ymin_eeE,ymax_eeE)
+                    pl.xscale(xscale)
                     
-                idx = np.where((eeE_data['BIN1']==bin1) & (eeE_data['BIN2']==bin2))[0]
-                # Plot data
-                if (statistic == 'bandpowers'):
-                    ax.errorbar(eeB_data['ANG'][idx], eeB_data['VALUE'][idx]/eeB_data['ANG'][idx]*scaling_ee, eeB_std[idx]/eeB_data['ANG'][idx]*scaling_ee, linestyle = 'None', marker = '.', markersize=5)
-                elif (statistic == 'cosebis'):
-                    ax.errorbar(eeB_data['ANG'][idx],eeB_data['VALUE'][idx]*scaling_ee, yerr=eeB_std[idx]*scaling_ee, fmt='d',markeredgecolor='C0',mew=1,markerfacecolor='C0', color='C0', markersize=4)
-                elif (statistic == 'xiE') or (statistic == 'xiB') or (statistic == '2pcf'):
-                    ax.errorbar(eeB_data['ANG'][idx],eeB_data['ANG'][idx]*eeB_data['VALUE'][idx]*scaling_ee, yerr=eeB_data['ANG'][idx]*eeB_std[idx]*scaling_ee,     fmt='d',markeredgecolor='C0',mew=1,markerfacecolor='C0', color='C0', markersize=4)
-                
-                ax.axhline(y=0, color='k', ls=':')
-                lg = pl.legend([leg1],[r'$\mathrm{{S}}{{{0}}}-\mathrm{{S}}{{{1}}}$'.format(bin1,bin2)],loc='upper right',
-                        handlelength=0,borderpad=0,labelspacing=0.1,ncol=2,prop={'size':fontsize}
-                        ,columnspacing=0,frameon=None)
-                #lg.draw_frame(False)
-                # pl.gca().add_artist(lg)
-                # if((bin1==1) & (bin2==bin1)):
-                #     lg = pl.legend(bbox_to_anchor=(-0.1, 0.5),handlelength=1,borderpad=0,labelspacing=0.1,ncol=1,prop={'size':fontsize}
-                #         ,columnspacing=0,frameon=None)
-                #     lg.draw_frame(False)
+                    idx = np.where((eeE_data['BIN1']==bin1) & (eeE_data['BIN2']==bin2))[0] #??
+                    # Plot data
+                    if (statistic == 'bandpowers'):
+                        ax.errorbar(eeB_data['ANG'][idx], eeB_data['VALUE'][idx]/eeB_data['ANG'][idx]*scaling_ee, eeB_std[idx]/eeB_data['ANG'][idx]*scaling_ee, linestyle='None',   marker='.', markersize=5)
+                    elif (statistic == 'cosebis'):
+                        ax.errorbar(eeB_data['ANG'][idx],eeB_data['VALUE'][idx]*scaling_ee, yerr=eeB_std[idx]*scaling_ee, fmt='d', markeredgecolor='C0', mew=1, markerfacecolor='C0',   color='C0', markersize=4)
+                    elif (statistic == 'xiE') or (statistic == 'xiB') or (statistic == '2pcf'):
+                        ax.errorbar(eeB_data['ANG'][idx],eeB_data['ANG'][idx]*eeB_data['VALUE'][idx]*scaling_ee, yerr=eeB_data['ANG'][idx]*eeB_std[idx]*scaling_ee, fmt='d',    markeredgecolor='C0', mew=1, markerfacecolor='C0', color='C0', markersize=4)
+                    
+                    ax.axhline(y=0, color='k', ls=':')
+                    lg = pl.legend([leg1],[r'$\mathrm{{S}}{{{0}}}-\mathrm{{S}}{{{1}}}$'.format(bin1,bin2)], loc='upper right',
+                                handlelength=0, borderpad=0, labelspacing=0., ncol=3,
+                                prop={'size':fontsize}, columnspacing=0, frameon=None)
+                    #lg.draw_frame(False)
+                    # pl.gca().add_artist(lg)
+                    # if((bin1==1) & (bin2==bin1)):
+                    #     lg = pl.legend(bbox_to_anchor=(-0.1, 0.5),handlelength=1,borderpad=0,labelspacing=0.1,ncol=1,prop={'size':fontsize}
+                    #         ,columnspacing=0,frameon=None)
+                    #     lg.draw_frame(False)
         fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
         if suffix:
             pl.savefig(output_dir+'/cosmic_shear_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
@@ -347,19 +380,20 @@ if __name__ == '__main__':
             pl.savefig(output_dir+'/cosmic_shear_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax), bbox_inches="tight")
         pl.close()
         pl.clf()
-        pl.rcParams.update()
+        
     if ne:
         # plotting sizes
-        yprops=dict(rotation=90, horizontalalignment='center',verticalalignment='center', x=10,labelpad=20, fontsize=15)
+        pl.rcParams.update(pl.rcParamsDefault)
+        yprops=dict(rotation=90, horizontalalignment='center', verticalalignment='center', x=10, labelpad=20, fontsize=15)
         leg1=Rectangle((0,0),0,0,alpha=0.0)
         formatter = ScalarFormatter(useMathText=True)
         formatter.set_scientific(True)
         fig_width_pt = 246.0*3.5 # Get this from LaTex using \the\columnwidth
         inches_per_pt = 1.0/72.27
         golden_mean = (np.sqrt(5)-1.0)/2.0
-        fig_width  = fig_width_pt*inches_per_pt # width in inches
-        fig_height = fig_width*golden_mean # height in inches
-        fig_size = [fig_width*nlens/ntomo, fig_height*1.5]
+        fig_width  = 2.5#fig_width_pt*inches_per_pt # width in inches
+        fig_height = fig_width#/golden_mean # height in inches
+        fig_size = [fig_width*nlens, fig_height*ntomo]
         fontsize=15
         params = {'axes.labelsize':15,
                 'font.size':10,
@@ -369,8 +403,8 @@ if __name__ == '__main__':
                 'figure.figsize':fig_size,
                 'font.family': 'serif'}
         pl.rcParams.update(params)
-        pl.rc('text',usetex=True)
-        pl.subplots_adjust(wspace=0.075,hspace=0.075) # you can add spaces between the block here
+        pl.rc('text', usetex=True)
+        pl.subplots_adjust(wspace=0.075, hspace=0.075) # you can add spaces between the block here
         pl.clf()
         fig = pl.figure()
         pl.clf()
@@ -380,15 +414,15 @@ if __name__ == '__main__':
                 ax = pl.subplot(ntomo, nlens, (bin2-1)*(nlens) + (bin1-1) + 1)
                 ax.set_box_aspect(1)
                 ax.set_ylim(ymin_neE,ymax_neE)
-                pl.xscale(xscale)
+                ax.set_xscale(xscale)
                 idx = np.where((neE_data['BIN1']==bin1) & (neE_data['BIN2']==bin2))[0]
                 # Plot data
                 if (statistic == 'bandpowers'):
-                    ax.errorbar(neE_data['ANG'][idx], neE_data['VALUE'][idx]/neE_data['ANG'][idx]*scaling_ne, neE_std[idx]/neE_data['ANG'][idx]*scaling_ne, linestyle = 'None', marker = '.', markersize=5)
+                    ax.errorbar(neE_data['ANG'][idx], neE_data['VALUE'][idx]/neE_data['ANG'][idx]*scaling_ne, neE_std[idx]/neE_data['ANG'][idx]*scaling_ne, linestyle='None', marker='.', markersize=5)
                 elif (statistic == 'cosebis'):
-                    ax.errorbar(neE_data['ANG'][idx],neE_data['VALUE'][idx]*scaling_ne, yerr=neE_std[idx]*scaling_ne, fmt='d',markeredgecolor='C0',mew=1,markerfacecolor='C0', color='C0', markersize=4)
+                    ax.errorbar(neE_data['ANG'][idx],neE_data['VALUE'][idx]*scaling_ne, yerr=neE_std[idx]*scaling_ne, fmt='d', markeredgecolor='C0', mew=1, markerfacecolor='C0', color='C0', markersize=4)
                 elif statistic == '2pcf':
-                    ax.errorbar(neE_data['ANG'][idx],neE_data['ANG'][idx]*neE_data['VALUE'][idx]*scaling_ne, yerr=neE_data['ANG'][idx]*neE_std[idx]*scaling_ne,     fmt='d',markeredgecolor='C0',mew=1,markerfacecolor='C0', color='C0', markersize=4)
+                    ax.errorbar(neE_data['ANG'][idx],neE_data['ANG'][idx]*neE_data['VALUE'][idx]*scaling_ne, yerr=neE_data['ANG'][idx]*neE_std[idx]*scaling_ne, fmt='d', markeredgecolor='C0', mew=1, markerfacecolor='C0', color='C0', markersize=4)
         
                 ax.axhline(y=0, color='k', ls=':',label='')
                 ax.tick_params(bottom=True, top=False, left=True, right=False, which='both')
@@ -399,17 +433,17 @@ if __name__ == '__main__':
                     ax.tick_params(bottom=True, top=False, left=True, right=False, which='both')
                     ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=False)
                     ax.xaxis.set_label_position('bottom')
-                if bin1==nlens:
+                if bin1==1:
                     ax.set_ylabel(ylabel_neE,**yprops)
                     ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
-                    ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=True)
-                    ax.yaxis.set_label_position('right')
-                if bin1==nlens and bin2==ntomo:
+                    ax.tick_params(labelbottom=False, labeltop=False, labelleft=True, labelright=False)
+                    ax.yaxis.set_label_position('left')
+                if bin1==1 and bin2==ntomo:
                     ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
-                    ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=True)
-                lg = pl.legend([leg1],[r'$\mathrm{{L}}{{{0}}}-\mathrm{{S}}{{{1}}}$'.format(bin1,bin2)],loc='upper right',
-                            handlelength=0,borderpad=0,labelspacing=0.,ncol=3,prop={'size':fontsize}
-                            ,columnspacing=0,frameon=None)
+                    ax.tick_params(labelbottom=True, labeltop=False, labelleft=True, labelright=False)
+                lg = pl.legend([leg1],[r'$\mathrm{{L}}{{{0}}}-\mathrm{{S}}{{{1}}}$'.format(bin1,bin2)], loc='upper right',
+                            handlelength=0, borderpad=0, labelspacing=0., ncol=3,
+                            prop={'size':fontsize}, columnspacing=0, frameon=None)
                 #lg.draw_frame(False)
                 
         fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
@@ -420,64 +454,66 @@ if __name__ == '__main__':
         pl.close()
         pl.clf()
         
-        if (statistic == 'bandpowers') or (statistic == '2pcf'):
-            for bin1 in range(1, nlens+1):
-                for bin2 in range(1, ntomo+1):
-                    index = int(ntomo*(bin1-1) - (bin1-1)*(bin1-1 - 1)/2 + (bin2-1))
-                    ax = pl.subplot(ntomo, nlens, (bin2-1)*(nlens) + (bin1-1) + 1)
-                    ax.set_box_aspect(1)
-                    ax.set_ylim(ymin_neE,ymax_neE)
-                    pl.xscale(xscale)
-                    idx = np.where((neB_data['BIN1']==bin1) & (neB_data['BIN2']==bin2))[0]
-                    # Plot data
-                    if (statistic == 'bandpowers'):
-                        ax.errorbar(neB_data['ANG'][idx], neB_data['VALUE'][idx]/neB_data['ANG'][idx]*scaling_ne, neB_std[idx]/neB_data['ANG'][idx]*scaling_ne, linestyle = 'None',     marker = '.', markersize=5)
-                    elif statistic == '2pcf':
-                        ax.errorbar(neB_data['ANG'][idx],neB_data['ANG'][idx]*neB_data['VALUE'][idx]*scaling_ne, yerr=neB_data['ANG'][idx]*neB_std[idx]*scaling_ne,         fmt='d',markeredgecolor='C0',mew=1,markerfacecolor='C0', color='C0', markersize=4)
+        if neB_data is not None:
+            if (statistic == 'bandpowers') or (statistic == '2pcf'):
+                for bin1 in range(1, nlens+1):
+                    for bin2 in range(1, ntomo+1):
+                        index = int(ntomo*(bin1-1) - (bin1-1)*(bin1-1 - 1)/2 + (bin2-1))
+                        ax = pl.subplot(ntomo, nlens, (bin2-1)*(nlens) + (bin1-1) + 1)
+                        ax.set_box_aspect(1)
+                        ax.set_ylim(ymin_neE,ymax_neE)
+                        ax.set_xscale(xscale)
+                        idx = np.where((neB_data['BIN1']==bin1) & (neB_data['BIN2']==bin2))[0]
+                        # Plot data
+                        if (statistic == 'bandpowers'):
+                            ax.errorbar(neB_data['ANG'][idx], neB_data['VALUE'][idx]/neB_data['ANG'][idx]*scaling_ne, neB_std[idx]/neB_data['ANG'][idx]*scaling_ne, linestyle='None',      marker='.', markersize=5)
+                        elif statistic == '2pcf':
+                            ax.errorbar(neB_data['ANG'][idx],neB_data['ANG'][idx]*neB_data['VALUE'][idx]*scaling_ne, yerr=neB_data['ANG'][idx]*neB_std[idx]*scaling_ne, fmt='d',    markeredgecolor='C0', mew=1, markerfacecolor='C0', color='C0', markersize=4)
             
-                    ax.axhline(y=0, color='k', ls=':',label='')
-                    ax.tick_params(bottom=True, top=False, left=True, right=False, which='both')
-                    ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=False)
-            
-                    if bin2==ntomo:
-                        ax.set_xlabel(xlabel)
+                        ax.axhline(y=0, color='k', ls=':',label='')
                         ax.tick_params(bottom=True, top=False, left=True, right=False, which='both')
-                        ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=False)
-                        ax.xaxis.set_label_position('bottom')
-                    if bin1==nlens:
-                        ax.set_ylabel(ylabel_neB,**yprops)
-                        ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
-                        ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=True)
-                        ax.yaxis.set_label_position('right')
-                    if bin1==nlens and bin2==ntomo:
-                        ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
-                        ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=True)
-                    lg = pl.legend([leg1],[r'$\mathrm{{L}}{{{0}}}-\mathrm{{S}}{{{1}}}$'.format(bin1,bin2)],loc='upper right',
-                                handlelength=0,borderpad=0,labelspacing=0.,ncol=3,prop={'size':fontsize}
-                                ,columnspacing=0,frameon=None)
-                    #lg.draw_frame(False)
+                        ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=False)
             
-            fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
-            if suffix:
-                pl.savefig(output_dir+'/ggl_B_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
-            else:
-                pl.savefig(output_dir+'/ggl_B_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax), bbox_inches="tight")
-            pl.close()
-            pl.clf()
+                        if bin2==ntomo:
+                            ax.set_xlabel(xlabel)
+                            ax.tick_params(bottom=True, top=False, left=True, right=False, which='both')
+                            ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=False)
+                            ax.xaxis.set_label_position('bottom')
+                        if bin1==1:
+                            ax.set_ylabel(ylabel_neE,**yprops)
+                            ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
+                            ax.tick_params(labelbottom=False, labeltop=False, labelleft=True, labelright=False)
+                            ax.yaxis.set_label_position('left')
+                        if bin1==1 and bin2==ntomo:
+                            ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
+                            ax.tick_params(labelbottom=True, labeltop=False, labelleft=True, labelright=False)
+                        lg = pl.legend([leg1],[r'$\mathrm{{L}}{{{0}}}-\mathrm{{S}}{{{1}}}$'.format(bin1,bin2)], loc='upper right',
+                                handlelength=0, borderpad=0, labelspacing=0., ncol=3,
+                                prop={'size':fontsize}, columnspacing=0, frameon=None)
+                        #lg.draw_frame(False)
+            
+                fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
+                if suffix:
+                    pl.savefig(output_dir+'/ggl_B_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
+                else:
+                    pl.savefig(output_dir+'/ggl_B_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax), bbox_inches="tight")
+                pl.close()
+                pl.clf()
         pl.rcParams.update()
     
     if nn:
         # plotting sizes
-        yprops=dict(rotation=90, horizontalalignment='center',verticalalignment='center', x=10,labelpad=20, fontsize=15)
+        pl.rcParams.update(pl.rcParamsDefault)
+        yprops=dict(rotation=90, horizontalalignment='center', verticalalignment='center', x=10, labelpad=20, fontsize=15)
         leg1=Rectangle((0,0),0,0,alpha=0.0)
         formatter = ScalarFormatter(useMathText=True)
         formatter.set_scientific(True)
         fig_width_pt = 246.0*3.5 # Get this from LaTex using \the\columnwidth
         inches_per_pt = 1.0/72.27
         golden_mean = (np.sqrt(5)-1.0)/2.0
-        fig_width  = fig_width_pt*inches_per_pt # width in inches
-        fig_height = fig_width*golden_mean # height in inches
-        fig_size = [fig_width/nlens, fig_height*1.5]
+        fig_width  = 2.5#fig_width_pt*inches_per_pt # width in inches
+        fig_height = fig_width#/golden_mean # height in inches
+        fig_size = [fig_width*2, 2*fig_height*nlens]
         fontsize=15
         params = {'axes.labelsize':15,
                 'font.size':10,
@@ -487,8 +523,8 @@ if __name__ == '__main__':
                 'figure.figsize':fig_size,
                 'font.family': 'serif'}
         pl.rcParams.update(params)
-        pl.rc('text',usetex=True)
-        pl.subplots_adjust(wspace=0.075,hspace=0.075) # you can add spaces between the block here
+        pl.rc('text', usetex=True)
+        pl.subplots_adjust(wspace=0.075, hspace=0.075) # you can add spaces between the block here
         pl.clf()
         fig = pl.figure()
         pl.clf()
@@ -500,15 +536,15 @@ if __name__ == '__main__':
                 ax = pl.subplot(nlens, 1, bin1)#(bin1-1)*(nlens) + 1) # use this for upper triangle
                 ax.set_box_aspect(1)
                 ax.set_ylim(ymin_nn,ymax_nn)
-                pl.xscale(xscale)
+                ax.set_xscale(xscale)
                 idx = np.where((nn_data['BIN1']==bin1) & (nn_data['BIN2']==bin2))[0]
                 # Plot data
                 if (statistic == 'bandpowers'):
-                    ax.errorbar(nn_data['ANG'][idx], nn_data['VALUE'][idx]/nn_data['ANG'][idx]*scaling_nn, nn_std[idx]/nn_data['ANG'][idx]*scaling_nn, linestyle = 'None', marker = '.', markersize=5)
+                    ax.errorbar(nn_data['ANG'][idx], nn_data['VALUE'][idx]/nn_data['ANG'][idx]*scaling_nn, nn_std[idx]/nn_data['ANG'][idx]*scaling_nn, linestyle='None', marker='.', markersize=5)
                 elif (statistic == 'cosebis'):
-                    ax.errorbar(nn_data['ANG'][idx],nn_data['VALUE'][idx]*scaling_nn, yerr=nn_std[idx]*scaling_nn, fmt='d',markeredgecolor='C0',mew=1,markerfacecolor='C0', color='C0', markersize=4)
+                    ax.errorbar(nn_data['ANG'][idx],nn_data['VALUE'][idx]*scaling_nn, yerr=nn_std[idx]*scaling_nn, fmt='d', markeredgecolor='C0', mew=1, markerfacecolor='C0', color='C0', markersize=4)
                 elif statistic == '2pcf':
-                    ax.errorbar(nn_data['ANG'][idx],nn_data['ANG'][idx]*nn_data['VALUE'][idx]*scaling_nn, yerr=nn_data['ANG'][idx]*nn_std[idx]*scaling_nn,     fmt='d',markeredgecolor='C0',mew=1,markerfacecolor='C0', color='C0', markersize=4)
+                    ax.errorbar(nn_data['ANG'][idx],nn_data['ANG'][idx]*nn_data['VALUE'][idx]*scaling_nn, yerr=nn_data['ANG'][idx]*nn_std[idx]*scaling_nn, fmt='d', markeredgecolor='C0', mew=1, markerfacecolor='C0', color='C0', markersize=4)
         
                 ax.axhline(y=0, color='k', ls=':',label='')
                 ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
@@ -517,19 +553,19 @@ if __name__ == '__main__':
                 if bin2==nlens:
                     ax.set_xlabel(xlabel)
                     ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
-                    ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=True)
+                    ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=False)
                     ax.xaxis.set_label_position('bottom')
                 if bin1==1:
                     ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
-                    ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=True)
-                    ax.yaxis.set_label_position('right')
-                if bin1==nlens and bin2==nlens:
+                    ax.tick_params(labelbottom=False, labeltop=False, labelleft=True, labelright=False)
+                    ax.yaxis.set_label_position('left')
+                if bin1==1 and bin2==nlens:
                     ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
-                    ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=True)
-                    ax.yaxis.set_label_position('right')
-                lg = pl.legend([leg1],[r'$\mathrm{{L}}{{{0}}}-\mathrm{{L}}{{{1}}}$'.format(bin1,bin2)],loc='upper right',
-                            handlelength=0,borderpad=0,labelspacing=0.,ncol=3,prop={'size':fontsize}
-                            ,columnspacing=0,frameon=None)
+                    ax.tick_params(labelbottom=True, labeltop=False, labelleft=True, labelright=False)
+                    ax.yaxis.set_label_position('left')
+                lg = pl.legend([leg1],[r'$\mathrm{{L}}{{{0}}}-\mathrm{{L}}{{{1}}}$'.format(bin1,bin2)], loc='upper right',
+                            handlelength=0, borderpad=0, labelspacing=0., ncol=3,
+                            prop={'size':fontsize}, columnspacing=0, frameon=None)
                 #lg.draw_frame(False)
                 
         fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
@@ -539,19 +575,20 @@ if __name__ == '__main__':
             pl.savefig(output_dir+'/clustering_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax), bbox_inches="tight")
         pl.close()
         pl.clf()
-        pl.rcParams.update()
+        
     if obs:
         # plotting sizes
-        yprops=dict(rotation=90, horizontalalignment='center',verticalalignment='center', x=10,labelpad=20, fontsize=15)
+        pl.rcParams.update(pl.rcParamsDefault)
+        yprops=dict(rotation=90, horizontalalignment='center', verticalalignment='center', x=10, labelpad=20, fontsize=15)
         leg1=Rectangle((0,0),0,0,alpha=0.0)
         formatter = ScalarFormatter(useMathText=True)
         formatter.set_scientific(True)
         fig_width_pt = 246.0*3.5 # Get this from LaTex using \the\columnwidth
         inches_per_pt = 1.0/72.27
         golden_mean = (np.sqrt(5)-1.0)/2.0
-        fig_width  = fig_width_pt*inches_per_pt # width in inches
-        fig_height = fig_width*golden_mean # height in inches
-        fig_size = [fig_width/nlens, fig_height*1.5]
+        fig_width  = 2.5#fig_width_pt*inches_per_pt # width in inches
+        fig_height = fig_width#/golden_mean # height in inches
+        fig_size = [fig_width*2, fig_height*2]
         fontsize=15
         params = {'axes.labelsize':15,
                 'font.size':10,
@@ -561,38 +598,33 @@ if __name__ == '__main__':
                 'figure.figsize':fig_size,
                 'font.family': 'serif'}
         pl.rcParams.update(params)
-        pl.rc('text',usetex=True)
-        pl.subplots_adjust(wspace=0.075,hspace=0.075) # you can add spaces between the block here
+        pl.rc('text', usetex=True)
+        pl.subplots_adjust(wspace=0.075, hspace=0.075) # you can add spaces between the block here
         pl.clf()
         fig = pl.figure()
         pl.clf()
-        for bin1 in range(1, nobs+1):
-            index = int(nobs*(bin1-1) - (bin1-1))
-            ax = pl.subplot(nobs, 1, bin1)#(bin1-1)*(nlens) + 1) # use this for upper triangle
-            ax.set_box_aspect(1)
-            #ax.set_ylim(ymin_obs,ymax_obs)
-            pl.xscale(xscale_obs)
-            pl.yscale(yscale_obs)
-            # Plot data
-            ax.errorbar(obs_data[f'ANG{bin1}'], obs_data[f'VALUE{bin1}']*scaling_obs, obs_std*scaling_obs, linestyle = 'None', marker = '.', markersize=5)
         
+        ax = pl.subplot(1, 1, 1)
+        ax.set_ylim(ymin_obs/2,ymax_obs*2)
+        ax.set_xlim(xmin_obs/2,xmax_obs*2)
+        ax.set_xscale(xscale_obs)
+        ax.set_yscale(yscale_obs)
+        
+        for bin1 in range(1, nobs+1):
+            
+            # Plot data
+            ax.errorbar(obs_data[f'ANG{bin1}'], obs_data[f'VALUE{bin1}']*scaling_obs, obs_std*scaling_obs, linestyle='None', marker='.', markersize=5)
             #ax.axhline(y=0, color='k', ls=':',label='')
-            ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
-            ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=False)
-            ax.set_ylabel(ylabel_obs,**yprops)
-            if bin1==nobs:
-                ax.set_xlabel(xlabel_obs)
-                ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
-                ax.tick_params(labelbottom=True, labeltop=False, labelleft=False, labelright=True)
-                ax.xaxis.set_label_position('bottom')
-                ax.yaxis.set_label_position('right')
-            if bin1==1:
-                ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
-                ax.tick_params(labelbottom=False, labeltop=False, labelleft=False, labelright=True)
-                ax.yaxis.set_label_position('right')
-            lg = pl.legend([leg1],[r'$\mathrm{{O}}{{{0}}}$'.format(bin1)],loc='upper right',
-                        handlelength=0,borderpad=0,labelspacing=0.,ncol=3,prop={'size':fontsize}
-                        ,columnspacing=0,frameon=None)
+        ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
+        ax.tick_params(labelbottom=True, labeltop=False, labelleft=True, labelright=False)
+        ax.set_ylabel(ylabel_obs,**yprops)
+        ax.set_xlabel(xlabel_obs)
+        ax.xaxis.set_label_position('bottom')
+        ax.yaxis.set_label_position('left')
+        ax.set_box_aspect(1)
+        lg = pl.legend([leg1],[r'$\mathrm{{O}}{{{0}}}$'.format(bin1)], loc='upper right',
+                            handlelength=0, borderpad=0, labelspacing=0., ncol=3,
+                            prop={'size':fontsize}, columnspacing=0, frameon=None)
             #lg.draw_frame(False)
                 
         fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic,thetamin,thetamax), fontsize=20)
@@ -602,7 +634,7 @@ if __name__ == '__main__':
             pl.savefig(output_dir+'/smf_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax), bbox_inches="tight")
         pl.close()
         pl.clf()
-        pl.rcParams.update()
+
 
 
 

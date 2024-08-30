@@ -120,20 +120,20 @@ cosebis_configpath=@RUNROOT@/@CONFIGPATH@/cosebis/
   
 stats=""
 twopt_modules=""
-if [[ .*\ $MODES\ .* =~ " EE " ]]
+if [[ .*\ $MODES\ .* =~ " NN " ]]
 then
-  stats="${stats} En"
-  twopt_modules="${twopt_modules} cosebis"
+  stats="${stats} Psi_gg"
+  twopt_modules="${twopt_modules} psi_gg"
 fi
 if [[ .*\ $MODES\ .* =~ " NE " ]]
 then
   stats="${stats} Psi_gm"
   twopt_modules="${twopt_modules} psi_gm"
 fi
-if [[ .*\ $MODES\ .* =~ " NN " ]]
+if [[ .*\ $MODES\ .* =~ " EE " ]]
 then
-  stats="${stats} Psi_gg"
-  twopt_modules="${twopt_modules} psi_gg"
+  stats="${stats} En"
+  twopt_modules="${twopt_modules} cosebis"
 fi
 if [[ .*\ $MODES\ .* =~ " OBS " ]]
 then
@@ -278,20 +278,20 @@ then
   #scale cut {{{
 stats=""
 twopt_modules=""
-if [[ .*\ $MODES\ .* =~ " EE " ]]
+if [[ .*\ $MODES\ .* =~ " NN " ]]
 then
-  stats="${stats} PeeE"
-  twopt_modules="${twopt_modules} bandpower_shear_e"
+  stats="${stats} Pnn"
+  twopt_modules="${twopt_modules} bandpower_clustering"
 fi
 if [[ .*\ $MODES\ .* =~ " NE " ]]
 then
   stats="${stats} PneE"
   twopt_modules="${twopt_modules} bandpower_ggl"
 fi
-if [[ .*\ $MODES\ .* =~ " NN " ]]
+if [[ .*\ $MODES\ .* =~ " EE " ]]
 then
-  stats="${stats} Pnn"
-  twopt_modules="${twopt_modules} bandpower_clustering"
+  stats="${stats} PeeE"
+  twopt_modules="${twopt_modules} bandpower_shear_e"
 fi
 if [[ .*\ $MODES\ .* =~ " OBS " ]]
 then
@@ -524,20 +524,20 @@ then
   
   stats=""
   twopt_modules=""
-  if [[ .*\ $MODES\ .* =~ " EE " ]]
+  if [[ .*\ $MODES\ .* =~ " NN " ]]
   then
-    stats="${stats} xiP xiM"
-    twopt_modules="${twopt_modules} xi"
+    stats="${stats} wTh"
+    twopt_modules="${twopt_modules} wth"
   fi
   if [[ .*\ $MODES\ .* =~ " NE " ]]
   then
     stats="${stats} gT"
     twopt_modules="${twopt_modules} gt"
   fi
-  if [[ .*\ $MODES\ .* =~ " NN " ]]
+  if [[ .*\ $MODES\ .* =~ " EE " ]]
   then
-    stats="${stats} wTh"
-    twopt_modules="${twopt_modules} wth"
+    stats="${stats} xiP xiM"
+    twopt_modules="${twopt_modules} xi"
   fi
   if [[ .*\ $MODES\ .* =~ " OBS " ]]
   then
