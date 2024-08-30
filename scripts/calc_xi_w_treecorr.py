@@ -64,7 +64,7 @@ if __name__ == '__main__':
              help='Name of the Dec column in the first catalogue')
     parser.add_argument('--file2dec', dest="cat2decname", type=str,default='DELTA_J2000',
              help='Name of the Dec column in the second catalogue')
-    parser.add_argument('--patch_centers', dest="center_file", type=str, nargs='?',default='',
+    parser.add_argument('--patch_centers', dest="center_file", type=str, nargs='?',default=None,
              help='File containing centers for performing jackknife/bootstrap covariance calculations')
     parser.add_argument('--nthreads', dest="num_threads", type=int,default=None,
              help='Number of desired parallel threads. If None (default) then uses all available')
@@ -222,6 +222,6 @@ if __name__ == '__main__':
         # Write it out unweighted npairs and praise-be again for Jarvis and his well documented code
         gg.write(outfile, precision=12)
 
-    if center_file != "": 
+    if center_file is not None:
         np.savetxt(covoutfile,gg.cov)
 

@@ -155,20 +155,17 @@ if __name__ == '__main__':
         if nn:
             nn_data = f[extension_nn].data
             n_data_nn = len(nn_data)
-            #nn_cov = f['COVMAT'].data[0:n_data_nn,:][:,0:n_data_nn]
-            nn_cov = np.eye(n_data_nn)
+            nn_cov = f['COVMAT'].data[0:n_data_nn,:][:,0:n_data_nn]
             nn_std = np.sqrt(np.diag(nn_cov))
         if ne:
             neE_data = f[extension_neE].data
             n_data_ne = len(neE_data)
-            #neE_cov = f['COVMAT'].data[n_data_nn:n_data_nn+n_data_ne,:][:,n_data_nn:n_data_nn+n_data_ne]
-            neE_cov = np.eye(n_data_ne)
+            neE_cov = f['COVMAT'].data[n_data_nn:n_data_nn+n_data_ne,:][:,n_data_nn:n_data_nn+n_data_ne]
             neE_std = np.sqrt(np.diag(neE_cov))
             try:
                 neB_data = f[extension_neB].data
                 n_data_nb = len(neB_data)
-                #neB_cov = f['COVMAT'].data[n_data_nn+n_data_ne:n_data_nn+n_data_ne+n_data_nb,:][:,n_data_nn+n_data_ne:n_data_nn+n_data_ne+n_data_nb]
-                neB_cov = np.eye(n_data_ne)
+                neB_cov = f['COVMAT'].data[n_data_nn+n_data_ne:n_data_nn+n_data_ne+n_data_nb,:][:,n_data_nn+n_data_ne:n_data_nn+n_data_ne+n_data_nb]
                 neB_std = np.sqrt(np.diag(neB_cov))
             except:
                 neB_data = None
@@ -177,14 +174,12 @@ if __name__ == '__main__':
         if ee:
             eeE_data = f[extension_eeE].data
             n_data_ee = len(eeE_data)
-            #eeE_cov = f['COVMAT'].data[n_data_nn+n_data_ne+n_data_nb:n_data_nn+n_data_ne+n_data_nb+n_data_ee,:][:,n_data_nn+n_data_ne+n_data_nb:n_data_nn+n_data_ne+n_data_nb+n_data_ee]
-            eeE_cov = np.eye(n_data_ee)
+            eeE_cov = f['COVMAT'].data[n_data_nn+n_data_ne+n_data_nb:n_data_nn+n_data_ne+n_data_nb+n_data_ee,:][:,n_data_nn+n_data_ne+n_data_nb:n_data_nn+n_data_ne+n_data_nb+n_data_ee]
             eeE_std = np.sqrt(np.diag(eeE_cov))
             try:
                 eeB_data = f[extension_eeB].data
                 n_data_bb = len(eeB_data)
-                #eeB_cov = f['COVMAT'].data[n_data_nn+n_data_ne+n_data_nb+n_data_ee:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb,:][:,n_data_nn+n_data_ne+n_data_nb+n_data_ee:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb]
-                eeB_cov = np.eye(n_data_ee)
+                eeB_cov = f['COVMAT'].data[n_data_nn+n_data_ne+n_data_nb+n_data_ee:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb,:][:,n_data_nn+n_data_ne+n_data_nb+n_data_ee:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb]
                 eeB_std = np.sqrt(np.diag(eeB_cov))
             except:
                 eeB_data = None
@@ -193,8 +188,7 @@ if __name__ == '__main__':
         if obs:
             obs_data = f[extension_obs].data
             n_data_obs = np.sum([len(obs_data[f'ANG{i+1}']) for i in range(nobs)])
-            #nn_cov = f['COVMAT'].data[n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb+n_data_nn,:][:,n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb+n_data_nn]
-            obs_cov = np.eye(n_data_obs)
+            obs_cov = f['COVMAT'].data[n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb+n_data_obs,:][:,n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb+n_data_obs]
             obs_std = np.sqrt(np.diag(obs_cov))
 
     

@@ -71,7 +71,7 @@ if __name__ == '__main__':
              help='Name of the RA column in the source catalogue')
     parser.add_argument('--sourcedec', dest="sourcedecname", type=str,default='DELTA_J2000',
              help='Name of the Dec column in the source catalogue')
-    parser.add_argument('--patch_centers', dest="center_file", type=str, nargs='?',default='',
+    parser.add_argument('--patch_centers', dest="center_file", type=str, nargs='?',default=None,
              help='File containing centers for performing jackknife/bootstrap covariance calculations')
     parser.add_argument('--nthreads', dest="num_threads", type=int,default=None,
              help='Number of desired parallel threads. If None (default) then uses all available')
