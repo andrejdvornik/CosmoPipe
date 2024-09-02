@@ -17,7 +17,7 @@ output=${output##*/}
 #Number of tomographic bins 
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 
-if [ ! -f @RUNROOT@/@CONFIGPATH@/cosebis/Tplus/Tp_@BV:THETAMINXI@_@BV:THETAMAXXI@_@BV:NMAXCOSEBIS@.table  ] 
+if [ ! -f @RUNROOT@/@CONFIGPATH@/cosebis/Tplus/Tp_@BV:THETAMIN@_@BV:THETAMAX@_@BV:NMAXCOSEBIS@.table  ] 
 then 
   #Compute the Tpm files 
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/get_weights_cosebis.py \

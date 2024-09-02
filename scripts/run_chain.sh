@@ -16,8 +16,8 @@ if [ "${STATISTIC^^}" == "COSEBIS" ]
 then
   # check whether the pre-computed COSEBIS tables exist 
   SRCLOC=@RUNROOT@/@CONFIGPATH@/cosebis
-  normfile=${SRCLOC}/TLogsRootsAndNorms/Normalization_@BV:THETAMIN@-@BV:THETAMAXXI@.table
-  rootfile=${SRCLOC}/TLogsRootsAndNorms/Root_@BV:THETAMINXI@-@BV:THETAMAX@.table
+  normfile=${SRCLOC}/TLogsRootsAndNorms/Normalization_@BV:THETAMIN@-@BV:THETAMAX@.table
+  rootfile=${SRCLOC}/TLogsRootsAndNorms/Root_@BV:THETAMIN@-@BV:THETAMAX@.table
 
   if [ ! -f ${normfile} ] || [ ! -f ${rootfile} ]
   then 
@@ -38,7 +38,7 @@ then
   fi
   # check whether the precomputed WnLog files exist
   nfiles=@BV:NMAXCOSEBIS@
-  basefile="${SRCLOC}/WnLog/WnLogBIN-@BV:THETAMINXI@-@BV:THETAMAXXI@.table"
+  basefile="${SRCLOC}/WnLog/WnLogBIN-@BV:THETAMIN@-@BV:THETAMAX@.table"
   for i in $(seq -f "%01g" 1 $nfiles)
   do
     file=`echo ${basefile} | sed "s/BIN/${i}/g"`
