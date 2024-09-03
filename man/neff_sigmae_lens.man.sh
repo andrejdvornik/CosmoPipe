@@ -40,12 +40,12 @@ trap '_abort' 0
 set -e 
 #}}}
 
-# Input variables {{{ 
-function _inp_var { 
+# Input variables {{{
+function _inp_var {
   #Variable inputs (leave blank if none)
   list=''
-  for patch in @PATCHLIST@ @ALLPATCH@ 
-  do 
+  for patch in @PATCHLIST@ @ALLPATCH@
+  do
     list="${list} BV:SURVEYAREA_${patch}"
   done
   echo ALLPATCH BLU BV:BLIND BV:LENSWEIGHTNAME DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH ${list}
@@ -59,27 +59,27 @@ function _inp_data {
 } 
 #}}}
 
-# Output data {{{ 
-function _outputs { 
+# Output data {{{
+function _outputs {
   #Data outputs (leave blank if none)
   outlist=''
   for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
-  do 
+  do
     outlist="${outlist} cov_inp_${patch}_@BV:BLIND@ neff_lens_${patch}_@BV:BLIND@"
   done
   echo ${outlist}
-} 
+}
 #}}}
 
-# Execution command {{{ 
-function _runcommand { 
-  #Command for running the script 
+# Execution command {{{
+function _runcommand {
+  #Command for running the script
   echo bash @RUNROOT@/@SCRIPTPATH@/neff_sigmae_lens.sh
-} 
+}
 #}}}
 
-# Unset Function command {{{ 
-function _unset_functions { 
+# Unset Function command {{{
+function _unset_functions {
   #Remove these functions from the environment
   unset -f _prompt _description _inp_data _inp_var _abort _outputs _runcommand _unset_functions
 } 

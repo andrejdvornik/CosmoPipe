@@ -47,28 +47,30 @@ function _inp_var {
 } 
 #}}}
 
-# Input data {{{ 
-function _inp_data { 
+# Input data {{{
+function _inp_data {
   #Data inputs (leave blank if none)
+  blind=`_parse_blockvars "@BV:BLIND@"`
   outlist=''
-  for patch in @ALLPATCH@ @PATCHLIST@ 
-  do 
-    outlist="${outlist} mbias_${patch}_@BV:BLIND@"
-  done 
+  for patch in @ALLPATCH@ @PATCHLIST@
+  do
+    outlist="${outlist} mbias_${patch}_${blind}"
+  done
   echo ${outlist}
 }
 #}}}
 
 # Output data {{{ 
-function _outputs { 
-  #Data outputs (leave blank if none)
+function _outputs {
+#Data outputs (leave blank if none)
+  blind=`_parse_blockvars "@BV:BLIND@"`
   outlist=''
-  for patch in @PATCHLIST@ @ALLPATCH@ 
-  do 
+  for patch in @PATCHLIST@ @ALLPATCH@
+  do
     outlist="${outlist} cosmosis_mcov_${patch}_@BV:BLIND@ cosmosis_mbias_${patch}_@BV:BLIND@ cosmosis_msigma_${patch}_@BV:BLIND@ mcov_${patch}_@BV:BLIND@"
-  done 
+  done
   echo ${outlist}
-} 
+}
 #}}}
 
 # Execution command {{{ 
