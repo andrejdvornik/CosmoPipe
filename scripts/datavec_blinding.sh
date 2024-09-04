@@ -64,7 +64,7 @@ done
 
 # Remove all the previous statistic files / datavectors / everything after treecorr runs
 datablock_names="`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/`"
-to_delete="gt wt xipm cosebis bandpowers psi_stats cosmosis_npair" # Add more if we figure out that is needed
+to_delete="gt wt xipm cosebis bandpowers psi_stats" # Add more if we figure out that is needed
 for name in ${datablock_names}
 do
   for del in ${to_delete}
