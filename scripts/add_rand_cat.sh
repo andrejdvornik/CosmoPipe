@@ -3,9 +3,9 @@
 #
 
 #If needed, make the simulations folder 
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/rand_cats/ ]
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/rand_main/ ]
 then
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/rand_cats
+  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/rand_main
 fi
 
 #Check that the main catalogue(s) exists
@@ -33,7 +33,7 @@ else
 fi 
 
 #Update the datablock contents file 
-_add_datablock rand_cats "$filelist"
+_add_datablock rand_main "$filelist"
 
 #Get the number of catalogues 
 nrand=`echo ${filelist} | awk '{print NF}'`
@@ -41,4 +41,4 @@ nrand=`echo ${filelist} | awk '{print NF}'`
 _write_blockvars "NRANDCATS" "${nrand}"
 
 #Create the RAND_CATS block variable
-_write_blockvars "RAND_CATS" "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/rand_cats/${outname}"
+_write_blockvars "RAND_MAIN" "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/rand_main/${outname}"

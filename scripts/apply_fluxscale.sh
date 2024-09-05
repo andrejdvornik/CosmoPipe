@@ -9,7 +9,7 @@
 
 ### Construct fluxscale corrected catalogue ### {{{
 _message "Applying fluxscale correction to the KiDS Bright catalogue:"
-file_one="@BV:LENS_CATS@"
+file_one="@BV:LENS_MAIN@"
 #Define the output filename
 outname=${file_one##*/}
 outname=${outname%%.*}

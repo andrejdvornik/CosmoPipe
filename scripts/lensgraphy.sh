@@ -11,7 +11,7 @@
 _message "Applying selections to the lens catalogue and constructing lens bins:"
 
 lensfile="@BV:FLUXSCALE_CORRECTED@"
-randfile="@BV:RAND_CATS@"
+randfile="@BV:RAND_MAIN@"
 stacked_nz="@BV:STACKED_NZ@"
 
 if [ -f ${lensfile} ]

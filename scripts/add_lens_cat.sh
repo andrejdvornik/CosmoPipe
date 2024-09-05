@@ -3,9 +3,9 @@
 #
 
 #If needed, make the simulations folder 
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats/ ]
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_main/ ]
 then
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats
+  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_main
 fi
 
 #Check that the main catalogue(s) exists
@@ -33,7 +33,7 @@ else
 fi 
 
 #Update the datablock contents file 
-_add_datablock lens_cats "$filelist"
+_add_datablock lens_main "$filelist"
 
 #Get the number of catalogues 
 nlens=`echo ${filelist} | awk '{print NF}'`
@@ -41,6 +41,6 @@ nlens=`echo ${filelist} | awk '{print NF}'`
 _write_blockvars "NLENSCATS" "${nlens}"
 
 #Create the LENS_CATS block variable
-_write_blockvars "LENS_CATS" "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats/${outname}"
+_write_blockvars "LENS_MAIN" "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_main/${outname}"
 
 
