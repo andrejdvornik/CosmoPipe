@@ -12,15 +12,15 @@
 MODES="@BV:MODES@"
 if [[ .*\ $MODES\ .* =~ " EE " ]]
 then
-  headfiles_xi="@BV:HEADFILES_XI@"
+  headfiles_xi="@DB:xipm_comb@"
 fi
 if [[ .*\ $MODES\ .* =~ " NE " ]]
 then
-  headfiles_gt="@BV:HEADFILES_GT@"
+  headfiles_gt="@DB:gt_comb@"
 fi
 if [[ .*\ $MODES\ .* =~ " NN " ]]
 then
-  headfiles_wt="@BV:HEADFILES_WT@"
+  headfiles_wt="@DB:wt_comb@"
 fi
 
 #Number of tomographic bins

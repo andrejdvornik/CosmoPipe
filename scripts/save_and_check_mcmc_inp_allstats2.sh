@@ -109,7 +109,7 @@ then
   fi
   if [[ .*\ $MODES\ .* =~ " NN " ]]
   then
-    input_datavector_nn="@DB:gg_vec@"
+    input_datavector_nn="@DB:wt_vec@"
   else
     input_datavector_nn=
   fi
