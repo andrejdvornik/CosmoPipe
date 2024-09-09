@@ -16,6 +16,7 @@ fi
 
 IAMODEL="@BV:IAMODEL@"
 CHAINSUFFIX=@BV:CHAINSUFFIX@
+blind=@BV:BLIND@
 
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 [DEFAULT]
@@ -28,8 +29,6 @@ HMPATH        = %(MY_PATH)s/INSTALL/halo_model/
 
 OUTPUT_FOLDER = %(MY_PATH)s/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/%(stats_name)s/chain/
 CONFIG_FOLDER = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/
-
-2PT_FILE = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}${iteration}.fits
 
 blind              = @BV:BLIND@
 redshift_name      = source
@@ -77,10 +76,19 @@ else
   exit 1
 fi
 
+
 datafile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}_${blind}${iteration}.fits
+
+if [ -f ${datafile} ]
+then
+  continue
+else
+  datafile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}${iteration}.fits
+fi
 
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 data_file = ${datafile}
+2PT_FILE = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}${iteration}.fits
 
 EOF
 #}}}
@@ -88,7 +96,7 @@ EOF
 #Set up the scale cuts module {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 [scale_cuts]
-file = %(KCAP_PATH)s/modules/scale_cuts/scale_cuts.py
+file = %(KCAP_PATH)s/modules/scale_cuts_new/scale_cuts.py
 output_section_name = scale_cuts_output
 data_and_covariance_fits_filename = %(data_file)s
 simulate = F
@@ -99,7 +107,7 @@ if [ "${STATISTIC^^}" == "COSEBIS_B" ] || [ "${STATISTIC^^}" == "BANDPOWERS_B" ]
 then
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini <<- EOF
 [scale_cuts_b]
-file = %(KCAP_PATH)s/modules/scale_cuts/scale_cuts.py
+file = %(KCAP_PATH)s/modules/scale_cuts_new/scale_cuts.py
 output_section_name = scale_cuts_output_b
 data_and_covariance_fits_filename = %(data_file)s
 simulate = F
@@ -873,7 +881,7 @@ then
           exit 1
     fi
     
-    COSMOSIS_PIPELINE="correlated_dz_priors load_nz_fits consistency camb extrapolate halo_model_ingredients hod bnl pk add_and_upsample ${iamodel_pipeline} source_photoz_bias ${twopt_modules} bnl_delete"
+    COSMOSIS_PIPELINE="correlated_dz_priors load_nz_fits consistency camb extrapolate halo_model_ingredients hod hod_smf bnl pk add_and_upsample ${iamodel_pipeline} source_photoz_bias ${twopt_modules} bnl_delete"
 else
 	COSMOSIS_PIPELINE="@BV:COSMOSIS_PIPELINE@"
 fi
@@ -998,7 +1006,7 @@ file = %(CSL_PATH)s/boltzmann/camb/camb_interface.py
 do_reionization = F
 mode = power
 nonlinear = pk
-halofit_version = none
+halofit_version =
 neutrino_hierarchy = normal
 kmax = 20.0
 kmax_extrapolate=1000.0
@@ -1025,6 +1033,13 @@ modulelist=`echo ${COSMOSIS_PIPELINE} | sed 's/ /\n/g' | sort | uniq | awk '{pri
 for module in ${modulelist}
 do 
   case ${module} in
+	"consistency") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(CSL_PATH)s/utility/consistency/consistency_interface.py
+			
+			EOF
+			;; #}}}
 	"correlated_dz_priors") #{{{
 			shifts_source=""
 			unc_shifts=""
@@ -1038,7 +1053,7 @@ do
 			file = %(KCAP_PATH)s/utils/correlated_priors.py
 			uncorrelated_parameters = ${unc_shifts}
 			output_parameters = ${shifts_source}
-			#covariance = @DB:nzcov@
+			covariance = @DB:nzcov@
 			
 			EOF
 			;; #}}}
