@@ -42,7 +42,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo MCMCINPUTFILE BV:STATISTIC DATABLOCK RUNROOT STORAGEPATH
+  echo BV:BOLTZMAN BV:MCMCINPUTFILE BV:STATISTIC DATABLOCK RUNROOT STORAGEPATH
 } 
 #}}}
 
