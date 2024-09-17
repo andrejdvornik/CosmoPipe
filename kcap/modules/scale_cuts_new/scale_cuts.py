@@ -145,9 +145,9 @@ def execute(block, config):
         [config['bandpower_clustering_section_name'],     config['bandpower_clustering_extension_name'],     'ell',           False],
         [config['bandpower_ggl_section_name'],            config['bandpower_ggl_extension_name'],            'ell',           True],
         [config['bandpower_e_cosmic_shear_section_name'], config['bandpower_e_cosmic_shear_extension_name'], 'ell',           False],
-        [config['psi_stats_gg_section_name'],             config['psi_stats_gg_extension_name'],             'cosebis_n',     False],
-        [config['psi_stats_gm_section_name'],             config['psi_stats_gm_extension_name'],             'cosebis_n',     True],
-        [config['cosebis_section_name'],                  config['cosebis_extension_name'],                  'cosebis_n',     False],
+        [config['psi_stats_gg_section_name'],             config['psi_stats_gg_extension_name'],             'index_bin_1_1',     False],
+        [config['psi_stats_gm_section_name'],             config['psi_stats_gm_extension_name'],             'index_bin_1_1',     True],
+        [config['cosebis_section_name'],                  config['cosebis_extension_name'],                  'n',     False],
     ]
     
     for line in sectionNameList:

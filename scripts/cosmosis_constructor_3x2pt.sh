@@ -158,8 +158,8 @@ psi_stats_gm_extension_name = Psi_gm
 psi_stats_gg_extension_name = Psi_gg
 onepoint_extension_name = 1pt
 cosebis_section_name = cosebis
-psi_stats_gm_section_name = psi_gm
-psi_stats_gg_section_name = psi_gg
+psi_stats_gm_section_name = psi_stats_gm
+psi_stats_gg_section_name = psi_stats_gg
 onepoint_section_name = one_point
 
 EOF
@@ -1508,8 +1508,8 @@ do
 			do_p_gI = False
 			do_p_mI = False
 			do_p_II = False
-			input_power_suffix_extrap = hod
-			hod_section_name_extrap =
+			input_power_suffix_extrap =
+			hod_section_name_extrap = hod
 			
 			EOF
 			;; #}}}
@@ -1604,7 +1604,7 @@ do
 			[$module]
 			file = %(CSL_PATH)s/intrinsic_alignments/la_model/linear_alignments_interface.py
 			method = bk_corrected
-			do_galaxy_intrinsic=${ne}
+			do_galaxy_intrinsic= ${ne}
 			
 			EOF
 			;; #}}}
