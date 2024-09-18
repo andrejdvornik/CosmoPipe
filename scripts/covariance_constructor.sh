@@ -598,7 +598,7 @@ arbitrary_accuracy = 1e-5
 EOF
 
 fi
-if [ "${use_arbitrary}" == "True" ]
+if [ "${use_arbitrary}" == "True" ] && [ "${cov_between_stats}" != "True" ]
 then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 #arb_summary_directory = @RUNROOT@/@CONFIGPATH@/covariance_arb_summary/
