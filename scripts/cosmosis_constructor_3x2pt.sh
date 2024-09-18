@@ -81,7 +81,7 @@ datafile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_
 
 if [ -f ${datafile} ]
 then
-  continue
+  datafile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}_${blind}${iteration}.fits
 else
   datafile=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}${iteration}.fits
 fi
@@ -1006,7 +1006,7 @@ file = %(CSL_PATH)s/boltzmann/camb/camb_interface.py
 do_reionization = F
 mode = power
 nonlinear = pk
-halofit_version =
+halofit_version = mead2020_feedback
 neutrino_hierarchy = normal
 kmax = 20.0
 kmax_extrapolate=1000.0

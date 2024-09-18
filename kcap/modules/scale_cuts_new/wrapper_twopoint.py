@@ -96,8 +96,8 @@ class LabelConvention:
         self.kernelTypeDict[P_ne_B]  = [self.lens,   self.source, tpType4, tpType6, None] 
         self.kernelTypeDict[P_ee_E]  = [self.source, self.source, tpType5, tpType5, None] 
         self.kernelTypeDict[P_ee_B]  = [self.source, self.source, tpType6, tpType6, None] 
-        self.kernelTypeDict[E_n]     = [self.source, self.source, tpType5, tpType6, None] 
-        self.kernelTypeDict[B_n]     = [self.source, self.source, tpType6, tpType5, None]
+        self.kernelTypeDict[E_n]     = [self.source, self.source, tpType5, tpType5, None]
+        self.kernelTypeDict[B_n]     = [self.source, self.source, tpType6, tpType6, None]
         self.kernelTypeDict[Psi_gm]  = [self.lens,   self.source, tpType4, tpType5, None]
         self.kernelTypeDict[Psi_gg]  = [self.lens,   self.lens,   tpType4, tpType4, None]
         return

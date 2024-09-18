@@ -24,20 +24,35 @@ else
   exit 1
 fi
 
+if [ "${STATISTIC^^}" == "COSEBIS" ]
+then
+  mode="co"
+fi
+if [ "${STATISTIC^^}" == "BANDPOWERS" ]
+then
+  mode="bp"
+fi
+if [ "${STATISTIC^^}" == "2PCF" ]
+then
+  mode="xi"
+fi
+
 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 @PYTHON3BIN@ -m blind_2pt_cosmosis \
     -i @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_@BV:STATISTIC@.ini \
     -u @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}.fits \
     -b -r \
+    -m ${mode} \
     --key_path @BV:KEYPATH@ \
     --file_path @BV:BLINDFILE@ 2>&1
 
-mbias = `ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/`
+mbias=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/`
 if [[ ${mbias} =~ .*"no_m_bias".* ]]
 then
   MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 @PYTHON3BIN@ -m blind_2pt_cosmosis \
     -i @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_@BV:STATISTIC@.ini \
     -u @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}_no_m_bias.fits \
     -b -r \
+    -m ${mode} \
     --key_path @BV:KEYPATH@ \
     --file_path @BV:BLINDFILE@ 2>&1
 fi
