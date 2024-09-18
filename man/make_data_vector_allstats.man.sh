@@ -169,15 +169,15 @@ function _outputs {
   then
     if [[ .*\ $MODES\ .* =~ " EE " ]]
     then
-      outputs="${outputs} xipm_binned"
+      outputs="${outputs} xipm"
     fi
     if [[ .*\ $MODES\ .* =~ " NE " ]]
     then
-      outputs="${outputs} gt_binned"
+      outputs="${outputs} gt"
     fi
     if [[ .*\ $MODES\ .* =~ " NN " ]]
     then
-      outputs="${outputs} wt_binned"
+      outputs="${outputs} wt"
     fi
   #}}}
   fi
