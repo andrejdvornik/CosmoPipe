@@ -19,10 +19,10 @@ def setup(options):
         raise NameError('data_and_covariance_fits_filename cannot be empty')
     
     ## Read extension names for data outputs
-    config['wt_extension_name']                       = options.get_string(option_section, 'wt_extension_name', default='wTh')
-    config['gt_extension_name']                       = options.get_string(option_section, 'gt_extension_name', default='gT')
-    config['xi_plus_extension_name']                  = options.get_string(option_section, 'xi_plus_extension_name', default='xiP')
-    config['xi_minus_extension_name']                 = options.get_string(option_section, 'xi_minus_extension_name', default='xiM')
+    config['wt_extension_name']                       = options.get_string(option_section, 'wt_extension_name', default='wtheta')
+    config['gt_extension_name']                       = options.get_string(option_section, 'gt_extension_name', default='gammat')
+    config['xi_plus_extension_name']                  = options.get_string(option_section, 'xi_plus_extension_name', default='xip')
+    config['xi_minus_extension_name']                 = options.get_string(option_section, 'xi_minus_extension_name', default='xim')
     config['bandpower_clustering_extension_name']     = options.get_string(option_section, 'bandpower_clustering_extension_name', default='Pnn')
     config['bandpower_ggl_extension_name']            = options.get_string(option_section, 'bandpower_ggl_extension_name', default='PneE')
     config['bandpower_e_cosmic_shear_extension_name'] = options.get_string(option_section, 'bandpower_e_cosmic_shear_extension_name', default='PeeE')
@@ -140,8 +140,8 @@ def execute(block, config):
     sectionNameList = [
         [config['wt_section_name'],                       config['wt_extension_name'],                       'theta',         False],
         [config['gt_section_name'],                       config['gt_extension_name'],                       'theta',         True],
-        [config['xi_plus_section_name'],                  config['xi_plus_extension_name'],                  'theta_bin_1_1', False],
-        [config['xi_minus_section_name'],                 config['xi_minus_extension_name'],                 'theta_bin_1_1', False],
+        [config['xi_plus_section_name'],                  config['xi_plus_extension_name'],                  'theta',         False],
+        [config['xi_minus_section_name'],                 config['xi_minus_extension_name'],                 'theta',         False],
         [config['bandpower_clustering_section_name'],     config['bandpower_clustering_extension_name'],     'ell',           False],
         [config['bandpower_ggl_section_name'],            config['bandpower_ggl_extension_name'],            'ell',           True],
         [config['bandpower_e_cosmic_shear_section_name'], config['bandpower_e_cosmic_shear_extension_name'], 'ell',           False],

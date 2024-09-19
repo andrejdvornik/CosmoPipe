@@ -10,6 +10,8 @@
 #Run blinding for a constructed ini file and input cosmosis fits file
 
 BOLTZMAN="@BV:BOLTZMAN@"
+STATISTIC="@BV:STATISTIC@"
+
 if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
 then
   non_linear_model=mead2020_feedback

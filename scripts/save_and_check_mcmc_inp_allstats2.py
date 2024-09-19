@@ -653,8 +653,8 @@ else:
     datavec_nn_no_mbias = []
     no_m_bias_nn = False
     
-if len(args.smfvec) == 1:
-    smfvec = args.smfvec[0]
+if len(args.smfvec) >= 1:
+    smfvec = args.smfvec
     smftag = 'file'
 else:
     smfvec=[]
@@ -708,15 +708,15 @@ elif statistic == 'bandpowers':
         }
 elif statistic =='2pcf':
     if 'NN' in args.mode:
-        stats_string = stats_string + 'wTh '
+        stats_string = stats_string + 'wtheta '
         datavec.extend(datavec_nn)
         datavec_no_mbias.extend(datavec_nn_no_mbias)
     if 'NE' in args.mode:
-        stats_string = stats_string + 'gT gX '
+        stats_string = stats_string + 'gammat gammax '
         datavec.extend(datavec_ne)
         datavec_no_mbias.extend(datavec_ne_no_mbias)
     if 'EE' in args.mode:
-        stats_string = stats_string + 'xiP xiM '
+        stats_string = stats_string + 'xip xim '
         datavec.extend(datavec_ee)
         datavec_no_mbias.extend(datavec_ee_no_mbias)
     if 'OBS' in args.mode:

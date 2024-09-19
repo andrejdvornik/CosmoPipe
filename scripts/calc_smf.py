@@ -133,8 +133,8 @@ if __name__ == '__main__':
     data_out = np.array([10.0**M_center, phi_bins/step, np.ones_like(phi_bins)]).T
     vmax_out = np.array([M_center, vmax_out]).T
     
-    np.savetxt(f"{out_path}/smf_vec/{outname}_smf.txt", data_out)
-    np.savetxt(f"{out_path}/vmax/{outname}_vmax.txt", vmax_out)
+    np.savetxt(f"{out_path}/smf_vec/{outname}_smf.txt", np.nan_to_num(data_out))
+    np.savetxt(f"{out_path}/vmax/{outname}_vmax.txt", np.nan_to_num(vmax_out))
     np.savetxt(f"{out_path}/f_tomo/{outname}_vmax.txt", np.array([f_tomo]))
     
     

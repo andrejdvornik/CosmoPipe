@@ -534,17 +534,17 @@ then
   twopt_modules=""
   if [[ .*\ $MODES\ .* =~ " NN " ]]
   then
-    stats="${stats} wTh"
+    stats="${stats} wtheta"
     twopt_modules="${twopt_modules} wth"
   fi
   if [[ .*\ $MODES\ .* =~ " NE " ]]
   then
-    stats="${stats} gT"
+    stats="${stats} gammat"
     twopt_modules="${twopt_modules} gt"
   fi
   if [[ .*\ $MODES\ .* =~ " EE " ]]
   then
-    stats="${stats} xiP xiM"
+    stats="${stats} xip xim"
     twopt_modules="${twopt_modules} xi"
   fi
   if [[ .*\ $MODES\ .* =~ " OBS " ]]
@@ -557,20 +557,20 @@ twopt_modules="${twopt_modules} scale_cuts likelihood"
 
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 use_stats = ${stats}
-wt_extension_name = wTh
-gt_extension_name = gT
-xi_plus_extension_name = xiP
-xi_minus_extension_name = xiM
+wt_extension_name = wtheta
+gt_extension_name = gammat
+xi_plus_extension_name = xip
+xi_minus_extension_name = xim
 onepoint_extension_name = 1pt
 wt_section_name = galaxy_xi_binned
 gt_section_name = galaxy_shear_xi_binned
-xi_plus_section_name = shear_xi_plus_binned
-xi_minus_section_name = shear_xi_minus_binned
+xi_plus_section_name = shear_xi_binned_plus
+xi_minus_section_name = shear_xi_binned_minus
 onepoint_section_name = one_point
-keep_ang_wTh  = @BV:THETAMIN@ @BV:THETAMAX@
-keep_ang_gT   = @BV:THETAMIN@ @BV:THETAMAX@
-keep_ang_xiP  = @BV:THETAMIN@ @BV:THETAMAX@
-keep_ang_xiM  = ${ximinus_min}  ${ximinus_max}
+keep_ang_wtheta  = @BV:THETAMIN@ @BV:THETAMAX@
+keep_ang_gammat   = @BV:THETAMIN@ @BV:THETAMAX@
+keep_ang_xip  = @BV:THETAMIN@ @BV:THETAMAX@
+keep_ang_xim  = ${ximinus_min}  ${ximinus_max}
 
 EOF
 #}}}
@@ -587,10 +587,10 @@ theta_min = @BV:THETAMIN@
 theta_max = @BV:THETAMAX@
 ell_max = 40000
 xi_type = '22'
-theta_file = %(data_file)s
+; theta_file = %(data_file)s ; Not working with scale_cuts.py that well!
 bin_avg = F
 input_section_name = shear_cl
-output_section_name = shear_xi_plus_binned  shear_xi_minus_binned
+output_section_name = shear_xi_binned
 
 EOF
 fi
@@ -605,7 +605,7 @@ theta_min = @BV:THETAMIN@
 theta_max = @BV:THETAMAX@
 ell_max = 40000
 xi_type = '02'
-theta_file = %%(data_file)s
+; theta_file = %(data_file)s ; Not working with scale_cuts.py that well!
 bin_avg = F
 input_section_name = galaxy_shear_cl
 output_section_name = galaxy_shear_xi_binned
@@ -623,7 +623,7 @@ theta_min = @BV:THETAMIN@
 theta_max = @BV:THETAMAX@
 ell_max = 40000
 xi_type = '00'
-theta_file = %(data_file)s
+; theta_file = %(data_file)s ; Not working with scale_cuts.py that well!
 bin_avg = F
 input_section_name = galaxy_cl
 output_section_name = galaxy_xi_binned
@@ -863,7 +863,8 @@ then
     # Set up intrinsic alignment pipeline blocks
     if [ "${IAMODEL^^}" == "LINEAR" ]
     then
-        iamodel_pipeline="linear_alignment projection"
+        iamodel_pipeline="projection"
+        #iamodel_pipeline="linear_alignment projection"
     elif [ "${IAMODEL^^}" == "TATT" ]
     then
         iamodel_pipeline="fast_pt tatt projection add_intrinsic"
@@ -972,11 +973,11 @@ fi
 if [ "${STATISTIC^^}" == "COSEBIS_B" ] || [ "${STATISTIC^^}" == "BANDPOWERS_B" ]
 then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
-likelihoods  = loglike loglike_b
+; likelihoods  = loglike loglike_b
 EOF
 else
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
-likelihoods  = loglike
+; likelihoods  = loglike
 EOF
 fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF

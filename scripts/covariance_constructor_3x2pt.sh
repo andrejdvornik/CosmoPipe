@@ -205,8 +205,8 @@ then
   csmf_log10Mmax=${obs_maxs}
   csmf_N_log10M_bin=@BV:NSMFBINS@
   csmf_directory="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/"
-  V_max_file=@DB:vmax@ # This assumes one file, currently we have NSMFLENSBINS
-  f_tomo_file=@DB:f_tomo@ # This assumes one file, currently we have NSMFLENSBINS
+  V_max_file="@DB:vmax@" # This assumes one file, currently we have NSMFLENSBINS
+  f_tomo_file="@DB:f_tomo@" # This assumes one file, currently we have NSMFLENSBINS
 else
   cstellar_mf=False
   csmf_log10Mmin=9.1
