@@ -535,17 +535,17 @@ then
   if [[ .*\ $MODES\ .* =~ " NN " ]]
   then
     stats="${stats} wtheta"
-    twopt_modules="${twopt_modules} wth"
+    twopt_modules="${twopt_modules} wth wth_conv"
   fi
   if [[ .*\ $MODES\ .* =~ " NE " ]]
   then
     stats="${stats} gammat"
-    twopt_modules="${twopt_modules} gt"
+    twopt_modules="${twopt_modules} gt gt_conv"
   fi
   if [[ .*\ $MODES\ .* =~ " EE " ]]
   then
     stats="${stats} xip xim"
-    twopt_modules="${twopt_modules} xi"
+    twopt_modules="${twopt_modules} xi xip_conv xim_conv"
   fi
   if [[ .*\ $MODES\ .* =~ " OBS " ]]
   then
@@ -562,10 +562,10 @@ gt_extension_name = gammat
 xi_plus_extension_name = xip
 xi_minus_extension_name = xim
 onepoint_extension_name = 1pt
-wt_section_name = galaxy_xi_binned
-gt_section_name = galaxy_shear_xi_binned
-xi_plus_section_name = shear_xi_binned_plus
-xi_minus_section_name = shear_xi_binned_minus
+wt_section_name = galaxy_xi
+gt_section_name = galaxy_shear_xi
+xi_plus_section_name = shear_xi_plus
+xi_minus_section_name = shear_xi_minus
 onepoint_section_name = one_point
 keep_ang_wtheta  = @BV:THETAMIN@ @BV:THETAMAX@
 keep_ang_gammat   = @BV:THETAMIN@ @BV:THETAMAX@
@@ -590,7 +590,17 @@ xi_type = '22'
 theta_file = %(data_file)s ; Not working with scale_cuts.py that well!
 bin_avg = F
 input_section_name = shear_cl
-output_section_name = shear_xi_binned
+output_section_name = shear_xi
+
+[xip_conv]
+file = %(CSL_PATH)s/utility/convert_theta/convert_theta.py
+output_units = arcmin
+section_name = shear_xi_plus
+
+[xim_conv]
+file = %(CSL_PATH)s/utility/convert_theta/convert_theta.py
+output_units = arcmin
+section_name = shear_xi_minus
 
 EOF
 fi
@@ -608,7 +618,13 @@ xi_type = '02'
 theta_file = %(data_file)s ; Not working with scale_cuts.py that well!
 bin_avg = F
 input_section_name = galaxy_shear_cl
-output_section_name = galaxy_shear_xi_binned
+output_section_name = galaxy_shear_xi
+
+[gt_conv]
+file = %(CSL_PATH)s/utility/convert_theta/convert_theta.py
+output_units = arcmin
+section_name = galaxy_shear_xi
+
 
 EOF
 fi
@@ -626,7 +642,14 @@ xi_type = '00'
 theta_file = %(data_file)s ; Not working with scale_cuts.py that well!
 bin_avg = F
 input_section_name = galaxy_cl
-output_section_name = galaxy_xi_binned
+output_section_name = galaxy_xi
+
+[wth_conv]
+file = %(CSL_PATH)s/utility/convert_theta/convert_theta.py
+output_units = arcmin
+section_name = galaxy_xi
+
+
 
 EOF
 fi
