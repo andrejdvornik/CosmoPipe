@@ -1,8 +1,3 @@
-#Create directory if needed
-if [ ! -d @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots ]
-then 
-  mkdir -p @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
-fi 
 
 #Input data vector
 STATISTIC="@BV:STATISTIC@"
@@ -26,10 +21,10 @@ then
   inputfile_B=@DB:mcmc_inp_xiB@
 fi
 #If needed, create the output directory {{{
-if [ ! -d @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots ]
-then 
-  mkdir -p @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
-fi 
+if [ ! -d @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots ]
+then
+  mkdir -p @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
+fi
 #}}}
 
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
@@ -64,7 +59,7 @@ then
   fi
   
   arr=(${inputfile})
-  if [ "${#arr[@]}" > 1]
+  if [ "${#arr[@]}" > 1 ]
   then
     for file in ${inputfile}
     do
@@ -79,7 +74,7 @@ then
           --ee ${ee} --ne ${ne} --nn ${nn} --obs ${obs} \
           --title "@SURVEY@" \
           --suffix "@BV:CHAINSUFFIX@" \
-          --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
+          --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
       fi
     done
   else
@@ -92,7 +87,7 @@ then
       --ee ${ee} --ne ${ne} --nn ${nn} --obs ${obs} \
       --title "@SURVEY@" \
       --suffix "@BV:CHAINSUFFIX@" \
-      --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
+      --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
   fi
 else
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/plot_data_vector_python.py \
@@ -104,7 +99,7 @@ else
   --ee True --ne False --nn False --obs False \
   --title "@SURVEY@" \
   --suffix "@BV:CHAINSUFFIX@E" \
-  --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
+  --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
 
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/plot_data_vector_python.py \
   --inputfile ${inputfile_B} \
@@ -115,7 +110,7 @@ else
   --ee True --ne False --nn False --obs False \
   --title "@SURVEY@" \
   --suffix "@BV:CHAINSUFFIX@B" \
-  --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
+  --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
 fi
 
 

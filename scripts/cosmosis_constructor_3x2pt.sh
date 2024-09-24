@@ -1293,7 +1293,7 @@ do
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(HMPATH)s/hod_interface.py
-			observables_file = path_to_smf_function??
+			observables_file = %(HMPATH)s/input_files/red_cen_lum_pdf.txt
 			observable_section_name = stellar_mass_function
 			save_observable = False
 			do_galaxy_linear_bias = False
@@ -1312,7 +1312,7 @@ do
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(HMPATH)s/hod_interface.py
-			observables_file = path_to_smf_function??
+			observables_file = %(HMPATH)sinput_files/blue_cen_lum_pdf.txt
 			observable_section_name = stellar_mass_function
 			save_observable = False
 			do_galaxy_linear_bias = False
@@ -1541,7 +1541,7 @@ do
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(HMPATH)s/add_and_upsample.py
-			f_red_file = path/to/red_fraction_file ; two columns: z f_red(z)
+			f_red_file = %(HMPATH)s/input_files/f_red.txt ; two columns: z f_red(z)
 			do_p_mm = False
 			do_p_gg = False
 			do_p_gm = False
@@ -1716,7 +1716,7 @@ do
 					shear-shear = %(redshift_name)s-%(redshift_name)s
 					shear-intrinsic = %(redshift_name)s-%(redshift_name)s
 					intrinsic-intrinsic = %(redshift_name)s-%(redshift_name)s
-					intrinsicb-intrinsicb = %(redshift_name)s-%(redshift_name)s
+					#intrinsicb-intrinsicb = %(redshift_name)s-%(redshift_name)s
 			
 					EOF
 				fi
