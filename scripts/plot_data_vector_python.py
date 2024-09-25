@@ -66,8 +66,8 @@ if __name__ == '__main__':
         if ee:
             extension_eeE = 'En'
             extension_eeB = 'Bn'
-            ylabel_eeE = r'$E_{\rm n}[10^{-10}{\rm rad}^2]$'
-            ylabel_eeB = r'$B_{\rm n}[10^{-10}{\rm rad}^2]$'
+            ylabel_eeE = r'$E_{\mathrm{n}}[10^{-10}{\mathrm{rad}}^2]$'
+            ylabel_eeB = r'$B_{\mathrm{n}}[10^{-10}{\mathrm{rad}}^2]$'
             xlabel = r'n'
             xscale = 'linear'
             scaling_ee = 1e10
@@ -75,25 +75,25 @@ if __name__ == '__main__':
         if ne:
             extension_neE = 'Psi_gm'
             extension_neB = ''
-            ylabel_neE = r'$\Psi_{\rm gm,n}[10^{-10}{\rm rad}^2]$'
-            ylabel_neB = r'$\Psi_{\rm gm,n}[10^{-10}{\rm rad}^2]$'
+            ylabel_neE = r'$\Psi_{\mathrm{gm,n}}[10^{-10}{\mathrm{rad}}^2]$'
+            ylabel_neB = r'$\Psi_{\mathrm{gm,n}}[10^{-10}{\mathrm{rad}}^2]$'
             xlabel = r'n'
             xscale = 'linear'
-            scaling_ne = 1e10
+            scaling_ne = 1e8
             statistic_gm = 'psi stats'
         if nn:
             extension_nn = 'Psi_gg'
-            ylabel_nn = r'$\Psi_{\rm gg,n}[10^{-10}{\rm rad}^2]$'
+            ylabel_nn = r'$\Psi_{\mathrm{gg,n}}[10^{-10}{\mathrm{rad}}^2]$'
             xlabel = r'n'
             xscale = 'linear'
-            scaling_nn = 1e10
+            scaling_nn = 1e6
             statistic_gg = 'psi stats'
     if statistic == 'bandpowers':
         if ee:
             extension_eeE = 'PeeE'
             extension_eeB = 'PeeB'
-            ylabel_eeE = r'$\mathcal{C}_{\rm EE}(\ell)/\ell\;[10^{-7}]$'
-            ylabel_eeB = r'$\mathcal{C}_{\rm BB}(\ell)/\ell\;[10^{-7}]$'
+            ylabel_eeE = r'$\mathcal{C}_{\mathrm{EE}}(\ell)/\ell\;[10^{-7}]$'
+            ylabel_eeB = r'$\mathcal{C}_{\mathrm{BB}}(\ell)/\ell\;[10^{-7}]$'
             xlabel = r'$\ell$'
             xscale = 'log'
             scaling_ee = 1e7
@@ -101,53 +101,53 @@ if __name__ == '__main__':
         if ne:
             extension_neE = 'PneE'
             extension_neB = 'PneB'
-            ylabel_neE = r'$\mathcal{C}_{\rm NE}(\ell)/\ell\;[10^{-7}]$'
-            ylabel_neB = r'$\mathcal{C}_{\rm NB}(\ell)/\ell\;[10^{-7}]$'
+            ylabel_neE = r'$\mathcal{C}_{\mathrm{NE}}(\ell)/\ell\;[10^{-7}]$'
+            ylabel_neB = r'$\mathcal{C}_{\mathrm{NB}}(\ell)/\ell\;[10^{-7}]$'
             xlabel = r'$\ell$'
             xscale = 'log'
-            scaling_ne = 1e7
+            scaling_ne = 1e5
             statistic_gm = 'bandpowers'
         if nn:
             extension_nn = 'Pnn'
-            ylabel_nn = r'$\mathcal{C}_{\rm NN}(\ell)/\ell\;[10^{-7}]$'
+            ylabel_nn = r'$\mathcal{C}_{\mathrm{NN}}(\ell)/\ell\;[10^{-7}]$'
             xlabel = r'$\ell$'
             xscale = 'log'
-            scaling_nn = 1e7
+            scaling_nn = 1e3
             statistic_gg = 'bandpowers'
     if (statistic == 'xiE') or (statistic == 'xiB') or (statistic == '2pcf'):
         if ee:
-            extension_eeE = 'xiP'
-            extension_eeB = 'xiM'
-            if statistic == 'xipm':
-                ylabel_eeE = r'$\theta\xi_+[10^{-4}{\rm arcmin}]$'
-                ylabel_eeB = r'$\theta\xi_-[10^{-4}{\rm arcmin}]$'
+            extension_eeE = 'xip'
+            extension_eeB = 'xim'
+            if statistic == '2pcf':
+                ylabel_eeE = r'$\theta\xi_+[10^{-4}{\mathrm{arcmin}}]$'
+                ylabel_eeB = r'$\theta\xi_-[10^{-4}{\mathrm{arcmin}}]$'
                 statistic_mm = 'xipm'
             if statistic == 'xiE':
-                ylabel_eeE = r'$\theta\xi^{\rm E}_+[10^{-4}{\rm arcmin}]$'
-                ylabel_eeB = r'$\theta\xi^{\rm E}_-[10^{-4}{\rm arcmin}]$'
+                ylabel_eeE = r'$\theta\xi^{\mathrm{E}}_+[10^{-4}{\mathrm{arcmin}}]$'
+                ylabel_eeB = r'$\theta\xi^{\mathrm{E}}_-[10^{-4}{\mathrm{arcmin}}]$'
                 statistic_mm = 'xiE'
             if statistic == 'xiB':
-                ylabel_eeE = r'$\theta\xi^{\rm B}_+[10^{-4}{\rm arcmin}]$'
-                ylabel_eeB = r'$\theta\xi^{\rm B}_-[10^{-4}{\rm arcmin}]$'
+                ylabel_eeE = r'$\theta\xi^{\mathrm{B}}_+[10^{-4}{\mathrm{arcmin}}]$'
+                ylabel_eeB = r'$\theta\xi^{\mathrm{B}}_-[10^{-4}{\mathrm{arcmin}}]$'
                 statistic_mm = 'xiB'
             xlabel = r'$\theta$'
             xscale = 'log'
             scaling_ee = 1e4
         if ne:
-            extension_neE = 'gT'
-            extension_neB = 'gX'
-            ylabel_neE = r'$\theta\gamma_{\rm t}[10^{-4}{\rm arcmin}]$'
-            ylabel_neB = r'$\theta\gamma_{\rm x}[10^{-4}{\rm arcmin}]$'
+            extension_neE = 'gammat'
+            extension_neB = 'gammax'
+            ylabel_neE = r'$\theta\gamma_{\mathrm{t}}[10^{-3}{\mathrm{arcmin}}]$'
+            ylabel_neB = r'$\theta\gamma_{\mathrm{x}}[10^{-3}{\mathrm{arcmin}}]$'
             xlabel = r'$\theta$'
             xscale = 'log'
-            scaling_ne = 1e4
+            scaling_ne = 1e3
             statistic_gm = 'gamma_t'
         if nn:
-            extension_nn = 'wT'
-            ylabel_nn = r'$\theta\w(\theta}[10^{-4}{\rm arcmin}]$'
+            extension_nn = 'wtheta'
+            ylabel_nn = r'$\theta w(\theta)[10^{0}{\mathrm{arcmin}}]$'
             xlabel = r'$\theta$'
             xscale = 'log'
-            scaling_nn = 1e4
+            scaling_nn = 1
             statistic_gg = 'w'
     if obs:
         extension_obs = '1pt'
@@ -190,7 +190,7 @@ if __name__ == '__main__':
             try:
                 eeB_data = f[extension_eeB].data
                 n_data_bb = len(eeB_data)
-                eeB_cov = f['COVMAT'].data[n_data_nn+n_data_ne+n_data_nb+n_data_ee:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb,:][:,n_data_nn+n_data_ne+n_data_nb+n_data_ee:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb]
+                eeB_cov = f['COVMAT'].data[n_data_nn+n_data_ne+n_data_nb+n_data_ee:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_bb,:][:,n_data_nn+n_data_ne+n_data_nb+n_data_ee:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_bb]
                 eeB_std = np.sqrt(np.diag(eeB_cov))
             except:
                 eeB_data = None
@@ -198,9 +198,13 @@ if __name__ == '__main__':
                 eeB_std = None
         if obs:
             obs_data = f[extension_obs].data
-            n_data_obs = np.sum([len(obs_data[f'ANG{i+1}']) for i in range(nobs)])
-            obs_cov = f['COVMAT'].data[n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb+n_data_obs,:][:,n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_nb+n_data_obs]
+            bins_obs = np.array([len(obs_data[f'ANG{i+1}']) for i in range(nobs)])
+            n_data_obs = np.sum(bins_obs)
+            print(bins_obs, n_data_obs)
+            obs_cov = f['COVMAT'].data[n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_bb:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_bb+n_data_obs,:][:,n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_bb:n_data_nn+n_data_ne+n_data_nb+n_data_ee+n_data_bb+n_data_obs]
             obs_std = np.sqrt(np.diag(obs_cov))
+            print(obs_cov.shape)
+            print(obs_std.shape)
 
     
     if (statistic == 'xiE') or (statistic == 'xiB'):
@@ -257,9 +261,13 @@ if __name__ == '__main__':
     if obs:
         obs_x = []
         obs_y = []
+        obs_err = []
+        id = 0
         for i in range(nobs):
             obs_x.append(obs_data[f'ANG{i+1}'])
             obs_y.append(obs_data[f'VALUE{i+1}'])
+            obs_err.append(obs_std[id:id+bins_obs[i]])
+            id += bins_obs[i]
         xmax_obs = np.max(obs_x)
         xmin_obs = np.min(obs_x)
         ymax_obs = np.max(obs_y)
@@ -466,7 +474,7 @@ if __name__ == '__main__':
                         index = int(ntomo*(bin1-1) - (bin1-1)*(bin1-1 - 1)/2 + (bin2-1))
                         ax = pl.subplot(ntomo, nlens, (bin2-1)*(nlens) + (bin1-1) + 1)
                         ax.set_box_aspect(1)
-                        ax.set_ylim(ymin_neE,ymax_neE)
+                        ax.set_ylim(ymin_neB,ymax_neB)
                         ax.set_xscale(xscale)
                         idx = np.where((neB_data['BIN1']==bin1) & (neB_data['BIN2']==bin2))[0]
                         # Plot data
@@ -614,7 +622,7 @@ if __name__ == '__main__':
         pl.clf()
         
         ax = pl.subplot(1, 1, 1)
-        ax.set_ylim(ymin_obs/2,ymax_obs*2)
+        #ax.set_ylim(ymin_obs/2,ymax_obs*2)
         ax.set_xlim(xmin_obs/2,xmax_obs*2)
         ax.set_xscale(xscale_obs)
         ax.set_yscale(yscale_obs)
@@ -622,7 +630,7 @@ if __name__ == '__main__':
         for bin1 in range(1, nobs+1):
             
             # Plot data
-            ax.errorbar(obs_data[f'ANG{bin1}'], obs_data[f'VALUE{bin1}']*scaling_obs, obs_std*scaling_obs, linestyle='None', marker='.', markersize=5)
+            ax.errorbar(obs_x[bin1-1], obs_y[bin1-1]*scaling_obs, obs_err[bin1-1]*scaling_obs, linestyle='None', marker='.', markersize=5)
             #ax.axhline(y=0, color='k', ls=':',label='')
         ax.tick_params(bottom=True, top=False, left=True, right=True, which='both')
         ax.tick_params(labelbottom=True, labeltop=False, labelleft=True, labelright=False)

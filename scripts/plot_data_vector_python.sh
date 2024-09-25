@@ -6,19 +6,19 @@ BLIND="@BV:BLIND@"
 
 if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 then
-  inputfile=@DB:mcmc_inp_cosebis@
+  inputfile="@DB:mcmc_inp_cosebis@"
 #}}}
 elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
 then 
-  inputfile=@DB:mcmc_inp_bandpowers@
+  inputfile="@DB:mcmc_inp_bandpowers@"
 #}}}
 elif [ "${STATISTIC^^}" == "2PCF" ] #{{{
 then
-  inputfile=@DB:mcmc_inp_2pcf@
+  inputfile="@DB:mcmc_inp_2pcf@"
 elif [ "${STATISTIC^^}" == "XIEB" ] #{{{
 then 
-  inputfile_E=@DB:mcmc_inp_xiE@
-  inputfile_B=@DB:mcmc_inp_xiB@
+  inputfile_E="@DB:mcmc_inp_xiE@"
+  inputfile_B="@DB:mcmc_inp_xiB@"
 fi
 #If needed, create the output directory {{{
 if [ ! -d @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots ]
