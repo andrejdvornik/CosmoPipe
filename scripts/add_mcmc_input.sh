@@ -27,8 +27,8 @@ else
   exit 1
 fi
 
-file="@MCMCINPUTFILE@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}.fits"
-filename=${file##*/}
+file="@BV:MCMCINPUTFILE@"
+filename="MCMC_input_${non_linear_model}.fits"
 
 #Create the uncertainty file 
 cp $file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/${filename}
