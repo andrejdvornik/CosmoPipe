@@ -59,7 +59,7 @@ then
   fi
   
   arr=(${inputfile})
-  if [ "${#arr[@]}" > 1 ]
+  if [[ "${#arr[@]}" > 1 ]]
   then
     for file in ${inputfile}
     do
