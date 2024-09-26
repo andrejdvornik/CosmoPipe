@@ -24,7 +24,7 @@ parser.add_argument("--logM", dest="logM", type=float, nargs='+',
 parser.add_argument("--logM_pivot", dest="logM_pivot", type=float,
     help="log pivot mass", metavar="logM_pivot",required=True)
 parser.add_argument("--a_pivot_zdep", dest="a_pivot_zdep", type=float,
-    help="pivot scale factor for redshift dependent IA model", metavar="a_pivot_zdep",required=True
+    help="pivot scale factor for redshift dependent IA model", metavar="a_pivot_zdep",required=True)
 parser.add_argument("--weighted",choices=["False", "True"],required=True)
 
 ### settings
