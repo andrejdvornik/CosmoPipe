@@ -24,6 +24,7 @@ from matplotlib.patches import Rectangle
 import dill as pickle
 import argparse
 import os
+import subprocess
 
 def create_nz(x_array, z_array, sigma, zdep):
 
@@ -190,7 +191,7 @@ if __name__ == '__main__':
                 idx = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_bins[j+1]) & (y_data > y_bins[j]))
                 if idx[0].size == 0:
                     continue
-                data_out = np.copy(data[np.where(data[idx])])
+                data_out = np.copy(data[idx])
         
                 if plot:
                     ax.scatter(z_in[idx], stellar_mass_in[idx], color='k', alpha=0.25, marker='.', s=1, rasterized=True)
@@ -230,9 +231,10 @@ if __name__ == '__main__':
     
                 if random:
                     print('\nApplying selection to randoms...')
+                    """
                     random_in = fits.open(args.file_rand, memmap=True)
                     randoms = random_in[1].data
-                
+                    
                     index = np.in1d(randoms['clone_ID'].astype(bytes), data_out['ID'])
                 
                     rand_out = np.copy(randoms[np.where(randoms[index])])#[::3]) # remove every 3nd after testing
@@ -241,7 +243,8 @@ if __name__ == '__main__':
                     cols_rand = fits.ColDefs(rand_out)
                     num = fits.Column(name='UNIQUEID', format='J', array=num_col)
                     hdu = fits.BinTableHDU.from_columns(cols_rand + num)
-                    hdu.writeto(f'{outname_rand}{count+1}_rand.fits', overwrite=True)
+                    """
+                    subprocess.call(['ln', '-sf', args.file_rand, f'{outname_rand}{count+1}_rand.fits'])
                 count += 1
                 
     if not volume_limited:
@@ -281,7 +284,7 @@ if __name__ == '__main__':
                     idx = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_bins[j+1]) & (y_data > y_bins[j]) & (y_data > func_low(x_data)))
                 if idx[0].size == 0:
                     continue
-                data_out = np.copy(data[np.where(data[idx])])
+                data_out = np.copy(data[idx])
         
                 if plot:
                     ax.scatter(z_in[idx], stellar_mass_in[idx], color='k', alpha=0.25, marker='.', s=1, rasterized=True)
@@ -329,9 +332,9 @@ if __name__ == '__main__':
     
                 if random:
                     print('\nApplying selection to randoms...')
+                    """
                     random_in = fits.open(args.file_rand, memmap=True)
                     randoms = random_in[1].data
-                
                     index = np.in1d(randoms['clone_ID'].astype(bytes), data_out['ID'])
                 
                     rand_out = np.copy(randoms[np.where(randoms[index])])#[::3]) # remove every 3nd after testing
@@ -340,7 +343,8 @@ if __name__ == '__main__':
                     cols_rand = fits.ColDefs(rand_out)
                     num = fits.Column(name='UNIQUEID', format='J', array=num_col)
                     hdu = fits.BinTableHDU.from_columns(cols_rand + num)
-                    hdu.writeto(f'{outname_rand}{count+1}_rand.fits', overwrite=True)
+                    """
+                    subprocess.call(['ln', '-sf', args.file_rand, f'{outname_rand}{count+1}_rand.fits'])
                 count += 1
             
             

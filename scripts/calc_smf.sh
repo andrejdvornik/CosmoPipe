@@ -115,17 +115,17 @@ do
     rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/f_tomo/${outname1}_f_tomo.txt
     smfblock=`_read_datablock smf_vec`
     currentblock=`_blockentry_to_filelist ${smfblock}`
-    currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname} | awk '{printf $0 " "}' || echo `
+    currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname1}_smf.txt | awk '{printf $0 " "}' || echo `
     _write_datablock smf_vec "${currentblock}"
     
     vmaxblock=`_read_datablock vmax`
     currentblock=`_blockentry_to_filelist ${vmaxblock}`
-    currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname} | awk '{printf $0 " "}' || echo `
+    currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname1}_vmax.txt | awk '{printf $0 " "}' || echo `
     _write_datablock vmax "${currentblock}"
     
     ftomoblock=`_read_datablock f_tomo`
     currentblock=`_blockentry_to_filelist ${ftomoblock}`
-    currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname} | awk '{printf $0 " "}' || echo `
+    currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname1}_f_tomo.txt | awk '{printf $0 " "}' || echo `
     _write_datablock f_tomo "${currentblock}"
     _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
   fi
