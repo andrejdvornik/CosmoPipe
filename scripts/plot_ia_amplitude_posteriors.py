@@ -147,15 +147,15 @@ except:
     pass
 
 try:
-    #plt.errorbar(tomo_z, ia_massdep_massfixed_quantiles[1], yerr=[ia_massdep_massfixed_quantiles[0],ia_massdep_massfixed_quantiles[2]], capsize=3, fmt='--', color="orange", label="mass dependence, halo masses fixed")
-    plt.errorbar(tomo_z, ia_massdep_quantiles[1], yerr=[ia_massdep_quantiles[0],ia_massdep_quantiles[2]], capsize=3, fmt='o', color="red", label="mass dependence")
+    #plt.errorbar(tomo_z, ia_massdep_massfixed_quantiles[1], yerr=[ia_massdep_massfixed_quantiles[1]-ia_massdep_massfixed_quantiles[0],ia_massdep_massfixed_quantiles[2]-ia_massdep_massfixed_quantiles[1]], capsize=3, fmt='--', color="orange", label="mass dependence, halo masses fixed")
+    plt.errorbar(tomo_z, ia_massdep_quantiles[1], yerr=[ia_massdep_quantiles[1]-ia_massdep_quantiles[0],ia_massdep_quantiles[2]-ia_massdep_quantiles[1]], capsize=3, fmt='.', color="red", label="mass dependence")
 except:
     pass
 
 
 plt.xlim([zmin,zmax])
 plt.xlabel("$z$")
-plt.ylabel("$A_{\\rm IA}$")
+plt.ylabel("$A_{\\rm IA, total}$")
 plt.legend(loc='lower right',fontsize=14)
 
 plt.savefig(output_path + "/plot_ia_amplitude_posteriors.png",bbox_inches='tight',dpi=300)
