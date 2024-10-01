@@ -84,9 +84,15 @@ do
   arb_base=@RUNROOT@/@CONFIGPATH@/covariance_arb_summary/
   if [ ! -f $arb_base${file} ] || [ ! -f $arb_base${file2} ] || [ ! -f $arb_base${file3} ] || [ ! -f $arb_base${file4} ]
   then
-    use_arbitrary=False
-    _message "One or more arbitrary input files do not exist. Calculating filters on the fly!\n"
-    break
+    if [ "${STATISTIC^^}" == "COSEBIS_DIMLESS" ]
+    then
+      _message "Error: dimensionless COSEBIs require precalculated filter functions!\n"
+      exit 1
+    else
+      use_arbitrary=False
+      _message "One or more arbitrary input files do not exist. Calculating filters on the fly!\n"
+      break
+    fi
   else
     cp ${arb_base}/{$file,$file2,$file3,$file4} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/arb_summary_filters/
   fi
@@ -592,7 +598,7 @@ arbitrary_accuracy = 1e-5
 EOF
 
 fi
-if [ "${use_arbitrary}" == "True" ]
+if [ "${use_arbitrary}" == "True" ] && [ "${cov_between_stats}" != "True" ]
 then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 #arb_summary_directory = @RUNROOT@/@CONFIGPATH@/covariance_arb_summary/
