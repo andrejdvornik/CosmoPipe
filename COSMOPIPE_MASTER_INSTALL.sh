@@ -245,6 +245,9 @@ else
 fi 
 cd ${RUNROOT}/INSTALL
 #}}}
+#Copy IA model to the INSTALL directory {{{
+_message "   >${RED} Copying IA models${DEF}"
+rsync -autv ${PACKROOT}/ia_models ${RUNROOT}/INSTALL/ > ${RUNROOT}/INSTALL/ia_models_rsync.log 2>&1
 
 #Install cosebis functions {{{
 _message "   >${RED} Installing COSEBIs tools${DEF}"
