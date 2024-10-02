@@ -180,6 +180,14 @@ do
     mv -f ${output_file}_tmp ${output_file}
   fi 
   _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
+  #If used, undo the links {{{
+  if [ "${links}" == "TRUE" ] 
+  then 
+    rm ${current_data}
+    current_data=${originp}
+    rm ${output_file}
+    output_file=${origout}
+  fi
   #Update the DATAHEAD 
   _replace_datahead "${current_data}" "${output_file}"
 
