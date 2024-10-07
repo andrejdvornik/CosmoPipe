@@ -163,21 +163,15 @@ if ntomo != 1:
     inv_B_cov = np.linalg.inv(B_cov)
     B_combined = np.zeros(n_data_per_bin)
     inv_cov_combined = np.zeros((n_data_per_bin,n_data_per_bin))
-    for i in range(ntomo):
-        for j in range(i,ntomo):
-            idx = np.where((B_data['BIN1']==i+1) & (B_data['BIN2']==j+1))[0]
-            if i==j:
-                B_combined += B_data['VALUE'][idx]
-            else:
-                # multiply by 2
-                B_combined += B_data['VALUE'][idx]*2
+    for k in range(n_data_per_bin):
+        data = []
+        idx = np.where(B_data['ANGBIN']==k+1)[0]
+        B_combined[k] = np.average(B_data['VALUE'][idx], weights=1/np.diag(B_cov[idx,:][:,idx]))
+    
     for i in range(n_combinations):
         for j in range(i,n_combinations):
             inv_cov_combined += inv_B_cov[i*n_data_per_bin:(i+1)*n_data_per_bin,:][:,j*n_data_per_bin:(j+1)*n_data_per_bin]
-
     B_cov_combined = np.linalg.inv(inv_cov_combined)
-    B_combined /= (ntomo*ntomo)
-
     if suffix:
         outfile_combined = output_dir+'/bmodes_%.2f-%.2f_%s_onetomo'%(thetamin,thetamax,suffix)
     else:
