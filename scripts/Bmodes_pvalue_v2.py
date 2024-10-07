@@ -94,7 +94,7 @@ def plot_bmodes(x_data, y_data, y_data_plot, y_error, cov, bin1_data, bin2_data,
             plt.text(0.90, 0.9, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
         
         if statistic == 'cosebis':
-            p_nmax5 = pvalue(y_data, cov, mask = angbin <= 5, mult=factor)
+            p_nmax5 = pvalue(y_data, cov, mask = np.where(angbin <= 5)[0], mult=factor)
             if p_nmax5 > 1e-2:
                 plt.text(0.90, 0.95, 'p = %.2f'%p_nmax5, fontsize=14, transform=plt.gcf().transFigure, color='blue', horizontalalignment='right')
             else:
