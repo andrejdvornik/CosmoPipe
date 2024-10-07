@@ -159,33 +159,34 @@ if statistic == 'bandpowers':
         plot_bmodes(x_data=B_data['ANG'], y_datat=B_data['VALUE'], y_data_plot=B_data['VALUE']/B_data['ANG']*1e7, y_error=B_std/B_data['ANG']*1e7, cov=B_cov, bin1_data=B_data['BIN1'], bin2_data=B_data['BIN2'], angbin=B_data['ANGBIN'], outfile=outfile, ylabel=ylabel, ntomo = ntomo, mult=mult)
 
 # Combine tomographic bins into a single bin and calculate pvalue
-inv_B_cov = np.linalg.inv(B_cov)
-B_combined = np.zeros(n_data_per_bin)
-inv_cov_combined = np.zeros((n_data_per_bin,n_data_per_bin))
-for i in range(ntomo):
-    for j in range(i,ntomo):
-        idx = np.where((B_data['BIN1']==i+1) & (B_data['BIN2']==j+1))[0]
-        if i==j:
-            B_combined += B_data['VALUE'][idx]
-        else:
-            # multiply by 2
-            B_combined += B_data['VALUE'][idx]*2
-for i in range(n_combinations):
-    for j in range(i,n_combinations):
-        inv_cov_combined += inv_B_cov[i*n_data_per_bin:(i+1)*n_data_per_bin,:][:,j*n_data_per_bin:(j+1)*n_data_per_bin]
-B_cov_combined = np.linalg.inv(inv_cov_combined)
-B_combined /= (ntomo*ntomo)
+if ntomo != 1:
+    inv_B_cov = np.linalg.inv(B_cov)
+    B_combined = np.zeros(n_data_per_bin)
+    inv_cov_combined = np.zeros((n_data_per_bin,n_data_per_bin))
+    for i in range(ntomo):
+        for j in range(i,ntomo):
+            idx = np.where((B_data['BIN1']==i+1) & (B_data['BIN2']==j+1))[0]
+            if i==j:
+                B_combined += B_data['VALUE'][idx]
+            else:
+                # multiply by 2
+                B_combined += B_data['VALUE'][idx]*2
+    for i in range(n_combinations):
+        for j in range(i,n_combinations):
+            inv_cov_combined += inv_B_cov[i*n_data_per_bin:(i+1)*n_data_per_bin,:][:,j*n_data_per_bin:(j+1)*n_data_per_bin]
 
+    B_cov_combined = np.linalg.inv(inv_cov_combined)
+    B_combined /= (ntomo*ntomo)
 
-if suffix:
-    outfile_combined = output_dir+'/bmodes_%.2f-%.2f_%s_onetomo'%(thetamin,thetamax,suffix)
-else:
-    outfile_combined = output_dir+'/bmodes_%.2f-%.2f_onetomo'%(thetamin,thetamax)
+    if suffix:
+        outfile_combined = output_dir+'/bmodes_%.2f-%.2f_%s_onetomo'%(thetamin,thetamax,suffix)
+    else:
+        outfile_combined = output_dir+'/bmodes_%.2f-%.2f_onetomo'%(thetamin,thetamax)
 
-if statistic == 'cosebis':
-    plot_bmodes(x_data=B_data['ANG'][:n_data_per_bin], y_data=B_combined, y_data_plot=B_combined*1e10, y_error=np.sqrt(np.diag(B_cov_combined))*1e10, cov=B_cov_combined, bin1_data=B_data['BIN1'], bin2_data=B_data['BIN2'], angbin=B_data['ANGBIN'], outfile=outfile_combined, ylabel=ylabel, ntomo = 1)
-if statistic == 'bandpowers':
-    plot_bmodes(x_data=B_data['ANG'][:n_data_per_bin], y_data=B_combined, y_data_plot=B_combined/B_data['ANG'][:n_data_per_bin]*1e7, y_error=np.sqrt(np.diag(B_cov_combined))/B_data['ANG'][:n_data_per_bin]*1e7, cov=B_cov_combined, bin1_data=B_data['BIN1'], bin2_data=B_data['BIN2'], angbin=B_data['ANGBIN'], outfile=outfile_combined, ylabel=ylabel, ntomo = 1)
+    if statistic == 'cosebis':
+        plot_bmodes(x_data=B_data['ANG'][:n_data_per_bin], y_data=B_combined, y_data_plot=B_combined*1e10, y_error=np.sqrt(np.diag(B_cov_combined))*1e10, cov=B_cov_combined, bin1_data=B_data['BIN1'], bin2_data=B_data['BIN2'], angbin=B_data['ANGBIN'], outfile=outfile_combined, ylabel=ylabel, ntomo = 1)
+    if statistic == 'bandpowers':
+        plot_bmodes(x_data=B_data['ANG'][:n_data_per_bin], y_data=B_combined, y_data_plot=B_combined/B_data['ANG'][:n_data_per_bin]*1e7, y_error=np.sqrt(np.diag(B_cov_combined))/B_data['ANG'][:n_data_per_bin]*1e7, cov=B_cov_combined, bin1_data=B_data['BIN1'], bin2_data=B_data['BIN2'], angbin=B_data['ANGBIN'], outfile=outfile_combined, ylabel=ylabel, ntomo = 1)
 
 if statistic == 'xiEB':
     if suffix:
