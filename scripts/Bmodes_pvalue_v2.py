@@ -174,10 +174,6 @@ for i in range(n_combinations):
     for j in range(i,n_combinations):
         inv_cov_combined += inv_B_cov[i*n_data_per_bin:(i+1)*n_data_per_bin,:][:,j*n_data_per_bin:(j+1)*n_data_per_bin]
 B_cov_combined = np.linalg.inv(inv_cov_combined)
-
-print(B_combined)
-print(B_combined/n_combinations)
-print(B_combined/(ntomo*ntomo))
 B_combined /= (ntomo*ntomo)
 
 
