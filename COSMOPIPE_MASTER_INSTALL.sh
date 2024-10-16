@@ -193,6 +193,17 @@ git clone https://github.com/rreischke/OneCovariance.git >> gitclone_output.log 
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
 
+#Clone the Halo Model repository {{{
+_message "   >${RED} Cloning the Halo Model Git repository${DEF}"
+#Clone the repository
+if [ -d ${RUNROOT}/INSTALL/halo_model ]
+then
+  rm -fr halo_model
+fi
+git clone https://github.com/KiDS-WL/halomodel_for_cosmosis.git >> gitclone_output.log 2>&1
+_message "${BLU} - Done! ${DEF}\n"
+#}}}
+
 #Clone the 2ptstats repository {{{
 _message "   >${RED} Cloning the 2ptStats Git repository${DEF}"
 #Clone the repository
