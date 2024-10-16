@@ -39,7 +39,7 @@ mult = args.mult
 
 def pvalue(data, cov, mask=None, mult=1.0):
     if np.any(mask):
-        n_data = len(np.where(mask)[0])
+        n_data = len(mask)
     else: 
         n_data = len(data)
         mask = np.full(n_data, True)
@@ -70,13 +70,13 @@ def plot_bmodes(x_data, y_data, y_data_plot, y_error, cov, bin1_data, bin2_data,
             ax[x,y].errorbar(x_data[idx], y_data_plot[idx], y_error[idx], linestyle = 'None', marker = '.', markersize=5)
             ax[x,y].text(0.03, 0.96, 'zbin %d-%d'%(bin1+1,bin2+1), horizontalalignment='left', verticalalignment='top', transform = ax[x,y].transAxes)
             ax[x,y].axhline(y=0, color='black', linestyle= 'dashed')
-            p = pvalue(y_data, cov,  mask=((bin1_data==bin1+1) & (bin2_data==bin2+1)), mult=factor)
+            p = pvalue(y_data, cov,  mask=np.where((bin1_data==bin1+1) & (bin2_data==bin2+1))[0], mult=factor)
             if p > 1e-2:
                 ax[x,y].text(0.03, 0.01, 'p = %.2f'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
             else:
                 ax[x,y].text(0.03, 0.01, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
             if statistic == 'cosebis':
-                p_nmax5 = pvalue(y_data, cov,  mask=((bin1_data==bin1+1) & (bin2_data==bin2+1) & (angbin<=5)), mult=factor)
+                p_nmax5 = pvalue(y_data, cov,  mask=np.where((bin1_data==bin1+1) & (bin2_data==bin2+1) & (angbin<=5))[0], mult=factor)
                 if p_nmax5 > 1e-2:
                     plt.text(0.03, 0.11, 'p = %.2f'%p_nmax5, color='blue', horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
                 else:
@@ -94,7 +94,7 @@ def plot_bmodes(x_data, y_data, y_data_plot, y_error, cov, bin1_data, bin2_data,
             plt.text(0.90, 0.9, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
         
         if statistic == 'cosebis':
-            p_nmax5 = pvalue(y_data, cov, mask = angbin <= 5, mult=factor)
+            p_nmax5 = pvalue(y_data, cov, mask = np.where(angbin <= 5)[0], mult=factor)
             if p_nmax5 > 1e-2:
                 plt.text(0.90, 0.95, 'p = %.2f'%p_nmax5, fontsize=14, transform=plt.gcf().transFigure, color='blue', horizontalalignment='right')
             else:
@@ -157,6 +157,30 @@ if statistic == 'bandpowers':
     plot_bmodes(x_data=B_data['ANG'], y_data=B_data['VALUE'], y_data_plot=B_data['VALUE']/B_data['ANG']*1e7, y_error=B_std/B_data['ANG']*1e7, cov=B_cov, bin1_data=B_data['BIN1'], bin2_data=B_data['BIN2'], angbin=B_data['ANGBIN'], outfile=outfile, ylabel=ylabel, ntomo = ntomo)
     if mult:
         plot_bmodes(x_data=B_data['ANG'], y_datat=B_data['VALUE'], y_data_plot=B_data['VALUE']/B_data['ANG']*1e7, y_error=B_std/B_data['ANG']*1e7, cov=B_cov, bin1_data=B_data['BIN1'], bin2_data=B_data['BIN2'], angbin=B_data['ANGBIN'], outfile=outfile, ylabel=ylabel, ntomo = ntomo, mult=mult)
+
+# Combine tomographic bins into a single bin and calculate pvalue
+if ntomo != 1:
+    inv_B_cov = np.linalg.inv(B_cov)
+    B_combined = np.zeros(n_data_per_bin)
+    inv_cov_combined = np.zeros((n_data_per_bin,n_data_per_bin))
+    for k in range(n_data_per_bin):
+        data = []
+        idx = np.where(B_data['ANGBIN']==k+1)[0]
+        B_combined[k] = np.average(B_data['VALUE'][idx], weights=1/np.diag(B_cov[idx,:][:,idx]))
+    
+    for i in range(n_combinations):
+        for j in range(i,n_combinations):
+            inv_cov_combined += inv_B_cov[i*n_data_per_bin:(i+1)*n_data_per_bin,:][:,j*n_data_per_bin:(j+1)*n_data_per_bin]
+    B_cov_combined = np.linalg.inv(inv_cov_combined)
+    if suffix:
+        outfile_combined = output_dir+'/bmodes_%.2f-%.2f_%s_onetomo'%(thetamin,thetamax,suffix)
+    else:
+        outfile_combined = output_dir+'/bmodes_%.2f-%.2f_onetomo'%(thetamin,thetamax)
+
+    if statistic == 'cosebis':
+        plot_bmodes(x_data=B_data['ANG'][:n_data_per_bin], y_data=B_combined, y_data_plot=B_combined*1e10, y_error=np.sqrt(np.diag(B_cov_combined))*1e10, cov=B_cov_combined, bin1_data=B_data['BIN1'], bin2_data=B_data['BIN2'], angbin=B_data['ANGBIN'], outfile=outfile_combined, ylabel=ylabel, ntomo = 1)
+    if statistic == 'bandpowers':
+        plot_bmodes(x_data=B_data['ANG'][:n_data_per_bin], y_data=B_combined, y_data_plot=B_combined/B_data['ANG'][:n_data_per_bin]*1e7, y_error=np.sqrt(np.diag(B_cov_combined))/B_data['ANG'][:n_data_per_bin]*1e7, cov=B_cov_combined, bin1_data=B_data['BIN1'], bin2_data=B_data['BIN2'], angbin=B_data['ANGBIN'], outfile=outfile_combined, ylabel=ylabel, ntomo = 1)
 
 if statistic == 'xiEB':
     if suffix:

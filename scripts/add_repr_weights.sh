@@ -45,6 +45,26 @@ fi
 #}}}
 #Update the nsim value 
 nsim=`echo ${sims} | awk '{print NF}'`
+#Construct list of output files
+output=''
+for i in `seq ${nsim}`
+do
+  #Get the current data catalogue 
+  current_data=`echo ${input} | awk -v col=${i} '{print $col}'`
+  #Construct the output filename 
+  ext=${current_data##*.}
+  output="${output} ${current_data//.${ext}/_simmatch.${ext}}"
+done
+
+#Check if input file lengths are ok 
+links="FALSE"
+for file in ${input} ${sims} ${output}
+do 
+  if [ ${#file} -gt 250 ] 
+  then 
+    links="TRUE"
+  fi 
+done
 
 #Construct the data-simulation feature list 
 data_features="@BV:DATAFEATURES@"
@@ -80,10 +100,12 @@ do
   current_sim=`echo ${sims} | awk -v col=${i} '{print $col}'`
   #Get the current data catalogue 
   current_data=`echo ${input} | awk -v col=${i} '{print $col}'`
-  #Construct the output filename 
-  ext=${current_data##*.}
-  output_file=${current_data//.${ext}/_simmatch.${ext}}
-  
+  ##Construct the output filename 
+  #ext=${current_data##*.}
+  #output_file=${current_data//.${ext}/_simmatch.${ext}}
+  #Get the output file 
+  output_file=`echo ${output} | awk -v col=${i} '{print $col}'`
+
   #Notify that we are matching these catalogues 
   #_message "   @BLU@@BV:ZSPECDATA@ @BV:ZSPECSIM@@DEF@\n"
   _message " > @BLU@Matching simulation catalogue @RED@${current_sim##*/}@BLU@ to data catalogue @RED@${current_data##*/}@DEF@"
@@ -96,6 +118,36 @@ do
           -f ${feature_list} -c @BV:NTHREADS@ \
           2>&1 
 
+  if [ "${links}" == "TRUE" ] 
+  then
+    #Remove existing infile links 
+    if [ -e infile_$$.lnk ] || [ -h infile_$$.lnk ]
+    then 
+      rm infile_$$.lnk
+    fi 
+    #Remove existing simfile links 
+    if [ -e simfile_$$.lnk ] || [ -h simfile_$$.lnk ]
+    then 
+      rm simfile_$$.lnk
+    fi 
+    #Remove existing outfile links 
+    if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
+    then 
+      rm outfile_$$.lnk
+    fi
+    #Create input link
+    originp=${current_data}
+    ln -s ${current_data} infile_$$.lnk 
+    current_data="infile_$$.lnk"
+    #Create sim link
+    originsim=${current_sim}
+    ln -s ${current_sim} simfile_$$.lnk 
+    current_sim="simfile_$$.lnk"
+    #Create output links 
+    origout=${output_file}
+    ln -s ${output_file} outfile_$$.lnk
+    output_file=outfile_$$.lnk
+  fi
   #Notify 
   _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
   _message " > @BLU@Merging weight back to full simulation file @DEF@"
@@ -128,6 +180,14 @@ do
     mv -f ${output_file}_tmp ${output_file}
   fi 
   _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
+  #If used, undo the links {{{
+  if [ "${links}" == "TRUE" ] 
+  then 
+    rm ${current_data}
+    current_data=${originp}
+    rm ${output_file}
+    output_file=${origout}
+  fi
   #Update the DATAHEAD 
   _replace_datahead "${current_data}" "${output_file}"
 

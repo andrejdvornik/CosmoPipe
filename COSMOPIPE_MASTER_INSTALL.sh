@@ -204,6 +204,17 @@ git clone https://github.com/maricool/2pt_stats.git >> gitclone_output.log 2>&1
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
 
+#Clone the galselect repository {{{
+_message "   >${RED} Cloning the galselect Git repository${DEF}"
+#Clone the repository
+if [ -d ${RUNROOT}/INSTALL/galselect ] 
+then 
+  rm -fr galselect
+fi
+git clone https://github.com/jlvdb/galselect.git >> gitclone_output.log 2>&1
+_message "${BLU} - Done! ${DEF}\n"
+#}}}
+
 #Install THELI LDAC tools {{{
 _message "   >${RED} Installing THELI LDAC tools${DEF}"
 if [ -f ${RUNROOT}/../theli-1.6.1.tgz ]
@@ -234,6 +245,9 @@ else
 fi 
 cd ${RUNROOT}/INSTALL
 #}}}
+#Copy IA model to the INSTALL directory {{{
+_message "   >${RED} Copying IA models${DEF}"
+rsync -autv ${PACKROOT}/ia_models ${RUNROOT}/INSTALL/ > ${RUNROOT}/INSTALL/ia_models_rsync.log 2>&1
 
 #Install cosebis functions {{{
 _message "   >${RED} Installing COSEBIs tools${DEF}"
@@ -259,6 +273,17 @@ cat > OneCovariance_make.sh <<-EOF
 pip install .
 EOF
 conda run -n ${CONDAPIPENAME} bash OneCovariance_make.sh > ${RUNROOT}/INSTALL/OneCovariance_install.log 2>&1
+cd ${RUNROOT}/INSTALL/
+_message "${BLU} - Done! ${DEF}\n"
+#}}}
+
+#Install galselect {{{
+_message "   >${RED} Installing galselect ${DEF}"
+cd ${RUNROOT}/INSTALL/galselect/
+cat > galselect_make.sh <<-EOF
+pip install .
+EOF
+conda run -n ${CONDAPIPENAME} bash galselect_make.sh > ${RUNROOT}/INSTALL/galselect_install.log 2>&1
 cd ${RUNROOT}/INSTALL/
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
