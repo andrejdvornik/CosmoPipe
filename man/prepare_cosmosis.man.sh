@@ -63,7 +63,7 @@ function _outputs {
   patchvar=`_parse_blockvars ${patchvar}`
   #Define the patches to loop over {{{
   if [ "${patchvar}" == "ALL" ] || [ "${patchvar}" == "@BV:COSMOSIS_PATCHLIST@" ]
-  then 
+  then
     patchlist=`echo @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb` 
   else 
     patchlist="${patchvar}"

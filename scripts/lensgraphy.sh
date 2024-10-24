@@ -10,15 +10,15 @@
 ### Construct fluxscale corrected catalogue ### {{{
 _message "Applying selections to the lens catalogue and constructing lens bins:"
 
-lensfile="@BV:FLUXSCALE_CORRECTED@"
-randfile="@BV:RAND_MAIN@"
+lensfile="@DB:fluxscale_corrected@"
+randfile="@DB:rand_main@"
 stacked_nz="@BV:STACKED_NZ@"
 
 if [ -f ${lensfile} ]
 then
   lens_filelist=${lensfile}
 else
-  _message "${RED} - ERROR: Main input lens catalogue @BV:FLUXSCALE_CORRECTED@ does not exist or you have provided multiple catalogues!"
+  _message "${RED} - ERROR: Main input lens catalogue @DB:fluxscale_corrected@ does not exist or you have provided multiple catalogues!"
   exit -1
 fi
 

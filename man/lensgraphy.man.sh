@@ -53,7 +53,7 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo fluxscale_corrected
+  echo fluxscale_corrected rand_main
 }
 #}}}
 

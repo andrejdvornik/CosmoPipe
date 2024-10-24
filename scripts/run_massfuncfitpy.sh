@@ -9,7 +9,7 @@
 
 ### Construct mass limits functions for input stellar mass sample ### {{{
 _message "Run stellar mass function limit determination on a sample of stellar masses:"
-file_one="@BV:FLUXSCALE_CORRECTED@"
+file_one="@DB:fluxscale_corrected@"
 #Define the output filename
 outname=${file_one##*/}
 outname=${outname%%.*}
@@ -53,6 +53,10 @@ MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
   --outfile1 @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mass_lims/${outname1} \
   --outfile2 @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mass_lims/${outname2} \
   --h0 "@BV:H0_IN@" --omegam "@BV:OMEGAM_IN@" --omegav "@BV:OMEGAV_IN@" \
+  --min_mass "@BV:MINMASS@" \
+  --max_mass "@BV:MAXMASS@" \
+  --min_z "@BV:MINZ@" \
+  --max_z "@BV:MAXZ@" \
   --stellar_mass_column "@BV:STELLARMASS@" \
   --z_column @BV:REDSHIFT@ 2>&1
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
