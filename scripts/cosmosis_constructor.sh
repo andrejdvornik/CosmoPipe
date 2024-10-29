@@ -548,7 +548,7 @@ fi
 extraparams="cosmological_parameters/S_8 cosmological_parameters/sigma_8 cosmological_parameters/A_s cosmological_parameters/omega_m cosmological_parameters/omega_nu cosmological_parameters/omega_lambda cosmological_parameters/cosmomc_theta"
 if [ "${IAMODEL^^}" == "MASSDEP" ] 
 then
-  extraparams=="${extraparams} intrinsic_alignment_parameters/a intrinsic_alignment_parameters/beta intrinsic_alignment_parameters/beta intrinsic_alignment_parameters/log10_m_mean_1 intrinsic_alignment_parameters/log10_m_mean_2 intrinsic_alignment_parameters/log10_m_mean_3 intrinsic_alignment_parameters/log10_m_mean_4 intrinsic_alignment_parameters/log10_m_mean_5 intrinsic_alignment_parameters/log10_m_mean_6"
+  extraparams="${extraparams} intrinsic_alignment_parameters/a intrinsic_alignment_parameters/beta intrinsic_alignment_parameters/log10_m_mean_1 intrinsic_alignment_parameters/log10_m_mean_2 intrinsic_alignment_parameters/log10_m_mean_3 intrinsic_alignment_parameters/log10_m_mean_4 intrinsic_alignment_parameters/log10_m_mean_5 intrinsic_alignment_parameters/log10_m_mean_6"
 fi
 #Add nz shift values to outputs {{{
 shifts=""
