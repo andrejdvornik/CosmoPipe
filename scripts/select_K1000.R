@@ -3,11 +3,12 @@
 # File Name : add_rpr_weights.R
 # Created By : awright
 # Creation Date : 12-09-2023
-# Last Modified : Tue 12 Mar 2024 09:16:46 PM CET
+# Last Modified : Thu May 16 18:16:19 2024
 #
 #=========================================
 
 #Loop through the command arguments /*fold*/ {{{
+id_only<-FALSE
 inputs<-commandArgs(TRUE)
 while (length(inputs)!=0) {
   #Check the options syntax /*fold*/ {{{
@@ -24,6 +25,11 @@ while (length(inputs)!=0) {
     inputs<-inputs[-1]
     input.file<-inputs[1]
     inputs<-inputs[-1]
+    #/*fold*/}}}
+  } else if (inputs[1]=='--id_only') {
+    #output id's only? /*fold*/ {{{
+    inputs<-inputs[-1]
+    id_only<-TRUE
     #/*fold*/}}}
   } else if (inputs[1]=='-l') {
     #Read the output filename /*fold*/ {{{
@@ -46,7 +52,11 @@ while (length(inputs)!=0) {
 cat(paste0("Starting Input Read [",Sys.time(),"]\n"))
 
 #load the input catalogue {{{
-cat<-helpRfuncs::read.file(input.file,verbose=T)
+if (id_only) { 
+  cat<-helpRfuncs::read.file(input.file,verbose=T,cols=c("RAJ2000","DECJ2000"))
+} else { 
+  cat<-helpRfuncs::read.file(input.file,verbose=T)
+} 
 #}}}
 
 #load the limits catalogue {{{
@@ -60,7 +70,7 @@ ra[which(ra>300)]<-ra[which(ra>300)]-360
 lims[which(lims[,2]>300),2]<- lims[which(lims[,2]>300),2]-360
 lims[which(lims[,3]>300),3]<- lims[which(lims[,3]>300),3]-360
 
-#Select K1000 sources {{{
+#Select sources {{{
 keep<-rep(TRUE,nrow(cat))
 for (i in 1:nrow(lims)) { 
   ind<-(ra>=lims[i,2] & 
@@ -69,13 +79,17 @@ for (i in 1:nrow(lims)) {
         dec<=lims[i,5])
   keep[ind]<-FALSE
 }
-cat<-cat[which(keep),]
+if (!id_only) { 
+  cat<-cat[which(keep),]
+} else { 
+  cat$fieldsel<-ifelse(keep,1,0)
+} 
 #}}}
 
 cat(paste0("Removing ",length(which(!keep))," of ",length(keep)," sources (",round(digits=2,length(which(keep))/length(keep)*100),"% remain)\n"))
 
 #Output the weighted catalogues {{{
-cat(paste0("Outputting K1000 sources [",Sys.time(),"]\n"))
+cat(paste0("Outputting selection sources [",Sys.time(),"]\n"))
 helpRfuncs::write.file(file=output.file,cat,verbose=T)
 #}}}
 
