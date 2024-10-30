@@ -3,7 +3,7 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Sun 03 Mar 2024 05:07:25 PM CET
+# Last Modified : Wed 30 Oct 2024 12:16:52 PM CET
 #
 #=========================================
 #Script to generate a cosmosis .ini, values, & priors file 
@@ -69,6 +69,27 @@ simulate = F
 simulate_with_noise = T
 mock_filename =
 EOF
+if [ "@BV:REMOVETOMOBIN@" != "" ]
+then 
+  NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'` 
+  rempairs=''
+  for i in `seq $NTOMO`
+  do 
+    rempairs="${rempairs} @BV:REMOVETOMOBIN@+${i}"
+  done
+  if [ "${STATISTIC^^}" == "COSEBIS" ] 
+  then 
+    echo "cut_pair_En = $rempairs " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini 
+  elif [ "${STATISTIC^^}" == "BANDPOWERS" ] 
+  then 
+    echo "cut_pair_PeeE = $rempairs " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini 
+    echo "cut_pair_PeeB = $rempairs " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini 
+  elif [ "${STATISTIC^^}" == "XIPM" ] 
+  then 
+    echo "cut_pair_xiP = $rempairs " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini 
+    echo "cut_pair_xiM = $rempairs " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini 
+  fi 
+fi 
 if [ "${STATISTIC^^}" == "COSEBIS_B" ] || [ "${STATISTIC^^}" == "BANDPOWERS_B" ]
 then
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini <<- EOF
@@ -999,13 +1020,35 @@ do
 			fi
 			;; #}}}
     "likelihood") #{{{
-			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-			[$module]
-			file = %(KCAP_PATH)s/utils/mini_like.py
-			input_section_name = scale_cuts_output
-			like_name = loglike
+			MASKDATAPOINT=@BV:MASKDATAPOINT@
+			if [ -n "$MASKDATAPOINT" ] && [ "$MASKDATAPOINT" -eq "$MASKDATAPOINT" ]
+			then
+				if [ "${STATISTIC^^}" == "COSEBIS" ]
+				then
+					NDATA=@BV:NMAXCOSEBIS@
+				elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
+				then 
+					NDATA=@BV:NBANDPOWERS@
+				fi
+			  	cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+				[$module]
+				file = %(KCAP_PATH)s/utils/mini_like_dodgymask.py
+				input_section_name = scale_cuts_output
+				like_name = loglike
+				mask_datapoint=$MASKDATAPOINT
+				n_data=${NDATA}
+				n_tomo=${NTOMO}
 
 			EOF
+			else
+				cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+				[$module]
+				file = %(KCAP_PATH)s/utils/mini_like.py
+				input_section_name = scale_cuts_output
+				like_name = loglike
+
+				EOF
+			fi
     	;; #}}}
 	"likelihood_b") #{{{
 		cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
