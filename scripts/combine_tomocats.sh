@@ -3,7 +3,7 @@
 # File Name : combine_cats.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Tue 26 Mar 2024 02:44:49 AM CET
+# Last Modified : Fri 02 Aug 2024 08:25:10 AM CEST
 #
 #=========================================
 
@@ -117,14 +117,28 @@ do
 
   #Combine the DATAHEAD catalogues into one 
   _message "   > @BLU@Constructing combined catalogue @DEF@${outname##*/}@DEF@ "
-  @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacpaste \
-    -i ${filelist} \
-    -o ${outname} 2>&1 
+  if [ ${NTOMO} == 1 ]
+  then 
+    touch ${outname}
+    cp ${filelist} ${outname}
+  else 
+    @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacpaste \
+      -i ${filelist} \
+      -o ${outname} 2>&1 
+  fi 
   _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
   
   if [ "${links}" == "TRUE" ] 
   then 
-    rm ${filelist} ${outname}
+    if [ -s ${outname} ] 
+    then 
+      #Output file is a link
+      rm ${filelist} ${outname}
+    else 
+      #Output file is a file, not a link 
+      rm ${filelist} 
+      mv ${outname} ${origoname}
+    fi 
     filelist=${origlist}
     outname=${origoname}
   fi 
