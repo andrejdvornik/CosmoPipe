@@ -3,7 +3,7 @@
 # File Name : add_repr_weights.sh
 # Created By : awright
 # Creation Date : 12-09-2023
-# Last Modified : Sat Oct 28 19:53:46 2023
+# Last Modified : Thu 17 Oct 2024 11:26:50 PM CEST
 #
 #=========================================
 
@@ -185,7 +185,7 @@ do
   then 
     rm ${current_data}
     current_data=${originp}
-    rm ${output_file}
+    mv ${output_file} ${origout} 
     output_file=${origout}
   fi
   #Update the DATAHEAD 
