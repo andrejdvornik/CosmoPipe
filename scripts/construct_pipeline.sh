@@ -534,6 +534,10 @@ do
       if [ "${out}" == "DATAHEAD" ] || [ "${out}" == "ALLHEAD" ] 
       then 
         #Don't update the block (not needed), but track the last step for the flowchart 
+        if [ "$(_inblock $out)" == "0" ] 
+        then 
+          _writelist_datahead "__validitytest__"
+        fi 
         laststep="${step}_${nstep}[${step}]"
       elif [ "${out:0:3}" == "BV:" ] 
       then 
