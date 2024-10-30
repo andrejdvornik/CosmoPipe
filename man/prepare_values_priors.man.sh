@@ -63,7 +63,7 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo nzbias_uncorr
+  echo nzbias_uncorr cosmosis_inputs
 } 
 #}}}
 
