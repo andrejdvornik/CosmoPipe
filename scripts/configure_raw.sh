@@ -47,7 +47,16 @@ resume=""
 resumenum='0'
 while [ $# -gt 0 ] 
 do 
-  case $1 in 
+  case ${1,,} in 
+    "--pipeline-olny") 
+      pipeline_only=TRUE
+      echo "Nice typing bro. olny!=only (smh)" 
+      shift 
+      ;; 
+    "--pipeline-only") 
+      pipeline_only=TRUE
+      shift 
+      ;; 
     "--pipeline_only") 
       pipeline_only=TRUE
       shift 
