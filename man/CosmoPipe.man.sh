@@ -153,6 +153,8 @@ function _add_default_vars {
       #_write_blockvars ${varbase^^} "${varval}"
       _write_blockvars ${varbase^^} "${!varbase}"
     fi 
+    #Write the survey variable 
+    _write_blockvars SURVEY "@SURVEY@"
   done < @RUNROOT@/@PIPELINE@_defaults.sh
 } 
 #}}}

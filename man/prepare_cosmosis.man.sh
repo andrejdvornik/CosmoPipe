@@ -50,7 +50,7 @@ function _inp_var {
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo
+  echo ALLHEAD
 } 
 #}}}
 
@@ -73,7 +73,7 @@ function _outputs {
   do 
     outlist="${outlist} cosmosis_neff_source_${patch}_@BV:BLIND@ cosmosis_neff_lens_${patch}_@BV:BLIND@ cosmosis_neff_obs_${patch}_@BV:BLIND@ cosmosis_sigmae_${patch}_@BV:BLIND@ cosmosis_npair_${patch}_@BV:BLIND@"
   done
-  echo ${outlist} cosmosis_inputs
+  echo ${outlist}
 } 
 #}}}
 

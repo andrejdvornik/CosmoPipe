@@ -13,8 +13,8 @@ then
 fi 
 #Decorrelated the Nz bias values 
 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/decorrelate_params.py \
-  --means @RUNROOT@/INSTALL/ia_models/mass_dependent_ia/massdep_means.txt \
-  --cov @RUNROOT@/INSTALL/ia_models/mass_dependent_ia/massdep_cov.txt \
+  --means @BV:MASSDEP_MEANS@ \
+  --cov @BV:MASSDEP_COVARIANCE@ \
   --output '@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/massdep_params_uncorr/massdep_params_uncorr.txt' 2>&1
 
 #Update the datablock contents file 

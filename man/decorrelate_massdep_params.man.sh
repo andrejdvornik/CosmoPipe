@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo DATABLOCK PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH
+  echo BV:MASSDEP_COVARIANCE BV:MASSDEP_MEANS DATABLOCK PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 

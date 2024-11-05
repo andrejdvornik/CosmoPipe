@@ -3,7 +3,7 @@
 # File Name : calc_xipsf_w_treecorr.sh
 # Created By : awright
 # Creation Date : 29-02-2024
-# Last Modified : Thu 29 Feb 2024 06:07:54 PM CET
+# Last Modified : Fri Apr 26 12:11:01 2024
 #
 #=========================================
 
@@ -88,10 +88,24 @@ do
         _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       fi 
 
+      #Check if the user specified a bin_slop value. If not: use some standard values
+      bin_slop=@BV:BINSLOP@
+      if [[ $bin_slop =~ ^[+-]?[0-9]+\.?[0-9]*$ ]]
+      then
+        bin_slop=@BV:BINSLOP@
+      else
+        if [ @BV:NTHETABINXI@ -gt 100 ]
+        then
+          bin_slop=1.5
+        else
+          bin_slop=0.08
+        fi
+      fi
+
       _message "    -> @BLU@Bin $ZBIN1 ($ZB_lo < Z_B <= $ZB_hi) x Bin $ZBIN2 ($ZB_lo2 < Z_B <= $ZB_hi2)@DEF@"
       MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
         @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_xi_w_treecorr.py \
-        --nbins @BV:NTHETABIN@ --theta_min @BV:THETAMIN@ --theta_max @BV:THETAMAX@ --binning @BINNING@ \
+        --nbins @BV:NTHETABIN@ --theta_min @BV:THETAMIN@ --theta_max @BV:THETAMAX@ --binning @BINNING@ --bin_slop ${bin_slop}\
         --fileone ${file_one} \
         --filetwo ${file_two} \
         --output @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xipsf/${outname} \

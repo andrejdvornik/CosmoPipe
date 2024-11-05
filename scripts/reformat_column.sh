@@ -3,7 +3,7 @@
 # File Name : reformat_column.sh 
 # Created By : awright
 # Creation Date : 24-05-2024
-# Last Modified : Fri 24 May 2024 11:14:31 AM CEST
+# Last Modified : Sat 01 Jun 2024 09:14:36 AM CEST
 #
 #=========================================
 
@@ -41,7 +41,7 @@ then
   fi
   #Create input link
   originp=${input}
-  ln -s ${input}_tmp infile_$$.lnk_tmp
+  ln -s ${input} infile_$$.lnk
   input="infile_$$.lnk"
   #Create outfile links 
   ln -s ${outfile} outfile_$$.lnk
@@ -105,7 +105,8 @@ rm ${input}_tmp ${outfile}_tmp ${outfile}_proto
 if [ "${links}" == "TRUE" ] 
 then 
   #Remove old links {{{
-  mv ${outfile} ${origout} 
+  #mv ${outfile} ${origout} 
+  rm ${outfile} ${input}
   input=${originp}
   outfile=${origout}
   #}}}
