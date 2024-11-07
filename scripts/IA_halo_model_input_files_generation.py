@@ -17,13 +17,13 @@ if __name__ == '__main__':
              help='red/blue split value', default=3.0)
     parser.add_argument('-c','--catalogue', dest="catalogue", type=str,required=True,
              help='Input catalogue')
-    parser.add_argument('-o','--observable', dest="observable", type=str,required=True,
+    parser.add_argument('-o','--observable', dest="observable", type=str,required=False,
              help='Column name of desired observable', default='mstar_bestfit')
     parser.add_argument('-p','--output_path', dest="output_path", type=str,required=True,
              help='file for output catalogue')
-    parser.add_argument('-z','--redshift_column', dest="z", type=str,required=True,
+    parser.add_argument('-z','--redshift_column', dest="z", type=str,required=False,
              help='Column name of redshift', default='Z_B')
-    parser.add_argument('-t','--split_tag', dest="split_tag", type=str,required=True,
+    parser.add_argument('-t','--split_tag', dest="split_tag", type=str,required=False,
              help='Column name of the quantity to perform split in', default='T_B',nargs='+')
              
     #TO-DO: pass the redshift column name and color coloumn name as an argument
