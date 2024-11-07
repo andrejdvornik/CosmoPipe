@@ -11,6 +11,9 @@
 _message "Extracting files needed for IA halo model:"
 inputfile=@DB:DATAHEAD@
 ia_observable="@BV:IA_OBSERVABLE@"
+z_col="@BV:TOMOVAR@"
+s_tag="@BV:IA_SPLIT@"
+s_val="@BV:IA_SPLIT_VAL@"
 
 #If needed, make the output folder
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IA_hm_data/ ]
@@ -37,7 +40,9 @@ MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
   --catalogue ${inputfile} \
   --output_path @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/fluxscale_corrected \
   --nzbins 30 \
-  --split_value 3.0 \
+  --redshift_column ${z_col} \
+  --split_tag ${s_tag} \
+  --split_value ${s_val} \
   --observable ${ia_observable} 2>&1
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 

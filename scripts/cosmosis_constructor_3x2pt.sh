@@ -1269,10 +1269,11 @@ do
 			EOF
 			;; #}}}
 	"hod_ia_red") #{{{
+			obs_file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IA_hm_data/red_cen_lum_pdf.txt"
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(HMPATH)s/hod_interface.py
-			observables_file = %(HMPATH)s/input_files/red_cen_lum_pdf.txt
+			observables_file = ${obs_file}
 			observable_section_name = stellar_mass_function
 			save_observable = False
 			do_galaxy_linear_bias = False
@@ -1288,10 +1289,11 @@ do
 			EOF
 			;; #}}}
 	"hod_ia_blue") #{{{
+			obs_file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IA_hm_data/blue_cen_lum_pdf.txt"
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(HMPATH)s/hod_interface.py
-			observables_file = %(HMPATH)sinput_files/blue_cen_lum_pdf.txt
+			observables_file = ${obs_file}
 			observable_section_name = stellar_mass_function
 			save_observable = False
 			do_galaxy_linear_bias = False
@@ -1517,10 +1519,11 @@ do
 			EOF
 			;; #}}}
 	"add_and_upsample_ia") #{{{
+			f_file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IA_hm_data/f_red.txt"
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(HMPATH)s/add_and_upsample.py
-			f_red_file = %(HMPATH)s/input_files/f_red.txt ; two columns: z f_red(z)
+			f_red_file = ${f_file} ; two columns: z f_red(z)
 			do_p_mm = False
 			do_p_gg = False
 			do_p_gm = False
