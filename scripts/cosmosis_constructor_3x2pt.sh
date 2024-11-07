@@ -882,28 +882,7 @@ done
 #Add the values information #{{{
 if [  "@BV:COSMOSIS_PIPELINE@" == "default" ]
 then
-    
-    # Set up intrinsic alignment pipeline blocks
-    if [ "${IAMODEL^^}" == "LINEAR" ]
-    then
-        iamodel_pipeline="projection"
-        #iamodel_pipeline="linear_alignment projection"
-    elif [ "${IAMODEL^^}" == "TATT" ]
-    then
-        iamodel_pipeline="fast_pt tatt projection add_intrinsic"
-    elif [ "${IAMODEL^^}" == "LINEAR_Z" ]
-    then
-        iamodel_pipeline="linear_alignment projection lin_z_dependence_for_ia add_intrinsic"
-    elif [ "${IAMODEL^^}" == "MASSDEP" ]
-    then
-        iamodel_pipeline="correlated_massdep_priors linear_alignment projection mass_dependence_for_ia add_intrinsic"
-    elif [ "${IAMODEL^^}" == "HALO_MODEL" ]
-    then
-        iamodel_pipeline="hod_ia_red hod_ia_blue alignment_red alignment_blue radial_satellite_alignment_red radial_satellite_alignment_blue pk_ia_red pk_ia_blue add_and_upsample_ia projection add_intrinsic"
-    else
-        _message "Intrinsic alignment model not implemented: ${IAMODEL^^}\n"
-          exit 1
-    fi
+    iamodel_pipeline="hod_ia_red hod_ia_blue alignment_red alignment_blue radial_satellite_alignment_red radial_satellite_alignment_blue pk_ia_red pk_ia_blue add_and_upsample_ia projection add_intrinsic"
     
     COSMOSIS_PIPELINE="correlated_dz_priors load_nz_fits consistency camb extrapolate halo_model_ingredients hod hod_smf bnl pk add_and_upsample ${iamodel_pipeline} source_photoz_bias ${twopt_modules} bnl_delete"
 else
@@ -1298,7 +1277,7 @@ do
 			save_observable = False
 			do_galaxy_linear_bias = False
 			hod_section_name = hod_ia_red
-			values_name = hod_parameters_ia
+			values_name = hod_parameters
 			nobs = 200
 			nz = %(nz_def)s
 			log_mass_min = %(logmassmin_def)s
@@ -1317,7 +1296,7 @@ do
 			save_observable = False
 			do_galaxy_linear_bias = False
 			hod_section_name = hod_ia_blue
-			values_name = hod_parameters_ia
+			values_name = hod_parameters
 			nobs = 200
 			nz = %(nz_def)s
 			log_mass_min = %(logmassmin_def)s
@@ -1617,62 +1596,6 @@ do
 			
 			EOF
 			;; #}}}
-	"linear_alignment") #{{{
-			if [[ .*\ $MODES\ .* =~ " NE " ]]
-			then
-				ne="True"
-			else
-				ne="False"
-			fi
-			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-			[$module]
-			file = %(CSL_PATH)s/intrinsic_alignments/la_model/linear_alignments_interface.py
-			method = bk_corrected
-			do_galaxy_intrinsic= ${ne}
-			
-			EOF
-			;; #}}}
-	"tatt") #{{{
-			if [[ .*\ $MODES\ .* =~ " NE " ]]
-			then
-				ne="True"
-			else
-				ne="False"
-			fi
-			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-			[$module]
-			file = %(CSL_PATH)s/intrinsic_alignments/tatt/tatt_interface.py
-			sub_lowk=F
-			do_galaxy_intrinsic=${ne}
-			ia_model=tatt
-			
-			EOF
-			;; #}}}
-	"lin_z_dependence_for_ia") #{{{
-			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-			[$module]
-			file = @RUNROOT@/INSTALL/ia_models/lin_z_dependent_ia/lin_z_dependent_ia_model.py
-			sample = %(redshift_name)s
-			
-			EOF
-			;; #}}}
-	"mass_dependence_for_ia") #{{{
-			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-			[$module]
-			file = @RUNROOT@/INSTALL/ia_models/mass_dependent_ia/mass_dependent_ia_model.py
-			
-			EOF
-			;; #}}}
-	"fast_pt") #{{{
-			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-			[$module]
-			file = %(CSL_PATH)s/structure/fast_pt/fast_pt_interface.py
-			do_ia = T
-			k_res_fac = 0.5
-			verbose = F
-			
-			EOF
-			;; #}}}
 	"add_intrinsic") #{{{
 			if [[ .*\ $MODES\ .* =~ " EE " ]]
 			then
@@ -1725,7 +1648,7 @@ do
 					cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 					; GGL projections
 					GenericClustering-Shear = %(redshift_name_lens)s-%(redshift_name)s:{1-${NLENSBINS}}:
-					GenericClustering-Intrinsic = %(redshift_name_lens)s-%(redshift_name)s
+					GenericClustering-Intrinsic = %(redshift_name_lens)s-%(redshift_name)s ; :{1-${NLENSBINS}}:
 			
 					EOF
 				fi

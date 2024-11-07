@@ -138,7 +138,8 @@ if [ -d ${RUNROOT}/INSTALL/cosmosis-standard-library ]
 then 
   rm -fr cosmosis-standard-library
 fi
-git clone https://github.com/joezuntz/cosmosis-standard-library.git >> gitclone_output.log 2>&1
+git clone --single-branch -b two-point-one-point https://github.com/andrejdvornik/cosmosis-standard-library.git >> gitclone_output.log 2>&1
+#git clone https://github.com/joezuntz/cosmosis-standard-library.git >> gitclone_output.log 2>&1
 _message "${BLU} - Done! ${DEF}\n"
 #Replace the cpdef instances with cdef in classy.pyx
 ${P_SED_INPLACE} "s# cpdef # cdef #" cosmosis-standard-library/boltzmann/class/class_v3.2.0/python/classy.pyx 
