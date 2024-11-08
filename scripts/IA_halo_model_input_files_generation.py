@@ -63,7 +63,7 @@ if __name__ == '__main__':
         raise ValueError('Only one or two tags allowed, to either select on one value or colour')
     
     if plots:
-        plt.scatter(df_split, df[z], s=0.000005)
+        plt.scatter(df_split, df[z], s=0.000005, rasterized=True)
         plt.axvline(split_value)
         plt.xlabel(plot_tag, fontsize=15)
         plt.ylabel(z, fontsize=15)
