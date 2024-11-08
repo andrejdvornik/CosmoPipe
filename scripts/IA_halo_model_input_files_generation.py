@@ -45,7 +45,7 @@ if __name__ == '__main__':
     #nzbins = 30
     #catalogue = 'KIDS_cat.fits'
 
-    hdul = fits.open(catalogue)
+    hdul = fits.open(catalogue, memmap=True)
     hdul[1].header
     
     df = hdul[1].data
