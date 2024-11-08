@@ -40,7 +40,7 @@ nz_def = 15
 nk_def = 300
 zmin_def =  0.0
 zmax_def = 1.2
-nmass_def = 200
+nmass_def = 50 ; 200
 logmassmin_def = 9.0
 logmassmax_def = 18.0
 beta_nl = True
@@ -1269,7 +1269,7 @@ do
 			EOF
 			;; #}}}
 	"hod_ia_red") #{{{
-			obs_file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IA_hm_data/red_cen_lum_pdf.txt"
+			obs_file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IA_hm_data/red_cen_obs_pdf.txt"
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(HMPATH)s/hod_interface.py
@@ -1289,7 +1289,7 @@ do
 			EOF
 			;; #}}}
 	"hod_ia_blue") #{{{
-			obs_file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IA_hm_data/blue_cen_lum_pdf.txt"
+			obs_file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IA_hm_data/blue_cen_obs_pdf.txt"
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(HMPATH)s/hod_interface.py

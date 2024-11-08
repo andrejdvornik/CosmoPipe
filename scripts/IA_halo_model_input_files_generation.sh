@@ -14,6 +14,7 @@ ia_observable="@BV:IA_OBSERVABLE@"
 z_col="@BV:TOMOVAR@"
 s_tag="@BV:IA_SPLIT@"
 s_val="@BV:IA_SPLIT_VAL@"
+ia_log="@BV:IA_OBSERVABLE_LOG@"
 
 #If needed, make the output folder
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IA_hm_data/ ]
@@ -43,6 +44,7 @@ MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
   --redshift_column ${z_col} \
   --split_tag ${s_tag} \
   --split_value ${s_val} \
+  --log ${ia_log} \
   --observable ${ia_observable} 2>&1
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 

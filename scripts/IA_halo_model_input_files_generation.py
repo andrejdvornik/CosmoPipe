@@ -19,6 +19,8 @@ if __name__ == '__main__':
              help='Input catalogue')
     parser.add_argument('-o','--observable', dest="observable", type=str,required=False,
              help='Column name of desired observable', default='mstar_bestfit')
+    parser.add_argument('-l','--log', dest="if_log", type=str,required=False,
+             help='If desired observable is log quantity or not', default="False")
     parser.add_argument('-p','--output_path', dest="output_path", type=str,required=True,
              help='file for output catalogue')
     parser.add_argument('-z','--redshift_column', dest="z", type=str,required=False,
@@ -37,6 +39,8 @@ if __name__ == '__main__':
     output_path = args.output_path
     split_tag = args.split_tag
     z = args.z
+    if_log = args.if_log
+    if_log=if_log.lower() in ["true","t","1","y","yes"]
 
     plots = True
 
@@ -102,8 +106,12 @@ if __name__ == '__main__':
     obs_max = np.empty(nzbins)
     for i in range(nzbins):
         selection = df_obs[(df[z] <= edges[i+1]) & (df[z] > edges[i]) & (df_split < split_value)]# & (df['flag_central'] == 0)]
-        obs_min[i] = np.min(selection)
-        obs_max[i] = np.max(selection)
+        if if_log:
+            obs_min[i] = np.min(10.0**selection)
+            obs_max[i] = np.max(10.0**selection)
+        else:
+            obs_min[i] = np.min(selection)
+            obs_max[i] = np.max(selection)
         
     np.savetxt(f'{output_path}/red_cen_obs_pdf.txt', np.column_stack([z_bins, obs_min, obs_max]), header='z obs_min obs_max')
     
@@ -112,8 +120,12 @@ if __name__ == '__main__':
     obs_max = np.empty(nzbins)
     for i in range(nzbins):
         selection = df_obs[(df[z] <= edges[i+1]) & (df[z] > edges[i]) & (df_split >= split_value)]# & (df['flag_central'] == 0)]
-        obs_min[i] = np.min(selection)
-        obs_max[i] = np.max(selection)
+        if if_log:
+            obs_min[i] = np.min(10.0**selection)
+            obs_max[i] = np.max(10.0**selection)
+        else:
+            obs_min[i] = np.min(selection)
+            obs_max[i] = np.max(selection)
         
     np.savetxt(f'{output_path}/blue_cen_obs_pdf.txt', np.column_stack([z_bins, obs_min, obs_max]), header='z obs_min obs_max')
     
@@ -122,7 +134,10 @@ if __name__ == '__main__':
         # Check of the luminosity pdfs for red centrals at 4 different redshifts
         for i in [0,10,20,nzbins-1]:
             selection = df_obs[(df[z] <= edges[i+1]) & (df[z] > edges[i]) & (df_split < split_value)]# & (df['flag_central'] == 0)]
-            plt.hist(np.log10(selection), bins=10, histtype='step', density=True)
+            if if_log:
+                plt.hist(np.log10(10.0**selection), bins=10, histtype='step', density=True)
+            else:
+                plt.hist(np.log10(selection), bins=10, histtype='step', density=True)
         plt.xlabel('log_lum',fontsize=15)
         #plt.show()
         plt.savefig(f'{output_path}/check4.pdf')
