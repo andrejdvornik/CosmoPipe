@@ -38,7 +38,7 @@ fi
 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
   @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/IA_halo_model_input_files_generation.py \
   --catalogue ${inputfile} \
-  --output_path @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/fluxscale_corrected \
+  --output_path @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IA_hm_data \
   --nzbins 30 \
   --redshift_column ${z_col} \
   --split_tag ${s_tag} \

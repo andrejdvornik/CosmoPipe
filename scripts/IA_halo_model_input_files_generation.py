@@ -90,7 +90,7 @@ if __name__ == '__main__':
     np.savetxt(f'{output_path}/f_red.txt', np.column_stack([z_bins, red_fraction]))
     
     if plots:
-        plt.plot(zbins, blue_fraction)
+        plt.plot(z_bins, blue_fraction)
         plt.xlabel(z, fontsize=15)
         plt.ylabel('fraction of blue galaxies', fontsize=15)
         #plt.show()
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     # Mass limits for red centrals as a function of redshift
     obs_min = np.empty(nzbins)
     obs_max = np.empty(nzbins)
-    for i in range(len(zbins)):
+    for i in range(nzbins):
         selection = df_obs[(df[z] <= edges[i+1]) & (df[z] > edges[i]) & (df_split < split_value)]# & (df['flag_central'] == 0)]
         obs_min[i] = np.min(selection)
         obs_max[i] = np.max(selection)
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     # Luminosity limits for blue centrals as a function of redshift
     obs_min = np.empty(nzbins)
     obs_max = np.empty(nzbins)
-    for i in range(len(zbins)):
+    for i in range(nzbins):
         selection = df_obs[(df[z] <= edges[i+1]) & (df[z] > edges[i]) & (df_split >= split_value)]# & (df['flag_central'] == 0)]
         obs_min[i] = np.min(selection)
         obs_max[i] = np.max(selection)
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     
     if plots:
         # Check of the luminosity pdfs for red centrals at 4 different redshifts
-        for i in [0,10,20,30]:
+        for i in [0,10,20,nzbins-1]:
             selection = df_obs[(df[z] <= edges[i+1]) & (df[z] > edges[i]) & (df_split < split_value)]# & (df['flag_central'] == 0)]
             plt.hist(np.log10(selection), bins=10, histtype='step', density=True)
         plt.xlabel('log_lum',fontsize=15)
