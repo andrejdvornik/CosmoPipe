@@ -85,7 +85,7 @@ if __name__ == '__main__':
     total = nblue + nred
     red_fraction = nred / total
     blue_fraction = nblue / total
-    zbins = (edges[1:] + edges[:-1])/2.0
+    z_bins = (edges[1:] + edges[:-1])/2.0
     # Fraction of red galaxies as a function of redshift
     np.savetxt(f'{output_path}/f_red.txt', np.column_stack([z_bins, red_fraction]))
     

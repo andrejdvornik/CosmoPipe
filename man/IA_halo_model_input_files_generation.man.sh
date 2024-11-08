@@ -63,7 +63,7 @@ function _outputs {
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/apply_fluxscale.sh
+  echo bash @RUNROOT@/@SCRIPTPATH@/IA_halo_model_input_files_generation.sh
 } 
 #}}}
 

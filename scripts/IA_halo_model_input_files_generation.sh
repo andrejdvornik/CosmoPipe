@@ -9,7 +9,7 @@
 
 ### Construct fluxscale corrected catalogue ### {{{
 _message "Extracting files needed for IA halo model:"
-inputfile=@DB:DATAHEAD@
+inputfile="@DB:ALLHEAD@"
 ia_observable="@BV:IA_OBSERVABLE@"
 z_col="@BV:TOMOVAR@"
 s_tag="@BV:IA_SPLIT@"
