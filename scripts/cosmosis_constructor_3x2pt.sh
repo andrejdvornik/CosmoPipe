@@ -768,8 +768,8 @@ then
   do
     var=`echo ${line} | awk '{print $1}'`
     #if [ "${var}" == "s_8_input" ] || [ "${var}" == "omch2" ] || [ "${var}" == "ombh2" ] || [ "${var:0:1}" == "[" ] || [ "${var}" == "" ] 
-    if [ "${var}" == "s_8_input" ] || [ "${var}" == "omch2" ] || [ "${var:0:1}" == "[" ] || [ "${var}" == "" ] 
-    then 
+    if [ "${var}" == "sigma_8" ] || [ "${var}" == "omch2" ] || [ "${var:0:1}" == "[" ] || [ "${var}" == "" ]
+    then
       #we have a variable we want, or a block definition, or an empty line: Reproduce the line
       echo ${line} >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values_fixed.ini
     else 
@@ -990,6 +990,7 @@ debug = F
 
 [runtime]
 sampler = %(SAMPLER_NAME)s
+verbosity = quiet
 
 [output]
 filename = ${OUTPUTNAME}
