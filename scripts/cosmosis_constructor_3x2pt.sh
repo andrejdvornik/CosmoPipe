@@ -739,7 +739,7 @@ split_threshold = 100
 n_networks = 8
 n_batch = $n_batch
 filepath = %(OUTPUT_FOLDER)s/run_nautilus.hdf5
-resume = False
+resume = False ; True
 f_live = 0.01
 discard_exploration = True
 verbose = True
@@ -768,7 +768,7 @@ then
   do
     var=`echo ${line} | awk '{print $1}'`
     #if [ "${var}" == "s_8_input" ] || [ "${var}" == "omch2" ] || [ "${var}" == "ombh2" ] || [ "${var:0:1}" == "[" ] || [ "${var}" == "" ] 
-    if [ "${var}" == "sigma_8" ] || [ "${var}" == "omch2" ] || [ "${var:0:1}" == "[" ] || [ "${var}" == "" ]
+    if [ "${var}" == "s_8_input" ] || [ "${var}" == "omch2" ] || [ "${var:0:1}" == "[" ] || [ "${var}" == "" ]
     then
       #we have a variable we want, or a block definition, or an empty line: Reproduce the line
       echo ${line} >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values_fixed.ini
@@ -884,7 +884,7 @@ if [  "@BV:COSMOSIS_PIPELINE@" == "default" ]
 then
     iamodel_pipeline="hod_ia_red hod_ia_blue alignment_red alignment_blue radial_satellite_alignment_red radial_satellite_alignment_blue pk_ia_red pk_ia_blue add_and_upsample_ia projection add_intrinsic"
     
-    COSMOSIS_PIPELINE="correlated_dz_priors load_nz_fits consistency camb extrapolate halo_model_ingredients hod hod_smf bnl pk add_and_upsample ${iamodel_pipeline} source_photoz_bias ${twopt_modules} bnl_delete"
+    COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits consistency camb extrapolate halo_model_ingredients hod hod_smf bnl pk add_and_upsample ${iamodel_pipeline} source_photoz_bias ${twopt_modules} bnl_delete"
 else
 	COSMOSIS_PIPELINE="@BV:COSMOSIS_PIPELINE@"
 fi
@@ -1037,6 +1037,15 @@ modulelist=`echo ${COSMOSIS_PIPELINE} | sed 's/ /\n/g' | sort | uniq | awk '{pri
 for module in ${modulelist}
 do 
   case ${module} in
+	"sample_S8") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(KCAP_PATH)s/utils/sample_S8.py
+			s8_name = s_8_input
+			sigma8_name = sigma_8
+			
+			EOF
+			;;#}}}
 	"consistency") #{{{
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]

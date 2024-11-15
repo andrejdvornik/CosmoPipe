@@ -205,6 +205,25 @@ git clone https://github.com/KiDS-WL/halomodel_for_cosmosis.git >> gitclone_outp
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
 
+#Clone the Datavec Blinding repository {{{
+_message "   >${RED} Cloning the Datavector Blinding Git repository${DEF}"
+#Clone the repository
+if [ -d ${RUNROOT}/INSTALL/legacy_blinding ]
+then
+  rm -fr legacy_blinding
+fi
+git clone --single-branch -b kids https://github.com/andrejdvornik/legacy_blinding.git >> gitclone_output.log 2>&1
+_message "${BLU} - Done! ${DEF}\n"
+#}}}
+cat > blinding_make.sh <<-EOF
+cd legacy_blinding
+python -m pip install -e .
+cd ..
+EOF
+conda run -n ${CONDAPIPENAME} bash blinding_make.sh > blinding_install_output.log 2>&1
+_message "${BLU} - Done! ${DEF}\n"
+#}}}
+
 #Clone the 2ptstats repository {{{
 _message "   >${RED} Cloning the 2ptStats Git repository${DEF}"
 #Clone the repository

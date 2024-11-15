@@ -352,7 +352,7 @@ then
   omega_b=${cosmological_parameters__ombh2}
   omega_c=${cosmological_parameters__omch2} 
   ns=${cosmological_parameters__n_s}
-  sigma8=${cosmological_parameters__sigma_8}
+  S8=${cosmological_parameters__s_8_input}
   if [ "${non_linear_model}" == "mead2020_feedback" ]
   then
     logT_AGN=${halo_model_parameters__log_t_agn}
@@ -375,7 +375,7 @@ else
   omega_b=`central_value "@BV:PRIOR_OMBH2@"`
   omega_c=`central_value "@BV:PRIOR_OMCH2@"` 
   ns=`central_value "@BV:PRIOR_NS@"`
-  sigma8=`central_value "@BV:PRIOR_SIGMA8@"`
+  S8=`central_value "@BV:PRIOR_S8INPUT@"`
   filename_extension=""
   nzfile_source=@DB:cosmosis_nz_source@
   nzfile_lens=@DB:cosmosis_nz_lens@
@@ -400,7 +400,7 @@ mnu=`central_value "@BV:PRIOR_MNU@"`
 Omega_m=`echo "$omega_b $omega_c $H0" | awk '{printf "%f", ($1 + $2) /$3 /$3}'`
 Omega_b=`echo "$omega_b $H0" | awk '{printf "%f", $1 /$2 /$2}'`
 Omega_de=`echo "$Omega_m $H0" | awk '{printf "%f", 1 - $1}'`
-sigma8=`central_value "@BV:PRIOR_SIGMA8@"`
+sigma8=`echo "$S8 $Omega_m" | awk '{printf "%f", $1 / sqrt($2/0.3)}'`
 
 # Covariance input path (just pointing to a inputs folder in the datablock) 
 input_path="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs"

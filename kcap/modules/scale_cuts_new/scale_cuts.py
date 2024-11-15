@@ -93,7 +93,7 @@ def setup(options):
     ## Do scale cuts to data and cov
     TP_data.cutScales(cutCross=scArgs[0], statsTag_tomoInd_tomoInd_list=scArgs[1], statsTag_binIndList_dict=scArgs[2])
     TP_data.keepScales(statsTag_tomoInd1_tomoInd2__angMin_angMax_dict=scArgs[3], statsTag__angMin_angMax_dict=scArgs[4])
-    print('  Did scale cuts to data & cov')
+    #print('  Did scale cuts to data & cov')
     
     ## Don't put this before scale cuts, because TP_data.choose_data_sets does 
     ## not modify the covmat_info attribute but only the covmat attribute.
@@ -122,7 +122,7 @@ def setup(options):
     return config
 
 def execute(block, config):
-    print('Gathering theory outputs to make a vector')
+    #print('Gathering theory outputs to make a vector')
     
     ## Save data and cov in the data block
     output_section_name = config['output_section_name']
@@ -154,7 +154,7 @@ def execute(block, config):
         section_name, extension_name, angle_name, isGGL = line
       
         if extension_name not in config['use_stats']:
-            print('  Skipped %s' % extension_name)
+            #print('  Skipped %s' % extension_name)
             continue
         
         elif not block.has_section(section_name):
@@ -177,7 +177,7 @@ def execute(block, config):
         if isGGL:
             for i in range(nbTomo_max):
                 if not block.has_value(section_name, 'bin_%d_%d' % (i+1, 1)):
-                    print('  %s stops at lens bin %d' % (section_name, i))
+                    #print('  %s stops at lens bin %d' % (section_name, i))
                     break
           
                 for j in range(nbTomo_max):
@@ -190,7 +190,7 @@ def execute(block, config):
         else:
             for i in range(nbTomo_max):
                 if not block.has_value(section_name, 'bin_%d_%d' % (i+1, i+1)):
-                    print('  %s stops at bin %d' % (section_name, i))
+                    #print('  %s stops at bin %d' % (section_name, i))
                     break
                 
                 for j in range(i, nbTomo_max):
@@ -230,7 +230,7 @@ def execute(block, config):
     scArgs = config['scale_cuts_arguments']
     TP_theory.cutScales(cutCross=scArgs[0], statsTag_tomoInd_tomoInd_list=scArgs[1], statsTag_binIndList_dict=scArgs[2])
     TP_theory.keepScales(statsTag_tomoInd1_tomoInd2__angMin_angMax_dict=scArgs[3], statsTag__angMin_angMax_dict=scArgs[4])
-    print('  Did scale cuts to theory')
+    #print('  Did scale cuts to theory')
     
     ## Extract the vector & put in block as output_section_name
     block[output_section_name, 'theory'] = TP_theory.makeMeanVector()
