@@ -800,6 +800,16 @@ function _write_blockvars {
     then 
       _filelist="{${2// /,}}"
     else 
+      if [ "${2:0:4}" == "@DB:" ] 
+      then 
+        #Make full file paths from block files 
+        _filelist=''
+        for _file in ${_prompt}
+        do 
+          _filelist="${_filelist} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${target}/${_file}"
+        done 
+        _prompt=`echo ${_filelist}`
+      fi 
       #Prompt about the update
       echo -n " -> #${_prompt}#"
     fi 
