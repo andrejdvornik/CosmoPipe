@@ -6,13 +6,14 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as pl
 import astropy.io.fits as fits
-import astropy.units as u
-from astropy.cosmology import FlatLambdaCDM, Flatw0waCDM, LambdaCDM, z_at_value
-from astropy.stats import sigma_clip
-import scipy.stats as ss
-from scipy.signal import find_peaks
-from scipy.stats import gaussian_kde
-from sklearn.neighbors import KernelDensity
+# import astropy.units as u
+# from astropy.cosmology import FlatLambdaCDM, Flatw0waCDM, LambdaCDM, z_at_value
+from astropy.cosmology import LambdaCDM
+# from astropy.stats import sigma_clip
+# import scipy.stats as ss
+# from scipy.signal import find_peaks
+# from scipy.stats import gaussian_kde
+# from sklearn.neighbors import KernelDensity
 import dill as pickle
 pl.ioff()
 
@@ -44,10 +45,11 @@ if __name__ == '__main__':
     path = args.path
     
     area_kids = args.area
-    frac = (area_kids/41253.0)
+    total_sky_area = 180.**2/np.pi**2*4.*np.pi #~41253.0
+    frac = (area_kids/total_sky_area)
     f_tomo = args.f_tomo
     
-
+    # TODO: Check the units for masses
     nbins = args.nbins
     Mmin_smf = args.min_mass
     Mmax_smf = args.max_mass
@@ -91,9 +93,10 @@ if __name__ == '__main__':
 
     cosmo_model = LambdaCDM(H0=h0*100., Om0=omegam, Ode0=omegav)
 
+    # TODO: what are these files?
     with open(os.path.join(path, 'mass_lim.npy'), 'rb') as dill_file:
         fit_func_inv = pickle.load(dill_file)
-        
+    
     with open(os.path.join(path, 'mass_lim_low.npy'), 'rb') as dill_file:
         fit_func_low = pickle.load(dill_file)
     
@@ -102,16 +105,21 @@ if __name__ == '__main__':
     stellar_mass_in = data[stellar_mass_column]
     z_in = data[z_column]
     
-    
+
     z_min = np.maximum(0.001, min_z)
+    # max_z is given as an input
     z_max_bin = max_z * np.ones_like(stellar_mass_in)
+    # This is the function that was imported. Finds z_max for each stellar mass?
     z_max = fit_func_inv(stellar_mass_in)
     z_max_i = np.minimum(z_max_bin, z_max)
     
+    # Comoving distance at z_min  and z_max_i in units of Mpc h
+    # z_max_i should be the maximum volume at which galaxy i is visible.
     dc_min = cosmo_model.comoving_distance(z_min).to('Mpc').value * h0
     dc_max = cosmo_model.comoving_distance(z_max_i).to('Mpc').value * h0
 
-    
+    # comoving volume between zmin and zmax (a fraction of a spherical shell of thickness dc_max-dc_min)
+    # V_max_i is the comoving volume over which galaxy i would be visible, given the magnitude limit of the whole sample, 
     V_max = 4.0*np.pi/3.0 * frac * (dc_max**3.0 - dc_min**3.0)
     
     M_bins = np.linspace(Mmin_smf, Mmax_smf, nbins+1, endpoint=True, retstep=True)
@@ -122,14 +130,18 @@ if __name__ == '__main__':
     vmax_out = np.zeros(nbins)
     M_center = (M_bins[1:] + M_bins[:-1])/2.0
     
+    # This is the same as doing a weighted histogram, where the weights are 1/V_max
+    # If the sample is volume limited then all galaxies that exist in our mass-redshift bins
+    # are observable.
     for i in range(nbins):
         index = ((stellar_mass_in > M_bins[i]) & (M_bins[i+1] > stellar_mass_in))
         phi_bins[i] = np.sum(1.0/V_max[index])
+        # Compute the arithmetic mean, ignoring NaNs.
         vmax_out[i] = np.nanmean(V_max[index])
-        
-
+    
     phi_bins = np.abs(phi_bins)
     
+    # TODO: To help with the integration I think we want to out put the min and max mass and also report the units
     data_out = np.array([10.0**M_center, phi_bins/step, np.ones_like(phi_bins)]).T
     vmax_out = np.array([M_center, vmax_out]).T
     
