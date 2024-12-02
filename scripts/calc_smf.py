@@ -52,13 +52,16 @@ if __name__ == '__main__':
     # TODO: Check the units for masses
     # From LePhare's documentation: https://www.cfht.hawaii.edu/~arnouts/LEPHARE/DOWNLOAD/lephare_doc.pdf
     # Mass is the stellar mass (M_sun)
-    # From Blicki+2021:
-    # We used a standard concordance cosmology (Ωm = 0.3, ΩΛ = 0.7, and H0 = 70 km s−1 Mpc−1),
-    #  a Chabrier (2003) initial mass function, the Calzetti et al. (1994) dust-extinction law, 
-    # Bruzual & Charlot (2003) stellar population synthesis models, 
-    # and exponentially declining star formation histories. 
-    # The input photometry to LePhare was extinction corrected using the Schlegel et al. (1998) maps 
-    # with the Schlafly & Finkbeiner (2011) coefficients, as described in Kuijken et al. (2019)
+    """
+    From Blicki+2021:
+    We used a standard concordance cosmology (Ωm = 0.3, ΩΛ = 0.7, and H0 = 70 km s^-1 Mpc^-1),
+    a Chabrier (2003) initial mass function, the Calzetti et al. (1994) dust-extinction law, 
+    Bruzual & Charlot (2003) stellar population synthesis models, 
+    and exponentially declining star formation histories. 
+    The input photometry to LePhare was extinction corrected using the Schlegel et al. (1998) maps 
+    with the Schlafly & Finkbeiner (2011) coefficients, as described in Kuijken et al. (2019).
+    """
+    
     nbins = args.nbins
     Mmin_smf = args.min_mass
     Mmax_smf = args.max_mass
@@ -110,8 +113,9 @@ if __name__ == '__main__':
     with open(os.path.join(path, 'mass_lim.npy'), 'rb') as dill_file:
         fit_func_inv = pickle.load(dill_file)
     
-    with open(os.path.join(path, 'mass_lim_low.npy'), 'rb') as dill_file:
-        fit_func_low = pickle.load(dill_file)
+    # Not used
+    # with open(os.path.join(path, 'mass_lim_low.npy'), 'rb') as dill_file:
+    #     fit_func_low = pickle.load(dill_file)
     
     data = file_in[1].data
     

@@ -5,7 +5,22 @@ import argparse
 import numpy as np
 import astropy.io.fits as fits
 
-
+"""
+From Blicki et al. 2021 bright sample paper:
+Appendix C:
+Note 1. All the "MASS" quantities stand for log10(M_star/M_sun).
+Note 2. Fluxscale correction: Because the GAaP photometry only measures the galaxy magnitude within a specific aperture size,
+the stellar mass should be corrected using a “fluxscale” parameter, which is the ratio of AUTO and GAaP fluxes:
+log10(fluxscale) = (MAG_GAAP_r - MAG_AUTO)/2.5. (C.1)
+The "total" stellar mass in then
+M_TOT = M_BEST + log10(fluxscale). (C.2)
+Similarly, also absolute magnitudes need corrections if total measurements are required:
+MAG_ABS_X, total = MAG_ABS_X - 2.5 log10(fluxscale). (C.3)
+All the LePhare quantities were computed assuming h = 0.7, and the estimated stellar masses are assumed to have a dependence
+on h dominated by the h^-2
+scaling of luminosities. Therefore, if another Hubble constant value is used, the logarithmic stellar mass
+in Eq. (C.2) needs to be corrected by -2 log10(h/0.7), while the absolute magnitudes in Eq. (C.3) need to have 5 log10(h/0.7) added.
+"""
 
 if __name__ == '__main__':
     
@@ -24,6 +39,7 @@ if __name__ == '__main__':
     data = data[(data['MASK'] == 0) & (data['MAG_ABS_r'] < -10) & (data['MASS_MED'] != -99)]
     
     fluxscale = (data['MAG_GAAP_r'] - data['MAG_AUTO_CALIB']) / 2.5
+    # TODO: - 2.0*np.log10(h0/0.7) should be updated in the cosmology pipeline
     stellar_mass_corrected = data['MASS_BEST'] + fluxscale - 2.0*np.log10(h0/0.7)
     
     

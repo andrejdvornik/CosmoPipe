@@ -7,7 +7,8 @@ import matplotlib.pyplot as pl
 from scipy.interpolate import interp1d
 import astropy.io.fits as fits
 import astropy.units as u
-from astropy.cosmology import FlatLambdaCDM, Flatw0waCDM, LambdaCDM, z_at_value
+# from astropy.cosmology import FlatLambdaCDM, Flatw0waCDM, LambdaCDM, z_at_value
+from astropy.cosmology import LambdaCDM, z_at_value
 from sklearn.neighbors import KernelDensity
 import dill as pickle
 pl.ioff()
@@ -124,8 +125,7 @@ if __name__ == '__main__':
     with open(outfile2, 'wb') as dill_file:
         pickle.dump(fit_func_low, dill_file)
 
-    
-    
+
     for_fit_z = np.zeros((nboot*n_bins_z, 2))
     for i in range(n_bins_z):
         for n in range(nboot):
