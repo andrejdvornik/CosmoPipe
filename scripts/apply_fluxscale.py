@@ -24,7 +24,7 @@ if __name__ == '__main__':
     data = data[(data['MASK'] == 0) & (data['MAG_ABS_r'] < -10) & (data['MASS_MED'] != -99)]
     
     fluxscale = (data['MAG_GAAP_r'] - data['MAG_AUTO_CALIB']) / 2.5
-    stellar_mass_corrected = data['MASS_BEST'] + fluxscale - 2.0*np.log10(h0/0.7)
+    stellar_mass_corrected = data['MASS_BEST'] + fluxscale #- 2.0*np.log10(h0/0.7)
     
     
     data_out = np.copy(data)

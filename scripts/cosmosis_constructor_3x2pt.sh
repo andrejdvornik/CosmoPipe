@@ -1009,8 +1009,8 @@ cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_con
 file = %(CSL_PATH)s/boltzmann/camb/camb_interface.py
 do_reionization = F
 mode = power
-nonlinear = pk
-halofit_version = mead2020_feedback
+nonlinear = none ; pk
+; halofit_version = mead2020_feedback
 neutrino_hierarchy = normal
 kmax = 20.0
 kmax_extrapolate=1000.0
@@ -1206,8 +1206,8 @@ do
 			hod_section_name = hod
 			values_name = hod_parameters
 			nobs = 200
-			obs_min =${obs_mins}
-			obs_max =${obs_maxs}
+			log10_obs_min =${obs_mins}
+			log10_obs_max =${obs_maxs}
 			zmin =${z_mins}
 			zmax =${z_maxs}
 			nz = %(nz_def)s
@@ -1266,8 +1266,8 @@ do
 			hod_section_name = hod_smf
 			values_name = hod_parameters
 			nobs = 200
-			obs_min = ${obs_mins}
-			obs_max = ${obs_maxs}
+			log10_obs_min = ${obs_mins}
+			log10_obs_max = ${obs_maxs}
 			zmin = ${z_mins}
 			zmax = ${z_maxs}
 			nz = %(nz_def)s
@@ -1363,8 +1363,8 @@ do
 			output_section_name = one_point
 			suffixes = ${suffix}
 			sample = nz_obs
-			obs_min =${obs_mins}
-			obs_max =${obs_maxs}
+			log10_obs_min =${obs_mins}
+			log10_obs_max =${obs_maxs}
 			n_obs = ${NSMFBINS}
 			edges = True
 			
