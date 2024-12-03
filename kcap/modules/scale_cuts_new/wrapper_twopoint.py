@@ -1,9 +1,9 @@
 
 
     ##############################
-    ##  wrapper_twopoint.py	##
-    ##  Chieh-An Lin		##
-    ##  Version 2020.02.21	##
+    ##  wrapper_twopoint.py    ##
+    ##  Chieh-An Lin        ##
+    ##  Version 2020.02.21    ##
     ##############################
 
 
@@ -28,7 +28,7 @@ class LabelConvention:
     This class deals with the conversion.
     """
     
-    def __init__(self, w='wtheta', gamma_t='gammat', gamma_x='gammax', xi_p='xip', xi_m='xim', 
+    def __init__(self, w='wtheta', gamma_t='gammat', gamma_x='gammax', xi_p='xip', xi_m='xim',
                   P_nn='Pnn', P_ne_E='PneE', P_ne_B='PneB', P_ee_E='PeeE', P_ee_B='PeeB',
                   E_n='En', B_n='Bn', Psi_gm='Psi_gm', Psi_gg='Psi_gg', onept='1pt'):
     
@@ -87,15 +87,15 @@ class LabelConvention:
         self.kernelTypeDict = clt.OrderedDict()
         ## Don't touch the order of the assertion
         self.kernelTypeDict[w]       = [self.lens,   self.lens,   tpType1, tpType1, 'arcmin']
-        self.kernelTypeDict[gamma_t] = [self.lens,   self.source, tpType1, tpType2, 'arcmin'] 
-        self.kernelTypeDict[gamma_x] = [self.lens,   self.source, tpType1, tpType3, 'arcmin'] 
-        self.kernelTypeDict[xi_p]    = [self.source, self.source, tpType2, tpType2, 'arcmin']  
+        self.kernelTypeDict[gamma_t] = [self.lens,   self.source, tpType1, tpType2, 'arcmin']
+        self.kernelTypeDict[gamma_x] = [self.lens,   self.source, tpType1, tpType3, 'arcmin']
+        self.kernelTypeDict[xi_p]    = [self.source, self.source, tpType2, tpType2, 'arcmin']
         self.kernelTypeDict[xi_m]    = [self.source, self.source, tpType3, tpType3, 'arcmin']
-        self.kernelTypeDict[P_nn]    = [self.lens,   self.lens,   tpType4, tpType4, None] 
-        self.kernelTypeDict[P_ne_E]  = [self.lens,   self.source, tpType4, tpType5, None] 
-        self.kernelTypeDict[P_ne_B]  = [self.lens,   self.source, tpType4, tpType6, None] 
-        self.kernelTypeDict[P_ee_E]  = [self.source, self.source, tpType5, tpType5, None] 
-        self.kernelTypeDict[P_ee_B]  = [self.source, self.source, tpType6, tpType6, None] 
+        self.kernelTypeDict[P_nn]    = [self.lens,   self.lens,   tpType4, tpType4, None]
+        self.kernelTypeDict[P_ne_E]  = [self.lens,   self.source, tpType4, tpType5, None]
+        self.kernelTypeDict[P_ne_B]  = [self.lens,   self.source, tpType4, tpType6, None]
+        self.kernelTypeDict[P_ee_E]  = [self.source, self.source, tpType5, tpType5, None]
+        self.kernelTypeDict[P_ee_B]  = [self.source, self.source, tpType6, tpType6, None]
         self.kernelTypeDict[E_n]     = [self.source, self.source, tpType5, tpType5, None]
         self.kernelTypeDict[B_n]     = [self.source, self.source, tpType6, tpType6, None]
         self.kernelTypeDict[Psi_gm]  = [self.lens,   self.source, tpType4, tpType5, None]

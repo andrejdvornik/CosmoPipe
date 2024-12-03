@@ -95,7 +95,7 @@ def setup(options):
     TP_data.keepScales(statsTag_tomoInd1_tomoInd2__angMin_angMax_dict=scArgs[3], statsTag__angMin_angMax_dict=scArgs[4])
     #print('  Did scale cuts to data & cov')
     
-    ## Don't put this before scale cuts, because TP_data.choose_data_sets does 
+    ## Don't put this before scale cuts, because TP_data.choose_data_sets does
     ## not modify the covmat_info attribute but only the covmat attribute.
     ## While one can cut a correctly cut covariance, the scale cuts on this
     ## covariance, which relies on covmat_info, can result in errors.

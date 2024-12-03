@@ -44,11 +44,13 @@ if __name__ == '__main__':
     data = data[(data['MASK'] == 0) & (data['MAG_ABS_r'] < -10) & (data['MASS_MED'] != -99)]
     
     fluxscale = (data['MAG_GAAP_r'] - data['MAG_AUTO_CALIB']) / 2.5
+
     # We want stellar masses in units of M_sun/h^2 to remove the h dependence
     # data['MASS_BEST'] is in units of M_sun. To make it in units of h^2 we multiply M* by h^2
     # log10(M/M_sun h^2) = log10 (M/M_sun) + 2*log10(h)
     stellar_mass_corrected = data['MASS_BEST'] + fluxscale + 2.0*np.log10(h0)
     # stellar_mass_corrected = data['MASS_BEST'] + fluxscale - 2.0*np.log10(h0/0.7)
+
     
     
     data_out = np.copy(data)
