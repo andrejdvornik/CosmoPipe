@@ -11,24 +11,29 @@
 # ----------------------------------------------------------------
 
 import treecorr
-import sys
 import numpy as np
-import astropy.io.fits as fits
 import argparse
+
+# import sys
+# import astropy.io.fits as fits
+
+
+# TODO: Either change the name of this file to calc_gt_wt_w_treecorr.py 
+# or move the clustering part to a new file. The latter is preferable as other files only do 
+# one type of correlation using treecorr.
 
 ## Calculate shape noise given noisy & noise-free shear
 def subtractNoise(g_1, g_2, eps_1, eps_2):
     g   = g_1 + 1j * g_2
     g_c = g_1 - 1j * g_2
     eps = eps_1 + 1j * eps_2
-    
     e = (eps - g) / (1.0 - g_c*eps)
     e = np.array([e.real, e.imag])
     return e
 
 if __name__ == '__main__':
     # Read in user input to set the nbins, theta_min, theta_max, lin_not_log, lenscat, rancat, sourcecat, outfilename, weighted
-        # Read in user input to set the nbins, theta_min, theta_max, lin_not_log, fitscat1, fitscat2, outfilename, weighted
+    # Read in user input to set the nbins, theta_min, theta_max, lin_not_log, fitscat1, fitscat2, outfilename, weighted
     # Specify the input arguments
     parser = argparse.ArgumentParser(description='Compute galaxy-galaxy lensing and or/clustering from user inputs')
     parser.add_argument('-n', '--nbins', dest="nbins",type=int,
@@ -156,20 +161,22 @@ if __name__ == '__main__':
 
     if center_file:
 
-        lenscat = treecorr.Catalog(args.lenscat, ra_col=lensraname, dec_col=lensdecname, ra_units='deg', dec_units='deg', w_col=lenswname, patch_centers=center_file)
-        rancat = treecorr.Catalog(args.randcat, ra_col=randraname, dec_col=randdecname, ra_units='deg', dec_units='deg', patch_centers=lenscat.patch_centers)
+        lenscat = treecorr.Catalog(args.lenscat, ra_col=lensraname, dec_col=lensdecname, ra_units='deg', 
+                                   dec_units='deg', w_col=lenswname, patch_centers=center_file)
+        rancat = treecorr.Catalog(args.randcat, ra_col=randraname, dec_col=randdecname, ra_units='deg', 
+                                  dec_units='deg', patch_centers=lenscat.patch_centers)
         if lensing:
             sourcecat = treecorr.Catalog(args.sourcecat, ra_col=sourceraname, dec_col=sourcedecname,
-                                    ra_units='deg', dec_units='deg', g1_col=e1name, g2_col=e2name, w_col=sourcewname, patch_centers=lenscat.patch_centers)
+                                    ra_units='deg', dec_units='deg', g1_col=e1name, g2_col=e2name, 
+                                    w_col=sourcewname, patch_centers=lenscat.patch_centers)
     else:
-        lenscat = treecorr.Catalog(args.lenscat, ra_col=lensraname, dec_col=lensdecname, ra_units='deg', dec_units='deg', w_col=lenswname)
-        rancat = treecorr.Catalog(args.randcat, ra_col=randraname, dec_col=randdecname, ra_units='deg', dec_units='deg')
+        lenscat = treecorr.Catalog(args.lenscat, ra_col=lensraname, dec_col=lensdecname, 
+                                   ra_units='deg', dec_units='deg', w_col=lenswname)
+        rancat = treecorr.Catalog(args.randcat, ra_col=randraname, dec_col=randdecname, 
+                                  ra_units='deg', dec_units='deg')
         if lensing:
             sourcecat = treecorr.Catalog(args.sourcecat, ra_col=sourceraname, dec_col=sourcedecname,
                                     ra_units='deg', dec_units='deg', g1_col=e1name, g2_col=e2name, w_col=sourcewname)
-    
-        
-    
 
     ## Set bin_slop
     #if nbins > 100: ## Fine-binning
@@ -178,7 +185,7 @@ if __name__ == '__main__':
     #else: ## Broad bins
     #    inbinslop_NN = 0.03
     #    inbinslop_NG = 0.05
-        
+    
     # Define the binning based on command line input
     if binning == 'lin':
         config = {'min_sep': theta_min,
@@ -308,7 +315,6 @@ if __name__ == '__main__':
                     np.nan_to_num([ ls.rnom,ls.meanr, ls.meanlogr, gamma_t, gamma_x, np.sqrt(ls.varxi), ls.weight,
                     ls.xi, ls.xi_im, rs.xi, rs.xi_im, np.sqrt(rs.varxi), ls.npairs], nan=0.0, posinf=0.0, neginf=0.0))
             
-            
     if clustering:
         # We will use the Landy-Szalay estimator:
         # It is given by
@@ -317,13 +323,14 @@ if __name__ == '__main__':
         # Treecorr does this for us automatically, provided we pass the required pair counts
         wt, varxi = dd.calculateXi(rr=rr,dr=dr,rd=rd)
         
-        # TO-DO: ADD WEIGHTED PAIR COUNT CALCULATION HERE!
+        # TODO: ADD WEIGHTED PAIR COUNT CALCULATION HERE!
         
         #Use treecorr to write out the output file and praise-be once more for Jarvis and his well documented code
         with treecorr.util.make_writer(outfile, precision=12) as writer:
             writer.write(
                 ['r_nom','meanr','meanlogr','wtheta','sigma','weight', 'nocor_wtheta', 'npairs_weighted'],
-                np.nan_to_num([ dd.rnom, dd.meanr, dd.meanlogr, wt, np.sqrt(dd.varxi), dd.weight, dd.xi, dd.npairs], nan=0.0, posinf=0.0, neginf=0.0))
+                np.nan_to_num([ dd.rnom, dd.meanr, dd.meanlogr, wt, np.sqrt(dd.varxi), dd.weight, dd.xi, dd.npairs],
+                               nan=0.0, posinf=0.0, neginf=0.0))
                 
         if center_file is not None:
             cov_wt = dd.estimate_cov(method='jackknife')
