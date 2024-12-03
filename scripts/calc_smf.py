@@ -6,14 +6,7 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as pl
 import astropy.io.fits as fits
-# import astropy.units as u
-# from astropy.cosmology import FlatLambdaCDM, Flatw0waCDM, LambdaCDM, z_at_value
 from astropy.cosmology import LambdaCDM
-# from astropy.stats import sigma_clip
-# import scipy.stats as ss
-# from scipy.signal import find_peaks
-# from scipy.stats import gaussian_kde
-# from sklearn.neighbors import KernelDensity
 import dill as pickle
 pl.ioff()
 
@@ -49,17 +42,26 @@ if __name__ == '__main__':
     frac = (area_kids/total_sky_area)
     f_tomo = args.f_tomo
     
-    # TODO: Check the units for masses
-    # From LePhare's documentation: https://www.cfht.hawaii.edu/~arnouts/LEPHARE/DOWNLOAD/lephare_doc.pdf
-    # Mass is the stellar mass (M_sun)
     """
+    From LePhare's documentation: 
+    https://www.cfht.hawaii.edu/~arnouts/LEPHARE/DOWNLOAD/lephare_doc.pdf
+    Mass is the stellar mass (M_sun)
     From Blicki+2021:
     We used a standard concordance cosmology (Ωm = 0.3, ΩΛ = 0.7, and H0 = 70 km s^-1 Mpc^-1),
     a Chabrier (2003) initial mass function, the Calzetti et al. (1994) dust-extinction law, 
     Bruzual & Charlot (2003) stellar population synthesis models, 
     and exponentially declining star formation histories. 
-    The input photometry to LePhare was extinction corrected using the Schlegel et al. (1998) maps 
-    with the Schlafly & Finkbeiner (2011) coefficients, as described in Kuijken et al. (2019).
+    The input photometry to LePhare was extinction corrected using the Schlegel et al. (1998) 
+    maps with the Schlafly & Finkbeiner (2011) coefficients, as described in Kuijken et al. (2019).
+    On average, the KiDS-Bright stellar mass estimates are smaller than those of GAMA 
+    by ∆ log10 M_star ≡log10 M_KiDS_star - log10 M_GAMA_star = -0.09±0.18 dex (median and SMAD).
+    Only 9% this scatter is due to the photo_z errors.
+    Such an overall bias between the former and the latter is expected: 
+    while our flux-scale correction is meant to compensate
+    for the flux missed by the GAaP measurements with respect to
+    AUTO magnitudes, an analogous correction in GAMA serves to
+    account for a flux that falls beyond the finite SDSS-based AUTO
+    aperture used for the SEDs. 
     """
     
     nbins = args.nbins
@@ -126,7 +128,7 @@ if __name__ == '__main__':
     z_min = np.maximum(0.001, min_z)
     # max_z is given as an input, this is the maximum redshift in the stellar mass-redshift bin.
     z_max_bin = max_z * np.ones_like(stellar_mass_in)
-    # This is the function that was imported. Finds z_max for each stellar mass?
+    # This is the function that was imported. Finds z_max given a stellar mass?
     z_max = fit_func_inv(stellar_mass_in)
     # Set z_max_i to which ever is smaller:
     # the maximum redshift where it can be visible given the flux limit, 
@@ -134,9 +136,8 @@ if __name__ == '__main__':
     z_max_i = np.minimum(z_max_bin, z_max)
     
     # Comoving distance at z_min and z_max_i in units of Mpc h
-    # z_max_i should be the maximum redshift at which galaxy i is visible.
-    # dc_min and dc_max will depend on cosmology.
-    # TODO: What is their sensitivity to cosmology?
+    # z_max_i is the maximum redshift at which galaxy i is visible in the sample
+    # dc_min and dc_max depend on cosmology. A correction needs to be applied in the analysis
     dc_min = cosmo_model.comoving_distance(z_min).to('Mpc').value * h0
     dc_max = cosmo_model.comoving_distance(z_max_i).to('Mpc').value * h0
 
@@ -144,8 +145,8 @@ if __name__ == '__main__':
     # V_max_i is the comoving volume over which galaxy i would be visible in the sample. 
     V_max = 4.0*np.pi/3.0 * frac * (dc_max**3.0 - dc_min**3.0)
     
-    M_bins = np.linspace(Mmin_smf, Mmax_smf, nbins+1, endpoint=True, retstep=True)
-    step = M_bins[1]
+    M_bins = np.linspace(Mmin_smf, Mmax_smf, nbins+1, endpoint=True, retdelta_log10_M=True)
+    delta_log10_M = M_bins[1]
     M_bins = M_bins[0]
     
     phi_bins = np.zeros(nbins)
@@ -153,8 +154,10 @@ if __name__ == '__main__':
     M_center = (M_bins[1:] + M_bins[:-1])/2.0
     
     # This is the same as doing a weighted histogram, where the weights are 1/V_max
-    # If the sample is volume limited then all galaxies that exist in our stellar mass-redshift bins
-    # are observable.
+    # In principle we can have an extra weight for the galaxies 
+    # that accounts for the completeness of the sample: Sum w/V_max
+    # If the sample is volume limited then all galaxies that exist in 
+    # our stellar mass-redshift bins are observable.
     for i in range(nbins):
         index = ((stellar_mass_in > M_bins[i]) & (M_bins[i+1] > stellar_mass_in))
         phi_bins[i] = np.sum(1.0/V_max[index])
@@ -163,8 +166,13 @@ if __name__ == '__main__':
     
     phi_bins = np.abs(phi_bins)
     
-    # TODO: To help with the integration I think we want to output the min and max mass and also report the units
-    data_out = np.array([10.0**M_center, phi_bins/step, np.ones_like(phi_bins)]).T
+    # TODO: To help with the integration 
+    # I think we want to output the min and max mass and also report the units
+
+    # Φ(m∗) ∆m∗ = sum 1.0/V_max (e.g. eq 1 of 0901.0706)
+    # Φ(m∗) m* dm*/m*  = Φ(m∗) m* dln m*= Φ(m∗) m* ln(10) dlog10_m* = sum 1.0/V_max
+    # Φ(m∗) m* ln(10)  = 1/dlog10_m*  sum 1.0/V_max
+    data_out = np.array([10.0**M_center, phi_bins/delta_log10_M, np.ones_like(phi_bins)]).T
     vmax_out = np.array([M_center, vmax_out]).T
     
     np.savetxt(f"{out_path}/smf_vec/{outname}_smf.txt", np.nan_to_num(data_out))
@@ -193,11 +201,11 @@ if __name__ == '__main__':
         fig, ax = pl.subplots(1, 1, figsize=(8, 8))
         ax.errorbar(baldry[:,0] - 2.0*np.log10(h0/0.7), baldry[:,2]*0.001, yerr=baldry[:,3]*0.001, ls='', ms=3, marker='o', label='Baldry et al. 2012')
         ax.errorbar(wright[:,0] - 2.0*np.log10(h0/0.7), wright[:,4], yerr=[wright[:,5], wright[:,6]], ls='', ms=3, marker='o', label='Wright et al. 2017')
-        #ax.errorbar(M_center, phi_bins/step, yerr=0, ls='', ms=3, marker='o', label='KiDS bright')
+        #ax.errorbar(M_center, phi_bins/delta_log10_M, yerr=0, ls='', ms=3, marker='o', label='KiDS bright')
         #ax.errorbar(np.log10(kids[:,0]) + 2.0*np.log10(1.0/0.7), kids[:,1] * 0.7**3.0, yerr=0, ls='', ms=3, marker='o', label='KiDS bright')
-        #ax.errorbar(M_center + 2.0*np.log10(h0/0.7), phi_bins/step, yerr=0, ls='', ms=3, marker='o', label='This sample')
+        #ax.errorbar(M_center + 2.0*np.log10(h0/0.7), phi_bins/delta_log10_M, yerr=0, ls='', ms=3, marker='o', label='This sample')
         #ax.errorbar(np.log10(kids[:,0]), kids[:,1], yerr=0, ls='', ms=3, marker='o', label='KiDS bright')
-        ax.errorbar(M_center, phi_bins/step, yerr=0, ls='', ms=3, marker='o', label='This sample')
+        ax.errorbar(M_center, phi_bins/delta_log10_M, yerr=0, ls='', ms=3, marker='o', label='This sample')
         #ax.plot(wright[:,0], phi_angus_og, ls='--', color='red')
         ax.set_yscale('log')
         ax.set_ylim([1e-8, 1e-1])
