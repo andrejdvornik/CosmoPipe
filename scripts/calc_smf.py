@@ -137,7 +137,6 @@ if __name__ == '__main__':
     
     # Comoving distance at z_min and z_max_i in units of Mpc h
     # z_max_i is the maximum redshift at which galaxy i is visible in the sample
-    # dc_min and dc_max depend on cosmology. A correction needs to be applied in the analysis
     dc_min = cosmo_model.comoving_distance(z_min).to('Mpc').value * h0
     dc_max = cosmo_model.comoving_distance(z_max_i).to('Mpc').value * h0
 
@@ -145,7 +144,7 @@ if __name__ == '__main__':
     # V_max_i is the comoving volume over which galaxy i would be visible in the sample. 
     V_max = 4.0*np.pi/3.0 * frac * (dc_max**3.0 - dc_min**3.0)
     
-    M_bins = np.linspace(Mmin_smf, Mmax_smf, nbins+1, endpoint=True, retdelta_log10_M=True)
+    M_bins = np.linspace(Mmin_smf, Mmax_smf, nbins+1, endpoint=True, retstep=True)
     delta_log10_M = M_bins[1]
     M_bins = M_bins[0]
     
@@ -165,9 +164,6 @@ if __name__ == '__main__':
         vmax_out[i] = np.nanmean(V_max[index])
     
     phi_bins = np.abs(phi_bins)
-    
-    # TODO: To help with the integration 
-    # I think we want to output the min and max mass and also report the units
 
     # Φ(m∗) ∆m∗ = sum 1.0/V_max (e.g. eq 1 of 0901.0706)
     # Φ(m∗) m* dm*/m*  = Φ(m∗) m* dln m*= Φ(m∗) m* ln(10) dlog10_m* = sum 1.0/V_max
