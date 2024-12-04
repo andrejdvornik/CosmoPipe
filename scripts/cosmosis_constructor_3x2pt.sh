@@ -1215,6 +1215,7 @@ do
 			log_mass_max = %(logmassmax_def)s
 			nmass = %(nmass_def)s
 			observable_mode = obs_z
+			observable_h_unit = 1/h^2
 			
 			EOF
 			;; #}}}
@@ -1275,6 +1276,7 @@ do
 			log_mass_max = %(logmassmax_def)s
 			nmass = %(nmass_def)s
 			observable_mode = obs_z
+			observable_h_unit = 1/h^2
 			
 			EOF
 			;; #}}}
@@ -1295,6 +1297,7 @@ do
 			log_mass_max = %(logmassmax_def)s
 			nmass = %(nmass_def)s
 			observable_mode = obs_onebin
+			observable_h_unit = 1/h^2
 			
 			EOF
 			;; #}}}
@@ -1315,6 +1318,7 @@ do
 			log_mass_max = %(logmassmax_def)s
 			nmass = %(nmass_def)s
 			observable_mode = obs_onebin
+			observable_h_unit = 1/h^2
 			
 			EOF
 			;; #}}}
