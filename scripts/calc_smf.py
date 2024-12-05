@@ -10,20 +10,29 @@ from astropy.cosmology import LambdaCDM
 import dill as pickle
 pl.ioff()
 
-
+"""
+This code makes the SMF for defined stellar mass-redshift bins.
+It also saves the number of galaxies in finely binned stellar mass bins. 
+This is used to predict the SMF from theory. 
+"""
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--h0', type=float, help='h0 from LePhare or other stellar mass code estimation routine', nargs='?', default=1.0, const=1.0)
-    parser.add_argument('--omegam', type=float, help='Om_m from LePhare or other stellar mass code estimation routine', nargs='?', default=0.3, const=0.3)
-    parser.add_argument('--omegav', type=float, help='Om_v from LePhare or other stellar mass code estimation routine', nargs='?', default=0.7, const=0.7)
+    parser.add_argument('--h0', type=float, help='h0 from LePhare or other stellar mass code estimation routine', 
+                        nargs='?', default=1.0, const=1.0)
+    parser.add_argument('--omegam', type=float, help='Om_m from LePhare or other stellar mass code estimation routine', 
+                        nargs='?', default=0.3, const=0.3)
+    parser.add_argument('--omegav', type=float, help='Om_v from LePhare or other stellar mass code estimation routine', 
+                        nargs='?', default=0.7, const=0.7)
     parser.add_argument('--area', type=float, help='Effective area of the survey/catalogue', nargs='?', default=777.4, const=777.4)
     parser.add_argument('--min_mass', type=float, help='Minimum stellar mass bin limit', nargs='?', default=7.0, const=7.0)
     parser.add_argument('--max_mass', type=float, help='Maximum stellar mass bin limit', nargs='?', default=12.5, const=12.5)
     parser.add_argument('--nbins', type=int, help='Number of stellar mass bins', nargs='?', default=30, const=30)
-    parser.add_argument('--min_z', type=float, help='Minimum redshift of the bin if not using computed stellar mass limits', nargs='?', default=0.001, const=0.001)
-    parser.add_argument('--max_z', type=float, help='Maximum redshift of the bin if not using computed stellar mass limits', nargs='?', default=1.0, const=1.0)
+    parser.add_argument('--min_z', type=float, help='Minimum redshift of the bin if not using computed stellar mass limits', 
+                        nargs='?', default=0.001, const=0.001)
+    parser.add_argument('--max_z', type=float, help='Maximum redshift of the bin if not using computed stellar mass limits', 
+                        nargs='?', default=1.0, const=1.0)
     parser.add_argument('--stellar_mass_column', type=str, help='Stellar mass column', default='stellar_mass', required=True)
     parser.add_argument('--z_column', type=str, help='Redshift column', default='z_ANNZ_KV', required=True)
     parser.add_argument('--path', type=str, help='Path to npy files required for mass limit', required=True)
@@ -32,6 +41,9 @@ if __name__ == '__main__':
     parser.add_argument('--output_path', type=str, help='Output path', required=True)
     parser.add_argument('--output_name', type=str, help='Output name', required=True)
     parser.add_argument('--f_tomo', type=float, help='Fraction of galaxies in this bin', required=True)
+    parser.add_argument('--nmbins', type=int, default=10000, nargs='?', required=False,
+                        help='Number of mass bins for estimating the number of galaxies in finely binned stellar mass bins. The default value is 10000.')
+
     args = parser.parse_args()
 
     compare_to_gama = args.compare_to_gama
@@ -69,6 +81,7 @@ if __name__ == '__main__':
     Mmax_smf = args.max_mass
     min_z = args.min_z
     max_z = args.max_z
+    nmbins = args.nmbins
     
     stellar_mass_column = args.stellar_mass_column
     z_column = args.z_column
@@ -179,7 +192,18 @@ if __name__ == '__main__':
     np.savetxt(f"{out_path}/vmax/{outname}_vmax.txt", np.nan_to_num(vmax_out))
     np.savetxt(f"{out_path}/f_tomo/{outname}_vmax.txt", np.array([f_tomo]))
     
+    # Find the number of galaxies in nmbins stellar mass bins
+    cond_mass = (stellar_mass_in<=Mmax_smf) & (stellar_mass_in>Mmin_smf)
+    # TODO: compare the SMF with and without redshift binning
+    # cond_z    = (z_in<=zmax_list[-1]) & (z_in>zmin_list[0])
+    # masses = stellar_mass_in[cond_mass & cond_z]
+    masses = stellar_mass_in[cond_mass]
+    nM, Mbins = np.histogram(masses, bins=nmbins,range=(Mmin_smf,Mmax_smf), density=True, weights=None)
+    OBS_MID = Mbins[:-1]+(Mbins[1:]-Mbins[:-1])/2.
+    np.savetxt(f"{out_path}/smf_vec/{outname}_nMStar.txt", np.array([OBS_MID,nM]).T,
+               header='log10 Stellar Mass [M_sun/h^2] Number of galaxies in log10 bin')
     
+
     if compare_to_gama:
         baldry = np.genfromtxt('/net/home/fohlen13/dvornik/smf_for_cosmo/gsmf-B12.txt')
         wright = np.genfromtxt('/net/home/fohlen13/dvornik/smf_for_cosmo/GAMAII_BBD_GSMFs.csv', delimiter=',')
