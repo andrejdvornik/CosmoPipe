@@ -146,7 +146,7 @@ fi
 if [[ .*\ $MODES\ .* =~ " OBS " ]]
 then
   stats="${stats} 1pt"
-  twopt_modules="${twopt_modules} predict_observable"
+  twopt_modules="${twopt_modules} predict_observable correct_cosmo_observable"
 fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 use_stats = ${stats}
@@ -304,7 +304,7 @@ fi
 if [[ .*\ $MODES\ .* =~ " OBS " ]]
 then
   stats="${stats} 1pt"
-  twopt_modules="${twopt_modules} predict_observable"
+  twopt_modules="${twopt_modules} predict_observable correct_cosmo_observable"
 fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 use_stats = ${stats}
@@ -884,7 +884,7 @@ if [  "@BV:COSMOSIS_PIPELINE@" == "default" ]
 then
     iamodel_pipeline="hod_ia_red hod_ia_blue alignment_red alignment_blue radial_satellite_alignment_red radial_satellite_alignment_blue pk_ia_red pk_ia_blue add_and_upsample_ia projection add_intrinsic"
     
-    COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits consistency camb extrapolate halo_model_ingredients hod hod_smf bnl pk add_and_upsample ${iamodel_pipeline} source_photoz_bias ${twopt_modules} bnl_delete"
+    COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits consistency camb extrapolate halo_model_ingredients_halomod hod hod_smf bnl pk add_and_upsample ${iamodel_pipeline} source_photoz_bias ${twopt_modules} bnl_delete"
 else
 	COSMOSIS_PIPELINE="@BV:COSMOSIS_PIPELINE@"
 fi
@@ -1335,26 +1335,18 @@ do
 					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
 					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
 					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
-					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
-					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
 					obs_mins="${obs_mins} ${x_lo}"
 					obs_maxs="${obs_maxs} ${x_hi}"
-					z_mins="${z_mins} ${y_lo}"
-					z_maxs="${z_maxs} ${y_hi}"
 				done
 			elif [ "${slice}" == "z" ]
 			then
 				for i in `seq ${NSMFLENSBINS}`
 				do
 					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
-					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
-					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
 					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
 					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
 					obs_mins="${obs_mins} ${y_lo}"
 					obs_maxs="${obs_maxs} ${y_hi}"
-					z_mins="${z_mins} ${x_lo}"
-					z_maxs="${z_maxs} ${x_hi}"
 				done
 			else
 				_message "Got wrong or no information about slicing of the lens sample.\n"
@@ -1371,6 +1363,49 @@ do
 			log10_obs_max =${obs_maxs}
 			n_obs = ${NSMFBINS}
 			edges = True
+			
+			EOF
+			;; #}}}
+	"correct_cosmo_observable") #{{{
+			z_mins=""
+			z_maxs=""
+			file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB1.txt"
+			slice=`grep '^slice_in' ${file1} | awk '{printf $2}'`
+			if [ "${slice}" == "obs" ]
+			then
+				for i in `seq ${NSMFLENSBINS}`
+				do
+					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
+					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
+					z_mins="${z_mins} ${y_lo}"
+					z_maxs="${z_maxs} ${y_hi}"
+				done
+			elif [ "${slice}" == "z" ]
+			then
+				for i in `seq ${NSMFLENSBINS}`
+				do
+					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
+					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
+					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+					z_mins="${z_mins} ${x_lo}"
+					z_maxs="${z_maxs} ${x_hi}"
+				done
+			else
+				_message "Got wrong or no information about slicing of the lens sample.\n"
+				#exit 1
+			fi
+			h0_in=`echo "@BV:H0_IN@" | awk '{printf "%d", 100*$1}'`
+			omega_m="@BV:OMEGAM_IN@"
+			omega_v ="@BV:OMEGAV_IN@"
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(HMPATH)s/correct_cosmo_observable.py
+			section_name = one_point
+			zmin =${z_mins}
+			zmax =${z_maxs}
+			astropy_cosmology_class = LambdaCDM
+			cosmo_kwargs = "{'H0':${h0_in}, 'Om0':${omega_m}, 'Ode0':${omega_v}}"
 			
 			EOF
 			;; #}}}
