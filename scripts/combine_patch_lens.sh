@@ -41,7 +41,7 @@ do
 
   #Combine the catalogues into one 
   _message "   > @BLU@Constructing patch-combined catalogue @DEF@${outname##*/}@DEF@ "
-  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/combine_patch_lens.py \
+  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/combine_cats_lens.py \
              --files ${inplist} \
 			 --output_file ${outname} 2>&1
   _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"

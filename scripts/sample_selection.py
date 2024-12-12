@@ -35,7 +35,7 @@ def create_nz(x_array, z_array, sigma, zdep):
         else:
             rv = norm(loc=z, scale=sigma)
         nz += rv.pdf(x_array)
-        nz = nz / sum(nz) # normalise
+    nz = nz / np.nansum(nz) # normalise
     return nz
 
 if __name__ == '__main__':
@@ -111,24 +111,33 @@ if __name__ == '__main__':
     z_sigma = args.z_sigma
     nz_step = args.nz_step
     
-    
-    file_in = fits.open(args.file, memmap=True)
-    data = file_in[1].data
-    
-    stellar_mass_in = data[stellar_mass_column]
-    z_in = data[z_column]
-    
-    details = {}
-
     with open(os.path.join(path, 'mass_lim.npy'), 'rb') as dill_file:
         fit_func_inv = pickle.load(dill_file)
     with open(os.path.join(path, 'mass_lim_low.npy'), 'rb') as dill_file:
         fit_func_low = pickle.load(dill_file)
     
+    file_in = fits.open(args.file, memmap=True)
+    data = file_in[1].data
+    
+    if plot:
+        x = np.linspace(6.0, 13.0, 100)
+        pl.rc('text',usetex=True)
+        fig, ax = pl.subplots(1, 1, figsize=(6, 6))
+        ax.set_ylim([6, 12])
+        ax.set_xlim([0, 0.55])
+        ax.hexbin(data[z_column], data[stellar_mass_column], gridsize=100, cmap='viridis', bins='log', rasterized=True, extent=(0, 0.7, 6, 12))
+        ax.plot(fit_func_inv(x), x, label=r'$M_{\star}\, \mathrm{limit}$')
+    
+    #idx_in = np.where(data[z_column] <= fit_func_inv(data[stellar_mass_column]))
+    #data = data[idx_in].copy()
+    
+    stellar_mass_in = data[stellar_mass_column]
+    z_in = data[z_column]
+    
+    details = {}
     
     if slice_in_m and slice_in_z:
         raise ValueError('Primary slicing in redshift and stellar mass is not allowed, select one or another')
-        
         
     if slice_in_m:
         x_bins = m_bins
@@ -139,6 +148,11 @@ if __name__ == '__main__':
         y_data = z_in
         details['x_data_name'] = stellar_mass_column
         details['y_data_name'] = z_column
+        if stacked_nz:
+            centers = np.arange(0.0, 6.0, step=nz_step)
+            nz_tot = np.zeros_like(centers)
+            #nz = create_nz(centers, np.nan_to_num(y_data), z_sigma, z_dependent_error)
+            #np.savetxt(f'{outpath}/nz_tot.txt', np.column_stack([centers, nz]), header='binstart, density')
     if slice_in_z:
         x_bins = z_bins
         y_bins_in = m_bins
@@ -150,15 +164,11 @@ if __name__ == '__main__':
         y_data = stellar_mass_in
         details['x_data_name'] = z_column
         details['y_data_name'] = stellar_mass_column
-
-    if plot:
-        x = np.linspace(6.0, 13.0, 100)
-        pl.rc('text',usetex=True)
-        fig, ax = pl.subplots(1, 1, figsize=(6, 6))
-        ax.set_ylim([6, 12])
-        ax.set_xlim([0, 0.55])
-        ax.hexbin(z_in, stellar_mass_in, gridsize=100, cmap='viridis', bins='log', rasterized=True, extent=(0, 0.7, 6, 12))
-        ax.plot(fit_func_inv(x), x, label=r'$M_{\star}\, \mathrm{limit}$')
+        if stacked_nz:
+            centers = np.arange(0.0, 6.0, step=nz_step)
+            nz_tot = np.zeros_like(centers)
+            #nz = create_nz(centers, np.nan_to_num(x_data), z_sigma, z_dependent_error)
+            #np.savetxt(f'{outpath}/nz_tot.txt', np.column_stack([centers, nz]), header='binstart, density')
     
     if volume_limited:
         # First we refine the binning with the stellar mass/luminosity limits
@@ -173,6 +183,7 @@ if __name__ == '__main__':
             y_bins = np.unique(np.concatenate((y_bins_in, y_bins_extra)))
 
             #idx = np.where((stellar_mass_in <= x_bins[i+1]) & (stellar_mass_in > x_bins[i]) & (z_in <= z_high) & (z_in > z_low))
+            idx00 = np.where((x_data <= x_bins[-1]) & (x_data > x_bins[0]) & (y_data <= y_high) & (y_data > y_low))
             idx0 = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_high) & (y_data > y_low))
             
             if slice_in_m and percentile_split:
@@ -211,19 +222,21 @@ if __name__ == '__main__':
                     details['x_med'] = np.log10(np.median(10.0**x_data[idx]))
                     details['y_med'] = np.median(y_data[idx])
                     details['slice_in'] = 'obs'
-                    details['f_tomo'] = len(x_data[idx])/len(x_data)
+                    details['f_tomo'] = len(x_data[idx])/len(x_data[idx00])
                     if stacked_nz:
                         centers = np.arange(0.0, 6.0, step=nz_step)
                         nz = create_nz(centers, y_data[idx], z_sigma, z_dependent_error)
+                        nz_tot += nz
                         np.savetxt(f'{outname_nz}{count+1}.txt', np.column_stack([centers, nz]), header='binstart, density')
                 if slice_in_z:
                     details['x_med'] = np.median(x_data[idx])
                     details['y_med'] = np.log10(np.median(10.0**y_data[idx]))
                     details['slice_in'] = 'z'
-                    details['f_tomo'] = len(y_data[idx])/len(y_data)
+                    details['f_tomo'] = len(y_data[idx])/len(y_data[idx00])
                     if stacked_nz:
                         centers = np.arange(0.0, 6.0, step=nz_step)
                         nz = create_nz(centers, x_data[idx], z_sigma, z_dependent_error)
+                        nz_tot += nz
                         np.savetxt(f'{outname_nz}{count+1}.txt', np.column_stack([centers, nz]), header='binstart, density')
                 with open(f'{outpath}/stats_LB{count+1}.txt', 'w') as f:
                     for key, value in details.items():
@@ -261,8 +274,10 @@ if __name__ == '__main__':
         
             #idx = np.where((stellar_mass_in <= x_bins[i+1]) & (stellar_mass_in > x_bins[i]) & (z_in <= z_high) & (z_in > z_low))
             if slice_in_m:
+                idx00 = np.where((x_data <= x_bins[-1]) & (x_data > x_bins[0]) & (y_data <= y_high) & (y_data > y_low) & (y_data <= func_high(x_data)))
                 idx0 = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_high) & (y_data > y_low) & (y_data <= func_high(x_data)))
             if slice_in_z:
+                idx00 = np.where((x_data <= x_bins[-1]) & (x_data > x_bins[0]) & (y_data <= y_high) & (y_data > y_low) & (y_data > func_low(x_data)))
                 idx0 = np.where((x_data <= x_bins[i+1]) & (x_data > x_bins[i]) & (y_data <= y_high) & (y_data > y_low) & (y_data > func_low(x_data)))
             
             if slice_in_m and percentile_split:
@@ -311,19 +326,21 @@ if __name__ == '__main__':
                     details['x_med'] = np.log10(np.median(10.0**x_data[idx]))
                     details['y_med'] = np.median(y_data[idx])
                     details['slice_in'] = 'obs'
-                    details['f_tomo'] = len(x_data[idx])/len(x_data)
+                    details['f_tomo'] = len(x_data[idx])/len(x_data[idx00])
                     if stacked_nz:
                         centers = np.arange(0.0, 6.0, step=nz_step)
                         nz = create_nz(centers, y_data[idx], z_sigma, z_dependent_error)
+                        nz_tot += nz
                         np.savetxt(f'{outname_nz}{count+1}.txt', np.column_stack([centers, nz]), header='binstart, density')
                 if slice_in_z:
                     details['x_med'] = np.median(x_data[idx])
                     details['y_med'] = np.log10(np.median(10.0**y_data[idx]))
                     details['slice_in'] = 'z'
-                    details['f_tomo'] = len(y_data[idx])/len(y_data)
+                    details['f_tomo'] = len(y_data[idx])/len(y_data[idx00])
                     if stacked_nz:
                         centers = np.arange(0.0, 6.0, step=nz_step)
                         nz = create_nz(centers, x_data[idx], z_sigma, z_dependent_error)
+                        nz_tot += nz
                         np.savetxt(f'{outname_nz}{count+1}.txt', np.column_stack([centers, nz]), header='binstart, density')
                 with open(f'{outpath}/stats_LB{count+1}.txt', 'w') as f:
                     for key, value in details.items():
@@ -350,6 +367,8 @@ if __name__ == '__main__':
             
     with open(f'{outpath}/nbins.txt', 'w') as f:
         f.write(f'nbins\t{count}\n')
+    nz_tot /= np.nansum(nz_tot)
+    np.savetxt(f'{outpath}/nz_tot.txt', np.column_stack([centers, nz_tot]), header='binstart, density')
 
     if plot:
         ax.set_ylabel(r'$\log(M_{\star}/h^{-2}\,M_{\odot})$')

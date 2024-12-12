@@ -15,8 +15,8 @@ if __name__ == '__main__':
 	parser.add_argument('--output_file', type=str, help='Output catalogue', nargs='?', default=None, const=None)
 	args = parser.parse_args()
     
-	file_in1 = fits.open(args.file[0])
-	file_in2 = fits.open(args.file[1])
+	file_in1 = fits.open(args.files[0])
+	file_in2 = fits.open(args.files[1])
 	data1 = file_in1[1].data
 	data2 = file_in2[1].data
     

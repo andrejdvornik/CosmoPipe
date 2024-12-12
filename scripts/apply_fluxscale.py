@@ -41,7 +41,8 @@ if __name__ == '__main__':
     
     data = file_in[1].data
     
-    data = data[(data['MASK'] == 0) & (data['MAG_ABS_r'] < -10) & (data['MASS_MED'] != -99)]
+    data = data[(data['MASK'] == 0) & (data['MAG_ABS_r'] < -10) & (data['MASS_MED'] != -99) & (data['z_ANNZ_KV'] >= 0.0)
+                & (data['z_ANNZ_KV'] <= 6.0) & (data['MASS_BEST'] >= 2.0) & (data['MASS_BEST'] <= 20.0)]
     
     fluxscale = (data['MAG_GAAP_r'] - data['MAG_AUTO_CALIB']) / 2.5
 

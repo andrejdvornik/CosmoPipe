@@ -100,13 +100,22 @@ do
     ftomo=1
   fi
   
+  file_nz_tot=`echo ${meta_filelist} | sed 's/ /\n/g' | grep nz_tot || echo `
+  #Check that the file exists
+  if [ "${file_nz_tot}" != "" ]
+  then
+    nz_tot=${file_nz_tot}
+  else
+    nz_tot=
+  fi
+  
   #Define the output filename
   outname=${file_lens_one##*/}
   outname0=${outname%%${appendstr}*}
   outname1=${outname0}${appendstr}
 
   #Check if the output file exists
-  if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/${outname1}_smf.txt ]
+  if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_vec/${outname1}_smf.txt ]
   then
     _message "    -> @BLU@Removing previous @RED@Bin $LBIN@BLU@ stellar mass function function@DEF@"
     rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_vec/${outname1}_smf.txt
@@ -134,6 +143,7 @@ do
   _message "    -> @BLU@Bin $LBIN @DEF@"
   MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
     @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_smf.py \
+    --estimator extended \
     --nbins "@BV:NSMFBINS@" --min_mass "@BV:MINMASS@" --max_mass "@BV:MAXMASS@" \
     --h0 "@BV:H0_IN@" --omegam "@BV:OMEGAM_IN@" --omegav "@BV:OMEGAV_IN@" \
     --file ${file_lens_one} \
@@ -145,7 +155,10 @@ do
     --area @SURVEYAREADEG@ \
     --compare_to_gama \
     --path @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mass_lims \
-    --f_tomo ${ftomo} 2>&1
+    --f_tomo ${ftomo} \
+    --nobs ${NBIN} \
+    --nz_file "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_obs/${outname0}_nz_LB${LBIN}.txt" \
+    --nz_tot ${nz_tot} 2>&1
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
       
   #Add the smf function to the datablock
