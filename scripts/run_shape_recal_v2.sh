@@ -3,7 +3,7 @@
 # File Name : run_shape_recal.sh
 # Created By : awright
 # Creation Date : 26-05-2023
-# Last Modified : Fri 05 Apr 2024 12:45:45 PM UTC
+# Last Modified : Sat Nov  2 19:43:33 2024
 #
 #=========================================
 
@@ -44,25 +44,25 @@ done
 if [ "${links}" == "TRUE" ] 
 then 
   #Remove existing infile links 
-  if [ -e infile_$$.lnk ] || [ -h infile_$$.lnk ]
+  if [ -e infile_$$.lnk.cat ] || [ -h infile_$$.lnk.cat ]
   then 
-    rm infile_$$.lnk
+    rm infile_$$.lnk.cat
   fi 
   #Remove existing outfile links 
-  if [ -e outfile_$$.lnk ] || [ -h outfile_$$.lnk ]
+  if [ -e outfile_$$.lnk.cat ] || [ -h outfile_$$.lnk.cat ]
   then 
-    rm outfile_$$.lnk
+    rm outfile_$$.lnk.cat
   fi
 
   #Create input link
   originp=${current}
-  ln -s ${current} infile_$$.lnk 
-  current="infile_$$.lnk"
+  ln -s ${current} infile_$$.lnk.cat
+  current="infile_$$.lnk.cat"
   #Create output links 
   origout=${outputname}
-  ln -s ${outputname} outfile_$$.lnk
+  ln -s ${outputname} outfile_$$.lnk.cat
   origout=${outputname}
-  outputname=outfile_$$.lnk
+  outputname=outfile_$$.lnk.cat
 fi 
 #}}}
 
@@ -111,7 +111,7 @@ rm ${outputname}_tmp2
 #If using links, remove them {{{
 if [ "${links}" == "TRUE" ] 
 then 
-  rm ${current} ${outputname}
+  rm ${current} ${outputname} 
   current=${originp}
   outputname=${origout}
 fi
