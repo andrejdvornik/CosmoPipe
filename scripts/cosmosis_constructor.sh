@@ -3,7 +3,7 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Wed 30 Oct 2024 12:16:52 PM CET
+# Last Modified : Tue Nov 19 21:29:08 2024
 #
 #=========================================
 #Script to generate a cosmosis .ini, values, & priors file 
@@ -481,11 +481,11 @@ split_threshold = 100
 n_networks = 8
 n_batch = $n_batch
 filepath = %(OUTPUT_FOLDER)s/run_nautilus.hdf5
-resume = False
+resume = @BV:NAUTILUS_RESUME@
 f_live = 0.01
 discard_exploration = True
 verbose = True
-n_eff = 10000
+n_eff = @BV:NAUTILUS_NSAMP@
 
 EOF
 
