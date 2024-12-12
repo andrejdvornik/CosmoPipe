@@ -796,7 +796,7 @@ function _write_blockvars {
     _prompt=${_filelist#\{}
     _prompt=${_prompt%\}}
     _prompt=${_prompt//,/ }
-    if [ "${_prompt}" == "" ] || [ "${_prompt}" == "@BV:${target}@" ]
+    if [ "${_prompt}" == "" ] || [ "${_prompt}" == "@BV:${_target}@" ]
     then 
       _filelist="{${2// /,}}"
     else 
@@ -806,9 +806,11 @@ function _write_blockvars {
         _filelist=''
         for _file in ${_prompt}
         do 
-          _filelist="${_filelist} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${target}/${_file}"
+          _filelist="${_filelist} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${_target}/${_file}"
         done 
         _prompt=`echo ${_filelist}`
+        _filelist="${_filelist// /,}"
+        _filelist="{${_filelist/^,/}}"
       fi 
       #Prompt about the update
       echo -n " -> #${_prompt}#"
