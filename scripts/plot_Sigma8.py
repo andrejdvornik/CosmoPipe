@@ -28,6 +28,8 @@ inputfile = args.inputfile
 outputfile = args.outputfile
 statistic = args.statistic
 chain = load_chain(inputfile)
+idx = chain[0]['weight']>0.
+chain = chain[0][idx].reset_index(),chain[1]
 
 parameters = ['Omega_m', 'sigma_8']
 cosmosis_parameters = [cosmosis_names[p] for p in parameters]
