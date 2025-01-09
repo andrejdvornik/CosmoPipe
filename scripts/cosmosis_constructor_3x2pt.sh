@@ -550,7 +550,7 @@ then
   if [[ .*\ $MODES\ .* =~ " OBS " ]]
   then
     stats="${stats} 1pt"
-    twopt_modules="${twopt_modules} predict_observable"
+    twopt_modules="${twopt_modules} predict_observable correct_cosmo_observable"
   fi
   
 twopt_modules="${twopt_modules} scale_cuts likelihood"
@@ -797,7 +797,7 @@ then
   then
     ncombinations_ne=`echo "$NLENSBINS" "$NTOMO" | awk '{printf "%u", $1*$2 }'`
   else
-    ncombinations_ne=
+    ncombinations_ne=0
   fi
   if [[ .*\ $MODES\ .* =~ " NN " ]]
   then
@@ -812,8 +812,14 @@ then
   else
     ncombinations_obs=0
   fi
-  ncombinations=$(($ncombinations_ee + $ncombinations_ne + $ncombinations_nn))
   
+  if [ "${STATISTIC^^}" == "2PCF" ]
+  then
+    ncombinations=$(($ncombinations_ee + $ncombinations_ee + $ncombinations_ne + $ncombinations_nn))
+  else
+    ncombinations=$(($ncombinations_ee + $ncombinations_ne + $ncombinations_nn))
+  fi
+    
   if [[ .*\ $MODES\ .* =~ " OBS " ]]
   then
     ndat_obs=`echo "$ncombinations_obs @BV:NSMFBINS@" | awk '{printf "%u", $1*$2 }'`
@@ -831,7 +837,7 @@ then
     ndat=$(($ndat_ + $ndat_obs))
   elif [ "${STATISTIC^^}" == "2PCF" ]
   then 
-	ndat_=`echo "$ncombinations @BV:NTHETAREBIN@" | awk '{printf "%u", $1*$2*2 }'`
+	ndat_=`echo "$ncombinations @BV:NTHETAREBIN@" | awk '{printf "%u", $1*$2 }'`
     ndat=$(($ndat_ + $ndat_obs))
   fi
   listparam="scale_cuts_output/theory#${ndat}"
@@ -1013,7 +1019,7 @@ nonlinear = none ; pk
 ; halofit_version = mead2020_feedback
 neutrino_hierarchy = normal
 kmax = 20.0
-kmax_extrapolate=1000.0
+kmax_extrapolate = 1000.0
 nk = 300
 zmin = 0.0
 zmax = 3.0
@@ -1397,7 +1403,7 @@ do
 			fi
 			h0_in=`echo "@BV:H0_IN@" | awk '{printf "%d", 100*$1}'`
 			omega_m="@BV:OMEGAM_IN@"
-			omega_v ="@BV:OMEGAV_IN@"
+			omega_v="@BV:OMEGAV_IN@"
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(HMPATH)s/correct_cosmo_observable.py
