@@ -64,7 +64,7 @@ ntomo = len(tomo_z)
 
 # read & process chains
 try:
-    NLA_chain = load_chain(chainbase+'_NLA.txt')
+    NLA_chain = load_chain(chainbase+'_linear.txt')
     ia_const = NLA_chain[0]['intrinsic_alignment_parameters--a'].to_numpy()
     if weighted == False:
         ia_const_quantiles = np.quantile(ia_const, quantile_levels)
