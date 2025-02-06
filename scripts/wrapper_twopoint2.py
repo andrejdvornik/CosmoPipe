@@ -532,9 +532,8 @@ class TwoPointBuilder:
     def _getIndexForCut_OneCov(self, statsTag):
         labConv = wtp.LabelConvention()
         statsTag = statsTag.split('+')
-        print(statsTag)
-        ind = []
         
+        ind = []
         for stat in statsTag:
             if self.nbTomoN > 0:
                 wTh = True if labConv.w == stat else False
@@ -616,7 +615,6 @@ class TwoPointBuilder:
                 if onept:
                     nobsbins = len(self.nobs[0].nobs[0])
                     ind += [onept]*nobsbins*self.__nbPairsONEPT
-        print(ind, len(ind))
         return ind
        
     
