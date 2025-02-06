@@ -121,7 +121,7 @@ do
     rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_vec/${outname1}_smf.txt
     rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vmax/${outname1}_vmax.txt
     rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/${outname1}_smf_comp.png
-    rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/f_tomo/${outname1}_f_tomo.txt
+    rm -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/f_tomo/${outname1}_ftomo.txt
     smfblock=`_read_datablock smf_vec`
     currentblock=`_blockentry_to_filelist ${smfblock}`
     currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname1}_smf.txt | awk '{printf $0 " "}' || echo `
@@ -134,7 +134,7 @@ do
     
     ftomoblock=`_read_datablock f_tomo`
     currentblock=`_blockentry_to_filelist ${ftomoblock}`
-    currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname1}_f_tomo.txt | awk '{printf $0 " "}' || echo `
+    currentblock=`echo ${currentblock} | sed 's/ /\n/g' | grep -v ${outname1}_ftomo.txt | awk '{printf $0 " "}' || echo `
     _write_datablock f_tomo "${currentblock}"
     _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
   fi
@@ -143,7 +143,7 @@ do
   _message "    -> @BLU@Bin $LBIN @DEF@"
   MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
     @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_smf.py \
-    --estimator extended \
+    --estimator simple \
     --nbins "@BV:NSMFBINS@" --min_mass "@BV:MINMASS@" --max_mass "@BV:MAXMASS@" \
     --h0 "@BV:H0_IN@" --omegam "@BV:OMEGAM_IN@" --omegav "@BV:OMEGAV_IN@" \
     --file ${file_lens_one} \
@@ -167,7 +167,7 @@ do
   ftomoblock=`_read_datablock f_tomo`
   _write_datablock smf_vec "`_blockentry_to_filelist ${smfblock}` ${outname1}_smf.txt"
   _write_datablock vmax "`_blockentry_to_filelist ${vmaxblock}` ${outname1}_vmax.txt"
-  _write_datablock f_tomo "`_blockentry_to_filelist ${ftomoblock}` ${outname1}_f_tomo.txt"
+  _write_datablock f_tomo "`_blockentry_to_filelist ${ftomoblock}` ${outname1}_ftomo.txt"
 done
 _message "  }\n"
 #}}}

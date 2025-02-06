@@ -20,7 +20,7 @@ import wrapper_twopoint as wtp
 class TwoPointBuilder:
     
     def __init__(self,
-                  nbTomoN=2, nbTomoG=5, nbObs=1,
+                  nbTomoN=0, nbTomoG=0, nbObs=0,
                   N_theta=9, theta_min=0.5, theta_max=300,
                   N_ell=8, ell_min=100, ell_max=1500,
                   nbModes=5,
@@ -84,6 +84,13 @@ class TwoPointBuilder:
         self.__nbPairsGG  = self.nbTomoG * (self.nbTomoG+1) // 2
         self.__pairListNG = [(i, j) for i in range(self.nbTomoN) for j in range(self.nbTomoG)]
         self.__pairListGG = [(i, j) for i in range(self.nbTomoG) for j in range(i, self.nbTomoG)]
+        
+        self.__nbPairsONEPT  = self.nbObs
+        self.__pairListONEPT = [(i, i) for i in range(self.nbObs)]
+        
+        print(self.__pairListNN, self.__pairListNG, self.__pairListGG, self.__pairListONEPT)
+        print(self.__nbPairsNN, self.__nbPairsNG, self.__nbPairsGG, self.__nbPairsONEPT)
+        
         return
     
     ## Mean
@@ -447,7 +454,10 @@ class TwoPointBuilder:
         gT  = True if labConv.gamma_t  in statsTag else False
         xiP = True if labConv.xi_p in statsTag else False
         xiM = True if labConv.xi_m in statsTag else False
-        ind = [wTh]*self.N_theta*self.__nbPairsNN + [gT]*self.N_theta*self.__nbPairsNG + [xiP]*self.N_theta*self.__nbPairsGG + [xiM]*self.N_theta*self.__nbPairsGG
+        onept = True if labConv.onept in statsTag else False
+        if onept:
+            nobsbins = len(self.nobs[0].nobs[0])
+        ind = [wTh]*self.N_theta*self.__nbPairsNN + [gT]*self.N_theta*self.__nbPairsNG + [xiP]*self.N_theta*self.__nbPairsGG + [xiM]*self.N_theta*self.__nbPairsGG + [onept]*nobsbins*self.__nbPairsONEPT
         return ind
     
     def _getBPIndexForCut(self, statsTag):
@@ -458,11 +468,13 @@ class TwoPointBuilder:
         PneB = True if labConv.P_ne_B in statsTag else False
         PeeE = True if labConv.P_ee_E in statsTag else False
         PeeB = True if labConv.P_ee_B in statsTag else False
-        
+        onept = True if labConv.onept in statsTag else False
+        if onept:
+            nobsbins = len(self.nobs[0].nobs[0])
         if PneE or PeeE == True:
-            ind = [Pnn]*self.N_ell*self.__nbPairsNN + [PneE]*self.N_ell*self.__nbPairsNG + [PeeE]*self.N_ell*self.__nbPairsGG
+            ind = [Pnn]*self.N_ell*self.__nbPairsNN + [PneE]*self.N_ell*self.__nbPairsNG + [PeeE]*self.N_ell*self.__nbPairsGG + [onept]*nobsbins*self.__nbPairsONEPT
         else:
-            ind = [Pnn]*self.N_ell*self.__nbPairsNN + [PneB]*self.N_ell*self.__nbPairsNG + [PeeB]*self.N_ell*self.__nbPairsGG
+            ind = [Pnn]*self.N_ell*self.__nbPairsNN + [PneB]*self.N_ell*self.__nbPairsNG + [PeeB]*self.N_ell*self.__nbPairsGG + [onept]*nobsbins*self.__nbPairsONEPT
         return ind
     
     def _getCOSEBIIndexForCut(self, statsTag):
@@ -471,7 +483,10 @@ class TwoPointBuilder:
         Bn  = True if labConv.B_n in statsTag else False
         Psi_gm = True if labConv.Psi_gm in statsTag else False
         Psi_gg = True if labConv.Psi_gg in statsTag else False
-        ind = [Psi_gg]*self.nbModes*self.__nbPairsNN + [Psi_gm]*self.nbModes*self.__nbPairsNG + [En]*self.nbModes*self.__nbPairsGG + [Bn]*self.nbModes*self.__nbPairsGG
+        onept = True if labConv.onept in statsTag else False
+        if onept:
+            nobsbins = len(self.nobs[0].nobs[0])
+        ind = [Psi_gg]*self.nbModes*self.__nbPairsNN + [Psi_gm]*self.nbModes*self.__nbPairsNG + [En]*self.nbModes*self.__nbPairsGG + [Bn]*self.nbModes*self.__nbPairsGG + [onept]*nobsbins*self.__nbPairsONEPT
         return ind
     
     @classmethod
@@ -511,8 +526,106 @@ class TwoPointBuilder:
         else:
             raise ValueError('statsTag = \"%s\" not allowed' % statsTag)
         
-        cov = cov[ind].T[ind].T 
+        cov = cov[ind].T[ind].T
         return cov
+    
+    def _getIndexForCut_OneCov(self, statsTag):
+        labConv = wtp.LabelConvention()
+        statsTag = statsTag.split('+')
+        print(statsTag)
+        ind = []
+        
+        for stat in statsTag:
+            if self.nbTomoN > 0:
+                wTh = True if labConv.w == stat else False
+                Pnn  = True if labConv.P_nn == stat else False
+                Psi_gg = True if labConv.Psi_gg == stat else False
+                if wTh:
+                    ind_nn = []
+                    for i in range(self.nbTomoN):
+                        for j in range(i, self.nbTomoN):
+                            if self.nnAuto:
+                                if i==j:
+                                    ind_nn += [True]*self.N_theta
+                                else:
+                                    ind_nn += [False]*self.N_theta
+                            else:
+                                ind_nn += [True]*self.N_theta
+                    ind += ind_nn
+                if Pnn:
+                    ind_nn = []
+                    for i in range(self.nbTomoN):
+                        for j in range(i, self.nbTomoN):
+                            if self.nnAuto:
+                                if i==j:
+                                    ind_nn += [True]*self.N_ell
+                                else:
+                                    ind_nn += [False]*self.N_ell
+                            else:
+                                ind_nn += [True]*self.N_ell
+                    ind += ind_nn
+                if Psi_gg:
+                    ind_nn = []
+                    for i in range(self.nbTomoN):
+                        for j in range(i, self.nbTomoN):
+                            if self.nnAuto:
+                                if i==j:
+                                    ind_nn += [True]*self.nbModes
+                                else:
+                                    ind_nn += [False]*self.nbModes
+                            else:
+                                ind_nn += [True]*self.nbModes
+                    ind += ind_nn
+        
+            if self.nbTomoN > 0 and self.nbTomoG > 0:
+                gT  = True if labConv.gamma_t == stat else False
+                PneE = True if labConv.P_ne_E == stat else False
+                PneB = True if labConv.P_ne_B == stat else False
+                Psi_gm = True if labConv.Psi_gm == stat else False
+                if gT:
+                    ind += [gT]*self.N_theta*self.__nbPairsNG
+                if PneE:
+                    ind += [PneE]*self.N_ell*self.__nbPairsNG
+                if PneB:
+                    ind += [PneB]*self.N_ell*self.__nbPairsNG
+                if Psi_gm:
+                    ind += [Psi_gm]*self.nbModes*self.__nbPairsNG
+        
+            if self.nbTomoG > 0:
+                xiP = True if labConv.xi_p == stat else False
+                xiM = True if labConv.xi_m == stat else False
+                PeeE = True if labConv.P_ee_E == stat else False
+                PeeB = True if labConv.P_ee_B == stat else False
+                En  = True if labConv.E_n == stat else False
+                Bn  = True if labConv.B_n == stat else False
+                if xiP:
+                    ind += [xiP]*self.N_theta*self.__nbPairsGG
+                if xiM:
+                    ind += [xiM]*self.N_theta*self.__nbPairsGG
+                if PeeE:
+                    ind += [PeeE]*self.N_ell*self.__nbPairsGG
+                if PeeB:
+                    ind += [PeeB]*self.N_ell*self.__nbPairsGG
+                if En:
+                    ind += [En]*self.nbModes*self.__nbPairsGG
+                if Bn:
+                    ind += [Bn]*self.nbModes*self.__nbPairsGG
+        
+            if self.nbObs > 0:
+                onept = True if labConv.onept == stat else False
+                if onept:
+                    nobsbins = len(self.nobs[0].nobs[0])
+                    ind += [onept]*nobsbins*self.__nbPairsONEPT
+        print(ind, len(ind))
+        return ind
+       
+    
+    def _makeCov_OneCov(self, name, statsTag, cleanNaN=True, CTag='tot', verbose=True):
+        cov  = np.genfromtxt(name)
+        ind = self._getIndexForCut_OneCov(statsTag)
+        cov = cov[ind].T[ind].T
+        return cov
+    
     
     def setCov(self, tag, name=None, statsTag=None, cleanNaN=True, CTag='tot', verbose=True):
         if tag is None or tag == 'none':
@@ -522,6 +635,8 @@ class TwoPointBuilder:
             self.cov = self._makeCov_Flinc(name, statsTag, verbose=verbose) ## Consider `name` as `aves`
         elif tag == 'list':
             self.cov = self._makeCov_list(name, statsTag, cleanNaN=cleanNaN, CTag=CTag, verbose=verbose)
+        elif tag == 'onecov':
+            self.cov = self._makeCov_OneCov(name, statsTag, cleanNaN=cleanNaN, CTag=CTag, verbose=verbose)
         elif tag == 'variable':
             self.cov = name ## Consider `name` as the variable which contains the covariance
       
@@ -803,7 +918,7 @@ def getPrefix():
 ## Main function snippet
 
 def saveFitsTwoPoint(
-        nbTomoN=2, nbTomoG=3, nbObs=1,
+        nbTomoN=0, nbTomoG=0, nbObs=0,
         N_theta=12, theta_min=0.5, theta_max=300,
         N_ell=8, ell_min=100, ell_max=1500,
         nbModes=5, nnAuto=False,
@@ -840,9 +955,9 @@ def saveFitsTwoPoint(
         
     ## Make
     TPBuilder.setMean(meanTag, name=meanName, statsTag=statsTag)
+    TPBuilder.setNobs(nobsTag, name=nobsName)
     TPBuilder.setCov(covTag, name=covName, statsTag=statsTag)
     TPBuilder.setNOfZ(nOfZNameList, nGalList=nGalList, sigmaEpsList=sigmaEpsList)
-    TPBuilder.setNobs(nobsTag, name=nobsName)
     TP = TPBuilder.makeTwoPoint(labConv, statsTag_c)
     
     ## Cut

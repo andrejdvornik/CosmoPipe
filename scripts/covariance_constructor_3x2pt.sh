@@ -32,6 +32,11 @@ fi
 STATISTIC="@BV:STATISTIC@"
 SECONDSTATISTIC="@BV:SECONDSTATISTIC@"
 MODES="@BV:MODES@"
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
+NLENS="@BV:NLENSBINS@"
+NOBS="@BV:NSMFLENSBINS@"
+
+
 if [ "${STATISTIC^^}" == "2PCF" ]
 then
   if [[ .*\ $MODES\ .* =~ " EE " ]]
@@ -81,29 +86,29 @@ then
     arb_real_filter_mm_p_file_@BV:STATISTIC@="Tplus_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
     arb_real_filter_mm_m_file_@BV:STATISTIC@="Tminus_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
   else
-    est_shear=cosebis
+    est_shear=cosebi
     cosmic_shear=False
   fi
   if [[ .*\ $MODES\ .* =~ " NE " ]]
   then
-    est_ggl=cosebis
+    est_ggl=cosebi
     ggl=True
     n_arb_ne=@BV:NMAXCOSEBIS@
     arb_fourier_filter_gm_file_@BV:STATISTIC@="Qgm_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
     arb_real_filter_gm_file_@BV:STATISTIC@="Wn_psigm_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
   else
-    est_ggl=cosebis
+    est_ggl=cosebi
     ggl=False
   fi
   if [[ .*\ $MODES\ .* =~ " NN " ]]
   then
-    est_clust=cosebis
+    est_clust=cosebi
     clustering=True
     n_arb_nn=@BV:NMAXCOSEBIS@
     arb_fourier_filter_gg_file_@BV:STATISTIC@="Ugg_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
     arb_real_filter_gg_file_@BV:STATISTIC@="Wn_psigg_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
   else
-    est_clust=cosebis
+    est_clust=cosebi
     clustering=False
   fi
 elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
@@ -164,11 +169,15 @@ fi
 
 if [[ .*\ $MODES\ .* =~ " OBS " ]]
 then
+  obs_mins=""
+  obs_maxs=""
+  z_mins=""
+  z_maxs=""
   file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB1.txt"
   slice=`grep '^slice_in' ${file1} | awk '{printf $2}'`
   if [ "${slice}" == "obs" ]
   then
-    for i in `seq ${NSMFLENSBINS}`
+    for i in `seq ${NOBS}`
     do
       file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
       x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
@@ -182,7 +191,7 @@ then
     done
   elif [ "${slice}" == "z" ]
   then
-    for i in `seq ${NSMFLENSBINS}`
+    for i in `seq ${NOBS}`
     do
       file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
       x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
@@ -194,23 +203,21 @@ then
       z_mins="${z_mins} ${x_lo}"
       z_maxs="${z_maxs} ${x_hi}"
     done
-    obs_mins=`echo ${obs_mins} | sed 's/ /,/g'`
-    obs_maxs=`echo ${obs_maxs} | sed 's/ /,/g'`
   else
     _message "Got wrong or no information about slicing of the lens sample.\n"
     #exit 1
   fi
   cstellar_mf=True
-  csmf_log10Mmin=${obs_mins}
-  csmf_log10Mmax=${obs_maxs}
+  csmf_Mmin=`echo ${obs_mins} | sed 's/ /,/g'`
+  csmf_Mmax=`echo ${obs_maxs} | sed 's/ /,/g'`
   csmf_N_log10M_bin=@BV:NSMFBINS@
   csmf_directory="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf/"
   V_max_file="@DB:vmax@" # This assumes one file, currently we have NSMFLENSBINS
   f_tomo_file="@DB:f_tomo@" # This assumes one file, currently we have NSMFLENSBINS
 else
   cstellar_mf=False
-  csmf_log10Mmin=9.1
-  csmf_log10Mmax=11.3
+  csmf_Mmin=9.1
+  csmf_Mmax=11.3
   csmf_N_log10M_bin=10
   csmf_directory="@RUNROOT@/INSTALL/OneCovariance/input/conditional_smf/"
   V_max_file="V_max.asc"
@@ -218,8 +225,57 @@ else
 fi
 
 
+if [[ .*\ $MODES\ .* =~ " NE " ]] || [[ .*\ $MODES\ .* =~ " NN " ]]
+then
+  obs_mins=""
+  obs_maxs=""
+  z_mins=""
+  z_maxs=""
+  file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB1.txt"
+  slice=`grep '^slice_in' ${file1} | awk '{printf $2}'`
+  if [ "${slice}" == "obs" ]
+  then
+    for i in `seq ${NLENS}`
+    do
+      file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt"
+      x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
+      x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+      y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+      y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
+      obs_mins="${obs_mins} ${x_lo}"
+      obs_maxs="${obs_maxs} ${x_hi}"
+      z_mins="${z_mins} ${y_lo}"
+      z_maxs="${z_maxs} ${y_hi}"
+    done
+  elif [ "${slice}" == "z" ]
+  then
+    for i in `seq ${NLENS}`
+    do
+      file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt"
+      x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
+      x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+      y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+      y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
+      obs_mins="${obs_mins} ${y_lo}"
+      obs_maxs="${obs_maxs} ${y_hi}"
+      z_mins="${z_mins} ${x_lo}"
+      z_maxs="${z_maxs} ${x_hi}"
+    done
+  else
+    _message "Got wrong or no information about slicing of the lens sample.\n"
+    #exit 1
+  fi
+  bias_Mmin=`echo ${obs_mins} | sed 's/ /,/g'`
+  bias_Mmax=`echo ${obs_maxs} | sed 's/ /,/g'`
+else
+  bias_Mmin=9.0
+  bias_Mmax=13.0
+fi
+bias_Mmin=9.0,13.0
+bias_Mmax=13.0
+
 # Check if the arbitrary input files exist and copy to input directory
-use_arbitrary=True
+use_arbitrary=False
 if [[ .*\ $MODES\ .* =~ " EE " ]]
 then
   for i in $(seq -f "%02g" 1 $n_arb_ee)
@@ -420,9 +476,6 @@ do
 done
 
 msigmalist=`echo ${msigmalist} | sed 's/ /,/g'`
-NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
-NLENS="@BV:NLENSBINS@"
-NOBS="@BV:NSMFLENSBINS@"
 
 # Base settings {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
@@ -444,8 +497,8 @@ cross_terms = True
 unbiased_clustering = True
 
 [csmf settings]
-csmf_log10Mmin = ${csmf_log10Mmin}
-csmf_log10Mmax = ${csmf_log10Mmax}
+csmf_log10Mmin = ${csmf_Mmin}
+csmf_log10Mmax = ${csmf_Mmax}
 csmf_N_log10M_bin = ${csmf_N_log10M_bin}
 csmf_directory = ${csmf_directory}
 ;csmf_log10M_bins =
@@ -630,9 +683,9 @@ zclust_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz_lens/
 zclust_file = ${nzfile_lens}
 zclust_extension = NZ_LENS
 
-zcmsf_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz_obs/
-zcmsf_file = ${nzfile_obs}
-zcmsf_extension = NZ_OBS
+zcsmf_directory = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_nz_obs/
+zcsmf_file = ${nzfile_obs}
+zcsmf_extension = NZ_OBS
 
 EOF
 #}}}
@@ -640,7 +693,7 @@ EOF
 # All kinds of parameters {{{
 npair_mm_file="@BV:NPAIRBASE_XI@_nBins_${NTOMO}_Bin?_Bin?.ascii"
 npair_gm_file="@BV:NPAIRBASE_GT@_nBins_${NLENS}_Bin?_Bin?.ascii"
-npair_gg_file="@BV:NPAIRBASE_WT@_nBins_${NLENS}_Bin?.ascii"
+npair_gg_file="@BV:NPAIRBASE_WT@_nBins_${NLENS}_Bin?_Bin?.ascii"
 
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 [cosmo]
@@ -661,7 +714,8 @@ model = Tinker10
 bias_2h = 1.0
 mc_relation_cen = duffy08
 mc_relation_sat = duffy08
-log10mass_bins = 9.1, 11.3
+log10mass_bins = ${bias_Mmin}
+; log10mass_bins = ${bias_Mmax}
 
 [IA]
 A_IA = $AIA

@@ -304,7 +304,7 @@ def plot_covariance(filename,title,savename):
     ext=F["COVMAT"]
     covariance= ext.data
     fig, ax = plt.subplots()
-    im = ax.imshow(covariance)
+    im = ax.imshow(covariance, interpolation='nearest')
     cbar = ax.figure.colorbar(im, ax=ax)
     plt.title(title)
     plt.savefig(savename)
@@ -319,7 +319,7 @@ def plot_correlation_mat(filename,title,savename):
         for j in range(len(cov)):
             corr[i,j]=cov[i,j]/np.sqrt(cov[i,i]*cov[j,j])
     fig, ax = plt.subplots()
-    im = ax.imshow(corr)
+    im = ax.imshow(corr, interpolation='nearest')
     cbar = ax.figure.colorbar(im, ax=ax)
     plt.title(title)
     plt.savefig(savename)
@@ -694,7 +694,8 @@ elif statistic == 'bandpowers':
         datavec.extend(datavec_nn)
         datavec_no_mbias.extend(datavec_nn_no_mbias)
     if 'NE' in args.mode:
-        stats_string = stats_string + 'PneE PneB '
+        #stats_string = stats_string + 'PneE PneB '
+        stats_string = stats_string + 'PneE '
         datavec.extend(datavec_ne)
         datavec_no_mbias.extend(datavec_ne_no_mbias)
     if 'EE' in args.mode:
@@ -712,7 +713,8 @@ elif statistic =='2pcf':
         datavec.extend(datavec_nn)
         datavec_no_mbias.extend(datavec_nn_no_mbias)
     if 'NE' in args.mode:
-        stats_string = stats_string + 'gammat gammax '
+        #stats_string = stats_string + 'gammat gammax '
+        stats_string = stats_string + 'gammat '
         datavec.extend(datavec_ne)
         datavec_no_mbias.extend(datavec_ne_no_mbias)
     if 'EE' in args.mode:
@@ -745,7 +747,7 @@ wtp2.saveFitsTwoPoint(
         scDict=scDict,
         meanTag='variable',
         meanName=np.array(datavec),
-        covTag='file',
+        covTag='onecov',
         covName=covariance,
         nobsTag=smftag,
         nobsName=smfvec,
@@ -773,7 +775,7 @@ if no_m_bias_ee == True and no_m_bias_ne == True and no_m_bias_nn == True:
         scDict=scDict,
         meanTag='variable',
         meanName=np.array(datavec_no_mbias),
-        covTag='file',
+        covTag='onecov',
         covName=covariance,
         nobsTag=smftag,
         nobsName=smfvec,
@@ -788,7 +790,7 @@ statsList = stats_string.split()
 # Plots
 title='KiDS-Legacy'
 savename=plotdir+'/only_source_Nz.pdf'
-plot_redshift(outputfile+'.fits',title,savename)
+#plot_redshift(outputfile+'.fits',title,savename)
 
 title=statistic
 savename=plotdir+'/'+statistic+'_covariance.pdf'

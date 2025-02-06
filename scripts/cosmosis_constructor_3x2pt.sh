@@ -664,6 +664,9 @@ else
 fi
 #}}}
 
+bnl_delete=""
+fast_slow="F"
+
 #Requested sampler {{{
 OUTPUTNAME="%(OUTPUT_FOLDER)s/output_%(RUN_NAME)s.txt"
 VALUES=values
@@ -671,7 +674,8 @@ PRIORS=priors
 listparam=''
 if [ "${SAMPLER^^}" == "TEST" ] #{{{
 then 
-  
+bnl_delete="bnl_delete"
+fast_slow="F"
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini <<- EOF
 [test]
 save_dir=%(OUTPUT_FOLDER)s/output_%(RUN_NAME)s
@@ -682,7 +686,7 @@ EOF
 #}}}
 elif [ "${SAMPLER^^}" == "MAXLIKE" ] #{{{
 then 
-
+fast_slow="F"
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini <<- EOF
 [maxlike]
 method = Nelder-Mead
@@ -695,7 +699,7 @@ EOF
 #}}}
 elif [ "${SAMPLER^^}" == "MULTINEST" ] #{{{
 then 
-
+fast_slow="T"
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini <<- EOF
 [multinest]
 max_iterations=100000
@@ -711,7 +715,7 @@ EOF
 #}}}
 elif [ "${SAMPLER^^}" == "POLYCHORD" ] #{{{
 then 
-
+fast_slow="T"
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini <<- EOF
 [polychord]
 live_points = 300
@@ -729,7 +733,8 @@ EOF
 
 #}}}
 elif [ "${SAMPLER^^}" == "NAUTILUS" ] #{{{
-then 
+then
+fast_slow="F"
 n_batch=`echo "@BV:NTHREADS@" | awk '{printf "%d", 4*$1}'`
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini <<- EOF
 [nautilus]
@@ -750,7 +755,7 @@ EOF
 #}}}
 elif [ "${SAMPLER^^}" == "APRIORI" ] #{{{
 then 
-
+fast_slow="F"
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_sampler.ini <<- EOF
 [apriori]
 nsample=500000
@@ -759,7 +764,8 @@ EOF
 
 #}}}
 elif [ "${SAMPLER^^}" == "GRID" ] #{{{
-then 
+then
+  fast_slow="F"
   #Set up the fixed values file {{{
   VALUES=values_fixed
   PRIORS=
@@ -787,6 +793,7 @@ then
 #}}}
 elif [ "${SAMPLER^^}" == "LIST" ] #{{{
 then
+  fast_slow="F"
   if [[ .*\ $MODES\ .* =~ " EE " ]]
   then
     ncombinations_ee=`echo "$NTOMO" | awk '{printf "%u", $1*($1+1)/2 }'`
@@ -890,7 +897,7 @@ if [  "@BV:COSMOSIS_PIPELINE@" == "default" ]
 then
     iamodel_pipeline="hod_ia_red hod_ia_blue alignment_red alignment_blue radial_satellite_alignment_red radial_satellite_alignment_blue pk_ia_red pk_ia_blue add_and_upsample_ia projection add_intrinsic"
     
-    COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits consistency camb extrapolate halo_model_ingredients_halomod hod hod_smf bnl pk add_and_upsample ${iamodel_pipeline} source_photoz_bias ${twopt_modules} bnl_delete"
+    COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits consistency camb extrapolate bnl halo_model_ingredients_halomod hod hod_smf pk add_and_upsample ${iamodel_pipeline} source_photoz_bias ${twopt_modules} ${bnl_delete}"
 else
 	COSMOSIS_PIPELINE="@BV:COSMOSIS_PIPELINE@"
 fi
@@ -926,7 +933,7 @@ then
 					tpdparams="${tpdparams} cosebis/bin_${tomo2}_${tomo1}#@BV:NMAXCOSEBIS@"
 				elif [ "${STATISTIC^^}" == "2PCF" ]
 				then
-					tpdparams="${tpdparams} shear_xi_plus_binned/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@ shear_xi_minus_binned/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@"
+					tpdparams="${tpdparams} shear_xi_plus/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@ shear_xi_minus/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@"
 				fi
 			done
 		done
@@ -945,7 +952,7 @@ then
 					tpdparams="${tpdparams} psi_stats_gm/bin_${tomo1}_${tomo2}#@BV:NMAXCOSEBIS@"
 				elif [ "${STATISTIC^^}" == "2PCF" ]
 				then
-					tpdparams="${tpdparams} galaxy_shear_xi_binned/bin_${tomo1}_${tomo2}#@BV:NTHETAREBIN@"
+					tpdparams="${tpdparams} galaxy_shear_xi/bin_${tomo1}_${tomo2}#@BV:NTHETAREBIN@"
 				fi
 			done
 		done
@@ -963,7 +970,7 @@ then
 				tpdparams="${tpdparams} psi_stats_gg/bin_${tomo1}_${tomo1}#@BV:NMAXCOSEBIS@"
 			elif [ "${STATISTIC^^}" == "2PCF" ]
 			then
-				tpdparams="${tpdparams} galaxy_xi_binned/bin_${tomo1}_${tomo1}#@BV:NTHETAREBIN@"
+				tpdparams="${tpdparams} galaxy_xi/bin_${tomo1}_${tomo1}#@BV:NTHETAREBIN@"
 			fi
 		done
 	fi
@@ -993,6 +1000,8 @@ extra_output = ${extraparams} ${shifts} ${listparam} ${tpdparams}
 quiet = T
 timing = F
 debug = F
+fast_slow = ${fast_slow}
+first_fast_module = halo_model_ingredients_halomod
 
 [runtime]
 sampler = %(SAMPLER_NAME)s
@@ -1182,8 +1191,10 @@ do
 					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
 					obs_mins="${obs_mins} ${x_lo}"
 					obs_maxs="${obs_maxs} ${x_hi}"
-					z_mins="${z_mins} ${y_lo}"
-					z_maxs="${z_maxs} ${y_hi}"
+					#z_mins="${z_mins} ${y_lo}"
+					#z_maxs="${z_maxs} ${y_hi}"
+					z_mins="${z_mins} 0.0"
+					z_maxs="${z_maxs} 3.0"
 				done
 			elif [ "${slice}" == "z" ]
 			then
@@ -1196,8 +1207,10 @@ do
 					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
 					obs_mins="${obs_mins} ${y_lo}"
 					obs_maxs="${obs_maxs} ${y_hi}"
-					z_mins="${z_mins} ${x_lo}"
-					z_maxs="${z_maxs} ${x_hi}"
+					#z_mins="${z_mins} ${x_lo}"
+					#z_maxs="${z_maxs} ${x_hi}"
+					z_mins="${z_mins} 0.0"
+					z_maxs="${z_maxs} 3.0"
 				done
 			else
 				_message "Got wrong or no information about slicing of the lens sample.\n"
@@ -1216,7 +1229,7 @@ do
 			log10_obs_max =${obs_maxs}
 			zmin =${z_mins}
 			zmax =${z_maxs}
-			nz = %(nz_def)s
+			nz = 50 ; %(nz_def)s
 			log_mass_min = %(logmassmin_def)s
 			log_mass_max = %(logmassmax_def)s
 			nmass = %(nmass_def)s
@@ -1243,8 +1256,10 @@ do
 					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
 					obs_mins="${obs_mins} ${x_lo}"
 					obs_maxs="${obs_maxs} ${x_hi}"
-					z_mins="${z_mins} ${y_lo}"
-					z_maxs="${z_maxs} ${y_hi}"
+					#z_mins="${z_mins} ${y_lo}"
+					#z_maxs="${z_maxs} ${y_hi}"
+					z_mins="${z_mins} 0.0"
+					z_maxs="${z_maxs} 3.0"
 				done
 			elif [ "${slice}" == "z" ]
 			then
@@ -1257,8 +1272,10 @@ do
 					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
 					obs_mins="${obs_mins} ${y_lo}"
 					obs_maxs="${obs_maxs} ${y_hi}"
-					z_mins="${z_mins} ${x_lo}"
-					z_maxs="${z_maxs} ${x_hi}"
+					#z_mins="${z_mins} ${x_lo}"
+					#z_maxs="${z_maxs} ${x_hi}"
+					z_mins="${z_mins} 0.0"
+					z_maxs="${z_maxs} 3.0"
 				done
 			else
 				_message "Got wrong or no information about slicing of the lens sample.\n"
@@ -1277,7 +1294,7 @@ do
 			log10_obs_max = ${obs_maxs}
 			zmin = ${z_mins}
 			zmax = ${z_maxs}
-			nz = %(nz_def)s
+			nz = 50 ; %(nz_def)s
 			log_mass_min = %(logmassmin_def)s
 			log_mass_max = %(logmassmax_def)s
 			nmass = %(nmass_def)s
@@ -1298,7 +1315,7 @@ do
 			hod_section_name = hod_ia_red
 			values_name = hod_parameters
 			nobs = 200
-			nz = %(nz_def)s
+			nz = 50 ; %(nz_def)s
 			log_mass_min = %(logmassmin_def)s
 			log_mass_max = %(logmassmax_def)s
 			nmass = %(nmass_def)s
@@ -1319,7 +1336,7 @@ do
 			hod_section_name = hod_ia_blue
 			values_name = hod_parameters
 			nobs = 200
-			nz = %(nz_def)s
+			nz = 50 ; %(nz_def)s
 			log_mass_min = %(logmassmin_def)s
 			log_mass_max = %(logmassmax_def)s
 			nmass = %(nmass_def)s

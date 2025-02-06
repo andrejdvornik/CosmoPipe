@@ -50,19 +50,21 @@ def make_2pt_vector(input_files, m_corr,col=1, xipm=False, correlations='EE'):
                 data_all_corr = np.concatenate((data_xip_all_corr,data_xim_all_corr))
             if correlations == 'NE':
                 data_gt = data['gamT']
-                data_gx = data['gamX']
+                #data_gx = data['gamX']
                 if rp==0:
                     data_gt_all      = data_gt.copy()
                     data_gt_all_corr = data_gt/m_corr[rp]
-                    data_gx_all      = data_gx.copy()
-                    data_gx_all_corr = data_gx/m_corr[rp]
+                    #data_gx_all      = data_gx.copy()
+                    #data_gx_all_corr = data_gx/m_corr[rp]
                 else:
                     data_gt_all      = np.hstack((data_gt_all,data_gt))
                     data_gt_all_corr = np.hstack((data_gt_all_corr,data_gt/m_corr[rp]))
-                    data_gx_all      = np.hstack((data_gx_all,data_gx))
-                    data_gx_all_corr = np.hstack((data_gx_all_corr,data_gx/m_corr[rp]))
-                data_all = np.concatenate((data_gt_all,data_gx_all))
-                data_all_corr = np.concatenate((data_gt_all_corr,data_gx_all_corr))
+                    #data_gx_all      = np.hstack((data_gx_all,data_gx))
+                    #data_gx_all_corr = np.hstack((data_gx_all_corr,data_gx/m_corr[rp]))
+                #data_all = np.concatenate((data_gt_all,data_gx_all))
+                #data_all_corr = np.concatenate((data_gt_all_corr,data_gx_all_corr))
+                data_all = data_gt_all
+                data_all_corr = data_gt_all_corr
             if correlations == 'NN':
                 data_wt = data['wtheta']
                 if rp==0:
@@ -270,12 +272,12 @@ elif statistic == 'bandpowers_ee':
 elif statistic == 'bandpowers_ne':
     matches_bandpowers = np.array([ "CnE_" in i for i in args.DataFiles])
     CnEDataFiles = np.array(args.DataFiles)[matches_bandpowers]
-    try:
-        matches_bandpowers_B = np.array([ "CnB_" in i for i in args.DataFiles])
-        CnBDataFiles = np.array(args.DataFiles)[matches_bandpowers_B]
-    except:
-        matches_bandpowers_B = np.array([ "CnE_" in i for i in args.DataFiles])
-        CnBDataFiles = np.array(args.DataFiles)[matches_bandpowers_B]
+    #try:
+    #    matches_bandpowers_B = np.array([ "CnB_" in i for i in args.DataFiles])
+    #    CnBDataFiles = np.array(args.DataFiles)[matches_bandpowers_B]
+    #except:
+    #    matches_bandpowers_B = np.array([ "CnE_" in i for i in args.DataFiles])
+    #    CnBDataFiles = np.array(args.DataFiles)[matches_bandpowers_B]
     #Input file name list:
     for bin1 in range(nBins_lens):
         for bin2 in range(nBins_source):
@@ -283,12 +285,12 @@ elif statistic == 'bandpowers_ne':
             match=np.array([tomoxcorrstr in i for i in CnEDataFiles])
             fileNameInput=CnEDataFiles[match][0]
             input_files.append(fileNameInput)
-    for bin1 in range(nBins_lens):
-        for bin2 in range(nBins_source):
-            tomoxcorrstr="_"+LBstr[bin1]+"_"+ZBstr[bin2]+'_bandpowers.asc'
-            match=np.array([tomoxcorrstr in i for i in CnBDataFiles])
-            fileNameInput=CnBDataFiles[match][0]
-            input_files.append(fileNameInput)
+    #for bin1 in range(nBins_lens):
+    #    for bin2 in range(nBins_source):
+    #        tomoxcorrstr="_"+LBstr[bin1]+"_"+ZBstr[bin2]+'_bandpowers.asc'
+    #        match=np.array([tomoxcorrstr in i for i in CnBDataFiles])
+    #        fileNameInput=CnBDataFiles[match][0]
+    #        input_files.append(fileNameInput)
     datavector_no_m_bias, datavector_with_m_bias = make_2pt_vector(input_files,np.concatenate((m_corr_ggl,m_corr_ggl)))
     datavector_no_m_bias_all, datavector_with_m_bias_all  = make_2pt_vector(input_files,np.concatenate((m_corr_ggl,m_corr_ggl)))
         

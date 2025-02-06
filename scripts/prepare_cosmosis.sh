@@ -184,7 +184,7 @@ then
       #}}}
     done
     #Update the datablock {{{
-    _write_datablock "cosmosis_npair_${patch}_@BV:BLIND@" "${outlist}"
+    #_write_datablock "cosmosis_npair_${patch}_@BV:BLIND@" "${outlist}"
     outall="${outall} ${outlist}"
     #}}}
     #}}}
@@ -241,7 +241,7 @@ then
       #}}}
     done
     #Update the datablock {{{
-    _write_datablock "cosmosis_npair_${patch}_@BV:BLIND@" "${outlist_gt}"
+    #_write_datablock "cosmosis_npair_${patch}_@BV:BLIND@" "${outlist_gt}"
     outall="${outall} ${outlist_gt}"
     #}}}
     #}}}
@@ -259,7 +259,7 @@ then
       #  appendstr2="_LB${LBIN2}"
         #}}}
         #Define the input file id {{{
-        #filestr="${appendstr}${appendstr2}_ggcorr.txt"
+        #filestr="${appendstr}${appendstr2}_wtcorr.txt"
         filestr="${appendstr}_wtcorr.txt"
         #}}}
         #Get the file {{{
@@ -280,19 +280,20 @@ then
         #Copy the file {{{
         _message " > @BLU@ Patch @DEF@${patch}@BLU@ BIN @DEF@${LBIN1}@BLU@@DEF@"
         cp ${file} \
-          @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_npair_${patch}_@BV:BLIND@/WT_@SURVEY@_${patch}_nBins_${NLENS}_Bin${LBIN1}.ascii
-        gawk -i inplace '{print $1, $2, $3, $NF}' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_npair_${patch}_@BV:BLIND@/WT_@SURVEY@_${patch}_nBins_${NLENS}_Bin${LBIN1}.ascii
+          @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_npair_${patch}_@BV:BLIND@/WT_@SURVEY@_${patch}_nBins_${NLENS}_Bin${LBIN1}_Bin${LBIN1}.ascii
+        gawk -i inplace '{print $1, $2, $3, $NF}' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_npair_${patch}_@BV:BLIND@/WT_@SURVEY@_${patch}_nBins_${NLENS}_Bin${LBIN1}_Bin${LBIN1}.ascii
         _message " - @RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
         #}}}
         #Save the file to the output list {{{
-        outlist_wt="${outlist_wt} WT_@SURVEY@_${patch}_nBins_${NLENS}_Bin${LBIN1}.ascii"
+        outlist_wt="${outlist_wt} WT_@SURVEY@_${patch}_nBins_${NLENS}_Bin${LBIN1}_Bin${LBIN1}.ascii"
         #}}}
       #done
       #}}}
     done
     #Update the datablock {{{
-    _write_datablock "cosmosis_npair_${patch}_@BV:BLIND@" "${outlist_wt}"
+    #_write_datablock "cosmosis_npair_${patch}_@BV:BLIND@" "${outlist_wt}"
     outall="${outall} ${outlist_wt}"
+    _write_datablock "cosmosis_npair_${patch}_@BV:BLIND@" "${outall}"
     #}}}
     #}}}
     
