@@ -330,7 +330,7 @@ do
     #Modify the datablock with the current HEAD {{{
     _target=${step:1}
     _target=`VERBOSE=0 _parse_blockvars ${_target}`
-    echo parsed 
+    echo parsed: ${_target}
 		VERBOSE=1 _write_datablock ${_target} "`_read_datahead`"
     #Write the link between the previous processing function and this block element
     echo "${laststep} -.-> ${_target}(${_target})" >> @RUNROOT@/@PIPELINE@_links.R
@@ -382,8 +382,18 @@ do
     #Add the new variable to the datablock {{{
     echo Variable assignment: ${step:1}
     _var=${step:1}
-    _varval=${_var#*=}
-    _var=${_var%%=*}
+    if [[ "${_var}" =~ .*"+=".* ]]
+    then 
+      _oldval=`_read_blockvars ${_var}` 
+      _addval=${_var#*=}
+      _varval=$((${_oldval}+${_addval}))
+      _var=${_var%%=*}
+    else 
+      _varval=${_var#*=}
+      _var=${_var%%=*}
+    fi 
+    _varval=`VERBOSE=0 _parse_blockvars ${_varval}`
+    echo _write_blockvars ${_var} "${_varval}"
     _write_blockvars ${_var} "${_varval}"
     #}}}
   else 
@@ -498,6 +508,19 @@ do
             warnings="${RED}    WARNINGS:${DEF}\n     - ${RED}ALLHEAD${BLU} was requested at a step where no ${RED}DATAHEAD${BLU} was currently assigned. This could be a quirk of the pipeline check.${DEF}\n"
           else 
             warnings="${warnings}     - ${RED}ALLHEAD${BLU} was requested at a step where no ${RED}DATAHEAD${BLU} was currently assigned. This could be a quirk of the pipeline check.${DEF}\n"
+          fi 
+          #}}}
+        elif [[ "${inp}" =~ .*"__validitytest_".* ]]
+        then
+          #Ignore: probably ok 
+          echo "warning message 2"
+          #Warn {{{
+          VERBOSE=1 _message "${RED}(WARNING)${DEF} "
+          if [ "${warnings}" == "" ] 
+          then 
+            warnings="${RED}    WARNINGS:${DEF}\n     - ${RED}${inp}${BLU} was requested, but includes a dynamically defined variable (set to '__validitytest__' during pipeline constructions. This should be ok, but maybe not...${DEF}\n"
+          else 
+            warnings="${warnings}     - ${RED}${inp}${BLU} was requested, but includes a dynamically defined variable (set to '__validitytest__' during pipeline constructions. This should be ok, but maybe not...${DEF}\n"
           fi 
           #}}}
         else 
@@ -861,8 +884,18 @@ do
     #If this is a blockvariable assignment: {{{
     echo "ASSIGNMENT TIME: ${step}"
     _var=${step:1}
-    _varval=${_var#*=}
-    _var=${_var%%=*}
+    if [[ "${_var}" =~ .*"+=".* ]]
+    then 
+      _oldval=`_read_blockvars ${_var}` 
+      _addval=${_var#*=}
+      _varval=$((${_oldval}+${_addval}))
+      _var=${_var%%=*}
+    else 
+      _varval=${_var#*=}
+      _var=${_var%%=*}
+    fi 
+    #_varval=${_var#*=}
+    #_var=${_var%%=*}
     #_var=`_parse_blockvars ${_var}`
     cat >> @RUNROOT@/@PIPELINE@_pipeline.sh <<- EOF 
 		
