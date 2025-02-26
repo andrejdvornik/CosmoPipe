@@ -3,15 +3,15 @@
 # File Name : plot_xisys.sh
 # Created By : awright
 # Creation Date : 29-02-2024
-# Last Modified : Thu 04 Apr 2024 12:51:42 AM CEST
+# Last Modified : Thu Jan 16 19:43:53 2025
 #
 #=========================================
 
 
 #Compute and plot the xisys function 
 xlabel="Radial Bin i" 
-ylabel_upper="Xi[p]" 
-ylabel_lower="Xi[m]" 
+ylabel_upper="xi[''+'']" 
+ylabel_lower="xi[''-'']" 
 ndata=@BV:NXIPM@
 xipmvec=`echo @DB:xipm_vec@ | awk '{print $1}'`
 xipsfvec=`echo @DB:xipsf_vec@ | awk '{print $1}'`

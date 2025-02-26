@@ -129,6 +129,8 @@ try:
     co_uncorr = [cosmosis_names[p] for p in pa_uncorr]
     pa_derived = ['M1_derived', 'M2_derived', 'M3_derived', 'M4_derived', 'M5_derived', 'M6_derived']
     co_derived = [cosmosis_names[p] for p in pa_derived]
+    print(co_uncorr)
+    print(co_derived)
     L = np.linalg.cholesky(massdep_cov)
 
     n = massdep_chain[0].shape[0]

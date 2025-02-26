@@ -47,7 +47,8 @@ logM="${PRIOR_LOG10_M_MEAN_1} ${PRIOR_LOG10_M_MEAN_2} ${PRIOR_LOG10_M_MEAN_3} ${
 #   --a_pivot_zdep @BV:PRIOR_A_PIV@ \
 #   --weighted True
 
-@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/plot_ia_amplitude_posteriors_correlated.py \
+#@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/plot_ia_amplitude_posteriors_correlated.py \
+@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/plot_ia_amplitude_posteriors_correlated.R \
   --inputbase @STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/output_@BV:SAMPLER@_@BV:BLIND@ \
   --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/ \
   --f_r ${f_r} \
