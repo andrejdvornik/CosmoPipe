@@ -9,6 +9,7 @@ tmp*
 scripts/unused
 scripts/ImSim
 config/covariance_arb_summary
+config/cosebis/
 kcap_all/
 tex/
 history/
