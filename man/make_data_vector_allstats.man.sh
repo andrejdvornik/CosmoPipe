@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLU BV:STATISTIC BV:TOMOLIMS DATABLOCK DEF PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  echo ALLPATCH BLU BV:STATISTIC BV:TOMOLIMS DATABLOCK DEF BV:PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 
@@ -73,7 +73,7 @@ function _inp_data {
 function _outputs { 
   #Data outputs (leave blank if none)
   outlist=''
-  for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+  for patch in @BV:PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
   do 
     outlist="${outlist} @BV:STATISTIC@_vec_${patch}"
   done 

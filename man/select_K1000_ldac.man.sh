@@ -42,7 +42,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU CONFIGPATH DEF MACHINE P_RSCRIPT PYTHON3BIN RED RUNROOT SCRIPTPATH
+  echo BLU CONFIGPATH DEF MACHINE PYTHON3BIN P_RSCRIPT RED RUNROOT SCRIPTPATH
 } 
 #}}}
 

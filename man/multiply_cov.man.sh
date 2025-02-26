@@ -44,7 +44,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BV:FACTOR PYTHON3BIN RUNROOT SCRIPTPATH
+  echo BV:COVBLOCK BV:FACTOR DATABLOCK PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 
