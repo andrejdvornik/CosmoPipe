@@ -164,11 +164,11 @@ then
   fi 
   #}}}
   cat > csl_make.sh <<-EOF
-  source cosmosis-configure
-  cd cosmosis-standard-library
-  make
-  cd ..
-  EOF
+source cosmosis-configure
+cd cosmosis-standard-library
+make
+cd ..
+EOF
   conda run -n ${CONDAPIPENAME} bash csl_make.sh > CSL_install_output.log 2>&1
   _message "${BLU} - Done! ${DEF}\n"
   #}}}
@@ -278,10 +278,10 @@ then
   python_vers=`conda run -n ${CONDAPIPENAME} python --version | head -1 | awk '{print $2}' | awk -F. '{print "python"$1"."$2 }'`
   cosmosis_src=`conda run -n ${CONDAPIPENAME} which cosmosis | sed "s@/bin/cosmosis@/lib/${python_vers}/site-packages/cosmosis/@"`
   cat > cosebis_make.sh <<-EOF
-  source cosmosis-configure
-  COSMOSIS_SRC_DIR=${cosmosis_src} make clean
-  COSMOSIS_SRC_DIR=${cosmosis_src} make
-  EOF
+source cosmosis-configure
+COSMOSIS_SRC_DIR=${cosmosis_src} make clean
+COSMOSIS_SRC_DIR=${cosmosis_src} make
+EOF
   conda run -n ${CONDAPIPENAME} bash cosebis_make.sh > ${RUNROOT}/INSTALL/COSEBIs_install.log 2>&1
   cd ${RUNROOT}/INSTALL/
   _message "${BLU} - Done! ${DEF}\n"
@@ -291,8 +291,8 @@ then
   _message "   >${RED} Installing OneCovariance ${DEF}"
   cd ${RUNROOT}/INSTALL/OneCovariance/
   cat > OneCovariance_make.sh <<-EOF
-  pip install .
-  EOF
+pip install .
+EOF
   conda run -n ${CONDAPIPENAME} bash OneCovariance_make.sh > ${RUNROOT}/INSTALL/OneCovariance_install.log 2>&1
   cd ${RUNROOT}/INSTALL/
   _message "${BLU} - Done! ${DEF}\n"
@@ -302,8 +302,8 @@ then
   _message "   >${RED} Installing galselect ${DEF}"
   cd ${RUNROOT}/INSTALL/galselect/
   cat > galselect_make.sh <<-EOF
-  pip install .
-  EOF
+pip install .
+EOF
   conda run -n ${CONDAPIPENAME} bash galselect_make.sh > ${RUNROOT}/INSTALL/galselect_install.log 2>&1
   cd ${RUNROOT}/INSTALL/
   _message "${BLU} - Done! ${DEF}\n"
