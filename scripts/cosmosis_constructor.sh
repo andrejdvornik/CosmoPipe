@@ -3,13 +3,16 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Sun 03 Mar 2024 05:07:25 PM CET
+# Last Modified : Wed 26 Feb 2025 10:47:21 AM CET
 #
 #=========================================
 #Script to generate a cosmosis .ini, values, & priors file 
 #Prepare the starting items {{{
 IAMODEL="@BV:IAMODEL@"
 CHAINSUFFIX=@BV:CHAINSUFFIX@
+STATISTIC="@BV:STATISTIC@"
+SAMPLER="@BV:SAMPLER@"
+BOLTZMAN="@BV:BOLTZMAN@"
 
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 [DEFAULT]
@@ -32,9 +35,7 @@ RUN_NAME = %(SAMPLER_NAME)s_%(blind)s${CHAINSUFFIX}
 
 EOF
 #}}}
-STATISTIC="@BV:STATISTIC@"
-SAMPLER="@BV:SAMPLER@"
-BOLTZMAN="@BV:BOLTZMAN@"
+
 #Define the data file name {{{ 
 if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
 then
@@ -83,6 +84,7 @@ EOF
 fi
 #}}}
 
+#Define the tomographic strings {{{
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'` 
 NHALF=`echo "$NTOMO" | awk '{printf "%d", $1/2}'`
 SPLITMODE=@BV:SPLITMODE@
@@ -103,10 +105,12 @@ then
     done
   done
 fi
+#}}}
+
 #Requested statistic {{{
 if [ "${STATISTIC^^}" == "COSEBIS" ] || [ "${STATISTIC^^}" == "COSEBIS_B" ] #{{{
 then 
-cosebis_configpath=@RUNROOT@/@CONFIGPATH@/cosebis/
+  cosebis_configpath=@RUNROOT@/@CONFIGPATH@/cosebis/
   #Scalecuts {{{
   lo=`echo @BV:NMINCOSEBIS@ | awk '{print $1-0.5}'`
   hi=`echo @BV:NMAXCOSEBIS@ | awk '{print $1+0.5}'`
@@ -124,8 +128,10 @@ cut_pair_En = $nottomostring
 
 EOF
 fi
+#}}}
 if [ "${STATISTIC^^}" == "COSEBIS_B" ]
 then 
+  #COSEBIs_B {{{
 cosebis_configpath=@RUNROOT@/@CONFIGPATH@/cosebis/
   #Scalecuts {{{
   lo=`echo @BV:NMINCOSEBIS@ | awk '{print $1-0.5}'`
@@ -137,6 +143,7 @@ cosebis_extension_name = Bn
 cosebis_section_name = cosebis_b
 
 EOF
+#}}}
 if [ "${SPLITMODE^^}" == "REDBLUE" ] 
 then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini <<- EOF
@@ -144,8 +151,8 @@ cut_pair_En = $nottomostring
 
 EOF
 fi
-fi
 #}}}
+fi
 
 #Base variables {{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
@@ -542,12 +549,14 @@ else
 fi
 #}}}
 
-#Prepare the pipeline section {{{ 
+#Prepare the pipeline ini files {{{ 
+#Extra parameters {{{
 extraparams="cosmological_parameters/S_8 cosmological_parameters/sigma_8 cosmological_parameters/A_s cosmological_parameters/omega_m cosmological_parameters/omega_nu cosmological_parameters/omega_lambda cosmological_parameters/cosmomc_theta"
 if [ "${IAMODEL^^}" == "MASSDEP" ] 
 then
   extraparams=="${extraparams} intrinsic_alignment_parameters/a intrinsic_alignment_parameters/beta"
 fi
+#}}}
 #Add nz shift values to outputs {{{
 shifts=""
 for i in `seq ${NTOMO}`
@@ -558,7 +567,7 @@ done
 #Add the values information #{{{
 if [  "@BV:COSMOSIS_PIPELINE@" == "default" ]
 then
-	# Set up boltzmann code blocks
+	# Set up boltzmann code blocks {{{
 	if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] 
 	then
 		#boltzmann_pipeline="cosmopower distances"
@@ -579,7 +588,8 @@ then
 		_message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
   		exit 1
 	fi
-	# Set up intrinsic alignment pipeline blocks
+  #}}}
+	# Set up intrinsic alignment pipeline blocks {{{
 	if [ "${IAMODEL^^}" == "LINEAR" ] 
 	then
 		iamodel_pipeline="linear_alignment projection"
@@ -596,6 +606,7 @@ then
 		_message "Intrinsic alignment model not implemented: ${IAMODEL^^}\n"
   		exit 1
 	fi
+  #}}}
 
 	if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 	then
@@ -612,13 +623,18 @@ then
 	elif [ "${STATISTIC^^}" == "BANDPOWERS_B" ] #{{{
 	then 
 		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} bandpowers scale_cuts bandpowers_b scale_cuts_b likelihood likelihood_b"
+  #}}}
 	elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
 	then 
 		COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} cl2xi xip_binned xim_binned scale_cuts likelihood"
 	fi
+  #}}}
 else
+  #Generic {{{
 	COSMOSIS_PIPELINE="@BV:COSMOSIS_PIPELINE@"
+  #}}}
 fi
+#Setup the pipeline block {{{
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
 [pipeline]
 modules = ${COSMOSIS_PIPELINE}
@@ -821,9 +837,10 @@ nz_background = 6000
 EOF
 #}}}
 else 
-  #ERROR: unknown boltzman code 
+  #ERROR: unknown boltzman code {{{
   _message "Boltzman Code Unknown: ${BOLTZMAN^^}\n"
   exit 1
+  #}}}
 fi
 #}}}
 
@@ -1027,13 +1044,15 @@ do
   esac
 done
 #}}}
+#}}}
+
+#Construct the .ini file {{{
 if [ "${STATISTIC^^}" == "COSEBIS_B" ] || [ "${STATISTIC^^}" == "BANDPOWERS_B" ]
 then
 cat \
   @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini >> \
   @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini
 fi
-#Construct the .ini file {{{
 cat \
   @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini \
   @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini \
