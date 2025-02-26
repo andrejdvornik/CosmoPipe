@@ -17,7 +17,7 @@
 PIPELINE=test
 
 #Root directory for pipeline scripts
-PACKROOT=`pwd`
+PACKROOT=@PACKROOT@
 
 #Date
 DATE=`date`
