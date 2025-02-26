@@ -3,22 +3,22 @@
 # File Name : add_datavector.sh
 # Created By : awright
 # Creation Date : 30-03-2023
-# Last Modified : Tue 02 May 2023 08:58:43 AM CEST
+# Last Modified : Thu 30 Jan 2025 09:27:54 PM CET
 #
 #=========================================
 
 
 #If needed, create the output directory 
-if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_vec ]
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/@BV:DATAVECBLOCK@ ]
 then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_vec/
+  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/@BV:DATAVECBLOCK@/
 fi 
 
-file="@COSEBIDATAVEC@"
+file="@BV:DATAVECPATH@"
 file=${file##*/}
 
 #Create the uncertainty file 
-cp @COSEBIDATAVEC@ @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosebis_vec/${file}
+cp @BV:DATAVECPATH@ @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/@BV:DATAVECBLOCK@/${file}
 
 #Update the datablock contents file 
-_write_datablock "cosebis_vec" "${file}"
+_write_datablock "@BV:DATAVECBLOCK@" "${file}"
