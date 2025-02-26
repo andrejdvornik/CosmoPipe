@@ -153,6 +153,8 @@ function _add_default_vars {
       #_write_blockvars ${varbase^^} "${varval}"
       _write_blockvars ${varbase^^} "${!varbase}"
     fi 
+    #Write the survey variable 
+    _write_blockvars SURVEY "@SURVEY@"
   done < @RUNROOT@/@PIPELINE@_defaults.sh
 } 
 #}}}
@@ -794,10 +796,22 @@ function _write_blockvars {
     _prompt=${_filelist#\{}
     _prompt=${_prompt%\}}
     _prompt=${_prompt//,/ }
-    if [ "${_prompt}" == "" ] || [ "${_prompt}" == "@BV:${target}@" ]
+    if [ "${_prompt}" == "" ] || [ "${_prompt}" == "@BV:${_target}@" ]
     then 
       _filelist="{${2// /,}}"
     else 
+      if [ "${2:0:4}" == "@DB:" ] 
+      then 
+        #Make full file paths from block files 
+        _filelist=''
+        for _file in ${_prompt}
+        do 
+          _filelist="${_filelist} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${_target}/${_file}"
+        done 
+        _prompt=`echo ${_filelist}`
+        _filelist="${_filelist// /,}"
+        _filelist="{${_filelist/^,/}}"
+      fi 
       #Prompt about the update
       echo -n " -> #${_prompt}#"
     fi 

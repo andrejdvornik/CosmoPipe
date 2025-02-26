@@ -36,18 +36,21 @@ PRIOR_B_IA="@BV:PRIOR_B_IA@"
 PRIOR_A_PIV="@BV:PRIOR_A_PIV@"
 #Mass dependent IA model
 PRIOR_LOG10_M_PIV="@BV:PRIOR_LOG10_M_PIV@"
-PRIOR_LOG10_M_MEAN_1="@BV:PRIOR_LOG10_M_MEAN_1@"
-PRIOR_LOG10_M_MEAN_2="@BV:PRIOR_LOG10_M_MEAN_2@"
-PRIOR_LOG10_M_MEAN_3="@BV:PRIOR_LOG10_M_MEAN_3@"
-PRIOR_LOG10_M_MEAN_4="@BV:PRIOR_LOG10_M_MEAN_4@"
-PRIOR_LOG10_M_MEAN_5="@BV:PRIOR_LOG10_M_MEAN_5@"
-PRIOR_LOG10_M_MEAN_6="@BV:PRIOR_LOG10_M_MEAN_6@"
 PRIOR_F_R_1="@BV:PRIOR_F_R_1@"
 PRIOR_F_R_2="@BV:PRIOR_F_R_2@"
 PRIOR_F_R_3="@BV:PRIOR_F_R_3@"
 PRIOR_F_R_4="@BV:PRIOR_F_R_4@"
 PRIOR_F_R_5="@BV:PRIOR_F_R_5@"
 PRIOR_F_R_6="@BV:PRIOR_F_R_6@"
+#SP(k) parameters fb_a fb_pow fb_pivot epsilon alpha beta gamma m_pivot
+#PRIOR_FB_A="@BV:PRIOR_FB_A@"
+#PRIOR_FB_POW="@BV:PRIOR_FB_POW@"
+#PRIOR_FB_PIVOT="@BV:PRIOR_FB_PIVOT@"
+#PRIOR_EPSILON="@BV:PRIOR_EPSILON@"
+#PRIOR_ALPHA="@BV:PRIOR_ALPHA@"
+#PRIOR_BETA="@BV:PRIOR_BETA@"
+#PRIOR_GAMMA="@BV:PRIOR_GAMMA@"
+#PRIOR_M_PIVOT="@BV:PRIOR_M_PIVOT@"
 
 #BOLTZMANN code
 BOLTZMAN=@BV:BOLTZMAN@
@@ -172,7 +175,7 @@ then
     fi 
     #}}}
   done
-elif [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
+elif [ "${BOLTZMAN^^}" == "CAMB_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_SPK" ]
 then
   for param in logT_AGN
   do 
@@ -410,7 +413,7 @@ then
   echo "A = 1.0" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
 elif [ "${IAMODEL^^}" == "MASSDEP" ] 
 then
-  for param in log10_M_piv log10_M_mean_1 log10_M_mean_2 log10_M_mean_3 log10_M_mean_4 log10_M_mean_5 log10_M_mean_6 f_r_1 f_r_2 f_r_3 f_r_4 f_r_5 f_r_6
+  for param in log10_M_piv f_r_1 f_r_2 f_r_3 f_r_4 f_r_5 f_r_6
   do 
     #Load the prior variable name {{{
     pvar=${param^^}
@@ -456,7 +459,7 @@ then
   #Add the uncorrelated AIA and beta 
   params_all=`cat @DB:massdep_params_uncorr@`
   n=1
-  for param in uncorr_a uncorr_beta
+  for param in uncorr_a uncorr_beta uncorr_log10_M_mean_1 uncorr_log10_M_mean_2 uncorr_log10_M_mean_3 uncorr_log10_M_mean_4 uncorr_log10_M_mean_5 uncorr_log10_M_mean_6
   do 
     val=`echo ${params_all} | awk -v d=${n} '{print $d}'`
     lo=`echo $val | awk '{print $1-5.00}'`
@@ -475,6 +478,56 @@ else
   exit 1
 fi
 #}}}
+
+if [ "${BOLTZMAN^^}" == "CAMB_SPK" ]
+then
+  blockname="[spk]"
+  echo "${blockname}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+  found_gauss=FALSE
+  for param in fb_a fb_pow fb_pivot #fb_a fb_pow fb_pivot epsilon alpha beta gamma m_pivot
+  do 
+    #Load the prior variable name {{{
+    pvar=${param^^}
+    pvar=PRIOR_${pvar}
+    #}}}
+    #get the prior value {{{
+    pprior=`echo ${!pvar}`
+    #}}}
+    #Check the prior is correctly specified {{{
+    nprior=`echo ${pprior} | awk '{print NF}'` 
+    if [ ${nprior} -ne 3 ] && [ ${nprior} -ne 1 ]
+    then 
+      _message "@RED@ ERROR - prior @DEF@${pvar}@RED@ does not have 3 values! Must be tophat ('lo start hi') or gaussian ('gaussian mean sd')@DEF@\n"
+      _message "@RED@         it is: @DEF@${pprior}\n"
+      exit 1 
+    fi 
+    #}}}
+    #Write the prior {{{
+    if [ "${pprior%% *}" == "gaussian" ]
+    then 
+      #Prior is a gaussian {{{
+      #Construct the tophat prior: [-10 sigma, +10 sigma ] {{{
+      pstring=`echo ${pprior} | awk '{print $2-10*$3,$2,$2+10*$3}'`
+      echo "${param} = ${pstring}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+      #}}}
+      #Add the gaussian prior to the priors.ini file  {{{
+      if [ "${found_gauss}" == "FALSE" ]
+      then 
+        echo "${blockname}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+        found_gauss=TRUE
+      fi 
+      #Write the gaussian prior to the priors file 
+      echo "${param} = ${pprior}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_priors.ini
+      #}}}
+      #}}}
+    else 
+      #Write the tophat prior to the priors file {{{
+      echo "${param} = ${pprior}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini
+      #}}}
+    fi 
+    #}}}
+  done
+fi
 
 #Update the values with the uncorrelated Dz priors {{{
 echo "[nofz_shifts]" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_values.ini 

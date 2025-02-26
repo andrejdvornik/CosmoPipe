@@ -9,6 +9,8 @@ library(magicaxis)
 library(argparser)
 #}}}
 
+on.exit(traceback())
+
 #Create the argument parser {{{
 p <- arg_parser("Plot a chain file")
 # Add a positional argument
@@ -22,6 +24,10 @@ p <- add_argument(p, "--sampler", help="sampler used in the chain")
 # Add an optional argument
 p <- add_argument(p, "--output", help="output png", default="plot_Om_S8.png")
 # Add an optional argument
+p <- add_argument(p, "--xtitle", help="x-axis label", default="Omega[m]")
+# Add an optional argument
+p <- add_argument(p, "--ytitle", help="y-axis label", default="italic(S)[8]*'='*sigma[8]*sqrt(Omega[m]/0.3)")
+# Add an optional argument
 p <- add_argument(p, "--xlabel", help="x-axis variable name", default="OMEGA_M")
 # Add an optional argument
 p <- add_argument(p, "--ylabel", help="y-axis variable name", default="s_8_input")
@@ -30,7 +36,7 @@ p <- add_argument(p, "--xlim", help="x-axis limits", default=c(0.09,0.52))
 # Add an optional argument
 p <- add_argument(p, "--ylim", help="y-axis limits", default=c(0.63,0.86))
 # Add an optional argument
-p <- add_argument(p, "--title", help="Plot title", default="Chain",nargs="+")
+p <- add_argument(p, "--title", help="Plot title", default="Chain")
 # Add a flag
 p <- add_argument(p, "--removeh2", help="remove h2 dependence from variables", flag=TRUE)
 ## Add a flag
@@ -58,15 +64,19 @@ cat<-helpRfuncs::read.chain(args$input)
 colnames(cat)<-gsub("cosmological_parameters--","",colnames(cat),ignore.case=T)
 colnames(cat)<-gsub("intrinsic_alignment_parameters--","IA_",colnames(cat),ignore.case=T)
 colnames(cat)<-gsub("halo_model_parameters--","HM_",colnames(cat),ignore.case=T)
+cat("Chain read successful\n")
+#print(colnames(cat))
 #}}}
 
 #Check for the xlabel and ylabel's in the catalogue {{{
 if (!args$xlabel%in%colnames(cat)) { 
   stop(paste("ERROR: the x-axis variable is not in the catalogue?!",args$xlabel))
 }
+cat[[args$xlabel]]<-as.numeric(cat[[args$xlabel]])
 if (!args$ylabel%in%colnames(cat)) { 
   stop(paste("ERROR: the y-axis variable is not in the catalogue?!",args$ylabel))
 }
+cat[[args$ylabel]]<-as.numeric(cat[[args$ylabel]])
 #}}}
 
 #If we aren't using the grid sampler, check for 'weight' and 'log-weight' columns {{{
@@ -83,6 +93,9 @@ if (args$sampler!='grid') {
     } 
   }
 }
+#remove non-finite weights {{{ 
+cat<-cat[which(is.finite(cat$weight) & is.finite(cat$post) & is.finite(cat[[args$xlabel]]) & is.finite(cat[[args$ylabel]])),]
+#}}}
 #}}}
 
 #If we have requested a reference catalogue {{{
@@ -93,17 +106,34 @@ if (args$refr!='none' & file.exists(args$refr)) {
   colnames(ref)<-gsub("cosmological_parameters--","",colnames(ref),ignore.case=T)
   colnames(ref)<-gsub("intrinsic_alignment_parameters--","IA_",colnames(ref),ignore.case=T)
   colnames(ref)<-gsub("halo_model_parameters--","HM_",colnames(ref),ignore.case=T)
+  cat("Reference read successful\n")
   #If there is no weight column (multinest/polychord)
-  if (!any(colnames(ref)=='weight')) { 
-    #If there is also no log_weight column (nautilus) 
-    if (any(colnames(ref)=='log_weight')) { 
-      #Convert it to linear weight 
-      ref$weight<-exp(ref$log_weight)
-    } else { 
-      #Error 
-      stop("ERROR: there is no weight or logweight in the reference file?!")
-    } 
+  if (args$sampler!='grid') { 
+    if (!any(colnames(ref)=='weight')) { 
+      #If there is also no log_weight column (nautilus) 
+      if (any(colnames(ref)=='log_weight')) { 
+        #Convert it to linear weight 
+        ref$weight<-exp(ref$log_weight)
+      } else { 
+        #Error 
+        stop("ERROR: there is no weight or logweight in the reference file?!")
+      } 
+    }
   }
+  #Check for the xlabel and ylabel's in the catalogue {{{
+  if (!args$xlabel%in%colnames(ref)) { 
+    stop(paste("ERROR: the x-axis variable is not in the reference catalogue?!",args$xlabel))
+  }
+  ref[[args$xlabel]]<-as.numeric(ref[[args$xlabel]])
+  if (!args$ylabel%in%colnames(ref)) { 
+    stop(paste("ERROR: the y-axis variable is not in the reference catalogue?!",args$ylabel))
+  }
+  ref[[args$ylabel]]<-as.numeric(ref[[args$ylabel]])
+  #}}}
+  #remove non-finite weights {{{ 
+  ref<-ref[which(is.finite(ref$weight) & is.finite(ref$post) & is.finite(ref[[args$xlabel]]) & is.finite(ref[[args$ylabel]])),]
+  print(str(ref))
+  #}}}
 }
 #}}}
 
@@ -111,12 +141,41 @@ if (args$refr!='none' & file.exists(args$refr)) {
 if (args$prior!='none' & file.exists(args$prior)) { 
   #Read the reference file 
   prior<-helpRfuncs::read.chain(args$prior)
+  colnames(prior)<-gsub('*','',colnames(prior),fixed=T)
+  if (any(colnames(prior)=='omegamh2')) { 
+    colnames(prior)[which(colnames(prior)=='omegamh2')]<-'omch2'
+  }
+  if (any(colnames(prior)=='S8')) { 
+    colnames(prior)[which(colnames(prior)=='S8')]<-'s_8_input'
+  }
+  if (any(colnames(prior)=='H0')) { 
+    prior$h0<-prior$H0/100
+  }
   #Edit the column names for simplicity 
   colnames(prior)<-gsub("cosmological_parameters--","",colnames(prior),ignore.case=T)
   colnames(prior)<-gsub("intrinsic_alignment_parameters--","IA_",colnames(prior),ignore.case=T)
   colnames(prior)<-gsub("halo_model_parameters--","HM_",colnames(prior),ignore.case=T)
+  cat("Prior read successful\n")
+  if (!any(colnames(prior)=='weight')) { 
+    #If there is also no log_weight column (nautilus) 
+    if (any(colnames(prior)=='log_weight')) { 
+      #Convert it to linear weight 
+      prior$weight<-exp(prior$log_weight)
+    } else { 
+      #Error 
+      stop("ERROR: there is no weight or logweight in the prior file?!")
+    } 
+  }
+  #remove non-finite weights {{{ 
+  print(nrow(prior))
+  prior<-as.data.frame(prior)
+  prior<-prior[which(is.finite(prior$weight) & is.finite(prior$post) & is.finite(prior[[args$xlabel]]) & is.finite(prior[[args$ylabel]])),]
+  prior<-data.table::as.data.table(prior)
+  print(nrow(prior))
+  #}}}
 }
 #}}}
+
 
 #If we want to remove the h^2 dependence from the plotted parameters{{{
 if (args$removeh2) { 
@@ -231,11 +290,16 @@ if (exists("ref")) {
 #Contour for the prior chain {{{
 if (args$sampler!='grid' & exists("prior")) { 
   #Construct the prior contour from the prior chain 
+  index<-prior[[args$xlabel]] >= min(args$xlim) & prior[[args$xlabel]] <= max(args$xlim) & 
+         prior[[args$ylabel]] >= min(args$ylim) & prior[[args$ylabel]] <= max(args$ylim)
+  hprior= sm::h.select(x = cbind(prior[[args$xlabel]],prior[[args$ylabel]])[index,], 
+                     y = NA, weights = prior$weight[index], nbins = 0)
   con.prior=helpRfuncs::contour(
-                   prior[[args$xlabel]],prior[[args$ylabel]],
-                   conlevels=c(diff(pnorm(c(-2,2))),diff(pnorm(c(-1,1))),0.9999),
-                   h=use.h,
-                   nbins=0,ngrid=1000,fill.col=c("#D3D3D37F","white","darkgrey"),
+                   prior[[args$xlabel]],prior[[args$ylabel]],weights=prior$weight,
+                   #conlevels=c(diff(pnorm(c(-2,2))),diff(pnorm(c(-1,1))),0.9999),
+                   conlevels=c(diff(pnorm(c(-1,1))),diff(pnorm(c(-2,2)))),
+                   h=hprior,
+                   nbins=0,ngrid=1000,fill.col=c("#D3D3D37F","darkgrey"),
                    doim=F,col=NA,fill=T,lwd=2,
                    add=TRUE,barposition='bottomright',barorient='h',dobar=F)
 } else if (args$sampler=='grid') { 
@@ -359,15 +423,22 @@ helpRfuncs::contour(rnorm(1e4,mean=args$xlim[2]-xbuff-htmp[1]*3,sd=htmp[1]/1e4),
                     conlevels=c(diff(pnorm(c(-1,1))),diff(pnorm(c(-2,2)))),
                     xlim=args$xlim,ylim=args$ylim,
                     ngrid=1000,doim=F,add=T,h=htmp,lwd=1.5,dobar=F,col='black')
+if (exists('prior')) { 
+helpRfuncs::contour(rnorm(1e4,mean=args$xlim[2]-xbuff-htmp[1]*3,sd=htmp[1]/1e4),
+                    rnorm(1e4,mean=args$ylim[2]-ybuff-max(htmp[2]*3.5,0.01),sd=htmp[2]/1e4),
+                    conlevels=c(diff(pnorm(c(-1,1))),diff(pnorm(c(-2,2)))),
+                    xlim=args$xlim,ylim=args$ylim,
+                    ngrid=1000,doim=F,add=T,h=hprior,lwd=1.5,dobar=F,col='grey')
+}
 #}}}
 
 #Annotate the axes {{{
 magaxis(xlab="",side=1,labels=T,lab.cex=1.5)
 magaxis(ylab="",side=2:4,labels=c(T,F,F),lab.cex=1.5)
 #Axes labels: xaxis 
-mtext(side=1,line=1.8,text=bquote(Omega[m]*" ("*.(args$xlabel)*")"))
+mtext(side=1,line=1.8,text=bquote(.(parse(text=paste0(args$xtitle,'*" ("*',args$xlabel,'*")"')))))
 #Axes labels: yaxis 
-mtext(side=2,line=1.5,text=bquote(italic(S)[8]*"="*sigma[8]*sqrt(Omega[m]/0.3)*" ("*.(args$ylabel)*")"))
+mtext(side=2,line=1.5,text=bquote(.(parse(text=paste0(args$ytitle,'*" ("*',args$ylabel,'*")"')))))
 #Plot Title 
 mtext(side=3,line=0.5,font=2,text=args$title)
 #}}}

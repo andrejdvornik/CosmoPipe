@@ -106,7 +106,16 @@ N_R = args.nbins_R
 N_SNR = args.nbins_SNR
 
 ## start with R bin
-obj_cat['bin_R'] = pd.qcut(obj_cat['R'], N_R, labels=False, retbins=False)
+try: 
+    rval = obj_cat['R']
+except: 
+    emod = np.hypot(obj_cat[col_e1].astype(np.float64), obj_cat[col_e2].astype(np.float64))
+    r_ab = (obj_cat['autocal_scalelength_pixels'].astype(np.float64) * np.sqrt((1.-emod)/(1.+emod)))
+    PSFsize = ((obj_cat['PSF_Q11'].astype(np.float64)*obj_cat['PSF_Q22'].astype(np.float64) - obj_cat['PSF_Q12'].astype(np.float64)**2.)**0.5)
+    rval = (PSFsize / (r_ab**2 + PSFsize))
+    obj_cat['R'] = rval 
+
+obj_cat['bin_R'] = pd.qcut(rval, N_R, labels=False, retbins=False)
 
 ## then snr bin
 obj_cat['bin_snr'] = np.zeros(len(obj_cat))-999

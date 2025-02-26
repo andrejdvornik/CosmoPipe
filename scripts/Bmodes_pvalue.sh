@@ -29,8 +29,8 @@ then
 #}}}
 elif [ "${STATISTIC^^}" == "XIEB" ] #{{{
 then 
-  inputfile=@DB:mcmc_inp_xiE@
-  inputfile_B=@DB:mcmc_inp_xiB@
+  inputfile_E=@DB:mcmc_inp_xiE@
+  inputfile=@DB:mcmc_inp_xiB@
 fi
 #}}}
 #If needed, create the output directory {{{
@@ -42,30 +42,36 @@ fi
 
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 MULT=@BV:MULT@
-if [ "${STATISTIC^^}" == "XIEB" ] #{{{
+
+# Old Bmode script
+#if [ -n "$MULT" ]
+#then
+#  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue.py \
+#  --inputfile ${inputfile} \
+#  --statistic @BV:STATISTIC@ \
+#  --ntomo ${NTOMO} \
+#  --thetamin @BV:THETAMINXI@ \
+#  --thetamax @BV:THETAMAXXI@ \
+#  --title "@SURVEY@" \
+#  --suffix "@BV:CHAINSUFFIX@" \
+#  --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/ \
+#  --mult ${MULT}
+#else
+#  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue.py \
+#  --inputfile ${inputfile} \
+#  --statistic @BV:STATISTIC@ \
+#  --ntomo ${NTOMO} \
+#  --thetamin @BV:THETAMINXI@ \
+#  --thetamax @BV:THETAMAXXI@ \
+#  --title "@SURVEY@" \
+#  --suffix "@BV:CHAINSUFFIX@" \
+#  --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
+#fi
+
+if [ -n "$MULT" ] && [ "$MULT" != "1.0" ]
 then
-@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue.py \
-  --inputfile ${inputfile} \
-  --statistic @BV:STATISTIC@ \
-  --ntomo ${NTOMO} \
-  --thetamin @BV:THETAMINXI@ \
-  --thetamax @BV:THETAMAXXI@ \
-  --title "@SURVEY@" \
-  --suffix "@BV:CHAINSUFFIX@E" \
-  --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
-@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue.py \
-  --inputfile ${inputfile_B} \
-  --statistic @BV:STATISTIC@ \
-  --ntomo ${NTOMO} \
-  --thetamin @BV:THETAMINXI@ \
-  --thetamax @BV:THETAMAXXI@ \
-  --title "@SURVEY@" \
-  --suffix "@BV:CHAINSUFFIX@B" \
-  --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
-else
-if [ -n "$MULT" ]
-then
-  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue.py \
+ # @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue_v2.py \
+  @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue_v2.R \
   --inputfile ${inputfile} \
   --statistic @BV:STATISTIC@ \
   --ntomo ${NTOMO} \
@@ -76,7 +82,8 @@ then
   --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/ \
   --mult ${MULT}
 else
-  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue.py \
+  #@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue_v2.py \
+  @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue_v2.R \
   --inputfile ${inputfile} \
   --statistic @BV:STATISTIC@ \
   --ntomo ${NTOMO} \
@@ -85,6 +92,5 @@ else
   --title "@SURVEY@" \
   --suffix "@BV:CHAINSUFFIX@" \
   --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
-fi
 fi
 

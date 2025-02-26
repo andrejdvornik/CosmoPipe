@@ -3,7 +3,7 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Wed 26 Feb 2025 10:47:21 AM CET
+# Last Modified : Wed Feb 26 21:21:49 2025
 #
 #=========================================
 #Script to generate a cosmosis .ini, values, & priors file 
@@ -13,6 +13,11 @@ CHAINSUFFIX=@BV:CHAINSUFFIX@
 STATISTIC="@BV:STATISTIC@"
 SAMPLER="@BV:SAMPLER@"
 BOLTZMAN="@BV:BOLTZMAN@"
+
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/ ] 
+then 
+  mkdir -p @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs 
+fi 
 
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 [DEFAULT]
@@ -37,7 +42,7 @@ EOF
 #}}}
 
 #Define the data file name {{{ 
-if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ]
+if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_SPK" ] 
 then
   non_linear_model=mead2020_feedback
 elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
@@ -70,6 +75,32 @@ simulate = F
 simulate_with_noise = T
 mock_filename =
 EOF
+if [ "@BV:REMOVETOMOBIN@" != "" ]
+then 
+  NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'` 
+  rempairs=''
+  for i in `seq $NTOMO`
+  do 
+    if [ @BV:REMOVETOMOBIN@ -lt ${i} ] 
+    then 
+      rempairs="${rempairs} @BV:REMOVETOMOBIN@+${i}"
+    else 
+      rempairs="${rempairs} ${i}+@BV:REMOVETOMOBIN@"
+    fi 
+  done
+  if [ "${STATISTIC^^}" == "COSEBIS" ] 
+  then 
+    echo "cut_pair_En = $rempairs " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini 
+  elif [ "${STATISTIC^^}" == "BANDPOWERS" ] 
+  then 
+    echo "cut_pair_PeeE = $rempairs " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini 
+    echo "cut_pair_PeeB = $rempairs " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini 
+  elif [ "${STATISTIC^^}" == "XIPM" ] 
+  then 
+    echo "cut_pair_xiP = $rempairs " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini 
+    echo "cut_pair_xiM = $rempairs " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini 
+  fi 
+fi 
 if [ "${STATISTIC^^}" == "COSEBIS_B" ] || [ "${STATISTIC^^}" == "BANDPOWERS_B" ]
 then
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini <<- EOF
@@ -88,7 +119,7 @@ fi
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'` 
 NHALF=`echo "$NTOMO" | awk '{printf "%d", $1/2}'`
 SPLITMODE=@BV:SPLITMODE@
-if [ "${SPLITMODE^^}" == "REDBLUE" ] 
+if [ "${SPLITMODE^^}" == "REDBLUE" ] || [ "${SPLITMODE^^}" == "NORTHSOUTH" ] 
 then
   tomostring=""
   nottomostring=""
@@ -121,7 +152,7 @@ cosebis_extension_name = En
 cosebis_section_name = cosebis
 
 EOF
-if [ "${SPLITMODE^^}" == "REDBLUE" ] 
+if [ "${SPLITMODE^^}" == "REDBLUE" ] || [ "${SPLITMODE^^}" == "NORTHSOUTH" ] 
 then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 cut_pair_En = $nottomostring
@@ -143,8 +174,7 @@ cosebis_extension_name = Bn
 cosebis_section_name = cosebis_b
 
 EOF
-#}}}
-if [ "${SPLITMODE^^}" == "REDBLUE" ] 
+if [ "${SPLITMODE^^}" == "REDBLUE" ] || [ "${SPLITMODE^^}" == "NORTHSOUTH" ] 
 then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini <<- EOF
 cut_pair_En = $nottomostring
@@ -212,7 +242,7 @@ bandpower_e_cosmic_shear_section_name = bandpower_shear_e
 keep_ang_PeeE = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
 
 EOF
-if [ "${SPLITMODE^^}" == "REDBLUE" ] 
+if [ "${SPLITMODE^^}" == "REDBLUE" ] || [ "${SPLITMODE^^}" == "NORTHSOUTH" ] 
 then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 cut_pair_PeeE = $nottomostring
@@ -228,7 +258,7 @@ bandpower_b_cosmic_shear_section_name = bandpower_shear_b
 keep_ang_PeeE = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
 
 EOF
-if [ "${SPLITMODE^^}" == "REDBLUE" ] 
+if [ "${SPLITMODE^^}" == "REDBLUE" ] || [ "${SPLITMODE^^}" == "NORTHSOUTH" ] 
 then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini <<- EOF
 cut_pair_PeeB = $nottomostring
@@ -324,7 +354,7 @@ keep_ang_xiP  = @BV:THETAMINXI@ @BV:THETAMAXXI@
 keep_ang_xiM  = ${ximinus_min}  ${ximinus_max}
 
 EOF
-if [ "${SPLITMODE^^}" == "REDBLUE" ] 
+if [ "${SPLITMODE^^}" == "REDBLUE" ] || [ "${SPLITMODE^^}" == "NORTHSOUTH" ] 
 then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 cut_pair_xiP = $nottomostring
@@ -352,7 +382,8 @@ weighted_binning = 1
 InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/@BV:NPAIRBASE@
 InputNpair_suffix = .ascii
 Column_theta_Name = meanr 
-Column_Npair_Name = npairs_weighted
+#Column_Npair_Name = npairs_weighted
+Column_Npair_Name = weight
 nBins_in = ${NTOMO}
 
 add_2D_cterm = 0 
@@ -372,7 +403,8 @@ weighted_binning = 1
 InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_xipm/@BV:NPAIRBASE@
 InputNpair_suffix = .ascii
 Column_theta_Name = meanr 
-Column_Npair_Name = npairs_weighted
+#Column_Npair_Name = npairs_weighted
+Column_Npair_Name = weight
 nBins_in = ${NTOMO} 
 
 add_2D_cterm = 0
@@ -465,11 +497,11 @@ split_threshold = 100
 n_networks = 8
 n_batch = $n_batch
 filepath = %(OUTPUT_FOLDER)s/run_nautilus.hdf5
-resume = False
+resume = @BV:NAUTILUS_RESUME@
 f_live = 0.01
 discard_exploration = True
 verbose = True
-n_eff = 10000
+n_eff = @BV:NAUTILUS_NSAMP@
 
 EOF
 
@@ -554,7 +586,7 @@ fi
 extraparams="cosmological_parameters/S_8 cosmological_parameters/sigma_8 cosmological_parameters/A_s cosmological_parameters/omega_m cosmological_parameters/omega_nu cosmological_parameters/omega_lambda cosmological_parameters/cosmomc_theta"
 if [ "${IAMODEL^^}" == "MASSDEP" ] 
 then
-  extraparams=="${extraparams} intrinsic_alignment_parameters/a intrinsic_alignment_parameters/beta"
+  extraparams="${extraparams} intrinsic_alignment_parameters/a intrinsic_alignment_parameters/beta intrinsic_alignment_parameters/log10_m_mean_1 intrinsic_alignment_parameters/log10_m_mean_2 intrinsic_alignment_parameters/log10_m_mean_3 intrinsic_alignment_parameters/log10_m_mean_4 intrinsic_alignment_parameters/log10_m_mean_5 intrinsic_alignment_parameters/log10_m_mean_6"
 fi
 #}}}
 #Add nz shift values to outputs {{{
@@ -584,6 +616,9 @@ then
 	elif [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
 	then
 		boltzmann_pipeline="one_parameter_hmcode camb"
+	elif [ "${BOLTZMAN^^}" == "CAMB_SPK" ] 
+	then
+		boltzmann_pipeline="camb spk"
 	else
 		_message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
   		exit 1
@@ -836,6 +871,34 @@ nz_background = 6000
 
 EOF
 #}}}
+elif [ "${BOLTZMAN^^}" == "CAMB_SPK" ] #{{{
+then 
+
+cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_boltzman.ini <<- EOF
+[camb]
+file = %(CSL_PATH)s/boltzmann/camb/camb_interface.py
+do_reionization = F
+mode = power
+nonlinear = pk
+halofit_version = mead2020_feedback
+neutrino_hierarchy = normal
+kmax = 10.0
+zmid = 2.0
+nz_mid = 100
+zmax = 3.0
+nz = 150
+zmax_background = 6.0
+zmin_background = 0.0
+nz_background = 6000
+use_ppf_w = True
+
+[spk]
+file = %(CSL_PATH)s/structure/spk/spk_interface.py
+astropy_model = flatlambdacdm
+fb_table = %(CSL_PATH)s/structure/spk/BAHAMAS_fb_M200.csv
+
+EOF
+#}}}
 else 
   #ERROR: unknown boltzman code {{{
   _message "Boltzman Code Unknown: ${BOLTZMAN^^}\n"
@@ -884,14 +947,14 @@ do
 			EOF
 			;; #}}}
 	"correlated_massdep_priors") #{{{
-	  massdep_params="intrinsic_alignment_parameters/a intrinsic_alignment_parameters/beta"
-	  unc_massdep_params="intrinsic_alignment_parameters/uncorr_a intrinsic_alignment_parameters/uncorr_beta"
+	  massdep_params="intrinsic_alignment_parameters/a intrinsic_alignment_parameters/beta intrinsic_alignment_parameters/log10_M_mean_1 intrinsic_alignment_parameters/log10_M_mean_2 intrinsic_alignment_parameters/log10_M_mean_3 intrinsic_alignment_parameters/log10_M_mean_4 intrinsic_alignment_parameters/log10_M_mean_5 intrinsic_alignment_parameters/log10_M_mean_6" 
+	  unc_massdep_params="intrinsic_alignment_parameters/uncorr_a intrinsic_alignment_parameters/uncorr_beta intrinsic_alignment_parameters/uncorr_log10_M_mean_1 intrinsic_alignment_parameters/uncorr_log10_M_mean_2 intrinsic_alignment_parameters/uncorr_log10_M_mean_3 intrinsic_alignment_parameters/uncorr_log10_M_mean_4 intrinsic_alignment_parameters/uncorr_log10_M_mean_5 intrinsic_alignment_parameters/uncorr_log10_M_mean_6"
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
 			file = %(KCAP_PATH)s/utils/correlated_priors.py
 			uncorrelated_parameters = ${unc_massdep_params}
 			output_parameters = ${massdep_params}
-			covariance = @RUNROOT@/INSTALL/ia_models/mass_dependent_ia/massdep_cov.txt
+			covariance = @BV:MASSDEP_COVARIANCE@
 			
 			EOF
 			;; #}}}
@@ -1016,13 +1079,35 @@ do
 			fi
 			;; #}}}
     "likelihood") #{{{
-			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-			[$module]
-			file = %(KCAP_PATH)s/utils/mini_like.py
-			input_section_name = scale_cuts_output
-			like_name = loglike
+			MASKDATAPOINT=@BV:MASKDATAPOINT@
+			if [ -n "$MASKDATAPOINT" ] && [ "$MASKDATAPOINT" -eq "$MASKDATAPOINT" ]
+			then
+				if [ "${STATISTIC^^}" == "COSEBIS" ]
+				then
+					NDATA=@BV:NMAXCOSEBIS@
+				elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
+				then 
+					NDATA=@BV:NBANDPOWERS@
+				fi
+			  	cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+				[$module]
+				file = %(KCAP_PATH)s/utils/mini_like_dodgymask.py
+				input_section_name = scale_cuts_output
+				like_name = loglike
+				mask_datapoint=$MASKDATAPOINT
+				n_data=${NDATA}
+				n_tomo=${NTOMO}
 
 			EOF
+			else
+				cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+				[$module]
+				file = %(KCAP_PATH)s/utils/mini_like.py
+				input_section_name = scale_cuts_output
+				like_name = loglike
+
+				EOF
+			fi
     	;; #}}}
 	"likelihood_b") #{{{
 		cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF

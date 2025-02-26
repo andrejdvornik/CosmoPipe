@@ -262,9 +262,11 @@ if mode == 'cosebis':
         TminusFileName= tfoldername+'/'+tminusfile+'_n'+str(n)+'_'+thetaRange+'.table'
 
         if(os.path.isfile(TplusFileName)):
+            print('T_plus file: %s found!'%TplusFileName)
             file = open(TplusFileName)
             tp=np.loadtxt(file,comments='#')
         else:
+            print('T_plus file: %s not found! Calculating now!'%TplusFileName)
             file = open(normfile)
             norm_all=np.loadtxt(file,comments='#')
             norm_in=norm_all[n-1]
@@ -278,10 +280,12 @@ if mode == 'cosebis':
             np.savetxt(TplusFileName,tp)
     # 
         if(os.path.isfile(TminusFileName)):
+            print('T_minus file: %s found!'%TminusFileName)
             file = open(TminusFileName)
             tm=np.loadtxt(file,comments='#')
         else:
             file = open(normfile)
+            print('T_minus file: %s not found! Calculating now!'%TminusFileName)
             norm_all=np.loadtxt(file,comments='#')
             norm_in=norm_all[n-1]
             norm=norm_in[1]

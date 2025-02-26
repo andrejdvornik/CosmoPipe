@@ -10,6 +10,45 @@
 #Run cosmosis for a constructed ini file 
 ppython=@PYTHON3BIN@
 pythonbin=${ppython%/*}
+
+STATISTIC="@BV:STATISTIC@"
+if [ "${STATISTIC^^}" == "COSEBIS" ] 
+then
+  # check whether the pre-computed COSEBIS tables exist 
+  SRCLOC=@RUNROOT@/@CONFIGPATH@/cosebis
+  normfile=${SRCLOC}/TLogsRootsAndNorms/Normalization_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
+  rootfile=${SRCLOC}/TLogsRootsAndNorms/Root_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
+
+  if [ ! -f ${normfile} ] || [ ! -f ${rootfile} ]
+  then 
+    if [ "@BINNING@" == "log" ] 
+    then 
+      _message "    -> @BLU@Computing COSEBIs root and norm files@DEF@"
+      @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/cosebis_compute_log_weight.py \
+        --thetamin @BV:THETAMINXI@ \
+        --thetamax @BV:THETAMAXXI@ \
+        --nmax @BV:NMAXCOSEBIS@ \
+        --outputbase ${SRCLOC}/TLogsRootsAndNorms/ 2>&1
+      _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
+    else 
+      _message "- ERROR!\n"
+      _message "COSEBIS pre-computed table ${normfile} or ${rootfile} is missing, and pipeline cannot compute them for linear binning. Download from gitrepo!\n"
+      exit 1
+    fi 
+  fi
+  # check whether the precomputed WnLog files exist
+  nfiles=@BV:NMAXCOSEBIS@
+  basefile="${SRCLOC}/WnLog/WnLogBIN-@BV:THETAMINXI@-@BV:THETAMAXXI@.table"
+  for i in $(seq -f "%01g" 1 $nfiles)
+  do
+    file=`echo ${basefile} | sed "s/BIN/${i}/g"`
+    if [ ! -f ${file} ]
+    then
+      _message "Pre-computed WnLog file ${file} is missing! Calculating on the fly!\n"
+    fi
+  done
+fi
+
 _message " >@BLU@ Running cosmosis chain!\n   Start time:@DEF@ `date +'%a %H:%M'`@BLU@)\n@DEF@"
 _message " >@BLU@ Status can be monitored in the logfile located here:\n@RED@ `ls -tr @RUNROOT@/@LOGPATH@/step_*_run_chain.log | tail -n 1` @DEF@\n"
 if [ @BV:NTHREADS@ -eq 1 ] || [ "@BV:SAMPLER@" == "test" ] || [ "@BV:SAMPLER@" == "maxlike" ]

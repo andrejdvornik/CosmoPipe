@@ -42,7 +42,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo COSEBIDATAVEC DATABLOCK RUNROOT STORAGEPATH
+  echo BV:DATAVECBLOCK BV:DATAVECPATH DATABLOCK RUNROOT STORAGEPATH
 } 
 #}}}
 

@@ -1,0 +1,218 @@
+\documentclass[fleqn,usenatbib]{mnras}
+\usepackage[T1]{fontenc}
+\usepackage{ae,aecompl}
+\usepackage{graphicx}   % Including figure files
+\usepackage{amsmath}    % Advanced maths commands
+\usepackage{amssymb}    % Extra maths symbols
+\usepackage{siunitx}    % for numbers with units
+\DeclareSIUnit{\degree}{deg} % we want degrees written with 'deg' and
+                             % not with a superscript circle.
+\DeclareSIUnit{\arcmin}{arcmin} % we want degrees written  'arcmin' and
+                             % not as a prime.
+\DeclareSIUnit{\arcsec}{arcsec} % we want arcsec written  'arcsec' and
+                             % not as a double prime.
+\usepackage{color,verbatim,url}
+\usepackage{tabularx}
+\usepackage[table,usenames,dvipsnames]{xcolor}
+\usepackage{booktabs}
+\usepackage{pdflscape}
+\usepackage{lastpage}
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{escapeinside={<@}{@>}}
+
+\usepackage{minitoc}
+
+\definecolor{pink}{rgb}{0.858, 0.188, 0.478}
+\definecolor{purple}{RGB}{76, 0,153}
+\def\ie{\,{\rm i.e.}\,}
+\def\eg{\,{\rm e.g.}\,}
+\onecolumn
+
+\newcommand{\red}[1]{{\color{red}{#1}}}
+\newcommand{\green}[1]{{\color{green}{#1}}}
+\newcommand{\blue}[1]{{\color{blue}{#1}}}
+\newcommand{\x}{\vec{x}}
+\renewcommand{\d}[0]{{\rm d}}
+
+\newcommand{\be}{\begin{equation}}  \newcommand{\ee}{\end{equation}}
+\newcommand{\mb}[1]{\mbox{ #1 }}  
+\newcommand{\ba}{\begin{eqnarray}}\newcommand{\ea}{\end{eqnarray}}
+\newcommand{\bm}[1]{\mbox{\boldmath{$#1$}}}   %this is bold italic for MNRAS
+\newcommand{\mat}[1]{\mathbfss{#1}}
+
+\title[CosmoPipe Manual]{CosmoPipe Manual} 
+
+\date{Compiled: @DATE@}
+
+\begin{document}
+\setlength{\voffset}{-12mm}
+
+\doparttoc % Tell to minitoc to generate a toc for the parts
+\faketableofcontents % Run a fake tableofcontents command for the partocs
+\noptcrule  %No horizontal rules in TOC
+
+\maketitle
+
+\section{Installation}
+CosmoPipe can be installed on linux distributions using the command: 
+
+\section{Execution} 
+After installation, you will receive a prompt that contains all pertinent information for running CosmoPipe. 
+It looks similar to the below: 
+
+\begin{verbatim}
+CosmoPipe has been installed at the below path:
+/path/to/your/running/directory
+
+In that directory, you will find: 
+  - configure.sh (The pipeline configuration script)
+  - variables.sh (The file contains compile-time variables)
+    -> These variables cannot be edited after compilation.
+  - defaults.sh (The file contains run-time variables)
+    -> These variables can be assigned/modified as the pipeline runs, and so this file just
+       contains the global default values that they are assigned during compilation. 
+    -> Only run-time variables needed by your pipeline are important, and so the compilation
+       will select the needed run-time variables and put them into a different bespoke file.
+       So you can probably ignore this file for now.
+  - pipeline.ini (The pipeline definition script)
+
+To use CosmoPipe: 
+  1) Go to the directory containing CosmoPipe (listed above)
+  2) Check the variables.sh file has all the variables correctly defined
+    -> Of particular importance is the PIPELINE variable, which tells
+       CosmoPipe which pipeline in pipeline.ini to construct!
+  3) Check the pipeline.ini file has your desired pipeline, and that the pipeline is correct
+  4) Run the configuration: conda run -n cosmopipe bash configure.sh 
+  5) Follow the configuration instructions! 
+\end{verbatim}
+
+\section{Pipelines} 
+A pipeline is a list of processing functions. An example of a simple pipeline is below in plain text:
+\begin{enumerate}
+  \item[\textbf{MyPipeline:}]
+  \item[Step 1:] Load in an LDAC-format catalogue 
+  \item[Step 2:] Split the catalogue into line-of-sight (`tomographic') bins 
+  \item[Step 3:] Remove sources that are fainter than some magnitude limit 
+  \item[Step 4:] Compute and subtract the mean ellipticity (`c-term') from all sources in each bin 
+\end{enumerate}
+Such a pipeline can be constructed in CosmoPipe using similar plain-text, by
+calling relevant processing functions that achieve each of these goals. A CosmoPipe 
+pipeline for `MyPipeline', as it would appear in the \texttt{pipeline.ini} file, 
+is given below:
+\begin{verbatim}
+MyPipeline: 
+  add_head 
+  tomography
+  ldacfilter
+  correct_cterm
+\end{verbatim}
+Of course, there are a number of parameters that must be set for this pipeline to work. 
+
+\begin{itemize} 
+  \item[Step 1:] What catalogue should be added? 
+  \item[Step 2:] How should the tomographic bins be defined? 
+  \item[Step 3:] How should the magnitude limit be defined? 
+  \item[Step 4:] What are the shape-measurement variable names? 
+\end{itemize}
+This is where CosmoPipe helps the user and lowers the barrier to entry for complex analyses. 
+If we ignore the above questions and just blindly compile the above pipeline (by running 
+\texttt{bash compile.sh MyPipeline}), we see the below output: 
+
+\begin{verbatim} 
+======================================================
+==         Cosmology Pipeline Configuration         ==
+======================================================
+> Copying Provided Data Products to Storage Path - Done!
+> Copying scripts & configs to Run directory - Done!
+> Modify Runtime Scripts for 325 files (166+27+132) - Done!
+> Constructing Pipeline MyPipeline  {
+  WARNINGS:
+  The pipeline used the following undeclared runtime variables:
+  E1NAME E2NAME INPUTS NBOOT TOMOLIMS TOMOVAR WEIGHTNAME
+  Of these variables, the following have no default value assigned:
+  INPUTS FILTERCOND 
+  You need to update those variables in the MyPipeline_defaults.sh file!
+} - Done!
+> Finished! To run the Cosmology pipeline, check cosmosis is configured (source cosmosis-configure) and run:
+  bash MyPipeline_pipeline.sh  (from within the 'cosmopipe' conda env), or:
+  conda run -n  --no-capture-output bash MyPipeline_pipeline.sh  (from anywhere).
+\end{verbatim}
+The pipeline has notified the user that there are 9 variables which are needed to sucessfully execute this pipeline. 
+However 7 of them already have default values assigned within the master defaults.sh file which ships with CosmoPipe. 
+These may or may not be desireable for each users needs, but nonetheless the defaults exist and are placed into the 
+bespoke \texttt{MyPipeline\_defaults.sh} file, for use by CosmoPipe. The variables "INPUTS" and "FILTERCOND", however, 
+have no default, and so \textbf{must} be set to a desired value by the user in the \texttt{MyPipeline\_defaults.sh} file 
+before running the pipeline. The  \texttt{MyPipeline\_defaults.sh} file looks as below after compilation: 
+
+\begin{verbatim}[MyPipeline_defaults.sh]
+#Path of file(s) to add to the datahead
+INPUTS=@BV:INPUTS@
+#Limits of the tomographic bins
+TOMOLIMS='0.1 0.3 0.5 0.7 0.9 1.2'
+#Variable used to define tomographic bins
+TOMOVAR=Z_B
+#Filtering condition
+FILTERCOND=@BV:FILTERCOND@
+#Shape measurement variables: e1
+E1NAME=autocal_e1
+#Shape measurement variables: e2
+E2NAME=autocal_e2
+#Number of bootstrap realisations
+NBOOT=300
+#Name of the lensing weight variable
+WEIGHTNAME=weight
+\end{verbatim}
+
+We can set the values of \texttt{INPUTS} and \texttt{FILTERCOND} to useful values in this file and then run the pipeline. 
+Alternatively, though, one can set the values of these parameters in the pipeline itself, which will then avoid the warning 
+about ``no default values'' (as defaults for these will no longer be needed, because we provide the values explicitly!). To 
+do this we use the `$+$' variable assignment syntax in our pipeline: 
+\begin{verbatim}
+MyPipeline: 
+  +INPUTS=/path/to/my/catalogue.cat
+  add_head 
+  tomography
+  +FILTERCOND="r_mag <= 24"
+  ldacfilter
+  correct_cterm
+\end{verbatim}
+where \texttt{r\_mag} is a column in \texttt{catalogue.cat}. When we compile this pipeline we instead see the below prompt: 
+\begin{verbatim} 
+======================================================
+==         Cosmology Pipeline Configuration         ==
+======================================================
+> Copying Provided Data Products to Storage Path - Done!
+> Copying scripts & configs to Run directory - Done!
+> Modify Runtime Scripts for 325 files (166+27+132) - Done!
+> Constructing Pipeline MyPipeline  {
+  WARNINGS:
+  The pipeline used the following undeclared runtime variables:
+  E1NAME E2NAME INPUTS NBOOT TOMOLIMS TOMOVAR WEIGHTNAME
+  !BUT! - all of them were assigned defaults in the MyPipeline_defaults.sh file!
+  So there is no action is required!
+} - Done!
+> Finished! To run the Cosmology pipeline, check cosmosis is configured (source cosmosis-configure) and run:
+  bash MyPipeline_pipeline.sh  (from within the 'cosmopipe' conda env), or:
+  conda run -n  --no-capture-output bash MyPipeline_pipeline.sh  (from anywhere).
+\end{verbatim}
+We can then execute this pipeline in the knowledge that all data products and variables that are 
+needed in the execution of the pipeline are present. 
+
+\subsection{Subroutines} 
+For more complex pipelines, the pipeline length can become excessive and/or may need to run collections of 
+processing 
+
+
+\section{Adding Functions} 
+
+
+\section{Available Functions} 
+The remainder of this document contains a list of all functions available for execution within CosmoPipe. 
+This list is constantly expanding. 
+
+\input{sections}
+
+
+
+\end{document}

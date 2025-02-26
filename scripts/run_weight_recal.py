@@ -243,7 +243,7 @@ pd_cat_corr.loc[(pd_cat_corr['AlphaRecalC_weight']<maxweight/1000.), 'AlphaRecal
 if flagsource: 
     print('number with well modelled alphas after weight recalibration', np.sum(pd_cat_corr['mask']==False), 'fraction', np.sum(pd_cat_corr['mask']==False)/len(pd_cat_corr))
     pd_cat_corr.loc[(pd_cat_corr['mask']), 'AlphaRecalC_weight'] = 0.
-    pd_cat_corr.drop('mask',axis=1,inplace=True) 
+pd_cat_corr.drop('mask',axis=1,inplace=True) 
 
 # merge
 obj_cat = obj_cat.merge(pd_cat_corr, how = 'outer', on = 'AlphaRecal_index',suffixes=('_orig',None))

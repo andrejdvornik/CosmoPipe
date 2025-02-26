@@ -18,6 +18,7 @@ cosmosis_names={
     'sigma_8_input':'COSMOLOGICAL_PARAMETERS--SIGMA_8_INPUT',
     'A_S':'COSMOLOGICAL_PARAMETERS--A_S',
     'Omega_m':'Omega_m',
+    'Omega_k':'cosmological_parameters--omega_k',
     'Omega_nu':'COSMOLOGICAL_PARAMETERS--OMEGA_NU',
     'Omega_Lambda':'COSMOLOGICAL_PARAMETERS--OMEGA_LAMBDA',
     'Theta_MC':'COSMOLOGICAL_PARAMETERS--COSMOMC_THETA',
@@ -27,16 +28,28 @@ cosmosis_names={
     'B_IA_linz':'intrinsic_alignment_parameters--b_ia',
     'AIA':'intrinsic_alignment_parameters--a',
     'beta':'intrinsic_alignment_parameters--beta',
-    'A_IA_derived':'INTRINSIC_ALIGNMENT_PARAMETERS--A',
-    'beta_derived':'INTRINSIC_ALIGNMENT_PARAMETERS--BETA',
-    'uncorr_AIA':'intrinsic_alignment_parameters--uncorr_a',
-    'uncorr_beta':'intrinsic_alignment_parameters--uncorr_beta',
     'M1':'intrinsic_alignment_parameters--log10_m_mean_1',
     'M2':'intrinsic_alignment_parameters--log10_m_mean_2',
     'M3':'intrinsic_alignment_parameters--log10_m_mean_3',
     'M4':'intrinsic_alignment_parameters--log10_m_mean_4',
     'M5':'intrinsic_alignment_parameters--log10_m_mean_5',
     'M6':'intrinsic_alignment_parameters--log10_m_mean_6',
+    'A_IA_derived':'INTRINSIC_ALIGNMENT_PARAMETERS--A',
+    'beta_derived':'INTRINSIC_ALIGNMENT_PARAMETERS--BETA',
+    'M1_derived':'INTRINSIC_ALIGNMENT_PARAMETERS--LOG10_M_MEAN_1',
+    'M2_derived':'INTRINSIC_ALIGNMENT_PARAMETERS--LOG10_M_MEAN_2',
+    'M3_derived':'INTRINSIC_ALIGNMENT_PARAMETERS--LOG10_M_MEAN_3',
+    'M4_derived':'INTRINSIC_ALIGNMENT_PARAMETERS--LOG10_M_MEAN_4',
+    'M5_derived':'INTRINSIC_ALIGNMENT_PARAMETERS--LOG10_M_MEAN_5',
+    'M6_derived':'INTRINSIC_ALIGNMENT_PARAMETERS--LOG10_M_MEAN_6',
+    'uncorr_AIA':'intrinsic_alignment_parameters--uncorr_a',
+    'uncorr_beta':'intrinsic_alignment_parameters--uncorr_beta',
+    'uncorr_M1':'intrinsic_alignment_parameters--uncorr_log10_m_mean_1',
+    'uncorr_M2':'intrinsic_alignment_parameters--uncorr_log10_m_mean_2',
+    'uncorr_M3':'intrinsic_alignment_parameters--uncorr_log10_m_mean_3',
+    'uncorr_M4':'intrinsic_alignment_parameters--uncorr_log10_m_mean_4',
+    'uncorr_M5':'intrinsic_alignment_parameters--uncorr_log10_m_mean_5',
+    'uncorr_M6':'intrinsic_alignment_parameters--uncorr_log10_m_mean_6',
     'A1':'intrinsic_alignment_parameters--a1',
     'A2':'intrinsic_alignment_parameters--a2',
     'alpha1':'intrinsic_alignment_parameters--alpha1',
@@ -47,6 +60,22 @@ cosmosis_names={
     'A_bary_shared':'halo_model_parameters_shared--a',
     'A_IA_shared':'intrinsic_alignment_parameters_shared--a',
     'AIA_shared':'intrinsic_alignment_parameters_shared--a',
+    'A_IA_derived_shared':'INTRINSIC_ALIGNMENT_PARAMETERS_SHARED--A',
+    'beta_derived_shared':'INTRINSIC_ALIGNMENT_PARAMETERS_SHARED--BETA',
+    'M1_derived_shared':'INTRINSIC_ALIGNMENT_PARAMETERS_SHARED--LOG10_M_MEAN_1',
+    'M2_derived_shared':'INTRINSIC_ALIGNMENT_PARAMETERS_SHARED--LOG10_M_MEAN_2',
+    'M3_derived_shared':'INTRINSIC_ALIGNMENT_PARAMETERS_SHARED--LOG10_M_MEAN_3',
+    'M4_derived_shared':'INTRINSIC_ALIGNMENT_PARAMETERS_SHARED--LOG10_M_MEAN_4',
+    'M5_derived_shared':'INTRINSIC_ALIGNMENT_PARAMETERS_SHARED--LOG10_M_MEAN_5',
+    'M6_derived_shared':'INTRINSIC_ALIGNMENT_PARAMETERS_SHARED--LOG10_M_MEAN_6',
+    'uncorr_AIA_shared':'intrinsic_alignment_parameters_shared--uncorr_a',
+    'uncorr_beta_shared':'intrinsic_alignment_parameters_shared--uncorr_beta',
+    'M1_shared':'intrinsic_alignment_parameters_shared--log10_m_mean_1',
+    'M2_shared':'intrinsic_alignment_parameters_shared--log10_m_mean_2',
+    'M3_shared':'intrinsic_alignment_parameters_shared--log10_m_mean_3',
+    'M4_shared':'intrinsic_alignment_parameters_shared--log10_m_mean_4',
+    'M5_shared':'intrinsic_alignment_parameters_shared--log10_m_mean_5',
+    'M6_shared':'intrinsic_alignment_parameters_shared--log10_m_mean_6',
     'log_T_AGN_shared':'halo_model_parameters_shared--log_t_agn',
     'deltaz_uncorr_1':'nofz_shifts--uncorr_bias_1',
     'deltaz_uncorr_2':'nofz_shifts--uncorr_bias_2',
@@ -108,6 +137,7 @@ latex_names={
     'sigma_8_input':r'$\sigma_{\rm 8, input}$',
     'A_S':r'$A_{\rm s}$',
     'Omega_m':r'$\Omega_{\rm m}$',
+    'Omega_k':r'$\Omega_{\rm k}$',
     'Omega_nu':r'$\Omega_\nu$',
     'Omega_Lambda':r'$\Omega_\Lambda$',
     'Theta_MC':r'$\Theta_{\rm MC}$',
@@ -117,16 +147,28 @@ latex_names={
     'B_IA_linz':r'$B_{\rm IA}$',
     'AIA':r'$A_{\rm IA}$',
     'beta':r'$\beta$',
-    'A_IA_derived':r'$A_{\rm IA}$',
-    'beta_derived':r'$\beta$',
-    'uncorr_AIA':r'$A_{\rm IA}$',
-    'uncorr_beta':r'$\beta$',
     'M1':r'$\log_{10}M_1$',
     'M2':r'$\log_{10}M_2$',
     'M3':r'$\log_{10}M_3$',
     'M4':r'$\log_{10}M_4$',
     'M5':r'$\log_{10}M_5$',
     'M6':r'$\log_{10}M_6$',
+    'A_IA_derived':r'$A_{\rm IA}$',
+    'beta_derived':r'$\beta$',
+    'M1_derived':r'$\log_{10}M_1$',
+    'M2_derived':r'$\log_{10}M_2$',
+    'M3_derived':r'$\log_{10}M_3$',
+    'M4_derived':r'$\log_{10}M_4$',
+    'M5_derived':r'$\log_{10}M_5$',
+    'M6_derived':r'$\log_{10}M_6$',
+    'uncorr_AIA':r'$A_{\rm IA}$',
+    'uncorr_beta':r'$\beta$',
+    'uncorr_M1':r'$\log_{10}M_1$',
+    'uncorr_M2':r'$\log_{10}M_2$',
+    'uncorr_M3':r'$\log_{10}M_3$',
+    'uncorr_M4':r'$\log_{10}M_4$',
+    'uncorr_M5':r'$\log_{10}M_5$',
+    'uncorr_M6':r'$\log_{10}M_6$',
     'A1':r'$A_1$',
     'A2':r'$A_2$',
     'alpha1':r'$\alpha_1$',
@@ -137,6 +179,22 @@ latex_names={
     'A_bary_shared':r'$A_{\rm bary}$', 
     'A_IA_shared':r'$A_{\rm IA}$',
     'AIA_shared':r'$A_{\rm IA}$',
+    'A_IA_derived_shared':r'$A_{\rm IA}$',
+    'beta_derived_shared':r'$\beta$',
+    'M1_derived_shared':r'$\log_{10}M_1$',
+    'M2_derived_shared':r'$\log_{10}M_2$',
+    'M3_derived_shared':r'$\log_{10}M_3$',
+    'M4_derived_shared':r'$\log_{10}M_4$',
+    'M5_derived_shared':r'$\log_{10}M_5$',
+    'M6_derived_shared':r'$\log_{10}M_6$',
+    'uncorr_AIA_shared':r'$A_{\rm IA}$',
+    'uncorr_beta_shared':r'$\beta$',
+    'M1_shared':r'$\log_{10}M_1$',
+    'M2_shared':r'$\log_{10}M_2$',
+    'M3_shared':r'$\log_{10}M_3$',
+    'M4_shared':r'$\log_{10}M_4$',
+    'M5_shared':r'$\log_{10}M_5$',
+    'M6_shared':r'$\log_{10}M_6$',
     'log_T_AGN_shared':r'$\log{T_{\rm AGN}}$',
     'deltaz_1':r'$\delta_{\rm z, 1}$', 
     'deltaz_2':r'$\delta_{\rm z, 2}$', 
@@ -284,6 +342,9 @@ def load_chain(path):
             return(data_array, None)
             
 def analyse_nautilus(basename):
+    if basename.endswith('.txt'):
+        basename = basename[:-4]
+    
     chain = load_chain(basename+'.txt')
     # 1 cosmo chain
     if len(chain) == 2:
@@ -304,16 +365,39 @@ def analyse_nautilus(basename):
         logZ = logsumexp(shell_log_v+shell_log_l)
     # Bayesian model dimensionality 
     if two_cosmo:
-        d = BMD(data_shared['like'], data_shared['weight'])
+        d_var = BMD(data_shared['like'], data_shared['weight'])
         d_l = d_like(data_shared['like'], data_shared['weight'])
         d_p = d_post(data_shared['like'], data_shared['post'], data_shared['weight'])
     else:
-        d = BMD(data['like'], data['weight'])
+        d_var = BMD(data['like'], data['weight'])
         d_l = d_like(data['like'], data['weight'])
         d_p = d_post(data['like'], data['post'], data['weight'])
+    d_eff = (d_l + d_p)/2
     # KL divergence
     D_KL = KL_nautilus(logZ, shell_log_v, shell_log_l)
     # Bayesian model dimensionality from Nautilus output (should be consistent with estimate from chain)
     d_nautilus = BMD_nautilus(logZ, shell_log_v, shell_log_l, D_KL)
 
-    return(logZ, d, d_l, d_p, d_nautilus, D_KL)
+    return(logZ, d_var, d_l, d_p, d_eff, d_nautilus, D_KL)
+
+def read_best_fit_chi2(path, no_like = False, tc=False):
+    if tc == True:
+        df = load_chain(path)[3]
+    else:
+        df = load_chain(path)[0]
+    if no_like:
+        chi2 = -2*(df.iloc[-1]['post'] - df.iloc[-1]['prior'])
+    else:
+        chi2 = -2*df.iloc[-1]['like']
+    post = -2*df.iloc[-1]['post']
+    prior = -2*df.iloc[-1]['prior']
+
+    if ((post == np.inf) or (chi2 == np.inf)):
+        post = -2*df.iloc[-2]['post']
+        prior = -2*df.iloc[-2]['prior']
+        if no_like:
+            chi2 = -2*(df.iloc[-2]['post'] - df.iloc[-2]['prior'])
+        else:
+            chi2 = -2*df.iloc[-2]['like']
+    
+    return(chi2, post, prior)

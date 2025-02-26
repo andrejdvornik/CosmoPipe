@@ -3,7 +3,7 @@
 # File Name : combine_patch.sh
 # Created By : awright
 # Creation Date : 20-03-2023
-# Last Modified : Tue 26 Mar 2024 02:44:41 AM CET
+# Last Modified : Sat Feb  8 14:01:56 2025
 #
 #=========================================
 
@@ -79,6 +79,10 @@ do
   #move the new catalogue to the original name 
   mv ${cata}_tmp ${cata}
   _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
+  if [ "${links}" == "TRUE" ] 
+  then 
+    mv ${cata} ${originp}
+  fi 
   #}}}
 done 
 #}}}
@@ -144,7 +148,13 @@ do
 
   if [ "${links}" == "TRUE" ] 
   then 
-    rm ${inplist} ${outname}
+    rm ${inplist} 
+    if [ -h ${outname} ] 
+    then 
+      rm ${outname}
+    else
+      mv ${outname} ${origoname}
+    fi 
     inplist=${origlist}
     outname=${origoname}
   fi 
