@@ -25,6 +25,7 @@ COMMOPTS=${COMMOPTS,,}
 #Do we want to run the configure file? (1=NO, else YES)
 NOCONFIG=1
 NOCONDA=1
+NOINSTALL=0
 #Source the main variables 
 source scripts/variables_raw.sh 
 #}}}
@@ -75,6 +76,9 @@ _prompt ${VERBOSE}
 #Variable Check {{{
 _varcheck $0
 #}}}
+
+if [ "$NOINSTALL" == "1" ] 
+then 
 
 #Move into the install directory {{{
 if [ -d ${RUNROOT}/INSTALL ] && [ "$NOCONDA" == "1" ] 
@@ -133,8 +137,8 @@ then
     conda env create --file environment.yml > conda_install_output.log 2>&1
   fi 
   _message "${BLU} - Done! ${DEF}\n"
-  #}}}
 fi 
+#}}}
 
 #Install cosmosis-standard-library {{{
 _message "   >${RED} Installing cosmosis-standard-library ${DEF}"
@@ -275,6 +279,8 @@ conda run -n ${CONDAPIPENAME} bash OneCovariance_make.sh > ${RUNROOT}/INSTALL/On
 cd ${RUNROOT}/INSTALL/
 _message "${BLU} - Done! ${DEF}\n"
 #}}}
+
+fi 
 
 # 
 # #Run the Script and Package Installations {{{
@@ -550,9 +556,9 @@ cd ${RUNROOT}
 _message "   >${RED} Update the configure script ${DEF}"
 MACHINE=`uname`
 THELIPATH=`echo ${RUNROOT}/INSTALL/theli-1.6.1/bin/${MACHINE}*`
-if [ "${PACKROOT}" != "${RUNROOT}" ]
+if [ "${PACKROOT%/}" != "${RUNROOT%/}" ]
 then 
-  cp ${PACKROOT}/update_configure.sh ${RUNROOT}/
+  cp -f ${PACKROOT}/update_configure.sh ${RUNROOT}/
 fi 
 cp ${PACKROOT}/scripts/configure_raw.sh ${RUNROOT}/configure.sh 
 cp ${PACKROOT}/scripts/variables_raw.sh ${RUNROOT}/variables.sh 
