@@ -128,7 +128,6 @@ then
 fi 
 
 #Install cosmosis-standard-library {{{
-_message "   >${RED} Installing cosmosis-standard-library ${DEF}"
 python_vers=`conda run -n ${CONDAPIPENAME} python --version | head -1 | awk '{print $2}' | awk -F. '{print "python"$1"."$2 }'`
 cosmosis_src=`conda run -n ${CONDAPIPENAME} which cosmosis | sed "s@/bin/cosmosis@/lib/${python_vers}/site-packages/cosmosis/@"`
 #Clone the cosmosis-standard-library repository {{{
@@ -140,6 +139,7 @@ then
 fi
 git clone https://github.com/joezuntz/cosmosis-standard-library.git >> gitclone_output.log 2>&1
 _message "${BLU} - Done! ${DEF}\n"
+_message "   >${RED} Installing cosmosis-standard-library ${DEF}"
 #Replace the cpdef instances with cdef in classy.pyx
 ${P_SED_INPLACE} "s# cpdef # cdef #" cosmosis-standard-library/boltzmann/class/class_v3.2.0/python/classy.pyx 
 #}}}
