@@ -64,7 +64,7 @@ function _outputs {
   #Define the patches to loop over {{{
   if [ "${patchvar}" == "ALL" ] || [ "${patchvar}" == "@BV:COSMOSIS_PATCHLIST@" ]
   then 
-    patchlist=`echo @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb` 
+    patchlist=`echo @BV:PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb` 
   else 
     patchlist="${patchvar}"
   fi 

@@ -58,7 +58,7 @@ function _inp_data {
 function _outputs { 
   #Data outputs (leave blank if none)
   outlist=''
-  for patch in @PATCHLIST@ @ALLPATCH@ 
+  for patch in @BV:PATCHLIST@ @ALLPATCH@ 
   do 
     outlist="${outlist} mbias_${patch}_@BV:BLIND@ mcov_${patch}_@BV:BLIND@"
   done 
