@@ -16,6 +16,9 @@
 #Pipeline that you wish to run
 PIPELINE=test
 
+#Pipeline that you wish to run
+SURVEY=KiDS_Legacy
+
 #Root directory for pipeline scripts
 PACKROOT=`pwd`
 
