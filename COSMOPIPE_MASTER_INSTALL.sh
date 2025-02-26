@@ -73,6 +73,13 @@ then
 fi 
 #}}}
 
+#Check for calling syntax {{{
+if [ ${PACKROOT} == "@PACKROOT@" ] || [ ${PACKROOT} == "" ]
+then 
+  PACKROOT=`pwd`
+fi 
+#}}}
+
 #Prompt {{{
 _prompt ${VERBOSE}
 #}}}
