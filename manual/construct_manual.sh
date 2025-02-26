@@ -3,14 +3,14 @@
 # File Name : construct_manual.sh
 # Created By : awright
 # Creation Date : 01-10-2024
-# Last Modified : Tue 25 Feb 2025 04:57:21 PM CET
+# Last Modified : Wed 26 Feb 2025 09:05:26 PM CET
 #
 #=========================================
 
 
 source ../man/CosmoPipe.man.sh 
 
-cat ../config/CosmoPipe_frontmatter.tex | sed "s/@DATE@/`date`/" > ../tex/CosmoPipe_manual.tex 
+cat CosmoPipe_frontmatter.tex | sed "s/@DATE@/`date`/" > ../tex/CosmoPipe_manual.tex 
 echo > ../tex/sections.tex 
 
 for file in `ls *.sh` 
