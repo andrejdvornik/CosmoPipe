@@ -12,7 +12,7 @@ inputs="@DB:cosebis@"
 #Input mbias files 
 mfiles="@DB:mbias@"
 
-for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+for patch in @BV:PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
 do 
   #Remove the 'comb' if needed 
   patchuse=${patch%comb}

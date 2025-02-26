@@ -567,7 +567,7 @@ do
         #Add it to the datablock 
         if [[ "${out:3}" =~ .*"PATCH".* ]]
         then 
-          str="@PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb"
+          str="@BV:PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb"
           str=${str//\"/}
           _write_blockvars ${out:3} "${str//\'/}"
         else 
@@ -617,7 +617,7 @@ echo "end" >> @RUNROOT@/@PIPELINE@_links.R
 #}}}
 #Remove unused patch-wise assignments from graph (assuming they are dummies) {{{
 skip=''
-for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+for patch in @BV:PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
 do 
   #Get all entries matching this patch {{{
   patch_links=`awk -F\> '{print $NF}' @RUNROOT@/@PIPELINE@_links.R | grep "_${patch})$" || echo`

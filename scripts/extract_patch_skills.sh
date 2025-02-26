@@ -39,7 +39,7 @@ inputfile=${inputtmp}
 
 #Construct the tomographic bin catalogues {{{
 outputlist=''
-for patch in @PATCHLIST@
+for patch in @BV:PATCHLIST@
 do
   #Define the output file name {{{
   outputname=${inputfile%.*}

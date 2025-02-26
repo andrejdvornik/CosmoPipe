@@ -15,7 +15,7 @@ for catname in ${headlist}
 do 
   catname=${catname##*/}
   found="FALSE"
-  for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+  for patch in @BV:PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
   do 
     #Find files with matching patch strings
     if [[ "${catname}" =~ .*"_${patch}_".* ]]

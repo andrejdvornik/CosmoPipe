@@ -16,7 +16,7 @@ NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 #Define the patches to loop over {{{
 if [ "@BV:COSMOSIS_PATCHLIST@" == "ALL" ]
 then 
-  patchlist=`echo @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb` 
+  patchlist=`echo @BV:PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb` 
 else 
   patchlist="@BV:COSMOSIS_PATCHLIST@"
 fi 

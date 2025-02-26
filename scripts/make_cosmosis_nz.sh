@@ -10,7 +10,7 @@
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 outputlist=''
 found="FALSE"
-for patch in @PATCHLIST@ @ALLPATCH@ 
+for patch in @BV:PATCHLIST@ @ALLPATCH@ 
 do 
   _message " ->@BLU@ Patch @RED@${patch}@DEF@"
   #Get all the files in this stat and patch {{{

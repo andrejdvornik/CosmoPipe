@@ -9,7 +9,7 @@
 
 inputlist="@DB:som_weight_calib_gold@"
 
-for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb 
+for patch in @BV:PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb 
 do 
   nfile=`echo ${inputlist} | sed 's/ /\n/g' | grep -c "_${patch}_" || echo `
   if [ ${nfile} -gt 0 ]

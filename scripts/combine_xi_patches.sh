@@ -38,7 +38,7 @@ do
 
     #Get the file list {{{
     filelist=''
-    for patch in @PATCHLIST@ 
+    for patch in @BV:PATCHLIST@ 
     do 
       file=`echo ${headfiles} | sed 's/ /\n/g' | grep "_${patch}_" | grep ${filestr} || echo `
       #Check if the output file exists 
