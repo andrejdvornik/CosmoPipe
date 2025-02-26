@@ -25,6 +25,10 @@ parser<-add_argument(parser,
     help="column name of the label to match",
 )
 parser<-add_argument(parser,
+    "--optimise",short="-o",flag=TRUE, 
+    help="optimise the radius of the match in arcsec",
+)
+parser<-add_argument(parser,
     "--radius",short="-r",default=1, 
     help="radius of the match in arcsec",
 )
@@ -56,32 +60,40 @@ cat("running matching\n")
 #Get typical comparison sample radial separations 
 match<-list(ID=matrix(0,nrow=2,ncol=0))
 rad=args$radius
-cat(paste0("Using initial matching radius of  ",rad," arcsec\n"))
-match = celestial::coordmatch(coordref=data.frame(train_data[[args$features[1]]],train_data[[args$features[2]]]),
-                              coordcompar=data.frame(train_data[[args$features[1]]],train_data[[args$features[2]]]),
-                              rad=rad,ignoreexact=TRUE)
-
-if(ncol(match$ID)==0 || nrow(match$bestmatch)/nrow(match$ID) < 0.5) { 
-  cat(paste0("estimating appropriate matching radius from training data:\n"))
-  cat(paste0(rad," arcsec "))
-  while(ncol(match$ID)==0 || nrow(match$bestmatch)/nrow(match$ID) < 0.5) { 
-    rad=rad*5
-    cat(paste0("- failed\n", rad," arcsec "))
-    match = celestial::coordmatch(coordref=data.frame(train_data[[args$features[1]]],train_data[[args$features[2]]]),
-                                  coordcompar=data.frame(train_data[[args$features[1]]],train_data[[args$features[2]]]),
-                                  rad=rad,ignoreexact=TRUE)
+if (args$optimise) { 
+  cat(paste0("Using initial matching radius of  ",rad," arcsec\n"))
+  match = celestial::coordmatch(coordref=data.frame(train_data[[args$features[1]]],train_data[[args$features[2]]]),
+                                coordcompar=data.frame(train_data[[args$features[1]]],train_data[[args$features[2]]]),
+                                rad=rad,ignoreexact=TRUE)
+  
+  if(ncol(match$ID)==0 || nrow(match$bestmatch)/nrow(match$ID) < 0.5) { 
+    cat(paste0("estimating appropriate matching radius from training data:\n"))
+    cat(paste0(rad," arcsec "))
+    while(ncol(match$ID)==0 || nrow(match$bestmatch)/nrow(match$ID) < 0.5) { 
+      rad=rad*5
+      cat(paste0("- failed\n", rad," arcsec "))
+      match = celestial::coordmatch(coordref=data.frame(train_data[[args$features[1]]],train_data[[args$features[2]]]),
+                                    coordcompar=data.frame(train_data[[args$features[1]]],train_data[[args$features[2]]]),
+                                    rad=rad,ignoreexact=TRUE)
+    }
+    cat(paste0("- success!\n"))
+    rad = ceiling(quantile(match$bestmatch$sep,probs=pnorm(3)-pnorm(-3)))
+    if (rad>=50 & rad < 3600) rad<-ceiling(rad/60)*60
+    if (rad>3600) rad<-ceiling(rad/3600)*3600
+    print(str(match))
+    cat(paste0("Using final matching radius of  ",rad," arcsec\n"))
   }
-  cat(paste0("- success!\n"))
-  rad = ceiling(quantile(match$bestmatch$sep,probs=pnorm(3)-pnorm(-3)))
-  if (rad>=50 & rad < 3600) rad<-ceiling(rad/60)*60
-  if (rad>3600) rad<-ceiling(rad/3600)*3600
-  print(str(match))
-  cat(paste0("Using final matching radius of  ",rad," arcsec\n"))
+} else { 
+  rad<-args$radius
 }
-
+print(args$features)
+print(str(data.frame(test_data[[args$features[1]]],test_data[[args$features[2]]])))
+print(str(data.frame(train_data[[args$features[1]]],train_data[[args$features[2]]])))
 idx = celestial::coordmatch(coordref=data.frame(test_data[[args$features[1]]],test_data[[args$features[2]]]), 
                             coordcompar=data.frame(train_data[[args$features[1]]],train_data[[args$features[2]]]),
-                            rad=rad)$ID[,1]
+                            rad=rad)
+if (ncol(idx$ID)==0) stop("There are no matches?!") 
+idx <- idx$ID[,1]
 
 if (length(idx) != nrow(test_data)) { 
   stop("Output match IDs not of same length as queried locations?!") 

@@ -3,7 +3,7 @@
 # File Name : match_to_sims.sh
 # Created By : awright
 # Creation Date : 15-06-2023
-# Last Modified : Fri Jul 19 03:33:31 2024
+# Last Modified : Thu 13 Feb 2025 07:16:46 AM CET
 #
 #=========================================
 
@@ -66,6 +66,39 @@ do
   then 
     rm ${output_file}
   fi 
+
+  #Check if input file lengths are ok {{{
+  links="FALSE"
+  for file in ${current_target} ${output_file}
+  do 
+    if [ ${#file} -gt 255 ] 
+    then 
+      links="TRUE"
+    fi 
+  done 
+  
+  if [ "${links}" == "TRUE" ] 
+  then
+    #Remove existing infile links 
+    if [ -e infile_$$.lnk.${ext} ] || [ -h infile_$$.lnk.${ext} ]
+    then 
+      rm infile_$$.lnk.${ext}
+    fi 
+    #Remove existing outfile links 
+    if [ -e outfile_$$.lnk.${ext} ] || [ -h outfile_$$.lnk.${ext} ]
+    then 
+      rm outfile_$$.lnk.${ext}
+    fi
+    #Create input link
+    originp=${current_target}
+    ln -s ${current_target} infile_$$.lnk.${ext} 
+    current_target="infile_$$.lnk.${ext}"
+    #Create output links 
+    ln -s ${output_file} outfile_$$.lnk.${ext}
+    origout=${output_file}
+    output_file=outfile_$$.lnk.${ext}
+  fi 
+  #}}}
   
   #Notify that we are matching these catalogues 
   _message " > @BLU@Matching label @BV:LABELNAME@ using RADEC from training catalogue @RED@${current_train##*/}@BLU@ to target catalogue @RED@${current_target##*/}@DEF@"
@@ -74,6 +107,7 @@ do
      -i ${current_target} \
      -o ${output_file} \
      -l @BV:LABELNAME@ \
+     -r @BV:RADIUS@ \
      -f ${target_features} 2>&1
   #Notify 
   _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
@@ -87,9 +121,17 @@ do
   #If exists, delete it {{{
   if [ "${cleared}" == "1" ] 
   then 
-    _message "   > @BLU@Removing pre-existing @BV:LABELNAME@ column@DEF@ "
+    #_message "   > @BLU@Removing pre-existing @BV:LABELNAME@ column@DEF@ "
+    #@RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacdelkey -i ${current_target} -o ${current_target}_tmp -t OBJECTS -k @BV:LABELNAME@ 2>&1 
+    #mv ${current_target}_tmp ${current_target}
+    #_message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
+    _message "   > @BLU@Renaming pre-existing @BV:LABELNAME@ column to @BV:LABELNAME@_orig @DEF@ "
     @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacdelkey -i ${current_target} -o ${current_target}_tmp -t OBJECTS -k @BV:LABELNAME@ 2>&1 
-    mv ${current_target}_tmp ${current_target}
+    @RUNROOT@/INSTALL/theli-1.6.1/bin/@MACHINE@/ldacrenkey \
+      -i ${current_target} \
+      -o ${current_target}_tmp \
+      -k @BV:LABELNAME@ @BV:LABELNAME@_orig 2>&1
+      mv ${current_target}_tmp ${current_target}
     _message " @RED@- Done! (`date +'%a %H:%M'`)@DEF@\n"
   fi 
   #}}}
@@ -106,6 +148,19 @@ do
   #Delete the temporary output file 
   mv ${output_file}_tmp ${output_file}
   #}}}
+
+  if [ "${links}" == "TRUE" ] 
+  then 
+    rm ${current_target} 
+    if [ -h ${output_file} ]
+    then 
+      rm ${output_file}
+    else 
+      mv ${output_file} ${origout}
+    fi 
+    current_target=${originp}
+    output_file=${origout}
+  fi 
 
   #Update the DATAHEAD 
   _replace_datahead "${current_target}" "${output_file}"
