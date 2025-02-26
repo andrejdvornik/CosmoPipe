@@ -222,7 +222,7 @@ if [ -f ${RUNROOT}/../theli-1.6.1.tgz ]
 then 
   ln -s ${RUNROOT}/../theli-1.6.1.tgz .
 else 
-  wget https://marvinweb.astro.uni-bonn.de/data_products/theli/theli-1.6.1.tgz > ${RUNROOT}/INSTALL/THELI_wget.log 2>&1
+  wget https://marvinweb.astro.uni-bonn.de/data_products/theli/theli-1.6.1.tgz > THELI_wget.log 2>&1
 fi 
 tar -xf theli-1.6.1.tgz >> THELI_install.log 2>&1
 rm -f theli-1.6.1.tgz  >> THELI_install.log 2>&1
@@ -234,10 +234,11 @@ then
 fi 
 #conda run -n ${CONDAPIPENAME} bash install.sh -m ALL >> THELI_install.log 2>&1
 warn=FALSE
-echo "bash install.sh -m ALL || echo " > THELI_install.sh
+echo "set -e" > THELI_install.sh
+echo "bash install.sh -m ALL || echo " >> THELI_install.sh
 echo ". pipe_env.bash.${MACHINE}" >> THELI_install.sh
 echo "make ldactools.make" >> THELI_install.sh
-conda run -n ${CONDAPIPENAME} bash THELI_install.sh || warn=TRUE >> THELI_install.log 2>&1
+conda run -n ${CONDAPIPENAME} bash THELI_install.sh >> THELI_install.log 2>&1 || warn=TRUE 
 if [ "${warn}" == "TRUE" ] 
 then 
   _message "${BLU} - ${RED}WARNING!${BLU} Check if ldac tools installed correctly... ${DEF}\n"
@@ -549,7 +550,10 @@ cd ${RUNROOT}
 _message "   >${RED} Update the configure script ${DEF}"
 MACHINE=`uname`
 THELIPATH=`echo ${RUNROOT}/INSTALL/theli-1.6.1/bin/${MACHINE}*`
-cp ${PACKROOT}/update_configure.sh ${RUNROOT}/
+if [ "${PACKROOT}" != "${RUNROOT}" ]
+then 
+  cp ${PACKROOT}/update_configure.sh ${RUNROOT}/
+fi 
 cp ${PACKROOT}/scripts/configure_raw.sh ${RUNROOT}/configure.sh 
 cp ${PACKROOT}/scripts/variables_raw.sh ${RUNROOT}/variables.sh 
 cp ${PACKROOT}/config/defaults.sh ${RUNROOT}/defaults.sh 
