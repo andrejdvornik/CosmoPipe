@@ -14,7 +14,7 @@
 #Variables required for master installation 
 
 #Pipeline that you wish to run
-PIPELINE=@PIPELINE@
+PIPELINE=test
 
 #Root directory for pipeline scripts
 PACKROOT=`pwd`
