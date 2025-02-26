@@ -3,13 +3,18 @@
 # File Name : cosmosis_constructor.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Tue Nov 19 21:29:08 2024
+# Last Modified : Thu 09 Jan 2025 03:21:04 PM CET
 #
 #=========================================
 #Script to generate a cosmosis .ini, values, & priors file 
 #Prepare the starting items {{{
 IAMODEL="@BV:IAMODEL@"
 CHAINSUFFIX=@BV:CHAINSUFFIX@
+
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/ ] 
+then 
+  mkdir -p @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs 
+fi 
 
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 [DEFAULT]
@@ -75,7 +80,12 @@ then
   rempairs=''
   for i in `seq $NTOMO`
   do 
-    rempairs="${rempairs} @BV:REMOVETOMOBIN@+${i}"
+    if [ @BV:REMOVETOMOBIN@ -lt ${i} ] 
+    then 
+      rempairs="${rempairs} @BV:REMOVETOMOBIN@+${i}"
+    else 
+      rempairs="${rempairs} ${i}+@BV:REMOVETOMOBIN@"
+    fi 
   done
   if [ "${STATISTIC^^}" == "COSEBIS" ] 
   then 
