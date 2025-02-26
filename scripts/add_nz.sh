@@ -3,7 +3,7 @@
 # File Name : add_nz.sh
 # Created By : awright
 # Creation Date : 22-03-2023
-# Last Modified : Fri 03 Nov 2023 09:49:58 PM CET
+# Last Modified : Thu 30 Jan 2025 09:19:30 PM CET
 #
 #=========================================
 
@@ -14,11 +14,11 @@ then
 fi 
 
 #Check that the Nz file(s) exists
-if [ -d "@NZPATH@" ]
+if [ -d "@BV:NZPATH@" ]
 then 
   _message " > @BLU@ Nz Path is a directory: assuming that @DEF@\`ls\`@BLU@ ordering is tomographic order!@DEF@\n"
   #we have a directory {{{
-  inputlist=`ls @NZPATH@`
+  inputlist=`ls @BV:NZPATH@`
   filelist=""
   #This just makes sure that the files are added correctly
   for file in ${inputlist} 
@@ -28,21 +28,21 @@ then
     #}}}
     _message " --> @BLU@ ${inpname}@DEF@\n"
     #Save the output file to the list {{{
-    filelist="$filelist @NZPATH@/$inpname"
+    filelist="$filelist @BV:NZPATH@/$inpname"
     #}}}
   done 
   #}}}
-elif [ -f "@NZPATH@" ]
+elif [ -f "@BV:NZPATH@" ]
 then 
   #we have a single file {{{
-  _message " > @BLU@ Nz Path is a single file: @DEF@@NZPATH@\n"
-  filelist=@NZPATH@
+  _message " > @BLU@ Nz Path is a single file: @DEF@@BV:NZPATH@\n"
+  filelist=@BV:NZPATH@
   #}}}
 else 
   _message " > @BLU@ Nz Path is a file list:@DEF@\n"
   #we have a file list {{{
   filelist=""
-  for inp in @NZPATH@
+  for inp in @BV:NZPATH@
   do 
     _message " --> @BLU@ ${inp}@DEF@\n"
     if [ ! -f ${inp} ]

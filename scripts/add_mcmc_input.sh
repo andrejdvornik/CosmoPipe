@@ -3,7 +3,7 @@
 # File Name : add_mcmc_input.sh
 # Created By : stoelzner
 # Creation Date : 30-03-2023
-# Last Modified : Tue 02 May 2023 08:58:43 AM CEST
+# Last Modified : Tue 07 Jan 2025 12:24:13 PM CET
 #
 #=========================================
 
@@ -35,3 +35,14 @@ cp $file @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/${filename}
 
 #Update the datablock contents file 
 _write_datablock "mcmc_inp_@BV:STATISTIC@" "${filename}"
+
+if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzcov ]
+then 
+  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzcov
+fi 
+
+#Create the uncertainty file 
+cp @BV:NZCOVFILE@ @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nzcov/nz_covariance.txt 
+
+#Update the datablock contents file 
+_write_datablock nzcov "nz_covariance.txt"
