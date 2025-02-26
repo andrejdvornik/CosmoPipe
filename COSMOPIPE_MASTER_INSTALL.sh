@@ -25,7 +25,7 @@ COMMOPTS=${COMMOPTS,,}
 #Do we want to run the configure file? (1=NO, else YES)
 NOCONFIG=1
 NOCONDA=1
-NOINSTALL=0
+NOINSTALL=1
 #Source the main variables 
 source scripts/variables_raw.sh 
 #}}}
@@ -39,6 +39,10 @@ do
   if [ $name == 'NOCONDA' ] 
   then 
     NOCONDA=0
+    shift 
+  elif [ $name == 'NOINSTALL' ] 
+  then 
+    NOINSTALL=0
     shift 
   elif [ $name == 'NOCONFIG' ]
   then 
