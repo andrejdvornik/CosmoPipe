@@ -61,6 +61,13 @@ do
 done
 #}}}
 
+#Check for calling syntax {{{
+if [ ${RUNROOT} == "@RUNROOT@" ] || [ ${RUNROOT} == "" ]
+then 
+  _runroot_error 
+fi 
+#}}}
+
 #Prompt {{{
 _prompt ${VERBOSE}
 #}}}
@@ -101,6 +108,8 @@ then
       _message "${RED}and then activate the installation with by sourcing your .bashrc:${DEF}\nsource ~/.bashrc\n" 
     fi 
     exit 1 
+  else 
+      _message "using conda binary ${RED}`which conda`${DEF}\n" 
   fi 
   #}}}
   
@@ -141,7 +150,10 @@ fi
 git clone https://github.com/joezuntz/cosmosis-standard-library.git >> gitclone_output.log 2>&1
 _message "${BLU} - Done! ${DEF}\n"
 #Replace the cpdef instances with cdef in classy.pyx
-${P_SED_INPLACE} "s# cpdef # cdef #" cosmosis-standard-library/boltzmann/class/class_v3.2.0/python/classy.pyx 
+if [ -f cosmosis-standard-library/boltzmann/class/class_v3.2.0/python/classy.pyx ]
+then 
+  ${P_SED_INPLACE} "s# cpdef # cdef #" cosmosis-standard-library/boltzmann/class/class_v3.2.0/python/classy.pyx 
+fi 
 #}}}
 cat > csl_make.sh <<-EOF
 source cosmosis-configure
