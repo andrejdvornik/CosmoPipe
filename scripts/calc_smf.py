@@ -36,9 +36,9 @@ if __name__ == '__main__':
     parser.add_argument('--output_name', type=str, help='Output name', required=True)
     parser.add_argument('--f_tomo', type=float, help='Fraction of galaxies in this bin', required=False, default=1.0)
     parser.add_argument('--nz_file', type=str, help='n(z) file', required=False, default='')
-    parser.add_argument('--nz_tot', type=str, help='n(z) files (all of them)', required=False, default='')
+    parser.add_argument('--nz_tot', type=str, help='n(z) files (all of them)', required=False, default='', nargs='?')
     parser.add_argument('--nobs',type=int, help='Number of SMF bins', required=False, default=0)
-    parser.add_argument('--nmbins', type=int, default=10000, nargs='?', required=False,
+    parser.add_argument('--nmbins', type=int, default=1000, nargs='?', required=False,
                         help='Number of mass bins for estimating the number of galaxies in finely binned stellar mass bins. The default value is 10000.')
     
     args = parser.parse_args()

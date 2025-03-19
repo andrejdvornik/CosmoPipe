@@ -106,8 +106,45 @@ do
   then
     nz_tot=${file_nz_tot}
   else
-    nz_tot=
+    nz_tot=""
   fi
+  
+  #file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB1.txt"
+  slice=`grep '^slice_in' ${file_ftomo_one} | awk '{printf $2}'`
+  if [ "${slice}" == "obs" ]
+  then
+    for i in `seq @BV:NSMFLENSBINS@`
+    do
+        #file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
+        x_lo=`grep '^x_lims_lo' ${file_ftomo_one} | awk '{printf $2}'`
+        x_hi=`grep '^x_lims_hi' ${file_ftomo_one} | awk '{printf $2}'`
+        y_lo=`grep '^y_lims_lo' ${file_ftomo_one} | awk '{printf $2}'`
+        y_hi=`grep '^y_lims_hi' ${file_ftomo_one} | awk '{printf $2}'`
+        obs_mins="${x_lo}"
+        obs_maxs="${x_hi}"
+        z_mins="${y_lo}"
+        z_maxs="${y_hi}"
+    done
+  elif [ "${slice}" == "z" ]
+  then
+    for i in `seq @BV:NSMFLENSBINS@`
+    do
+        #file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
+        x_lo=`grep '^x_lims_lo' ${file_ftomo_one} | awk '{printf $2}'`
+        x_hi=`grep '^x_lims_hi' ${file_ftomo_one} | awk '{printf $2}'`
+        y_lo=`grep '^y_lims_lo' ${file_ftomo_one} | awk '{printf $2}'`
+        y_hi=`grep '^y_lims_hi' ${file_ftomo_one} | awk '{printf $2}'`
+        obs_mins="${y_lo}"
+        obs_maxs="${y_hi}"
+        z_mins="${x_lo}"
+        z_maxs="${x_hi}"
+    done
+  else
+    _message "Got wrong or no information about slicing of the lens sample.\n"
+    #exit 1
+  fi
+  
+  
   
   #Define the output filename
   outname=${file_lens_one##*/}
@@ -144,12 +181,12 @@ do
   MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
     @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_smf.py \
     --estimator simple \
-    --nbins "@BV:NSMFBINS@" --min_mass "@BV:MINMASS@" --max_mass "@BV:MAXMASS@" \
+    --nbins "@BV:NSMFBINS@" --min_mass "${obs_mins}" --max_mass "${obs_maxs}" \
     --h0 "@BV:H0_IN@" --omegam "@BV:OMEGAM_IN@" --omegav "@BV:OMEGAV_IN@" \
     --file ${file_lens_one} \
     --output_path @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/ \
     --output_name ${outname1} \
-    --min_z "@BV:MINZ@" --max_z "@BV:MAXZ@" \
+    --min_z "${z_mins}" --max_z "${z_maxs}" \
     --stellar_mass_column @BV:STELLARMASS@ \
     --z_column @BV:REDSHIFT@ \
     --area @SURVEYAREADEG@ \

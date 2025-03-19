@@ -136,11 +136,11 @@ if __name__ == '__main__':
         if ne:
             extension_neE = 'gammat'
             extension_neB = 'gammax'
-            ylabel_neE = r'$\theta\gamma_{\mathrm{t}}[10^{-3}{\mathrm{arcmin}}]$'
-            ylabel_neB = r'$\theta\gamma_{\mathrm{x}}[10^{-3}{\mathrm{arcmin}}]$'
+            ylabel_neE = r'$\theta\gamma_{\mathrm{t}}[10^{-4}{\mathrm{arcmin}}]$'
+            ylabel_neB = r'$\theta\gamma_{\mathrm{x}}[10^{-4}{\mathrm{arcmin}}]$'
             xlabel = r'$\theta$'
             xscale = 'log'
-            scaling_ne = 1e3
+            scaling_ne = 1e4
             statistic_gm = 'gamma_t'
         if nn:
             extension_nn = 'wtheta'
@@ -232,20 +232,20 @@ if __name__ == '__main__':
             ymin_nb = np.min(nn_data['VALUE']/nn_data['ANG']*scaling_nn*1.3)
     else:
         if ee:
-            ymax_eeE = np.max(eeE_data['VALUE']*scaling_ee*1.3)
-            ymin_eeE = np.min(eeE_data['VALUE']*scaling_ee*1.3)
+            ymax_eeE = np.max(eeE_data['ANG']*eeE_data['VALUE']*scaling_ee*1.3)
+            ymin_eeE = np.min(eeE_data['ANG']*eeE_data['VALUE']*scaling_ee*1.3)
             if eeB_data is not None:
-                ymax_eeB = np.max(eeB_data['VALUE']*scaling_ee*1.3)
-                ymin_eeB = np.min(eeB_data['VALUE']*scaling_ee*1.3)
+                ymax_eeB = np.max(eeB_data['ANG']*eeB_data['VALUE']*scaling_ee*1.3)
+                ymin_eeB = np.min(eeB_data['ANG']*eeB_data['VALUE']*scaling_ee*1.3)
         if ne:
-            ymax_neE = np.max(neE_data['VALUE']*scaling_ne*1.3)
-            ymin_neE = np.min(neE_data['VALUE']*scaling_ne*1.3)
+            ymax_neE = np.max(neE_data['ANG']*neE_data['VALUE']*scaling_ne*1.3)
+            ymin_neE = np.min(neE_data['ANG']*neE_data['VALUE']*scaling_ne*1.3)
             if neB_data is not None:
-                ymax_neB = np.max(neB_data['VALUE']*scaling_ne*1.3)
-                ymin_neB = np.min(neB_data['VALUE']*scaling_ne*1.3)
+                ymax_neB = np.max(neB_data['ANG']*neB_data['VALUE']*scaling_ne*1.3)
+                ymin_neB = np.min(neB_data['ANG']*neB_data['VALUE']*scaling_ne*1.3)
         if nn:
-            ymax_nn = np.max(nn_data['VALUE']*scaling_nn*1.3)
-            ymin_nn = np.min(nn_data['VALUE']*scaling_nn*1.3)
+            ymax_nn = np.max(nn_data['ANG']*nn_data['VALUE']*scaling_nn*1.3)
+            ymin_nn = np.min(nn_data['ANG']*nn_data['VALUE']*scaling_nn*1.3)
     
     if ee:
         n_combinations_ee = int(ntomo*(ntomo+1)/2)

@@ -36,14 +36,15 @@ redshift_name_lens = lens
 redshift_name_obs  = obs
 
 ; default values for halo model part
-nz_def = 15
-nk_def = 300
+nz_def = 5 ; 15
+nk_def = 300 ; 300
 zmin_def =  0.0
 zmax_def = 1.2
-nmass_def = 50 ; 200
+nmass_def = 100 ; 200
 logmassmin_def = 9.0
 logmassmax_def = 18.0
 beta_nl = True
+mead2020_corrections = fit_feedback
 
 SAMPLER_NAME = @BV:SAMPLER@
 RUN_NAME = %(SAMPLER_NAME)s_%(blind)s${CHAINSUFFIX}
@@ -61,7 +62,7 @@ NLENSBINS="@BV:NLENSBINS@"
 NSMFLENSBINS="@BV:NSMFLENSBINS@"
 NSMFBINS="@BV:NSMFBINS@"
 #Define the data file name {{{
-if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ] || [ "${BOLTZMAN^^}" == "HALO_MODEL" ]
+if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ] || [ "${BOLTZMAN^^}" == "HALO_MODEL" ] || [ "${BOLTZMAN^^}" == "COSMOPOWER_HALO_MODEL" ]
 then
   non_linear_model=mead2020_feedback
 elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
@@ -583,6 +584,7 @@ cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_co
 [xi]
 file = %(CSL_PATH)s/shear/cl_to_xi_fullsky/cl_to_xi_interface.py
 n_theta_bins = @BV:NTHETAREBIN@
+n_theta = @BV:NTHETAREBIN@
 theta_min = @BV:THETAMIN@
 theta_max = @BV:THETAMAX@
 ell_max = 40000
@@ -611,6 +613,7 @@ cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_co
 [gt]
 file = %(CSL_PATH)s/shear/cl_to_xi_fullsky/cl_to_xi_interface.py
 n_theta_bins = @BV:NTHETAREBIN@
+n_theta = @BV:NTHETAREBIN@
 theta_min = @BV:THETAMIN@
 theta_max = @BV:THETAMAX@
 ell_max = 40000
@@ -635,6 +638,7 @@ cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_co
 [wth]
 file = %(CSL_PATH)s/shear/cl_to_xi_fullsky/cl_to_xi_interface.py
 n_theta_bins = @BV:NTHETAREBIN@
+n_theta = @BV:NTHETAREBIN@
 theta_min = @BV:THETAMIN@
 theta_max = @BV:THETAMAX@
 ell_max = 40000
@@ -895,9 +899,20 @@ done
 #Add the values information #{{{
 if [  "@BV:COSMOSIS_PIPELINE@" == "default" ]
 then
-    iamodel_pipeline="hod_ia_red hod_ia_blue alignment_red alignment_blue radial_satellite_alignment_red radial_satellite_alignment_blue pk_ia_red pk_ia_blue add_and_upsample_ia projection add_intrinsic"
-    
-    COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits consistency camb extrapolate bnl halo_model_ingredients_halomod hod hod_smf pk add_and_upsample ${iamodel_pipeline} source_photoz_bias ${twopt_modules} ${bnl_delete}"
+    # Set up boltzmann code blocks
+    if [ "${BOLTZMAN^^}" == "HALO_MODEL" ]
+    then
+        boltzmann_pipeline="camb"
+    elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HALO_MODEL" ]
+    then
+        boltzmann_pipeline="cosmopower"
+    else
+        _message "Boltzmann code not implemented: ${BOLTZMAN^^}\n"
+          exit 1
+    fi
+    #iamodel_pipeline="hod_ia_red hod_ia_blue alignment_red alignment_blue radial_satellite_alignment_red radial_satellite_alignment_blue pk_ia_red pk_ia_blue add_and_upsample_ia projection add_intrinsic"
+    iamodel_pipeline="projection"
+    COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_fits consistency ${boltzmann_pipeline} extrapolate bnl halo_model_ingredients_halomod hod hod_smf pk add_and_upsample ${iamodel_pipeline} source_photoz_bias ${twopt_modules} ${bnl_delete}"
 else
 	COSMOSIS_PIPELINE="@BV:COSMOSIS_PIPELINE@"
 fi
@@ -998,14 +1013,15 @@ fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
 extra_output = ${extraparams} ${shifts} ${listparam} ${tpdparams}
 quiet = T
-timing = F
+timing = F ; T
 debug = F
 fast_slow = ${fast_slow}
-first_fast_module = halo_model_ingredients_halomod
+first_fast_module = hod ; halo_model_ingredients_halomod
 
 [runtime]
 sampler = %(SAMPLER_NAME)s
 verbosity = quiet
+pool_stdout = F ; T
 
 [output]
 filename = ${OUTPUTNAME}
@@ -1016,16 +1032,15 @@ EOF
 #}}}
 
 #Requested boltzman {{{
-#if [ "${BOLTZMAN^^}" == "HALO_MODEL" ] #{{{
-#then
-
+if [ "${BOLTZMAN^^}" == "HALO_MODEL" ] #{{{
+then
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_boltzman.ini <<- EOF
 [camb]
 file = %(CSL_PATH)s/boltzmann/camb/camb_interface.py
 do_reionization = F
 mode = power
 nonlinear = none ; pk
-; halofit_version = mead2020_feedback
+halofit_version = mead2020_feedback
 neutrino_hierarchy = normal
 kmax = 20.0
 kmax_extrapolate = 1000.0
@@ -1039,12 +1054,45 @@ nz_background = 6000
 
 EOF
 #}}}
-#else
-#  #ERROR: unknown boltzman code
-#  _message "For 3x2pt only the halo model is implemented as boltzman code\n"
-#  exit 1
-#fi
+elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HALO_MODEL" ] #{{{
+then
+cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_boltzman.ini <<- EOF
+[cosmopower]
+file = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/cosmosis_modules/cosmopower_interface_new.py
+do_reionization = F
+mode = power
+nonlinear = none ; pk
+halofit_version = mead2020_feedback ; We need to use this here in order to correctly select the emulator
+neutrino_hierarchy = normal
+kmax = 20.0
+kmax_extrapolate = 1000.0
+nk = 300
+zmin = 0.0
+zmax = 3.0
+nz = 150
+zmax_background = 6.0
+zmin_background = 0.0
+nz_background = 6000
+
+use_specific_k_modes = F
+; otherwise it uses the k-modes the emulator is trained on
+kmin = 1e-5
+
+lin_matter_power_emulator = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/train_emulator_camb_S8/outputs/log10_reference_lin_matter_power_emulator_mead2020_feedback
+; nonlin_matter_power_emulator = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/train_emulator_camb_S8/outputs/log10_reference_non_lin_matter_power_emulator_mead2020_feedback
+reference_linear_spectra = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/train_emulator_camb_S8/outputs/center_linear_matter_mead2020_feedback.npz
+; reference_nonlinear_spectra = %(MY_PATH)s/INSTALL/INSTALL/CosmoPowerCosmosis/train_emulator_camb_S8/outputs/center_non_linear_matter_mead2020_feedback.npz
+; As_emulator = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/train_emulator_camb_S8/outputs/As_emulator
+
+EOF
 #}}}
+else
+  #ERROR: unknown boltzman code
+  _message "Boltzman Code Unknown: ${BOLTZMAN^^}\n"
+  exit 1
+fi
+#}}}
+
 
 #Additional Modules {{{
 echo > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini
@@ -1145,7 +1193,7 @@ do
 			overdensity = 200
 			delta_c = 1.686
 			cm_model = duffy08
-			use_mead2020_corrections = fit_feedback
+			use_mead2020_corrections = %(mead2020_corrections)s
 			nk = %(nk_def)s
 			profile = NFW ; Not yet implemented here
 			
@@ -1167,7 +1215,7 @@ do
 			overdensity = 200
 			delta_c = 1.686
 			cm_model = duffy08
-			use_mead2020_corrections = fit_feedback
+			use_mead2020_corrections = %(mead2020_corrections)s
 			nk = %(nk_def)s
 			profile = NFW
 			
@@ -1225,10 +1273,10 @@ do
 			hod_section_name = hod
 			values_name = hod_parameters
 			nobs = 200
-			log10_obs_min =${obs_mins}
-			log10_obs_max =${obs_maxs}
-			zmin =${z_mins}
-			zmax =${z_maxs}
+			log10_obs_min = ${obs_mins}
+			log10_obs_max = ${obs_maxs}
+			zmin = ${z_mins}
+			zmax = ${z_maxs}
 			nz = 50 ; %(nz_def)s
 			log_mass_min = %(logmassmin_def)s
 			log_mass_max = %(logmassmax_def)s
@@ -1348,6 +1396,7 @@ do
 	"predict_observable") #{{{
 			obs_mins=""
 			obs_maxs=""
+			nobs=""
 			suffix=`seq -s ' ' ${NSMFLENSBINS}`
 			file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB1.txt"
 			slice=`grep '^slice_in' ${file1} | awk '{printf $2}'`
@@ -1360,6 +1409,7 @@ do
 					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
 					obs_mins="${obs_mins} ${x_lo}"
 					obs_maxs="${obs_maxs} ${x_hi}"
+					nobs="${nobs} ${NSMFBINS}"
 				done
 			elif [ "${slice}" == "z" ]
 			then
@@ -1370,6 +1420,7 @@ do
 					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
 					obs_mins="${obs_mins} ${y_lo}"
 					obs_maxs="${obs_maxs} ${y_hi}"
+					nobs="${nobs} ${NSMFBINS}"
 				done
 			else
 				_message "Got wrong or no information about slicing of the lens sample.\n"
@@ -1382,9 +1433,9 @@ do
 			output_section_name = one_point
 			suffixes = ${suffix}
 			sample = nz_obs
-			log10_obs_min =${obs_mins}
-			log10_obs_max =${obs_maxs}
-			n_obs = ${NSMFBINS}
+			log10_obs_min = ${obs_mins}
+			log10_obs_max = ${obs_maxs}
+			n_obs = ${nobs}
 			edges = True
 			
 			EOF
@@ -1425,8 +1476,8 @@ do
 			[$module]
 			file = %(HMPATH)s/correct_cosmo_observable.py
 			section_name = one_point
-			zmin =${z_mins}
-			zmax =${z_maxs}
+			zmin = ${z_mins}
+			zmax = ${z_maxs}
 			astropy_cosmology_class = LambdaCDM
 			cosmo_kwargs = "{'H0':${h0_in}, 'Om0':${omega_m}, 'Ode0':${omega_v}}"
 			
@@ -1509,6 +1560,7 @@ do
 			poisson_type = scalar
 			point_mass = True
 			dewiggle = True
+			use_mead2020_corrections = %(mead2020_corrections)s
 			
 			EOF
 			;; #}}}
@@ -1540,6 +1592,7 @@ do
 			poisson_type = scalar
 			point_mass = False
 			dewiggle = True
+			use_mead2020_corrections = %(mead2020_corrections)s
 			
 			EOF
 			;; #}}}
@@ -1571,6 +1624,7 @@ do
 			poisson_type = scalar
 			point_mass = False
 			dewiggle = True
+			use_mead2020_corrections = %(mead2020_corrections)s
 			
 			EOF
 			;; #}}}
