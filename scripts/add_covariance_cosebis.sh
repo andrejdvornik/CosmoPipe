@@ -23,3 +23,22 @@ cp @BV:COSEBICOVFILE@ @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_cosebis/${f
 _write_datablock "covariance_cosebis" "${file}"
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
