@@ -43,8 +43,8 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BV:ANALYTIC_MCOV DATABLOCK PATCHLIST PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH
-} 
+  echo ALLPATCH BV:ANALYTIC_MCOV DATABLOCK BV:PATCHLIST PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH
+}
 #}}}
 
 # Input data {{{
@@ -52,7 +52,7 @@ function _inp_data {
   #Data inputs (leave blank if none)
   blind=`_parse_blockvars "@BV:BLIND@"`
   outlist=''
-  for patch in @ALLPATCH@ @PATCHLIST@
+  for patch in @ALLPATCH@ @BV:PATCHLIST@
   do
     outlist="${outlist} mbias_${patch}_${blind}"
   done
@@ -65,7 +65,7 @@ function _outputs {
 #Data outputs (leave blank if none)
   blind=`_parse_blockvars "@BV:BLIND@"`
   outlist=''
-  for patch in @PATCHLIST@ @ALLPATCH@
+  for patch in @BV:PATCHLIST@ @ALLPATCH@
   do
     outlist="${outlist} cosmosis_mcov_${patch}_@BV:BLIND@ cosmosis_mbias_${patch}_@BV:BLIND@ cosmosis_msigma_${patch}_@BV:BLIND@ mcov_${patch}_@BV:BLIND@"
   done

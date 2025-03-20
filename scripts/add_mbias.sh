@@ -8,7 +8,7 @@
 #=========================================
 
 #Loop over patches & allpatch
-for patch in @PATCHLIST@ @ALLPATCH@
+for patch in @BV:PATCHLIST@ @ALLPATCH@
 do
 
   #Construct the output directory 

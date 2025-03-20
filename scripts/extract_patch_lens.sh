@@ -36,7 +36,7 @@ _message "@BLU@Constructing Patch-wise catalogue from:@DEF@ ${lens_filelist##*/}
 outputlist=''
 for file in ${lens_filelist}
 do
-  for patch in @PATCHLIST@
+  for patch in @BV:PATCHLIST@
   do
     #Define the output file name {{{
     outputname=${file//_@ALLPATCH@_/_${patch}_}

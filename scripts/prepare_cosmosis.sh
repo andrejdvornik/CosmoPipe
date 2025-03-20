@@ -30,8 +30,8 @@ NLENS="@BV:NLENSBINS@"
 #Define the patches to loop over {{{
 if [ "@BV:COSMOSIS_PATCHLIST@" == "ALL" ]
 then 
-  patchlist=`echo @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb` 
-else 
+  patchlist=`echo @BV:PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb`
+else
   patchlist="@BV:COSMOSIS_PATCHLIST@"
 fi 
 #}}}

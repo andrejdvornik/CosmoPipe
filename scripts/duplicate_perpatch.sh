@@ -10,7 +10,7 @@
 #Script to duplicate the DATAHEAD catalogues once per patch 
 inputs="@DB:ALLHEAD@" 
 outputlist=''
-for patch in @PATCHLIST@ 
+for patch in @BV:PATCHLIST@ 
 do 
   for input in ${inputs}
   do 

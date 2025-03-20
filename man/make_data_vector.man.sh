@@ -43,8 +43,8 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BV:TOMOLIMS DATABLOCK PATCHLIST PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH
-} 
+  echo ALLPATCH BV:TOMOLIMS DATABLOCK BV:PATCHLIST PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH
+}
 #}}}
 
 # Input data {{{ 
@@ -58,7 +58,7 @@ function _inp_data {
 function _outputs { 
   #Data outputs (leave blank if none)
   outlist=''
-  for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+  for patch in @BV:PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
   do 
     outlist="${outlist} cosebis_vec_${patch}"
   done 

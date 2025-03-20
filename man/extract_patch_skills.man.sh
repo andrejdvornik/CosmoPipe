@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:SIMLABEL DEF MACHINE PATCHLIST P_RSCRIPT PYTHON3BIN RED RUNROOT SCRIPTPATH
+  echo BLU BV:SIMLABEL DEF MACHINE BV:PATCHLIST P_RSCRIPT PYTHON3BIN RED RUNROOT SCRIPTPATH
 } 
 #}}}
 

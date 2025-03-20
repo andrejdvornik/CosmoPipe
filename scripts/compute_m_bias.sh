@@ -145,7 +145,7 @@ _writelist_datahead "${outputlistbase}"
 #}}}
 
 #Loop over patches 
-for patch in @PATCHLIST@ @ALLPATCH@
+for patch in @BV:PATCHLIST@ @ALLPATCH@
 do 
   #Get the m-bias files for this patch (there should be NTOMO*NREALISATION files)
   filelist=`echo ${outputlist} | sed 's/ /\n/g' | grep "_${patch}_" || echo `

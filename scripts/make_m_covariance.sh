@@ -8,7 +8,7 @@
 #=========================================
 
 #Loop over the patch list
-for patch in @PATCHLIST@ @ALLPATCH@
+for patch in @BV:PATCHLIST@ @ALLPATCH@
 do 
   #m-bias files 
   mfiles="`_read_datablock mbias_${patch}_@BV:BLIND@`"

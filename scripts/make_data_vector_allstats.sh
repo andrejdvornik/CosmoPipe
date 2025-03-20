@@ -119,7 +119,7 @@ fi
 
 #Input mbias files
 mfiles="@DB:mbias@"
-for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+for patch in @BV:PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
 do
   for stat in ${stat_out}
   do

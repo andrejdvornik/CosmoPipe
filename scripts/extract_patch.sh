@@ -18,7 +18,7 @@ _message "@BLU@Constructing Patch-wise catalogue from:@DEF@ ${inputfile##*/}\n"
 
 #Construct the tomographic bin catalogues {{{
 outputlist=''
-for patch in @PATCHLIST@ 
+for patch in @BV:PATCHLIST@ 
 do
   #Define the output file name {{{
   outputname=${inputfile//_@ALLPATCH@_/_${patch}_}

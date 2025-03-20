@@ -11,8 +11,8 @@
 calib_cats="@DB:som_weight_calib_gold@"
 refr_cats="@DB:som_weight_refr_gold@"
 
-for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
-do 
+for patch in @BV:PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+do
   nfile=`echo ${calib_cats} | grep -c "_${patch}_" || echo `
   if [ ${nfile} -gt 0 ]
   then 
@@ -56,7 +56,7 @@ fi
 #Run the Nz bias construction for each bin {{{
 @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/compute_dz_priors.R -c ${calib_cats} -r ${refr_cats} \
   --binstrings ${binstrings} \
-  --patchstrings @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb \
+  --patchstrings @BV:PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb \
   ${calibweight} \
   -w @BV:WEIGHTNAME@ \
   --syserr @BV:NZSYSERROR@ \
@@ -68,7 +68,7 @@ fi
   --covout Nz_covariance.txt 2>&1
 #}}}
 
-for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+for patch in @BV:PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
 do 
   nfile=`echo ${calib_cats} | grep -c "_${patch}_" || echo `
   if [ ${nfile} -gt 0 ]

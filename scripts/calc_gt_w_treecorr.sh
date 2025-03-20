@@ -12,8 +12,8 @@ _message "Estimating galaxy-galaxy lensing correlation functions:"
 sourcefiles="@DB:ALLHEAD@"
 lensfiles="@BV:LENS_CATS@"
 randfiles="@BV:RAND_CATS@"
-for patch in @ALLPATCH@ @PATCHLIST@
-do 
+for patch in @ALLPATCH@ @BV:PATCHLIST@
+do
   _message " > Patch ${patch} {\n"
   #Select the catalogues from DATAHEAD in this patch 
   source_filelist=''

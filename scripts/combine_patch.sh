@@ -10,7 +10,7 @@
 
 #Get the combined catalogue name 
 inputcats="@DB:ALLHEAD@"
-patches=`echo @PATCHLIST@`
+patches=`echo @BV:PATCHLIST@`
 
 #Select one of the patches
 basepatch=${patches##* }
