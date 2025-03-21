@@ -42,8 +42,8 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:NZNAME_BASEBLOCK_LENS DATABLOCK DEF NZFILESUFFIX NZPATH_LENS RUNROOT STORAGEPATH
-}
+  echo BLU BV:NZNAME_BASEBLOCK_LENS BV:NZPATH_LENS DATABLOCK DEF NZFILESUFFIX RUNROOT STORAGEPATH
+} 
 #}}}
 
 # Input data {{{ 

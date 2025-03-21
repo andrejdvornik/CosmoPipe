@@ -43,8 +43,8 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BV:INPUT_COVFILE DATABLOCK RUNROOT STORAGEPATH BV:STATISTIC
-}
+  echo BV:INPUT_COVFILE BV:STATISTIC DATABLOCK RUNROOT STORAGEPATH
+} 
 #}}}
 
 # Input data {{{ 

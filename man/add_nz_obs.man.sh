@@ -42,8 +42,8 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:NZNAME_BASEBLOCK_OBS DATABLOCK DEF NZFILESUFFIX NZPATH_LENS RUNROOT STORAGEPATH
-}
+  echo BLU BV:NZNAME_BASEBLOCK_OBS BV:NZPATH_OBS DATABLOCK DEF NZFILESUFFIX RUNROOT STORAGEPATH
+} 
 #}}}
 
 # Input data {{{ 

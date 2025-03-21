@@ -143,9 +143,9 @@ def saveFitsTwoPoint(
     
     wtp2.saveFitsTwoPoint(
         nbTomoN=nbTomoN, nbTomoG=nbTomoG,
-        N_theta=N_theta, theta_min=theta_min, theta_max=theta_max,
-        N_ell=N_ell, ell_min=ell_min, ell_max=ell_max,
-        nbModes=nbModes,
+        N_theta_ee=N_theta, theta_min_ee=theta_min, theta_max_ee=theta_max,
+        N_ell_ee=N_ell, ell_min_ee=ell_min, ell_max_ee=ell_max,
+        nbModes_ee=nbModes,
         prefix_Flinc=prefix_Flinc,
         prefix_CosmoSIS=prefix_CosmoSIS,
         scDict=scDict,

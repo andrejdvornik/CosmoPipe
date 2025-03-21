@@ -40,10 +40,10 @@ set -e
 #}}}
 
 # Input variables {{{
-function _inp_var {
+function _inp_var { 
   #Variable inputs (leave blank if none)
-  
-  echo BV:INPUT_DATAVEC DATABLOCK RUNROOT STORAGEPATH BV:STATISTIC
+  echo BV:INPUT_DATAVEC BV:STATISTIC DATABLOCK RUNROOT STORAGEPATH
+} 
 }
 #}}}
 

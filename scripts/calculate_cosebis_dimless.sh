@@ -20,10 +20,10 @@ fi
 
 # check whether the pre-computed COSEBIS tables exist
 SRCLOC=@RUNROOT@/@CONFIGPATH@/cosebis
-normfile=${SRCLOC}/TLogsRootsAndNorms/Normalization_@BV:THETAMIN@-@BV:THETAMAX@.table
-rootfile=${SRCLOC}/TLogsRootsAndNorms/Root_@BV:THETAMIN@-@BV:THETAMAX@.table
-normfile_dimless=${SRCLOC}/TLogsRootsAndNorms_dimless/Normalization_@BV:THETAMIN@-@BV:THETAMAX@.table
-rootfile_dimless=${SRCLOC}/TLogsRootsAndNorms_dimless/Root_@BV:THETAMIN@-@BV:THETAMAX@.table
+normfile=${SRCLOC}/TLogsRootsAndNorms/Normalization_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
+rootfile=${SRCLOC}/TLogsRootsAndNorms/Root_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
+normfile_dimless=${SRCLOC}/TLogsRootsAndNorms_dimless/Normalization_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
+rootfile_dimless=${SRCLOC}/TLogsRootsAndNorms_dimless/Root_@BV:THETAMINXI@-@BV:THETAMAXXI@.table
 
 if [ ! -f ${normfile_dimless} ] || [ ! -f ${rootfile_dimless} ]
 then 
@@ -31,8 +31,8 @@ then
   then
     _message "    -> @BLU@Computing COSEBIs root and norm files@DEF@"
     @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/cosebis_compute_log_weight.py \
-      --thetamin @BV:THETAMIN@ \
-      --thetamax @BV:THETAMAX@ \
+      --thetamin @BV:THETAMINXI@ \
+      --thetamax @BV:THETAMAXXI@ \
       --nmax @BV:NMAXCOSEBIS@ \
       --dimless True \
       --outputbase ${SRCLOC}/TLogsRootsAndNorms_dimless/ 2>&1
@@ -65,8 +65,8 @@ _message "    -> @BLU@Computing COSEBIs for file @RED@${input##*/}@DEF@"
   -i ${input} \
   -t "meanr" -p "xip" -m "xim" \
   --cfoldername ${outfold} \
-  -o ${output} -b @BINNING@ -n @BV:NMAXCOSEBIS@ -s @BV:THETAMIN@ \
-  -l @BV:THETAMAX@ --tfoldername ${SRCLOC}/Tplus_minus_dimless \
+  -o ${output} -b @BINNING@ -n @BV:NMAXCOSEBIS@ -s @BV:THETAMINXI@ \
+  -l @BV:THETAMAXXI@ --tfoldername ${SRCLOC}/Tplus_minus_dimless \
   --norm ${normfile_dimless} --root ${rootfile_dimless} \
   -d "cosebis" 2>&1 
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"

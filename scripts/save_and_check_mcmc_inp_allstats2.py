@@ -502,21 +502,53 @@ parser.add_argument("--nlens", dest="nLens",type=int,
 parser.add_argument("--nobs", dest="nObs",type=int,
     help="Number of SMF bins",required=False, default=0)
     
-parser.add_argument("--nmaxcosebis", dest="nmaxcosebis",type=int,
+parser.add_argument("--nmaxcosebis_ee", dest="nmaxcosebis_ee",type=int,
     help="maximum n for cosebis",required=False, default=5)
-parser.add_argument("--nbandpowers", dest="nbandpowers",type=int,
+parser.add_argument("--nbandpowers_ee", dest="nbandpowers_ee",type=int,
     help="number of bandpower bins",required=False, default=8)
-parser.add_argument("--ellmin", dest="ellmin",type=float,
+parser.add_argument("--ellmin_ee", dest="ellmin_ee",type=float,
     help="bandpower ell_min",required=False, default=100)
-parser.add_argument("--ellmax", dest="ellmax",type=float,
+parser.add_argument("--ellmax_ee", dest="ellmax_ee",type=float,
     help="bandpower ell_max",required=False, default=1500)
     
-parser.add_argument("--thetamin", dest="thetamin",type=float,
+parser.add_argument("--nmaxcosebis_ne", dest="nmaxcosebis_ne",type=int,
+    help="maximum n for cosebis",required=False, default=5)
+parser.add_argument("--nbandpowers_ne", dest="nbandpowers_ne",type=int,
+    help="number of bandpower bins",required=False, default=8)
+parser.add_argument("--ellmin_ne", dest="ellmin_ne",type=float,
+    help="bandpower ell_min",required=False, default=100)
+parser.add_argument("--ellmax_ne", dest="ellmax_ne",type=float,
+    help="bandpower ell_max",required=False, default=1500)
+    
+parser.add_argument("--nmaxcosebis_nn", dest="nmaxcosebis_nn",type=int,
+    help="maximum n for cosebis",required=False, default=5)
+parser.add_argument("--nbandpowers_nn", dest="nbandpowers_nn",type=int,
+    help="number of bandpower bins",required=False, default=8)
+parser.add_argument("--ellmin_nn", dest="ellmin_nn",type=float,
+    help="bandpower ell_min",required=False, default=100)
+parser.add_argument("--ellmax_nn", dest="ellmax_nn",type=float,
+    help="bandpower ell_max",required=False, default=1500)
+    
+parser.add_argument("--thetamin_ee", dest="thetamin_ee",type=float,
     help="xipm theta_min",required=False, default=0.5)
-parser.add_argument("--thetamax", dest="thetamax",type=float,
+parser.add_argument("--thetamax_ee", dest="thetamax_ee",type=float,
     help="xipm theta_max",required=False, default=300)
-parser.add_argument("--ntheta", dest="ntheta",type=int,
+parser.add_argument("--ntheta_ee", dest="ntheta_ee",type=int,
     help="number of xipm bins",required=False, default=9)
+    
+    parser.add_argument("--thetamin_ne", dest="thetamin_ne",type=float,
+    help="gt theta_min",required=False, default=0.5)
+parser.add_argument("--thetamax_ne", dest="thetamax_ne",type=float,
+    help="gt theta_max",required=False, default=300)
+parser.add_argument("--ntheta_ne", dest="ntheta_ne",type=int,
+    help="number of gt bins",required=False, default=9)
+    
+parser.add_argument("--thetamin_nn", dest="thetamin_nn",type=float,
+    help="wt theta_min",required=False, default=0.5)
+parser.add_argument("--thetamax_nn", dest="thetamax_nn",type=float,
+    help="wt theta_max",required=False, default=300)
+parser.add_argument("--ntheta_nn", dest="ntheta_nn",type=int,
+    help="number of wt bins",required=False, default=9)
     
 parser.add_argument("--neff_source", dest="NeffFileSource",nargs='*',
     help="Neff values file for sources",required=False, default=None, const=None)
@@ -734,13 +766,27 @@ wtp2.saveFitsTwoPoint(
         nbTomoN=nBins_lens,
         nbTomoG=nBins_source,
         nbObs=nBins_obs,
-        N_theta=args.ntheta,
-        theta_min=args.thetamin,
-        theta_max=args.thetamax,
-        N_ell=args.nbandpowers,
-        ell_min=args.ellmin,
-        ell_max=args.ellmax,
-        nbModes=args.nmaxcosebis,
+        N_theta_ee=args.ntheta_ee,
+        theta_min_ee=args.thetamin_ee,
+        theta_max_ee=args.thetamax_ee,
+        N_ell_ee=args.nbandpowers_ee,
+        ell_min_ee=args.ellmin_ee,
+        ell_max_ee=args.ellmax_ee,
+        nbModes_ee=args.nmaxcosebis_ee,
+        N_theta_ne=args.ntheta_ne,
+        theta_min_ne=args.thetamin_ne,
+        theta_max_ne=args.thetamax_ne,
+        N_ell_ne=args.nbandpowers_ne,
+        ell_min_ne=args.ellmin_ne,
+        ell_max_ne=args.ellmax_ne,
+        nbModes_ne=args.nmaxcosebis_ne,
+        N_theta_nn=args.ntheta_nn,
+        theta_min_nn=args.thetamin_nn,
+        theta_max_nn=args.thetamax_nn,
+        N_ell_nn=args.nbandpowers_nn,
+        ell_min_nn=args.ellmin_nn,
+        ell_max_nn=args.ellmax_nn,
+        nbModes_nn=args.nmaxcosebis_nn,
         nnAuto=True,
         prefix_Flinc=None,
         prefix_CosmoSIS=None,
@@ -762,13 +808,27 @@ if no_m_bias_ee == True and no_m_bias_ne == True and no_m_bias_nn == True:
         nbTomoN=nBins_lens,
         nbTomoG=nBins_source,
         nbObs=nBins_obs,
-        N_theta=args.ntheta,
-        theta_min=args.thetamin,
-        theta_max=args.thetamax,
-        N_ell=args.nbandpowers,
-        ell_min=args.ellmin,
-        ell_max=args.ellmax,
-        nbModes=args.nmaxcosebis,
+        N_theta_ee=args.ntheta_ee,
+        theta_min_ee=args.thetamin_ee,
+        theta_max_ee=args.thetamax_ee,
+        N_ell_ee=args.nbandpowers_ee,
+        ell_min_ee=args.ellmin_ee,
+        ell_max_ee=args.ellmax_ee,
+        nbModes_ee=args.nmaxcosebis_ee,
+        N_theta_ne=args.ntheta_ne,
+        theta_min_ne=args.thetamin_ne,
+        theta_max_ne=args.thetamax_ne,
+        N_ell_ne=args.nbandpowers_ne,
+        ell_min_ne=args.ellmin_ne,
+        ell_max_ne=args.ellmax_ne,
+        nbModes_ne=args.nmaxcosebis_ne,
+        N_theta_nn=args.ntheta_nn,
+        theta_min_nn=args.thetamin_nn,
+        theta_max_nn=args.thetamax_nn,
+        N_ell_nn=args.nbandpowers_nn,
+        ell_min_nn=args.ellmin_nn,
+        ell_max_nn=args.ellmax_nn,
+        nbModes_nn=args.nmaxcosebis_nn,
         nnAuto=True,
         prefix_Flinc=None,
         prefix_CosmoSIS=None,

@@ -44,10 +44,10 @@ then
     est_shear=xi_pm
     cosmic_shear=True
     n_arb_ee=@BV:NTHETAREBIN@
-    arb_fourier_filter_mmE_file_@BV:STATISTIC@="fourier_weight_realspace_cf_mm_p_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    arb_fourier_filter_mmB_file_@BV:STATISTIC@="fourier_weight_realspace_cf_mm_m_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    arb_real_filter_mm_p_file_@BV:STATISTIC@="real_weight_realspace_cf_mm_p_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    arb_real_filter_mm_m_file_@BV:STATISTIC@="real_weight_realspace_cf_mm_m_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+    arb_fourier_filter_mmE_file_@BV:STATISTIC@="fourier_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    arb_fourier_filter_mmB_file_@BV:STATISTIC@="fourier_weight_realspace_cf_mm_m_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    arb_real_filter_mm_p_file_@BV:STATISTIC@="real_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    arb_real_filter_mm_m_file_@BV:STATISTIC@="real_weight_realspace_cf_mm_m_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
   else
     est_shear=xi_pm
     cosmic_shear=False
@@ -57,8 +57,8 @@ then
     est_ggl=gamma_t
     ggl=True
     n_arb_ne=@BV:NTHETAREBIN@
-    arb_fourier_filter_gm_file_@BV:STATISTIC@="fourier_weight_realspace_cf_gm_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    arb_real_filter_gm_file_@BV:STATISTIC@="real_weight_realspace_cf_gm_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+    arb_fourier_filter_gm_file_@BV:STATISTIC@="fourier_weight_realspace_cf_gm_@BV:THETAMINGT@-@BV:THETAMAXGT@_?.table"
+    arb_real_filter_gm_file_@BV:STATISTIC@="real_weight_realspace_cf_gm_@BV:THETAMINGT@-@BV:THETAMAXGT@_?.table"
   else
     est_ggl=gamma_t
     ggl=False
@@ -68,8 +68,8 @@ then
     est_clust=w
     clustering=True
     n_arb_nn=@BV:NTHETAREBIN@
-    arb_fourier_filter_gg_file_@BV:STATISTIC@="fourier_weight_realspace_cf_gg_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    arb_real_filter_gg_file_@BV:STATISTIC@="real_weight_realspace_cf_gg_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+    arb_fourier_filter_gg_file_@BV:STATISTIC@="fourier_weight_realspace_cf_gg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
+    arb_real_filter_gg_file_@BV:STATISTIC@="real_weight_realspace_cf_gg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
   else
     est_clust=w
     clustering=False
@@ -81,10 +81,10 @@ then
     est_shear=cosebi
     cosmic_shear=True
     n_arb_ee=@BV:NMAXCOSEBIS@
-    arb_fourier_filter_mmE_file_@BV:STATISTIC@="WnLog_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    arb_fourier_filter_mmB_file_@BV:STATISTIC@="WnLog_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    arb_real_filter_mm_p_file_@BV:STATISTIC@="Tplus_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    arb_real_filter_mm_m_file_@BV:STATISTIC@="Tminus_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+    arb_fourier_filter_mmE_file_@BV:STATISTIC@="WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    arb_fourier_filter_mmB_file_@BV:STATISTIC@="WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    arb_real_filter_mm_p_file_@BV:STATISTIC@="Tplus_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    arb_real_filter_mm_m_file_@BV:STATISTIC@="Tminus_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
   else
     est_shear=cosebi
     cosmic_shear=False
@@ -94,8 +94,8 @@ then
     est_ggl=cosebi
     ggl=True
     n_arb_ne=@BV:NMAXCOSEBIS@
-    arb_fourier_filter_gm_file_@BV:STATISTIC@="Qgm_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    arb_real_filter_gm_file_@BV:STATISTIC@="Wn_psigm_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+    arb_fourier_filter_gm_file_@BV:STATISTIC@="Qgm_@BV:THETAMINGT@-@BV:THETAMAXGT@_?.table"
+    arb_real_filter_gm_file_@BV:STATISTIC@="Wn_psigm_@BV:THETAMINGT@-@BV:THETAMAXGT@_?.table"
   else
     est_ggl=cosebi
     ggl=False
@@ -105,8 +105,8 @@ then
     est_clust=cosebi
     clustering=True
     n_arb_nn=@BV:NMAXCOSEBIS@
-    arb_fourier_filter_gg_file_@BV:STATISTIC@="Ugg_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    arb_real_filter_gg_file_@BV:STATISTIC@="Wn_psigg_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+    arb_fourier_filter_gg_file_@BV:STATISTIC@="Ugg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
+    arb_real_filter_gg_file_@BV:STATISTIC@="Wn_psigg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
   else
     est_clust=cosebi
     clustering=False
@@ -118,8 +118,8 @@ then
     est_shear=bandpowers
     cosmic_shear=True
     n_arb_ee=@BV:NBANDPOWERS@
-    theta_lo=`echo 'e(l(@BV:THETAMIN@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-    theta_up=`echo 'e(l(@BV:THETAMAX@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+    theta_lo=`echo 'e(l(@BV:THETAMINXI@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+    theta_up=`echo 'e(l(@BV:THETAMAXXI@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
     t_lo=`printf "%.2f" $theta_lo`
     t_up=`printf "%.2f" $theta_up`
     arb_fourier_filter_mmE_file_@BV:STATISTIC@="fourier_weight_bandpowers_mmE_${t_lo}-${t_up}_?.table"
@@ -135,8 +135,8 @@ then
     est_ggl=bandpowers
     ggl=True
     n_arb_ne=@BV:NBANDPOWERS@
-    theta_lo=`echo 'e(l(@BV:THETAMIN@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-    theta_up=`echo 'e(l(@BV:THETAMAX@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+    theta_lo=`echo 'e(l(@BV:THETAMINGT@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+    theta_up=`echo 'e(l(@BV:THETAMAXGT@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
     t_lo=`printf "%.2f" $theta_lo`
     t_up=`printf "%.2f" $theta_up`
     arb_fourier_filter_gm_file_@BV:STATISTIC@="fourier_weight_bandpowers_gm_${t_lo}-${t_up}_?.table"
@@ -150,8 +150,8 @@ then
     est_clust=bandpowers
     clustering=True
     n_arb_nn=@BV:NBANDPOWERS@
-    theta_lo=`echo 'e(l(@BV:THETAMIN@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-    theta_up=`echo 'e(l(@BV:THETAMAX@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+    theta_lo=`echo 'e(l(@BV:THETAMINWT@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+    theta_up=`echo 'e(l(@BV:THETAMAXWT@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
     t_lo=`printf "%.2f" $theta_lo`
     t_up=`printf "%.2f" $theta_up`
     arb_fourier_filter_gg_file_@BV:STATISTIC@="fourier_weight_bandpowers_gg_${t_lo}-${t_up}_?.table"
@@ -551,9 +551,9 @@ if [ "${STATISTIC^^}" == "2PCF" ] || [ "${SECONDSTATISTIC^^}" == "2PCF" ]
 then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covTHETAspace settings]
-theta_min = @BV:THETAMIN@
-theta_max = @BV:THETAMAX@
-theta_bins = @BV:NTHETAREBIN@
+theta_min = @BV:THETAMINXI@
+theta_max = @BV:THETAMAXXI@
+theta_bins = @BV:NXIPM@
 theta_type = log
 theta_list = 1, 2, 3
 xi_pp = ${cosmic_shear}
@@ -595,8 +595,8 @@ then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covCOSEBI settings]
 En_modes = @BV:NMAXCOSEBIS@
-theta_min = @BV:THETAMIN@
-theta_max = @BV:THETAMAX@
+theta_min = @BV:THETAMINXI@
+theta_max = @BV:THETAMAXXI@
 En_accuracy = 1e-4
 Wn_style = log
 
@@ -610,7 +610,7 @@ cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_
 apodisation_log_width = @BV:APODISATIONWIDTH@
 theta_lo = ${theta_lo}
 theta_up = ${theta_up}
-theta_binning = @BV:NTHETABIN@
+theta_binning = @BV:NTHETABINXI@
 ell_min = @BV:LMINBANDPOWERS@
 ell_max = @BV:LMAXBANDPOWERS@
 ell_bins = @BV:NBANDPOWERS@
@@ -788,52 +788,52 @@ then
       if [[ .*\ $MODES\ .* =~ " EE " ]]
       then
         n_arb_ee2=@BV:NTHETAREBIN@
-        arb_fourier_filter_mmE_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_mm_p_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-        arb_fourier_filter_mmB_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_mm_m_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-        arb_real_filter_mm_p_file_@BV:SECONDSTATISTIC@="real_weight_realspace_cf_mm_p_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-        arb_real_filter_mm_m_file_@BV:SECONDSTATISTIC@="real_weight_realspace_cf_mm_m_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+        arb_fourier_filter_mmE_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+        arb_fourier_filter_mmB_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_mm_m_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+        arb_real_filter_mm_p_file_@BV:SECONDSTATISTIC@="real_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+        arb_real_filter_mm_m_file_@BV:SECONDSTATISTIC@="real_weight_realspace_cf_mm_m_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
       fi
       if [[ .*\ $MODES\ .* =~ " NE " ]]
       then
         n_arb_ne2=@BV:NTHETAREBIN@
-        arb_fourier_filter_gm_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_gm_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-        arb_real_filter_gm_file_@BV:SECONDSTATISTIC@="real_weight_realspace_cf_gm_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+        arb_fourier_filter_gm_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_gm_@BV:THETAMINGT@-@BV:THETAMAXGT@_?.table"
+        arb_real_filter_gm_file_@BV:SECONDSTATISTIC@="real_weight_realspace_cf_gm_@BV:THETAMINGT@-@BV:THETAMAXGT@_?.table"
       fi
       if [[ .*\ $MODES\ .* =~ " NN " ]]
       then
         n_arb_nn2=@BV:NTHETAREBIN@
-        arb_fourier_filter_gg_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_gg_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-        arb_real_filter_gg_file_@BV:SECONDSTATISTIC@="real_weight_realspace_cf_gg_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+        arb_fourier_filter_gg_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_gg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
+        arb_real_filter_gg_file_@BV:SECONDSTATISTIC@="real_weight_realspace_cf_gg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
       fi
     elif [ "${SECONDSTATISTIC^^}" == "COSEBIS" ]
     then
       if [[ .*\ $MODES\ .* =~ " EE " ]]
       then
         n_arb_ee2=@BV:NMAXCOSEBIS@
-        arb_fourier_filter_mmE_file_@BV:SECONDSTATISTIC@="WnLog_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-        arb_fourier_filter_mmB_file_@BV:SECONDSTATISTIC@="WnLog_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-        arb_real_filter_mm_p_file_@BV:SECONDSTATISTIC@="Tplus_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-        arb_real_filter_mm_m_file_@BV:SECONDSTATISTIC@="Tminus_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+        arb_fourier_filter_mmE_file_@BV:SECONDSTATISTIC@="WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+        arb_fourier_filter_mmB_file_@BV:SECONDSTATISTIC@="WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+        arb_real_filter_mm_p_file_@BV:SECONDSTATISTIC@="Tplus_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+        arb_real_filter_mm_m_file_@BV:SECONDSTATISTIC@="Tminus_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
       fi
       if [[ .*\ $MODES\ .* =~ " NE " ]]
       then
         n_arb_ne2=@BV:NMAXCOSEBIS@
-        arb_fourier_filter_gm_file_@BV:SECONDSTATISTIC@="Qgm_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-        arb_real_filter_gm_file_@BV:SECONDSTATISTIC@="Wn_psigm_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+        arb_fourier_filter_gm_file_@BV:SECONDSTATISTIC@="Qgm_@BV:THETAMINGT@-@BV:THETAMAXGT@_?.table"
+        arb_real_filter_gm_file_@BV:SECONDSTATISTIC@="Wn_psigm_@BV:THETAMINGT@-@BV:THETAMAXGT@_?.table"
       fi
       if [[ .*\ $MODES\ .* =~ " NN " ]]
       then
         n_arb2_nn=@BV:NMAXCOSEBIS@
-        arb_fourier_filter_gg_file_@BV:SECONDSTATISTIC@="Ugg_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-        arb_real_filter_gg_file_@BV:SECONDSTATISTIC@="Wn_psigg_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+        arb_fourier_filter_gg_file_@BV:SECONDSTATISTIC@="Ugg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
+        arb_real_filter_gg_file_@BV:SECONDSTATISTIC@="Wn_psigg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
       fi
     elif [ "${SECONDSTATISTIC^^}" == "BANDPOWERS" ]
     then
       if [[ .*\ $MODES\ .* =~ " EE " ]]
       then
         n_arb_ee2=@BV:NBANDPOWERS@
-        theta_lo=`echo 'e(l(@BV:THETAMIN@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-        theta_up=`echo 'e(l(@BV:THETAMAX@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+        theta_lo=`echo 'e(l(@BV:THETAMINXI@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+        theta_up=`echo 'e(l(@BV:THETAMAXXI@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
         t_lo=`printf "%.2f" $theta_lo`
         t_up=`printf "%.2f" $theta_up`
         arb_fourier_filter_mmE_file_@BV:SECONDSTATISTIC@="fourier_weight_bandpowers_mmE_${t_lo}-${t_up}_?.table"
@@ -844,8 +844,8 @@ then
       if [[ .*\ $MODES\ .* =~ " NE " ]]
       then
         n_arb_ne2=@BV:NBANDPOWERS@
-        theta_lo=`echo 'e(l(@BV:THETAMIN@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-        theta_up=`echo 'e(l(@BV:THETAMAX@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+        theta_lo=`echo 'e(l(@BV:THETAMINGT@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+        theta_up=`echo 'e(l(@BV:THETAMAXGT@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
         t_lo=`printf "%.2f" $theta_lo`
         t_up=`printf "%.2f" $theta_up`
         arb_fourier_filter_gm_file_@BV:SECONDSTATISTIC@="fourier_weight_bandpowers_gm_${t_lo}-${t_up}_?.table"
@@ -854,8 +854,8 @@ then
       if [[ .*\ $MODES\ .* =~ " NN " ]]
       then
         n_arb_nn2=@BV:NBANDPOWERS@
-        theta_lo=`echo 'e(l(@BV:THETAMIN@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-        theta_up=`echo 'e(l(@BV:THETAMAX@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+        theta_lo=`echo 'e(l(@BV:THETAMINWT@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+        theta_up=`echo 'e(l(@BV:THETAMAXWT@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
         t_lo=`printf "%.2f" $theta_lo`
         t_up=`printf "%.2f" $theta_up`
         arb_fourier_filter_gg_file_@BV:SECONDSTATISTIC@="fourier_weight_bandpowers_gg_${t_lo}-${t_up}_?.table"

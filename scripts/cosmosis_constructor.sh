@@ -95,8 +95,8 @@ then
   then 
     echo "cut_pair_PeeE = $rempairs " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini 
     echo "cut_pair_PeeB = $rempairs " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini 
-  elif [ "${STATISTIC^^}" == "XIPM" ] 
-  then 
+  elif [ "${STATISTIC^^}" == "2PCF" ]
+  then
     echo "cut_pair_xiP = $rempairs " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini 
     echo "cut_pair_xiM = $rempairs " >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini 
   fi 
@@ -187,8 +187,8 @@ fi
 #Base variables {{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 ;COSEBIs settings
-tmin_cosebis = @BV:THETAMIN@
-tmax_cosebis = @BV:THETAMAX@
+tmin_cosebis = @BV:THETAMINXI@
+tmax_cosebis = @BV:THETAMAXXI@
 nmax_cosebis = @BV:NMAXCOSEBIS@
 WnLogPath = ${cosebis_configpath}/WnLog/
 
@@ -267,8 +267,8 @@ EOF
 fi
 fi
 #}}}
-theta_lo=`echo 'e(l(@BV:THETAMIN@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-theta_up=`echo 'e(l(@BV:THETAMAX@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+theta_lo=`echo 'e(l(@BV:THETAMINXI@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+theta_up=`echo 'e(l(@BV:THETAMAXXI@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
 #Statistic {{{
 if [ "${STATISTIC^^}" == "BANDPOWERS" ]
 then 
@@ -337,20 +337,20 @@ then
   if [ "${SAMPLER^^}" == "LIST" ]
   then 
     #Keep consistency between plus and minus 
-    ximinus_min=@BV:THETAMIN@
-    ximinus_max=@BV:THETAMAX@
-  else 
+    ximinus_min=@BV:THETAMINXI@
+    ximinus_max=@BV:THETAMAXXI@
+  else
     #Use the appropriate scale cut  
-    ximinus_min=@BV:THETAMINM@
-    ximinus_max=@BV:THETAMAXM@
-  fi 
+    ximinus_min=@BV:THETAMINXIM@
+    ximinus_max=@BV:THETAMAXXIM@
+  fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 use_stats = xiP xiM
 xi_plus_extension_name = xiP
 xi_minus_extension_name = xiM
 xi_plus_section_name = shear_xi_plus_binned
 xi_minus_section_name = shear_xi_minus_binned
-keep_ang_xiP  = @BV:THETAMIN@ @BV:THETAMAX@
+keep_ang_xiP  = @BV:THETAMINXI@ @BV:THETAMAXXI@
 keep_ang_xiM  = ${ximinus_min}  ${ximinus_max}
 
 EOF
@@ -373,9 +373,9 @@ output_section_name= shear_xi_plus_binned
 input_section_name= shear_xi_plus 
 type=plus 
 
-theta_min=@BV:THETAMIN@
-theta_max=@BV:THETAMAX@
-nTheta=@BV:NTHETAREBIN@
+theta_min=@BV:THETAMINXI@
+theta_max=@BV:THETAMAXXI@
+nTheta=@BV:NXIPM@
 
 weighted_binning = 1 
 
@@ -395,9 +395,9 @@ output_section_name = shear_xi_minus_binned
 type = minus 
 input_section_name = shear_xi_minus
 
-theta_min = @BV:THETAMIN@
-theta_max = @BV:THETAMAX@
-nTheta = @BV:NTHETAREBIN@
+theta_min = @BV:THETAMINXI@
+theta_max = @BV:THETAMAXXI@
+nTheta = @BV:NXIPM@
 
 weighted_binning = 1 
 InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_npair/@BV:NPAIRBASE_XI@
@@ -549,12 +549,12 @@ then
   if [ "${STATISTIC^^}" == "COSEBIS" ]
   then
     ndat=`echo "$ncombinations @BV:NMAXCOSEBIS@" | awk '{printf "%u", $1*$2 }'`
-  elif [ "${STATISTIC^^}" == "BANDPOWERS" ] 
+  elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
   then 
 	ndat=`echo "$ncombinations @BV:NBANDPOWERS@" | awk '{printf "%u", $1*$2 }'`
   elif [ "${STATISTIC^^}" == "2PCF" ]
   then 
-	ndat=`echo "$ncombinations @BV:NTHETAREBIN@" | awk '{printf "%u", $1*$2*2 }'`
+	ndat=`echo "$ncombinations @BV:NXIPM@" | awk '{printf "%u", $1*$2*2 }'`
   fi
   listparam="scale_cuts_output/theory#${ndat}"
   list_input="@BV:LIST_INPUT_SAMPLER@"
@@ -694,12 +694,12 @@ do
         if [ "${STATISTIC^^}" == "BANDPOWERS" ] 
         then
             tpdparams="${tpdparams} bandpower_shear_e/bin_${tomo2}_${tomo1}#@BV:NBANDPOWERS@"
-        elif [ "${STATISTIC^^}" == "COSEBIS" ] 
+        elif [ "${STATISTIC^^}" == "COSEBIS" ]
         then
             tpdparams="${tpdparams} cosebis/bin_${tomo2}_${tomo1}#@BV:NMAXCOSEBIS@"
-        elif [ "${STATISTIC^^}" == "2PCF" ] 
+        elif [ "${STATISTIC^^}" == "2PCF" ]
         then
-            tpdparams="${tpdparams} shear_xi_plus_binned/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@ shear_xi_minus_binned/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@"
+            tpdparams="${tpdparams} shear_xi_plus_binned/bin_${tomo2}_${tomo1}#@BV:NXIPM@ shear_xi_minus_binned/bin_${tomo2}_${tomo1}#@BV:NXIPM@"
         fi
     done
 done

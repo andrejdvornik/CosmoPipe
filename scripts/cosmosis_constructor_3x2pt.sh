@@ -123,26 +123,35 @@ fi
 if [ "${STATISTIC^^}" == "COSEBIS" ] || [ "${STATISTIC^^}" == "COSEBIS_B" ] #{{{
 then 
 cosebis_configpath=@RUNROOT@/@CONFIGPATH@/cosebis/
-  #Scalecuts {{{
-  lo=`echo @BV:NMINCOSEBIS@ | awk '{print $1-0.5}'`
-  hi=`echo @BV:NMAXCOSEBIS@ | awk '{print $1+0.5}'`
   
 stats=""
 twopt_modules=""
+lo_ee=""
+hi_ee=""
+lo_ne=""
+hi_ne=""
+lo_nn=""
+hi_nn=""
 if [[ .*\ $MODES\ .* =~ " NN " ]]
 then
   stats="${stats} Psi_gg"
   twopt_modules="${twopt_modules} psi_gg"
+  lo_ee=`echo @BV:NMINCOSEBIS@ | awk '{print $1-0.5}'`
+  hi_ee=`echo @BV:NMAXCOSEBIS@ | awk '{print $1+0.5}'`
 fi
 if [[ .*\ $MODES\ .* =~ " NE " ]]
 then
   stats="${stats} Psi_gm"
   twopt_modules="${twopt_modules} psi_gm"
+  lo_ne=`echo @BV:NMINCOSEBISNE@ | awk '{print $1-0.5}'`
+  hi_ne=`echo @BV:NMAXCOSEBISNE@ | awk '{print $1+0.5}'`
 fi
 if [[ .*\ $MODES\ .* =~ " EE " ]]
 then
   stats="${stats} En"
   twopt_modules="${twopt_modules} cosebis"
+  lo_nn=`echo @BV:NMINCOSEBISNN@ | awk '{print $1-0.5}'`
+  hi_nn=`echo @BV:NMAXCOSEBISNN@ | awk '{print $1+0.5}'`
 fi
 if [[ .*\ $MODES\ .* =~ " OBS " ]]
 then
@@ -151,9 +160,9 @@ then
 fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 use_stats = ${stats}
-keep_ang_En   = ${lo} ${hi}
-keep_ang_Psi_gm   = ${lo} ${hi}
-keep_ang_Psi_gg   = ${lo} ${hi}
+keep_ang_En   = ${lo_ee} ${hi_ee}
+keep_ang_Psi_gm   = ${lo_ne} ${hi_ne}
+keep_ang_Psi_gg   = ${lo_nn} ${hi_nn}
 cosebis_extension_name = En
 psi_stats_gm_extension_name = Psi_gm
 psi_stats_gg_extension_name = Psi_gg
@@ -169,9 +178,8 @@ twopt_modules="${twopt_modules} scale_cuts likelihood"
 if [ "${STATISTIC^^}" == "COSEBIS_B" ]
 then 
 cosebis_configpath=@RUNROOT@/@CONFIGPATH@/cosebis/
-  #Scalecuts {{{
-  lo=`echo @BV:NMINCOSEBIS@ | awk '{print $1-0.5}'`
-  hi=`echo @BV:NMAXCOSEBIS@ | awk '{print $1+0.5}'`
+lo=`echo @BV:NMINCOSEBIS@ | awk '{print $1-0.5}'`
+hi=`echo @BV:NMAXCOSEBIS@ | awk '{print $1+0.5}'`
   
 twopt_modules="${twopt_modules} cosebis_b "
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_b.ini <<- EOF
@@ -187,17 +195,6 @@ twopt_modules="${twopt_modules} scale_cuts_b likelihood_b"
 fi
 #}}}
 
-#Base variables {{{
-cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
-;COSEBIs settings
-tmin_cosebis = @BV:THETAMIN@
-tmax_cosebis = @BV:THETAMAX@
-nmax_cosebis = @BV:NMAXCOSEBIS@
-WnLogPath = ${cosebis_configpath}/WnLog/
-
-EOF
-#}}}
-
 echo > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini
 #statistic {{{
 if [[ .*\ $MODES\ .* =~ " EE " ]]
@@ -205,11 +202,11 @@ then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [cosebis]
 file = %(2PT_STATS_PATH)s/cl_to_cosebis/cl_to_cosebis_interface.so
-theta_min = %(tmin_cosebis)s
-theta_max = %(tmax_cosebis)s
-n_max = %(nmax_cosebis)s
+theta_min = @BV:THETAMINXI@
+theta_max = @BV:THETAMAXXI@
+n_max =  @BV:NMAXCOSEBIS@
 Roots_n_Norms_FolderName = ${cosebis_configpath}/TLogsRootsAndNorms/
-Wn_Output_FolderName = %(WnLogPath)s
+Wn_Output_FolderName = ${cosebis_configpath}/WnLog/
 Tn_Output_FolderName = %(2PT_STATS_PATH)s/TpnLog/
 output_section_name = cosebis
 input_section_name = shear_cl
@@ -222,11 +219,11 @@ then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [cosebis_b]
 file = %(2PT_STATS_PATH)s/cl_to_cosebis/cl_to_cosebis_interface.so
-theta_min = %(tmin_cosebis)s
-theta_max = %(tmax_cosebis)s
-n_max = %(nmax_cosebis)s
+theta_min = @BV:THETAMINXI@
+theta_max = @BV:THETAMAXXI@
+n_max =  @BV:NMAXCOSEBIS@
 Roots_n_Norms_FolderName = ${cosebis_configpath}/TLogsRootsAndNorms/
-Wn_Output_FolderName = %(WnLogPath)s
+Wn_Output_FolderName = ${cosebis_configpath}/WnLog/
 Tn_Output_FolderName = %(2PT_STATS_PATH)s/TpnLog/
 output_section_name = cosebis_b
 input_section_name = shear_cl_bb
@@ -243,9 +240,9 @@ cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_co
 [psi_gm]
 file = %(2PT_STATS_PATH)s/cl_to_psi/cl_to_psi_interface.so
 type = gm
-theta_min = %(tmin_cosebis)s
-theta_max = %(tmax_cosebis)s
-n_max = %(nmax_cosebis)s
+theta_min = @BV:THETAMINGT@
+theta_max = @BV:THETAMAXGT@
+n_max =  @BV:NMAXCOSEBISNE@
 ; l_bins = 1000000
 ; l_min = 0.5
 ; l_max = 1e6
@@ -264,9 +261,9 @@ cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_co
 [psi_gg]
 file = %(2PT_STATS_PATH)s/cl_to_psi/cl_to_psi_interface.so
 type = gg
-theta_min = %(tmin_cosebis)s
-theta_max = %(tmax_cosebis)s
-n_max = %(nmax_cosebis)s
+theta_min = @BV:THETAMINWT@
+theta_max = @BV:THETAMAXWT@
+n_max =  @BV:NMAXCOSEBISNN@
 ; l_bins = 1000000
 ; l_min = 0.5
 ; l_max = 1e6
@@ -318,8 +315,8 @@ bandpower_ggl_section_name = bandpower_ggl
 bandpower_e_cosmic_shear_section_name = bandpower_shear_e
 onepoint_section_name = one_point
 keep_ang_PeeE = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
-keep_ang_PneE = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
-keep_ang_Pnn  = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
+keep_ang_PneE = @BV:LMINBANDPOWERSNE@ @BV:LMAXBANDPOWERSNE@
+keep_ang_Pnn  = @BV:LMINBANDPOWERSNN@ @BV:LMAXBANDPOWERSNN@
 
 EOF
 twopt_modules="${twopt_modules} scale_cuts likelihood"
@@ -346,18 +343,18 @@ bandpower_b_ggl_section_name = bandpower_ggl_b
 bandpower_b_cosmic_shear_section_name = bandpower_shear_b
 onepoint_section_name = one_point
 keep_ang_PeeE = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
-keep_ang_PneE = @BV:LMINBANDPOWERS@ @BV:LMAXBANDPOWERS@
+keep_ang_PneE = @BV:LMINBANDPOWERSNE@ @BV:LMAXBANDPOWERSNE@
 
 EOF
 twopt_modules="${twopt_modules} scale_cuts_b likelihood_b"
 fi
 #}}}
-theta_lo=`echo 'e(l(@BV:THETAMIN@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-theta_up=`echo 'e(l(@BV:THETAMAX@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
 
 echo > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini
 if [[ .*\ $MODES\ .* =~ " EE " ]]
 then
+theta_lo_ee=`echo 'e(l(@BV:THETAMINXI@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+theta_up_ee=`echo 'e(l(@BV:THETAMAXXI@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
 #Statistic {{{
 if [ "${STATISTIC^^}" == "BANDPOWERS" ]
 then 
@@ -373,8 +370,8 @@ l_max = @BV:LMAXBANDPOWERS@
 nbands = @BV:NBANDPOWERS@
 apodise = 1
 delta_x = @BV:APODISATIONWIDTH@
-theta_min = ${theta_lo}
-theta_max = ${theta_up}
+theta_min = ${theta_lo_ee}
+theta_max = ${theta_up_ee}
 output_foldername = %(2PT_STATS_PATH)s/bandpowers_window/
 input_section_name = shear_cl
 
@@ -393,8 +390,8 @@ l_max = @BV:LMAXBANDPOWERS@
 nbands = @BV:NBANDPOWERS@
 apodise = 1
 delta_x = @BV:APODISATIONWIDTH@
-theta_min =${theta_lo}
-theta_max = ${theta_up}
+theta_min = ${theta_lo_ee}
+theta_max = ${theta_up_ee}
 output_foldername = %(2PT_STATS_PATH)s/bandpowers_window/
 input_section_name = shear_cl
 
@@ -412,8 +409,8 @@ l_max = @BV:LMAXBANDPOWERS@
 nbands = @BV:NBANDPOWERS@
 apodise = 1
 delta_x = @BV:APODISATIONWIDTH@
-theta_min =${theta_lo}
-theta_max = ${theta_up}
+theta_min =${theta_lo_ee}
+theta_max = ${theta_up_ee}
 output_foldername = %(2PT_STATS_PATH)s/bandpowers_window/
 input_section_name = shear_cl
 input_section_name_bmode = shear_cl_bb
@@ -426,6 +423,8 @@ fi
 
 if [[ .*\ $MODES\ .* =~ " NE " ]]
 then
+theta_lo_ne=`echo 'e(l(@BV:THETAMINGT@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+theta_up_ne=`echo 'e(l(@BV:THETAMAXGT@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
 #Statistic {{{
 if [ "${STATISTIC^^}" == "BANDPOWERS" ]
 then
@@ -436,13 +435,13 @@ type = ggl
 response_function_type = tophat
 analytic = 1
 output_section_name = bandpower_ggl
-l_min = @BV:LMINBANDPOWERS@
-l_max = @BV:LMAXBANDPOWERS@
-nbands = @BV:NBANDPOWERS@
+l_min = @BV:LMINBANDPOWERSNE@
+l_max = @BV:LMAXBANDPOWERSNE@
+nbands = @BV:NBANDPOWERSNE@
 apodise = 1
 delta_x = @BV:APODISATIONWIDTH@
-theta_min = ${theta_lo}
-theta_max = ${theta_up}
+theta_min = ${theta_lo_ne}
+theta_max = ${theta_up_ne}
 output_foldername = %(2PT_STATS_PATH)s/bandpowers_window/
 input_section_name = galaxy_shear_cl
 
@@ -456,13 +455,13 @@ type = ggl
 response_function_type = tophat
 analytic = 1
 output_section_name = bandpower_ggl
-l_min = @BV:LMINBANDPOWERS@
-l_max = @BV:LMAXBANDPOWERS@
-nbands = @BV:NBANDPOWERS@
+l_min = @BV:LMINBANDPOWERSNE@
+l_max = @BV:LMAXBANDPOWERSNE@
+nbands = @BV:NBANDPOWERSNE@
 apodise = 1
 delta_x = @BV:APODISATIONWIDTH@
-theta_min =${theta_lo}
-theta_max = ${theta_up}
+theta_min =${theta_lo_ne}
+theta_max = ${theta_up_ne}
 output_foldername = %(2PT_STATS_PATH)s/bandpowers_window/
 input_section_name = galaxy_shear_cl
 
@@ -475,13 +474,13 @@ type = ggl
 response_function_type = tophat
 analytic = 1
 output_section_name = bandpower_ggl_b
-l_min = @BV:LMINBANDPOWERS@
-l_max = @BV:LMAXBANDPOWERS@
-nbands = @BV:NBANDPOWERS@
+l_min = @BV:LMINBANDPOWERSNE@
+l_max = @BV:LMAXBANDPOWERSNE@
+nbands = @BV:NBANDPOWERSNE@
 apodise = 1
 delta_x = @BV:APODISATIONWIDTH@
-theta_min =${theta_lo}
-theta_max = ${theta_up}
+theta_min =${theta_lo_ne}
+theta_max = ${theta_up_ne}
 output_foldername = %(2PT_STATS_PATH)s/bandpowers_window/
 input_section_name = galaxy_shear_cl
 input_section_name_bmode = galaxy_shear_cl_bb
@@ -493,6 +492,8 @@ fi
 
 if [[ .*\ $MODES\ .* =~ " NN " ]]
 then
+theta_lo_nn=`echo 'e(l(@BV:THETAMINWT@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+theta_up_nn=`echo 'e(l(@BV:THETAMAXWT@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
 #Statistic {{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [bandpower_clustering]
@@ -501,13 +502,13 @@ type = clustering
 response_function_type = tophat
 analytic = 1
 output_section_name = bandpower_clustering
-l_min = @BV:LMINBANDPOWERS@
-l_max = @BV:LMAXBANDPOWERS@
-nbands = @BV:NBANDPOWERS@
+l_min = @BV:LMINBANDPOWERSNN@
+l_max = @BV:LMAXBANDPOWERSNN@
+nbands = @BV:NBANDPOWERSNN@
 apodise = 1
 delta_x = @BV:APODISATIONWIDTH@
-theta_min = ${theta_lo}
-theta_max = ${theta_up}
+theta_min = ${theta_lo_nn}
+theta_max = ${theta_up_nn}
 output_foldername = %(2PT_STATS_PATH)s/bandpowers_window/
 input_section_name = galaxy_cl
 
@@ -523,12 +524,12 @@ then
   if [ "${SAMPLER^^}" == "LIST" ]
   then 
     #Keep consistency between plus and minus 
-    ximinus_min=@BV:THETAMIN@
-    ximinus_max=@BV:THETAMAX@
-  else 
+    ximinus_min=@BV:THETAMINXI@
+    ximinus_max=@BV:THETAMAXXI@
+  else
     #Use the appropriate scale cut  
-    ximinus_min=@BV:THETAMINM@
-    ximinus_max=@BV:THETAMAXM@
+    ximinus_min=@BV:THETAMINXIM@
+    ximinus_max=@BV:THETAMAXXIM@
   fi
   
   stats=""
@@ -568,9 +569,9 @@ gt_section_name = galaxy_shear_xi
 xi_plus_section_name = shear_xi_plus
 xi_minus_section_name = shear_xi_minus
 onepoint_section_name = one_point
-keep_ang_wtheta  = @BV:THETAMIN@ @BV:THETAMAX@
-keep_ang_gammat   = @BV:THETAMIN@ @BV:THETAMAX@
-keep_ang_xip  = @BV:THETAMIN@ @BV:THETAMAX@
+keep_ang_wtheta  = @BV:THETAMINWT@ @BV:THETAMAXWT@
+keep_ang_gammat   = @BV:THETAMINGT@ @BV:THETAMAXGT@
+keep_ang_xip  = @BV:THETAMINXI@ @BV:THETAMAXXI@
 keep_ang_xim  = ${ximinus_min}  ${ximinus_max}
 
 EOF
@@ -583,10 +584,10 @@ then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [xi]
 file = %(CSL_PATH)s/shear/cl_to_xi_fullsky/cl_to_xi_interface.py
-n_theta_bins = @BV:NTHETAREBIN@
-n_theta = @BV:NTHETAREBIN@
-theta_min = @BV:THETAMIN@
-theta_max = @BV:THETAMAX@
+n_theta_bins = @BV:NXIPM@
+n_theta = @BV:NXIPM@
+theta_min = @BV:THETAMINXI@
+theta_max = @BV:THETAMAXXI@
 ell_max = 40000
 xi_type = '22'
 theta_file = %(data_file)s ; Not working with scale_cuts.py that well!
@@ -612,10 +613,10 @@ then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [gt]
 file = %(CSL_PATH)s/shear/cl_to_xi_fullsky/cl_to_xi_interface.py
-n_theta_bins = @BV:NTHETAREBIN@
-n_theta = @BV:NTHETAREBIN@
-theta_min = @BV:THETAMIN@
-theta_max = @BV:THETAMAX@
+n_theta_bins = @BV:NGT@
+n_theta = @BV:NGT@
+theta_min = @BV:THETAMINGT@
+theta_max = @BV:THETAMAXGT@
 ell_max = 40000
 xi_type = '02'
 theta_file = %(data_file)s ; Not working with scale_cuts.py that well!
@@ -637,10 +638,10 @@ then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [wth]
 file = %(CSL_PATH)s/shear/cl_to_xi_fullsky/cl_to_xi_interface.py
-n_theta_bins = @BV:NTHETAREBIN@
-n_theta = @BV:NTHETAREBIN@
-theta_min = @BV:THETAMIN@
-theta_max = @BV:THETAMAX@
+n_theta_bins = @BV:NWT@
+n_theta = @BV:NWT@
+theta_min = @BV:THETAMINWT@
+theta_max = @BV:THETAMAXWT@
 ell_max = 40000
 xi_type = '00'
 theta_file = %(data_file)s ; Not working with scale_cuts.py that well!
@@ -948,7 +949,7 @@ then
 					tpdparams="${tpdparams} cosebis/bin_${tomo2}_${tomo1}#@BV:NMAXCOSEBIS@"
 				elif [ "${STATISTIC^^}" == "2PCF" ]
 				then
-					tpdparams="${tpdparams} shear_xi_plus/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@ shear_xi_minus/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@"
+					tpdparams="${tpdparams} shear_xi_plus/bin_${tomo2}_${tomo1}#@BV:NXIPM@ shear_xi_minus/bin_${tomo2}_${tomo1}#@BV:NXIPM@"
 				fi
 			done
 		done
@@ -961,13 +962,13 @@ then
 			do
 				if [ "${STATISTIC^^}" == "BANDPOWERS" ]
 				then
-					tpdparams="${tpdparams} bandpower_ggl/bin_${tomo1}_${tomo2}#@BV:NBANDPOWERS@"
+					tpdparams="${tpdparams} bandpower_ggl/bin_${tomo1}_${tomo2}#@BV:NBANDPOWERSNE@"
 				elif [ "${STATISTIC^^}" == "COSEBIS" ]
 				then
-					tpdparams="${tpdparams} psi_stats_gm/bin_${tomo1}_${tomo2}#@BV:NMAXCOSEBIS@"
+					tpdparams="${tpdparams} psi_stats_gm/bin_${tomo1}_${tomo2}#@BV:NMAXCOSEBISNE@"
 				elif [ "${STATISTIC^^}" == "2PCF" ]
 				then
-					tpdparams="${tpdparams} galaxy_shear_xi/bin_${tomo1}_${tomo2}#@BV:NTHETAREBIN@"
+					tpdparams="${tpdparams} galaxy_shear_xi/bin_${tomo1}_${tomo2}#@BV:NGT@"
 				fi
 			done
 		done
@@ -979,13 +980,13 @@ then
 			# If we also want to use cross-terms here we need to enable them!
 			if [ "${STATISTIC^^}" == "BANDPOWERS" ]
 			then
-				tpdparams="${tpdparams} bandpower_clustering/bin_${tomo1}_${tomo1}#@BV:NBANDPOWERS@"
+				tpdparams="${tpdparams} bandpower_clustering/bin_${tomo1}_${tomo1}#@BV:NBANDPOWERSNN@"
 			elif [ "${STATISTIC^^}" == "COSEBIS" ]
 			then
-				tpdparams="${tpdparams} psi_stats_gg/bin_${tomo1}_${tomo1}#@BV:NMAXCOSEBIS@"
+				tpdparams="${tpdparams} psi_stats_gg/bin_${tomo1}_${tomo1}#@BV:NMAXCOSEBISNN@"
 			elif [ "${STATISTIC^^}" == "2PCF" ]
 			then
-				tpdparams="${tpdparams} galaxy_xi/bin_${tomo1}_${tomo1}#@BV:NTHETAREBIN@"
+				tpdparams="${tpdparams} galaxy_xi/bin_${tomo1}_${tomo1}#@BV:NWT@"
 			fi
 		done
 	fi

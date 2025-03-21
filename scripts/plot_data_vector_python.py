@@ -22,9 +22,17 @@ if __name__ == '__main__':
         help="Number of lens bins", metavar="output",required=True)
     parser.add_argument("--nobs", dest="nobs", type=int,
         help="Number of observable bins", metavar="output",required=True)
-    parser.add_argument("--thetamin", dest="thetamin", type=float,
+    parser.add_argument("--thetamin_ee", dest="thetamin_ee", type=float,
         help="Minimum theta", metavar="output",required=True)
-    parser.add_argument("--thetamax", dest="thetamax", type=float,
+    parser.add_argument("--thetamax_ee", dest="thetamax_ee", type=float,
+        help="Maximum theta", metavar="output",required=True)
+    parser.add_argument("--thetamin_ne", dest="thetamin_ne", type=float,
+        help="Minimum theta", metavar="output",required=True)
+    parser.add_argument("--thetamax_ne", dest="thetamax_ne", type=float,
+        help="Maximum theta", metavar="output",required=True)
+    parser.add_argument("--thetamin_nn", dest="thetamin_nn", type=float,
+        help="Minimum theta", metavar="output",required=True)
+    parser.add_argument("--thetamax_nn", dest="thetamax_nn", type=float,
         help="Maximum theta", metavar="output",required=True)
     parser.add_argument("--output_dir", dest="output_dir",
         help="Output directory", metavar="output",required=True)
@@ -47,8 +55,12 @@ if __name__ == '__main__':
     ntomo = args.ntomo
     nlens = args.nlens
     nobs = args.nobs
-    thetamin = args.thetamin
-    thetamax = args.thetamax
+    thetamin_ee = args.thetamin_ee
+    thetamax_ee = args.thetamax_ee
+    thetamin_ne = args.thetamin_ne
+    thetamax_ne = args.thetamax_ne
+    thetamin_nn = args.thetamin_nn
+    thetamax_nn = args.thetamax_nn
     output_dir = args.output_dir
     title = args.title
     suffix = args.suffix
@@ -386,11 +398,11 @@ if __name__ == '__main__':
                     #     lg = pl.legend(bbox_to_anchor=(-0.1, 0.5),handlelength=1,borderpad=0,labelspacing=0.1,ncol=1,prop={'size':fontsize}
                     #         ,columnspacing=0,frameon=None)
                     #     lg.draw_frame(False)
-        fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic_mm,thetamin,thetamax), fontsize=20)
+        fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic_mm,thetamin_ee,thetamax_ee), fontsize=20)
         if suffix:
-            pl.savefig(output_dir+'/cosmic_shear_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
+            pl.savefig(output_dir+'/cosmic_shear_datavector_%.2f-%.2f_%s.pdf'%(thetamin_ee,thetamax_ee,suffix), bbox_inches="tight")
         else:
-            pl.savefig(output_dir+'/cosmic_shear_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax), bbox_inches="tight")
+            pl.savefig(output_dir+'/cosmic_shear_datavector_%.2f-%.2f.pdf'%(thetamin_ee,thetamax_ee), bbox_inches="tight")
         pl.close()
         pl.clf()
         
@@ -459,11 +471,11 @@ if __name__ == '__main__':
                             prop={'size':fontsize}, columnspacing=0, frameon=None)
                 #lg.draw_frame(False)
                 
-        fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic_gm,thetamin,thetamax), fontsize=20)
+        fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic_gm,thetamin_ne,thetamax_ne), fontsize=20)
         if suffix:
-            pl.savefig(output_dir+'/ggl_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
+            pl.savefig(output_dir+'/ggl_datavector_%.2f-%.2f_%s.pdf'%(thetamin_ne,thetamax_ne,suffix), bbox_inches="tight")
         else:
-            pl.savefig(output_dir+'/ggl_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax), bbox_inches="tight")
+            pl.savefig(output_dir+'/ggl_datavector_%.2f-%.2f.pdf'%(thetamin_ne,thetamax_ne), bbox_inches="tight")
         pl.close()
         pl.clf()
         
@@ -505,11 +517,11 @@ if __name__ == '__main__':
                                 prop={'size':fontsize}, columnspacing=0, frameon=None)
                         #lg.draw_frame(False)
             
-                fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic_gm,thetamin,thetamax), fontsize=20)
+                fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic_gm,thetamin_ne,thetamax_ne), fontsize=20)
                 if suffix:
-                    pl.savefig(output_dir+'/ggl_B_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
+                    pl.savefig(output_dir+'/ggl_B_datavector_%.2f-%.2f_%s.pdf'%(thetamin_ne,thetamax_ne,suffix), bbox_inches="tight")
                 else:
-                    pl.savefig(output_dir+'/ggl_B_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax), bbox_inches="tight")
+                    pl.savefig(output_dir+'/ggl_B_datavector_%.2f-%.2f.pdf'%(thetamin_ne,thetamax_ne), bbox_inches="tight")
                 pl.close()
                 pl.clf()
         pl.rcParams.update()
@@ -585,11 +597,11 @@ if __name__ == '__main__':
                             prop={'size':fontsize}, columnspacing=0, frameon=None)
             #lg.draw_frame(False)
                 
-        fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic_gg,thetamin,thetamax), fontsize=20)
+        fig.suptitle(r'%s %s %s, $\theta=[%.2f,%.2f]$'%(title,suffix,statistic_gg,thetamin_nn,thetamax_nn), fontsize=20)
         if suffix:
-            pl.savefig(output_dir+'/clustering_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
+            pl.savefig(output_dir+'/clustering_datavector_%.2f-%.2f_%s.pdf'%(thetamin_nn,thetamax_nn,suffix), bbox_inches="tight")
         else:
-            pl.savefig(output_dir+'/clustering_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax), bbox_inches="tight")
+            pl.savefig(output_dir+'/clustering_datavector_%.2f-%.2f.pdf'%(thetamin_nn,thetamax_nn), bbox_inches="tight")
         pl.close()
         pl.clf()
         
@@ -646,9 +658,9 @@ if __name__ == '__main__':
                 
         fig.suptitle(r'%s %s %s'%(title,suffix,'1pt'), fontsize=20)
         if suffix:
-            pl.savefig(output_dir+'/smf_datavector_%.2f-%.2f_%s.pdf'%(thetamin,thetamax,suffix), bbox_inches="tight")
+            pl.savefig(output_dir+'/smf_datavector_%s.pdf'%(suffix), bbox_inches="tight")
         else:
-            pl.savefig(output_dir+'/smf_datavector_%.2f-%.2f.pdf'%(thetamin,thetamax), bbox_inches="tight")
+            pl.savefig(output_dir+'/smf_datavector.pdf', bbox_inches="tight")
         pl.close()
         pl.clf()
 

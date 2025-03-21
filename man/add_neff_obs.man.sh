@@ -43,7 +43,7 @@ set -e
 function _inp_var { 
   #Variable inputs (leave blank if none)
   echo BV:NSMFLENSBINS DATABLOCK NEFFLIST_OBS RUNROOT STORAGEPATH
-}
+} 
 #}}}
 
 # Input data {{{ 

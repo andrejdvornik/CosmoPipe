@@ -216,8 +216,8 @@ fi
 #Base variables {{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_base.ini <<- EOF
 ;COSEBIs settings
-tmin_cosebis = @BV:THETAMIN@
-tmax_cosebis = @BV:THETAMAX@
+tmin_cosebis = @BV:THETAMINXI@
+tmax_cosebis = @BV:THETAMAXXI@
 nmax_cosebis = @BV:NMAXCOSEBIS@
 WnLogPath = @RUNROOT@/@CONFIGPATH@/cosebis/WnLog/
 
@@ -303,8 +303,8 @@ l_max = @BV:LMAXBANDPOWERS@
 nbands = @BV:NBANDPOWERS@
 apodise = 1
 delta_x = @BV:APODISATIONWIDTH@
-theta_min = @BV:THETAMIN@
-theta_max = @BV:THETAMAX@
+theta_min = @BV:THETAMINXI@
+theta_max = @BV:THETAMAXXI@
 output_foldername = %(2PT_STATS_PATH)s/bandpowers_window/
 
 EOF
@@ -320,8 +320,8 @@ xi_plus_extension_name = xiP
 xi_minus_extension_name = xiM
 xi_plus_section_name = shear_xi_plus_binned
 xi_minus_section_name = shear_xi_minus_binned
-keep_ang_xiP  = @BV:THETAMIN@ @BV:THETAMAX@
-keep_ang_xiM  = @BV:THETAMINM@ @BV:THETAMAXM@
+keep_ang_xiP  = @BV:THETAMINXI@ @BV:THETAMAXXI@
+keep_ang_xiM  = @BV:THETAMINXIM@ @BV:THETAMAXXIM@
 EOF
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_2.ini <<- EOF
 use_stats = xiP xiM
@@ -329,8 +329,8 @@ xi_plus_extension_name = xiP
 xi_minus_extension_name = xiM
 xi_plus_section_name = shear_xi_plus_binned
 xi_minus_section_name = shear_xi_minus_binned
-keep_ang_xiP  = @BV:THETAMIN@ @BV:THETAMAX@
-keep_ang_xiM  = @BV:THETAMINM@ @BV:THETAMAXM@
+keep_ang_xiP  = @BV:THETAMINXI@ @BV:THETAMAXXI@
+keep_ang_xiM  = @BV:THETAMINXIM@ @BV:THETAMAXXIM@
 EOF
 if [ "${SPLITMODE^^}" == "ZBIN" ] || [ "${SPLITMODE^^}" == "ACCC" ]
 then 
@@ -340,8 +340,8 @@ xi_plus_extension_name = xiP
 xi_minus_extension_name = xiM
 xi_plus_section_name = shear_xi_plus_binned
 xi_minus_section_name = shear_xi_minus_binned
-keep_ang_xiP  = @BV:THETAMIN@ @BV:THETAMAX@
-keep_ang_xiM  = @BV:THETAMINM@ @BV:THETAMAXM@
+keep_ang_xiP  = @BV:THETAMINXI@ @BV:THETAMAXXI@
+keep_ang_xiM  = @BV:THETAMINXIM@ @BV:THETAMAXXIM@
 
 EOF
 fi
@@ -360,13 +360,13 @@ EOF
 elif [ "${SPLITMODE^^}" == "ANGULAR" ]
 then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_1.ini <<- EOF
-keep_ang_xiP  = @BV:THETAMIN@ @BV:XISPLIT@
-keep_ang_xiP  = @BV:THETAMIN@ @BV:XISPLIT@
+keep_ang_xiP  = @BV:THETAMINXI@ @BV:XISPLIT@
+keep_ang_xiP  = @BV:THETAMINXI@ @BV:XISPLIT@
 
 EOF
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut_2.ini <<- EOF
-keep_ang_xiP  = @BV:XISPLIT@ @BV:THETAMAX@
-keep_ang_xiP  = @BV:XISPLIT@ @BV:THETAMAX@
+keep_ang_xiP  = @BV:XISPLIT@ @BV:THETAMAXXI@
+keep_ang_xiP  = @BV:XISPLIT@ @BV:THETAMAXXI@
 
 EOF
 fi
@@ -381,9 +381,9 @@ output_section_name= shear_xi_plus_binned
 input_section_name= shear_xi_plus 
 type=plus 
 
-theta_min=@BV:THETAMIN@
-theta_max=@BV:THETAMAX@
-nTheta=@BV:NTHETAREBIN@
+theta_min=@BV:THETAMINXI@
+theta_max=@BV:THETAMAXXI@
+nTheta=@BV:NXIPM@
 
 weighted_binning = 1 
 
@@ -402,9 +402,9 @@ output_section_name = shear_xi_minus_binned
 type = minus 
 input_section_name = shear_xi_minus
 
-theta_min = @BV:THETAMIN@
-theta_max = @BV:THETAMAX@
-nTheta = @BV:NTHETAREBIN@
+theta_min = @BV:THETAMINXI@
+theta_max = @BV:THETAMAXXI@
+nTheta = @BV:NXIPM@
 
 weighted_binning = 1 
 InputNpair = @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_npair/@BV:NPAIRBASE_XI@
@@ -694,12 +694,12 @@ do
 	if [ "${STATISTIC^^}" == "BANDPOWERS" ] 
 	then
       tpdparams="${tpdparams} bandpowers_set1/bin_${tomo2}_${tomo1}#@BV:NBANDPOWERS@ bandpowers_set2/bin_${tomo2}_${tomo1}#@BV:NBANDPOWERS@"
-	elif [ "${STATISTIC^^}" == "COSEBIS" ] 
+	elif [ "${STATISTIC^^}" == "COSEBIS" ]
 	then
 	  tpdparams="${tpdparams} cosebis_set1/bin_${tomo2}_${tomo1}#@BV:NMAXCOSEBIS@ cosebis_set2/bin_${tomo2}_${tomo1}#@BV:NMAXCOSEBIS@"
-	elif [ "${STATISTIC^^}" == "2PCF" ] 
+	elif [ "${STATISTIC^^}" == "2PCF" ]
 	then
-	  tpdparams="${tpdparams} xip_set1/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@ xim_set1/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@ xip_set2/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@ xim_set2/bin_${tomo2}_${tomo1}#@BV:NTHETAREBIN@"
+	  tpdparams="${tpdparams} xip_set1/bin_${tomo2}_${tomo1}#@BV:NXIPM@ xim_set1/bin_${tomo2}_${tomo1}#@BV:NXIPM@ xip_set2/bin_${tomo2}_${tomo1}#@BV:NXIPM@ xim_set2/bin_${tomo2}_${tomo1}#@BV:NXIPM@"
 	fi
   done
 done

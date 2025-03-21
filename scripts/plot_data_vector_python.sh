@@ -36,20 +36,32 @@ then
   if [[ .*\ $MODES\ .* =~ " EE " ]]
   then
     ee="True"
+    thetamin_xi="@BV:THETAMINXI@"
+    thetamax_xi="@BV:THETAMAXXI@"
   else
     ee="False"
+    thetamin_xi="0.0"
+    thetamax_xi="0.0"
   fi
   if [[ .*\ $MODES\ .* =~ " NE " ]]
   then
     ne="True"
+    thetamin_gt="@BV:THETAMINGT@"
+    thetamax_gt="@BV:THETAMAXGT@"
   else
     ne="False"
+    thetamin_gt="0.0"
+    thetamax_gt="0.0"
   fi
   if [[ .*\ $MODES\ .* =~ " NN " ]]
   then
     nn="True"
+    thetamin_wt="@BV:THETAMINWT@"
+    thetamax_wt="@BV:THETAMAXWT@"
   else
     nn="False"
+    thetamin_wt="0.0"
+    thetamax_wt="0.0"
   fi
   if [[ .*\ $MODES\ .* =~ " OBS " ]]
   then
@@ -69,8 +81,12 @@ then
           --inputfile ${file} \
           --statistic @BV:STATISTIC@ \
           --ntomo ${NTOMO} --nlens ${NLENS} --nobs ${NOBS} \
-          --thetamin @BV:THETAMIN@ \
-          --thetamax @BV:THETAMAX@ \
+          --thetamin_ee ${thetamin_xi} \
+          --thetamax_ee ${thetamax_xi} \
+          --thetamin_ne ${thetamin_gt} \
+          --thetamax_ne ${thetamax_gt} \
+          --thetamin_nn ${thetamin_wt} \
+          --thetamax_nn ${thetamax_wt} \
           --ee ${ee} --ne ${ne} --nn ${nn} --obs ${obs} \
           --title "@SURVEY@" \
           --suffix "@BV:CHAINSUFFIX@" \
@@ -82,8 +98,12 @@ then
       --inputfile ${inputfile} \
       --statistic @BV:STATISTIC@ \
       --ntomo ${NTOMO} --nlens ${NLENS} --nobs ${NOBS} \
-      --thetamin @BV:THETAMIN@ \
-      --thetamax @BV:THETAMAX@ \
+      --thetamin_ee ${thetamin_xi} \
+      --thetamax_ee ${thetamax_xi} \
+      --thetamin_ne ${thetamin_gt} \
+      --thetamax_ne ${thetamax_gt} \
+      --thetamin_nn ${thetamin_wt} \
+      --thetamax_nn ${thetamax_wt} \
       --ee ${ee} --ne ${ne} --nn ${nn} --obs ${obs} \
       --title "@SURVEY@" \
       --suffix "@BV:CHAINSUFFIX@" \
@@ -94,8 +114,12 @@ else
   --inputfile ${inputfile_E} \
   --statistic xiE \
   --ntomo ${NTOMO} --nlens ${NLENS} --nobs ${NOBS} \
-  --thetamin @BV:THETAMIN@ \
-  --thetamax @BV:THETAMAX@ \
+  --thetamin_ee ${thetamin_xi} \
+  --thetamax_ee ${thetamax_xi} \
+  --thetamin_ne ${thetamin_gt} \
+  --thetamax_ne ${thetamax_gt} \
+  --thetamin_nn ${thetamin_wt} \
+  --thetamax_nn ${thetamax_wt} \
   --ee True --ne False --nn False --obs False \
   --title "@SURVEY@" \
   --suffix "@BV:CHAINSUFFIX@E" \
@@ -105,8 +129,12 @@ else
   --inputfile ${inputfile_B} \
   --statistic xiB \
   --ntomo ${NTOMO} --nlens ${NLENS} --nobs ${NOBS} \
-  --thetamin @BV:THETAMIN@ \
-  --thetamax @BV:THETAMAX@ \
+  --thetamin_ee ${thetamin_xi} \
+  --thetamax_ee ${thetamax_xi} \
+  --thetamin_ne ${thetamin_gt} \
+  --thetamax_ne ${thetamax_gt} \
+  --thetamin_nn ${thetamin_wt} \
+  --thetamax_nn ${thetamax_wt} \
   --ee True --ne False --nn False --obs False \
   --title "@SURVEY@" \
   --suffix "@BV:CHAINSUFFIX@B" \

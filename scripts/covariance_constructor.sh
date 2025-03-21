@@ -34,33 +34,33 @@ SECONDSTATISTIC="@BV:SECONDSTATISTIC@"
 if [ "${STATISTIC^^}" == "2PCF" ]
 then
   est_shear=xi_pm
-  n_arb=@BV:NTHETAREBIN@
-  arb_fourier_filter_mmE_file_@BV:STATISTIC@="fourier_weight_realspace_cf_mm_p_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-  arb_fourier_filter_mmB_file_@BV:STATISTIC@="fourier_weight_realspace_cf_mm_m_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-  arb_real_filter_mm_p_file_@BV:STATISTIC@="real_weight_realspace_cf_mm_p_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-  arb_real_filter_mm_m_file_@BV:STATISTIC@="real_weight_realspace_cf_mm_m_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+  n_arb=@BV:NXIPM@
+  arb_fourier_filter_mmE_file_@BV:STATISTIC@="fourier_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+  arb_fourier_filter_mmB_file_@BV:STATISTIC@="fourier_weight_realspace_cf_mm_m_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+  arb_real_filter_mm_p_file_@BV:STATISTIC@="real_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+  arb_real_filter_mm_m_file_@BV:STATISTIC@="real_weight_realspace_cf_mm_m_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
 elif [ "${STATISTIC^^}" == "COSEBIS" ]
 then
   est_shear=cosebi
   n_arb=@BV:NMAXCOSEBIS@
-  arb_fourier_filter_mmE_file_@BV:STATISTIC@="WnLog_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-  arb_fourier_filter_mmB_file_@BV:STATISTIC@="WnLog_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-  arb_real_filter_mm_p_file_@BV:STATISTIC@="Tplus_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-  arb_real_filter_mm_m_file_@BV:STATISTIC@="Tminus_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+  arb_fourier_filter_mmE_file_@BV:STATISTIC@="WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+  arb_fourier_filter_mmB_file_@BV:STATISTIC@="WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+  arb_real_filter_mm_p_file_@BV:STATISTIC@="Tplus_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+  arb_real_filter_mm_m_file_@BV:STATISTIC@="Tminus_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
 elif [ "${STATISTIC^^}" == "COSEBIS_DIMLESS" ]
 then
   est_shear=cosebi
   n_arb=@BV:NMAXCOSEBIS@
-  arb_fourier_filter_mmE_file_@BV:STATISTIC@="dimensionless_Wn_@BV:THETAMIN@_to_@BV:THETAMAX@_?.table"
-  arb_fourier_filter_mmB_file_@BV:STATISTIC@="dimensionless_Wn_@BV:THETAMIN@_to_@BV:THETAMAX@_?.table"
-  arb_real_filter_mm_p_file_@BV:STATISTIC@="dimensionless_Tp_@BV:THETAMIN@_to_@BV:THETAMAX@_?.table"
-  arb_real_filter_mm_m_file_@BV:STATISTIC@="dimensionless_Tm_@BV:THETAMIN@_to_@BV:THETAMAX@_?.table"
+  arb_fourier_filter_mmE_file_@BV:STATISTIC@="dimensionless_Wn_@BV:THETAMINXI@_to_@BV:THETAMAXXI@_?.table"
+  arb_fourier_filter_mmB_file_@BV:STATISTIC@="dimensionless_Wn_@BV:THETAMINXI@_to_@BV:THETAMAXXI@_?.table"
+  arb_real_filter_mm_p_file_@BV:STATISTIC@="dimensionless_Tp_@BV:THETAMINXI@_to_@BV:THETAMAXXI@_?.table"
+  arb_real_filter_mm_m_file_@BV:STATISTIC@="dimensionless_Tm_@BV:THETAMINXI@_to_@BV:THETAMAXXI@_?.table"
 elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
 then
   est_shear=bandpowers
   n_arb=@BV:NBANDPOWERS@
-  theta_lo=`echo 'e(l(@BV:THETAMIN@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-  theta_up=`echo 'e(l(@BV:THETAMAX@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+  theta_lo=`echo 'e(l(@BV:THETAMINXI@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+  theta_up=`echo 'e(l(@BV:THETAMAXXI@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
   t_lo=`printf "%.2f" $theta_lo`
   t_up=`printf "%.2f" $theta_up`
   arb_fourier_filter_mmE_file_@BV:STATISTIC@="fourier_weight_bandpowers_mmE_${t_lo}-${t_up}_?.table"
@@ -311,9 +311,9 @@ if [ "${STATISTIC^^}" == "2PCF" ] || [ "${SECONDSTATISTIC^^}" == "2PCF" ]
 then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covTHETAspace settings]
-theta_min = @BV:THETAMIN@
-theta_max = @BV:THETAMAX@
-theta_bins = @BV:NTHETAREBIN@
+theta_min = @BV:THETAMINXI@
+theta_max = @BV:THETAMAXXI@
+theta_bins = @BV:NXIPM@
 theta_type = log
 theta_list = 1, 2, 3
 xi_pp = True
@@ -353,8 +353,8 @@ then
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_statistic.ini <<- EOF
 [covCOSEBI settings]
 En_modes = @BV:NMAXCOSEBIS@
-theta_min = @BV:THETAMIN@
-theta_max = @BV:THETAMAX@
+theta_min = @BV:THETAMINXI@
+theta_max = @BV:THETAMAXXI@
 En_accuracy = 1e-4
 Wn_style = log
 
@@ -423,9 +423,9 @@ Tplus_filelist=""
 Tminus_filelist=""
 for i in  `seq @BV:NMAXCOSEBIS@`
 do
-  WnLog_filelist="${WnLog_filelist} WnLog/WnLog${i}-@BV:THETAMIN@-@BV:THETAMAX@.table,"
-  Tplus_filelist="${Tplus_filelist} Tplus/Tp_@BV:THETAMIN@-@BV:THETAMAX@_${i}.table,"
-  Tminus_filelist="${Tminus_filelist} Tminus/Tm_@BV:THETAMIN@-@BV:THETAMAX@_${i}.table,"
+  WnLog_filelist="${WnLog_filelist} WnLog/WnLog${i}-@BV:THETAMINXI@-@BV:THETAMAXXI@.table,"
+  Tplus_filelist="${Tplus_filelist} Tplus/Tp_@BV:THETAMINXI@-@BV:THETAMAXXI@_${i}.table,"
+  Tminus_filelist="${Tminus_filelist} Tminus/Tm_@BV:THETAMINXI@-@BV:THETAMAXXI@_${i}.table,"
 done
 # All kinds of parameters {{{
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
@@ -508,11 +508,11 @@ npair_mm_file = @BV:NPAIRBASE_XI@_nBins_${NTOMO}_Bin?_Bin?.ascii
 # These files should not be required anymore.
 # cosebi_directory = @RUNROOT@/@CONFIGPATH@/cosebis/
 # wn_log_file = ${WnLog_filelist}
-# wn_gg_file = W_Psi-@BV:THETAMIN@-@BV:THETAMAX@-lmin-0.5-lmax-1000000.0-lbins-1000000.table
+# wn_gg_file = W_Psi-@BV:THETAMINXI@-@BV:THETAMAXXI@-lmin-0.5-lmax-1000000.0-lbins-1000000.table
 # Tn_plus_file = ${Tplus_filelist}
 # Tn_minus_file = ${Tminus_filelist}
-# Qn_file = Qn/Q_n_@BV:THETAMIN@-@BV:THETAMAX@_?
-# Un_file = Un/U_n_@BV:THETAMIN@-@BV:THETAMAX@_?
+# Qn_file = Qn/Q_n_@BV:THETAMINXI@-@BV:THETAMAXXI@_?
+# Un_file = Un/U_n_@BV:THETAMINXI@-@BV:THETAMAXXI@_?
 Cell_directory = ${output_path}
 
 EOF
@@ -523,23 +523,23 @@ if [ "${cov_between_stats}" == "True" ]
 then
     if [ "${SECONDSTATISTIC^^}" == "2PCF" ]
     then
-      n_arb2=@BV:NTHETAREBIN@
-      arb_fourier_filter_mmE_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_mm_p_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-      arb_fourier_filter_mmB_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_mm_m_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-      arb_real_filter_mm_p_file_@BV:SECONDSTATISTIC@="real_weight_realspace_cf_mm_p_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-      arb_real_filter_mm_m_file_@BV:SECONDSTATISTIC@="real_weight_realspace_cf_mm_m_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+      n_arb2=@BV:NXIPM@
+      arb_fourier_filter_mmE_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+      arb_fourier_filter_mmB_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_mm_m_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+      arb_real_filter_mm_p_file_@BV:SECONDSTATISTIC@="real_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+      arb_real_filter_mm_m_file_@BV:SECONDSTATISTIC@="real_weight_realspace_cf_mm_m_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
     elif [ "${SECONDSTATISTIC^^}" == "COSEBIS" ]
     then
       n_arb2=@BV:NMAXCOSEBIS@
-      arb_fourier_filter_mmE_file_@BV:SECONDSTATISTIC@="WnLog_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-      arb_fourier_filter_mmB_file_@BV:SECONDSTATISTIC@="WnLog_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-      arb_real_filter_mm_p_file_@BV:SECONDSTATISTIC@="Tplus_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-      arb_real_filter_mm_m_file_@BV:SECONDSTATISTIC@="Tminus_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+      arb_fourier_filter_mmE_file_@BV:SECONDSTATISTIC@="WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+      arb_fourier_filter_mmB_file_@BV:SECONDSTATISTIC@="WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+      arb_real_filter_mm_p_file_@BV:SECONDSTATISTIC@="Tplus_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+      arb_real_filter_mm_m_file_@BV:SECONDSTATISTIC@="Tminus_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
     elif [ "${SECONDSTATISTIC^^}" == "BANDPOWERS" ]
     then
       n_arb2=@BV:NBANDPOWERS@
-      theta_lo=`echo 'e(l(@BV:THETAMIN@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-      theta_up=`echo 'e(l(@BV:THETAMAX@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+      theta_lo=`echo 'e(l(@BV:THETAMINXI@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
+      theta_up=`echo 'e(l(@BV:THETAMAXXI@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
       t_lo=`printf "%.2f" $theta_lo`
       t_up=`printf "%.2f" $theta_up`
       arb_fourier_filter_mmE_file_@BV:SECONDSTATISTIC@="fourier_weight_bandpowers_mmE_${t_lo}-${t_up}_?.table"
@@ -565,15 +565,15 @@ then
         cp ${arb_base}/{$file,$file2,$file3,$file4} @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/arb_summary_filters/
       fi
     done
-    #arb_fourier_filter_mmE_file_xipm="fourier_weight_realspace_cf_mm_p_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    #arb_fourier_filter_mmB_file_xipm="fourier_weight_realspace_cf_mm_m_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    #arb_real_filter_mm_p_file_xipm="real_weight_realspace_cf_mm_p_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    #arb_real_filter_mm_m_file_xipm="real_weight_realspace_cf_mm_m_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+    #arb_fourier_filter_mmE_file_xipm="fourier_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    #arb_fourier_filter_mmB_file_xipm="fourier_weight_realspace_cf_mm_m_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    #arb_real_filter_mm_p_file_xipm="real_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    #arb_real_filter_mm_m_file_xipm="real_weight_realspace_cf_mm_m_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
 
-    #arb_fourier_filter_mmE_file_cosebis="WnLog_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    #arb_fourier_filter_mmB_file_cosebis="WnLog_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    #arb_real_filter_mm_p_file_cosebis="Tplus_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
-    #arb_real_filter_mm_m_file_cosebis="Tminus_@BV:THETAMIN@-@BV:THETAMAX@_?.table"
+    #arb_fourier_filter_mmE_file_cosebis="WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    #arb_fourier_filter_mmB_file_cosebis="WnLog_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    #arb_real_filter_mm_p_file_cosebis="Tplus_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
+    #arb_real_filter_mm_m_file_cosebis="Tminus_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
 
     #t_lo=`printf "%.2f" $theta_lo`
     #t_up=`printf "%.2f" $theta_up`

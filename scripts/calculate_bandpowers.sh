@@ -44,11 +44,11 @@ then
     -i ${input} \
     -t "meanr" -p "xip" -m "xim" \
     --cfoldername ${outfold} \
-    -o ${output} -b @BINNING@ -s @BV:THETAMIN@ \
-    -l @BV:THETAMAX@ \
+    -o ${output} -b @BINNING@ -s @BV:THETAMINXI@ \
+    -l @BV:THETAMAXXI@ \
     -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
     -k @BV:NBANDPOWERS@ \
-    -d "bandpowers_ee" 2>&1 
+    -d "bandpowers_ee" 2>&1
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
   #Add the files to the datablock 
@@ -74,11 +74,11 @@ then
     -i ${input} \
     -t "meanr" -g "gamT" -q "gamX" \
     --cfoldername ${outfold} \
-    -o ${output} -b @BINNING@ -s @BV:THETAMIN@ \
-    -l @BV:THETAMAX@ \
-    -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
-    -k @BV:NBANDPOWERS@ \
-    -d "bandpowers_ne" 2>&1 
+    -o ${output} -b @BINNING@ -s @BV:THETAMINGT@ \
+    -l @BV:THETAMAXGT@ \
+    -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERSNE@ -x @BV:LMAXBANDPOWERSNE@ \
+    -k @BV:NBANDPOWERSNE@ \
+    -d "bandpowers_ne" 2>&1
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
   #Add the files to the datablock 
@@ -104,11 +104,11 @@ then
     -i ${input} \
     -t "meanr" -j "wtheta" \
     --cfoldername ${outfold} \
-    -o ${output} -b @BINNING@ -s @BV:THETAMIN@ \
-    -l @BV:THETAMAX@ \
-    -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERS@ -x @BV:LMAXBANDPOWERS@ \
-    -k @BV:NBANDPOWERS@ \
-    -d "bandpowers_nn" 2>&1 
+    -o ${output} -b @BINNING@ -s @BV:THETAMINWT@ \
+    -l @BV:THETAMAXWT@ \
+    -w @BV:APODISATIONWIDTH@ -z @BV:LMINBANDPOWERSNN@ -x @BV:LMAXBANDPOWERSNN@ \
+    -k @BV:NBANDPOWERSNN@ \
+    -d "bandpowers_nn" 2>&1
   _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
   #Add the files to the datablock 

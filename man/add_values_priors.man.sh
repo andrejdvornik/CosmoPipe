@@ -42,8 +42,8 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:VALUESINI BV:PRIORSINI BV:TOMOLIMS BV:NLENSBINS DATABLOCK DEF RED RUNROOT STORAGEPATH SURVEY
-}
+  echo BLU BV:NLENSBINS BV:PRIORSINI BV:TOMOLIMS BV:VALUESINI DATABLOCK DEF RED RUNROOT STORAGEPATH SURVEY
+} 
 #}}}
 
 # Input data {{{ 

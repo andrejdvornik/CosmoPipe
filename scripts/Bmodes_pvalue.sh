@@ -1,6 +1,6 @@
 #Statistic
 BOLTZMAN="@BV:BOLTZMAN@"
-if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ] || [ "${BOLTZMAN^^}" == "HALO_MODEL" ]
+if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ] || [ "${BOLTZMAN^^}" == "HALO_MODEL" ]  || [ "${BOLTZMAN^^}" == "COSMOPOWER_HALO_MODEL" ]
 then
   non_linear_model=mead2020_feedback
 elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] || [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
@@ -23,8 +23,8 @@ elif [ "${STATISTIC^^}" == "BANDPOWERS" ] #{{{
 then 
   inputfile=@DB:mcmc_inp_bandpowers@
 #}}}
-elif [ "${STATISTIC^^}" == "XIPM" ] #{{{
-then 
+elif [ "${STATISTIC^^}" == "2PCF" ] #{{{
+then
   _message "B-modes are not defined for vanilla xipm! Use xiEB instead!\n"
 #}}}
 elif [ "${STATISTIC^^}" == "XIEB" ] #{{{
@@ -50,8 +50,8 @@ MULT=@BV:MULT@
 #  --inputfile ${inputfile} \
 #  --statistic @BV:STATISTIC@ \
 #  --ntomo ${NTOMO} \
-#  --thetamin @BV:THETAMIN@ \
-#  --thetamax @BV:THETAMAX@ \
+#  --thetamin @BV:THETAMINXI@ \
+#  --thetamax @BV:THETAMAXXI@ \
 #  --title "@SURVEY@" \
 #  --suffix "@BV:CHAINSUFFIX@" \
 #  --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/ \
@@ -61,8 +61,8 @@ MULT=@BV:MULT@
 #  --inputfile ${inputfile} \
 #  --statistic @BV:STATISTIC@ \
 #  --ntomo ${NTOMO} \
-#  --thetamin @BV:THETAMIN@ \
-#  --thetamax @BV:THETAMAX@ \
+#  --thetamin @BV:THETAMINXI@ \
+#  --thetamax @BV:THETAMAXXI@ \
 #  --title "@SURVEY@" \
 #  --suffix "@BV:CHAINSUFFIX@" \
 #  --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
@@ -75,8 +75,8 @@ then
   --inputfile ${inputfile} \
   --statistic @BV:STATISTIC@ \
   --ntomo ${NTOMO} \
-  --thetamin @BV:THETAMIN@ \
-  --thetamax @BV:THETAMAX@ \
+  --thetamin @BV:THETAMINXI@ \
+  --thetamax @BV:THETAMAXXI@ \
   --title "@SURVEY@" \
   --suffix "@BV:CHAINSUFFIX@" \
   --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/ \
@@ -87,8 +87,8 @@ else
   --inputfile ${inputfile} \
   --statistic @BV:STATISTIC@ \
   --ntomo ${NTOMO} \
-  --thetamin @BV:THETAMIN@ \
-  --thetamax @BV:THETAMAX@ \
+  --thetamin @BV:THETAMINXI@ \
+  --thetamax @BV:THETAMAXXI@ \
   --title "@SURVEY@" \
   --suffix "@BV:CHAINSUFFIX@" \
   --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/

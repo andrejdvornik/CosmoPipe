@@ -43,7 +43,7 @@ set -e
 function _inp_var { 
   #Variable inputs (leave blank if none)
   echo BV:TREECORRWT DATABLOCK RED RUNROOT STORAGEPATH
-}
+} 
 #}}}
 
 # Input data {{{ 

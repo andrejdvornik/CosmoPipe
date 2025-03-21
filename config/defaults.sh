@@ -97,30 +97,54 @@ TOMOLIMS='0.1 0.3 0.5 0.7 0.9 1.2'                        #KiDS-1000
 #Variable used to define tomographic bins (Default is KiDS-Legacy)
 TOMOVAR=Z_B
 
-#Theta limits for covariance 
-THETAMINCOV="0.50"
-#Theta limits for covariance 
-THETAMAXCOV="300.00"
-
-PATCH_CENTERFILE=""
-
-#Theta limits for xipm (can be highres for BP/COSEBIs)
-THETAMIN="0.50"
-#Theta limits for xipm (can be highres for BP/COSEBIs)
-THETAMAX="300.00"
-#Number of Theta bins for xipm (can be highres for BP/COSEBIs)
-NTHETABIN="1000"
-#Number of Xipm bins used for science
-NTHETAREBIN=9
-#Maximum Theta for analysing Xim (arcmin)
-THETAMAXM=300
-#Minimum Theta for analysing Xim (arcmin)
-THETAMINM=4
+#lower theta limit for xipm (arcmin; Default is KiDS-Legacy)
+THETAMINXI="2.00"
+#upper theta limit for xipm (arcmin; Default is KiDS-Legacy)
+THETAMAXXI="300.00"
+#Number of Theta bins for xipm (can be highres for BP/COSEBIs; default is KiDS-Legacy)
+NTHETABINXI="1000"
+#Number of Xipm bins used for science (Default is KiDS-Legacy)
+NXIPM=9 
+#Maximum Theta for analysing Xim (arcmin; )
+THETAMAXXIM=300
+#Minimum Theta for analysing Xim (arcmin) 
+THETAMINXIM=4
 
 #Minimum Number of modes for COSEBIs (Default is KiDS-Legacy)
 NMINCOSEBIS=1
 #Maximum Number of modes for COSEBIs (Default is KiDS-Legacy)
 NMAXCOSEBIS=20
+
+
+#lower theta limit for gamma_t (arcmin; Default is KiDS-Legacy)
+THETAMINGT="2.00"
+#upper theta limit for gamma_t (arcmin; Default is KiDS-Legacy)
+THETAMAXGT="300.00"
+#Number of Theta bins for gamma_t (can be highres for BP/COSEBIs; default is KiDS-Legacy)
+NTHETABINGT="1000"
+#Number of gamma_t bins used for science (Default is KiDS-Legacy)
+NGT=9 
+
+#Minimum Number of modes for Psi_gm (Default is KiDS-Legacy)
+NMINCOSEBISNE=1
+#Maximum Number of modes for Psi_gm (Default is KiDS-Legacy)
+NMAXCOSEBISNE=20
+
+
+#lower theta limit for w(theta) (arcmin; Default is KiDS-Legacy)
+THETAMINWT="2.00"
+#upper theta limit for w(theta) (arcmin; Default is KiDS-Legacy)
+THETAMAXWT="300.00"
+#Number of Theta bins for w(theta) (can be highres for BP/COSEBIs; default is KiDS-Legacy)
+NTHETABINWT="1000"
+#Number of w(theta) bins used for science (Default is KiDS-Legacy)
+NWT=9 
+
+#Minimum Number of modes for Psi_gg (Default is KiDS-Legacy)
+NMINCOSEBISNN=1
+#Maximum Number of modes for Psi_gg (Default is KiDS-Legacy)
+NMAXCOSEBISNN=20
+
 
 #Name of the lensing weight variable (Default is KiDS-Legacy)
 WEIGHTNAME=AlphaRecalC_weight_@BV:BLIND@
@@ -211,12 +235,27 @@ SECONDSTATISTIC=""
 
 #String which determines type of bandpowers correlation function (EE,NE,NN) (shear, GGL, clustering)
 BANDPOWERMODE='EE'
-#Number of Bandpowers
+#Number of Bandpowers for EE
 NBANDPOWERS=8
-#Minimum of ell bins for bandpowers computation 
+#Minimum of ell bins for bandpowers computation for EE
 LMINBANDPOWERS=100.0
-#Maximum of ell bins for bandpowers computation 
+#Maximum of ell bins for bandpowers computation for EE
 LMAXBANDPOWERS=1500.0
+
+#Number of Bandpowers for NE
+NBANDPOWERSNE=8
+#Minimum of ell bins for bandpowers computation for NE
+LMINBANDPOWERSNE=100.0
+#Maximum of ell bins for bandpowers computation for NE
+LMAXBANDPOWERSNE=1500.0
+
+#Number of Bandpowers for NN
+NBANDPOWERSNN=8
+#Minimum of ell bins for bandpowers computation for NN
+LMINBANDPOWERSNN=100.0
+#Maximum of ell bins for bandpowers computation for NN
+LMAXBANDPOWERSNN=1500.0
+
 #Apodisation width for bandpowers 
 APODISATIONWIDTH=0.5
 

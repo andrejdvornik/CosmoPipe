@@ -143,7 +143,7 @@ do
       then
         bin_slop=@BV:BINSLOPNN@
       else
-        if [ @BV:NTHETABIN@ -gt 100 ]
+        if [ @BV:NTHETABINWT@ -gt 100 ]
         then
           bin_slop_NN=1.0
         else
@@ -156,7 +156,7 @@ do
       then
         bin_slop=@BV:BINSLOPNG@
       else
-        if [ @BV:NTHETABIN@ -gt 100 ]
+        if [ @BV:NTHETABINWT@ -gt 100 ]
         then
           bin_slop_NG=1.2
         else
@@ -173,7 +173,7 @@ do
       _message "    -> @BLU@Bin $LBIN1 x Bin $LBIN1 @DEF@"
       MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
         @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_gt_w_treecorr.py \
-        --clustering --nbins @BV:NTHETABIN@ --theta_min @BV:THETAMIN@ --theta_max @BV:THETAMAX@ --binning @BINNING@ --bin_slop_NN ${bin_slop_NN} --bin_slop_NG ${bin_slop_NG}\
+        --clustering --nbins @BV:NTHETABINWT@ --theta_min @BV:THETAMINWT@ --theta_max @BV:THETAMAXWT@ --binning @BINNING@ --bin_slop_NN ${bin_slop_NN} --bin_slop_NG ${bin_slop_NG}\
         --lenscat ${file_lens_one} \
         --randcat ${file_rand_one} \
         --output @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/wt/${outname} \

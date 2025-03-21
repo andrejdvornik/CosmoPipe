@@ -150,7 +150,7 @@ do
       then
         bin_slop=@BV:BINSLOPNN@
       else
-        if [ @BV:NTHETABIN@ -gt 100 ]
+        if [ @BV:NTHETABINGT@ -gt 100 ]
         then
           bin_slop_NN=1.0
         else
@@ -163,7 +163,7 @@ do
       then
         bin_slop=@BV:BINSLOPNG@
       else
-        if [ @BV:NTHETABIN@ -gt 100 ]
+        if [ @BV:NTHETABINGT@ -gt 100 ]
         then
           bin_slop_NG=1.2
         else
@@ -180,7 +180,7 @@ do
       _message "    -> @BLU@Bin $LBIN x Bin $ZBIN ($ZB_lo2 < Z_B <= $ZB_hi2)@DEF@"
       MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
         @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/calc_gt_w_treecorr.py \
-        --lensing --nbins @BV:NTHETABIN@ --theta_min @BV:THETAMIN@ --theta_max @BV:THETAMAX@ --binning @BINNING@ --bin_slop_NN ${bin_slop_NN} --bin_slop_NG ${bin_slop_NG} \
+        --lensing --nbins @BV:NTHETABINGT@ --theta_min @BV:THETAMINGT@ --theta_max @BV:THETAMAXGT@ --binning @BINNING@ --bin_slop_NN ${bin_slop_NN} --bin_slop_NG ${bin_slop_NG} \
         --lenscat ${file_lens_one} \
         --sourcecat ${file_source} \
         --randcat ${file_rand_one} \

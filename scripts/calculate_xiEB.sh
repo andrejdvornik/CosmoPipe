@@ -27,7 +27,7 @@ then
   mkdir ${outfold}
 fi 
 BOLTZMAN="@BV:BOLTZMAN@"
-if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ] || [ "${BOLTZMAN^^}" == "HALO_MODEL" ]
+if [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2020" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2020" ] || [ "${BOLTZMAN^^}" == "HALO_MODEL" ]  || [ "${BOLTZMAN^^}" == "COSMOPOWER_HALO_MODEL" ]
 then
   non_linear_model=mead2020_feedback
 elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015" ] || [ "${BOLTZMAN^^}" == "COSMOPOWER_HM2015_S8" ] || [ "${BOLTZMAN^^}" == "CAMB_HM2015" ]
@@ -47,9 +47,9 @@ _message "    -> @BLU@Computing xi_E/B from COSEBIs@DEF@"
   --data @DB:cosebis_dimless_vec@ \
   --covariance @DB:covariance_cosebis_dimless@ \
   --ncores @BV:NTHREADS@ \
-  --thetamin @BV:THETAMIN@ \
-  --thetamax @BV:THETAMAX@ \
-  --ntheta @BV:NTHETAREBIN@ \
+  --thetamin @BV:THETAMINXI@ \
+  --thetamax @BV:THETAMAXXI@ \
+  --ntheta @BV:NXIPM@ \
   --binning @BINNING@ \
   --ntomo ${NTOMO} \
   --output_data_E @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/xiE_vec \

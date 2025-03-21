@@ -225,13 +225,27 @@ then
   --nzsource ${nz_source} \
   --nzlens ${nz_lens} \
   --nzobs ${nz_obs} \
-  --nmaxcosebis @BV:NMAXCOSEBIS@ \
-  --nbandpowers @BV:NBANDPOWERS@ \
-  --ntheta @BV:NTHETAREBIN@ \
-  --ellmin @BV:LMINBANDPOWERS@ \
-  --ellmax @BV:LMAXBANDPOWERS@ \
-  --thetamin @BV:THETAMIN@ \
-  --thetamax @BV:THETAMAX@ \
+  --nmaxcosebis_ee @BV:NMAXCOSEBIS@ \
+  --nbandpowers_ee @BV:NBANDPOWERS@ \
+  --ntheta_ee @BV:NXIPM@ \
+  --ellmin_ee @BV:LMINBANDPOWERS@ \
+  --ellmax_ee @BV:LMAXBANDPOWERS@ \
+  --thetamin_ee @BV:THETAMINXI@ \
+  --thetamax_ee @BV:THETAMAXXI@ \
+  --nmaxcosebis_ne @BV:NMAXCOSEBISNE@ \
+  --nbandpowers_ne @BV:NBANDPOWERSNE@ \
+  --ntheta_ne @BV:NGT@ \
+  --ellmin_ne @BV:LMINBANDPOWERSNE@ \
+  --ellmax_ne @BV:LMAXBANDPOWERSNE@ \
+  --thetamin_ne @BV:THETAMINGT@ \
+  --thetamax_ne @BV:THETAMAXGT@ \
+  --nmaxcosebis_nn @BV:NMAXCOSEBISNN@ \
+  --nbandpowers_nn @BV:NBANDPOWERSNN@ \
+  --ntheta_nn @BV:NWT@ \
+  --ellmin_nn @BV:LMINBANDPOWERSNN@ \
+  --ellmax_nn @BV:LMAXBANDPOWERSNN@ \
+  --thetamin_nn @BV:THETAMINGT@ \
+  --thetamax_nn @BV:THETAMAXgt@ \
   --ntomo ${NTOMO} \
   --nlens ${NLENS} \
   --nobs ${NOBS} \
@@ -255,13 +269,27 @@ then
   --nzsource ${nz_source} \
   --nzlens ${nz_lens} \
   --nzobs ${nz_obs} \
-  --nmaxcosebis @BV:NMAXCOSEBIS@ \
-  --nbandpowers @BV:NBANDPOWERS@ \
-  --ntheta @BV:NTHETAREBIN@ \
-  --ellmin @BV:LMINBANDPOWERS@ \
-  --ellmax @BV:LMAXBANDPOWERS@ \
-  --thetamin @BV:THETAMIN@ \
-  --thetamax @BV:THETAMAX@ \
+  --nmaxcosebis_ee @BV:NMAXCOSEBIS@ \
+  --nbandpowers_ee @BV:NBANDPOWERS@ \
+  --ntheta_ee @BV:NXIPM@ \
+  --ellmin_ee @BV:LMINBANDPOWERS@ \
+  --ellmax_ee @BV:LMAXBANDPOWERS@ \
+  --thetamin_ee @BV:THETAMINXI@ \
+  --thetamax_ee @BV:THETAMAXXI@ \
+  --nmaxcosebis_ne @BV:NMAXCOSEBISNE@ \
+  --nbandpowers_ne @BV:NBANDPOWERSNE@ \
+  --ntheta_ne @BV:NGT@ \
+  --ellmin_ne @BV:LMINBANDPOWERSNE@ \
+  --ellmax_ne @BV:LMAXBANDPOWERSNE@ \
+  --thetamin_ne @BV:THETAMINGT@ \
+  --thetamax_ne @BV:THETAMAXGT@ \
+  --nmaxcosebis_nn @BV:NMAXCOSEBISNN@ \
+  --nbandpowers_nn @BV:NBANDPOWERSNN@ \
+  --ntheta_nn @BV:NWT@ \
+  --ellmin_nn @BV:LMINBANDPOWERSNN@ \
+  --ellmax_nn @BV:LMAXBANDPOWERSNN@ \
+  --thetamin_nn @BV:THETAMINGT@ \
+  --thetamax_nn @BV:THETAMAXgt@ \
   --ntomo ${NTOMO} \
   --nlens ${NLENS} \
   --nobs ${NOBS} \
@@ -286,13 +314,27 @@ else
       --nzsource ${nz_source} \
       --nzlens ${nz_lens} \
       --nzobs ${nz_obs} \
-      --nmaxcosebis @BV:NMAXCOSEBIS@ \
-      --nbandpowers @BV:NBANDPOWERS@ \
-      --ntheta @BV:NTHETAREBIN@ \
-      --ellmin @BV:LMINBANDPOWERS@ \
-      --ellmax @BV:LMAXBANDPOWERS@ \
-      --thetamin @BV:THETAMIN@ \
-      --thetamax @BV:THETAMAX@ \
+      --nmaxcosebis_ee @BV:NMAXCOSEBIS@ \
+      --nbandpowers_ee @BV:NBANDPOWERS@ \
+      --ntheta_ee @BV:NXIPM@ \
+      --ellmin_ee @BV:LMINBANDPOWERS@ \
+      --ellmax_ee @BV:LMAXBANDPOWERS@ \
+      --thetamin_ee @BV:THETAMINXI@ \
+      --thetamax_ee @BV:THETAMAXXI@ \
+      --nmaxcosebis_ne @BV:NMAXCOSEBISNE@ \
+      --nbandpowers_ne @BV:NBANDPOWERSNE@ \
+      --ntheta_ne @BV:NGT@ \
+      --ellmin_ne @BV:LMINBANDPOWERSNE@ \
+      --ellmax_ne @BV:LMAXBANDPOWERSNE@ \
+      --thetamin_ne @BV:THETAMINGT@ \
+      --thetamax_ne @BV:THETAMAXGT@ \
+      --nmaxcosebis_nn @BV:NMAXCOSEBISNN@ \
+      --nbandpowers_nn @BV:NBANDPOWERSNN@ \
+      --ntheta_nn @BV:NWT@ \
+      --ellmin_nn @BV:LMINBANDPOWERSNN@ \
+      --ellmax_nn @BV:LMAXBANDPOWERSNN@ \
+      --thetamin_nn @BV:THETAMINGT@ \
+      --thetamax_nn @BV:THETAMAXgt@ \
       --ntomo ${NTOMO} \
       --nlens ${NLENS} \
       --nobs ${NOBS} \
@@ -314,13 +356,27 @@ else
     --nzsource ${nz_source} \
     --nzlens ${nz_lens} \
     --nzobs ${nz_obs} \
-    --nmaxcosebis @BV:NMAXCOSEBIS@ \
-    --nbandpowers @BV:NBANDPOWERS@ \
-    --ntheta @BV:NTHETAREBIN@ \
-    --ellmin @BV:LMINBANDPOWERS@ \
-    --ellmax @BV:LMAXBANDPOWERS@ \
-    --thetamin @BV:THETAMIN@ \
-    --thetamax @BV:THETAMAX@ \
+    --nmaxcosebis_ee @BV:NMAXCOSEBIS@ \
+    --nbandpowers_ee @BV:NBANDPOWERS@ \
+    --ntheta_ee @BV:NXIPM@ \
+    --ellmin_ee @BV:LMINBANDPOWERS@ \
+    --ellmax_ee @BV:LMAXBANDPOWERS@ \
+    --thetamin_ee @BV:THETAMINXI@ \
+    --thetamax_ee @BV:THETAMAXXI@ \
+    --nmaxcosebis_ne @BV:NMAXCOSEBISNE@ \
+    --nbandpowers_ne @BV:NBANDPOWERSNE@ \
+    --ntheta_ne @BV:NGT@ \
+    --ellmin_ne @BV:LMINBANDPOWERSNE@ \
+    --ellmax_ne @BV:LMAXBANDPOWERSNE@ \
+    --thetamin_ne @BV:THETAMINGT@ \
+    --thetamax_ne @BV:THETAMAXGT@ \
+    --nmaxcosebis_nn @BV:NMAXCOSEBISNN@ \
+    --nbandpowers_nn @BV:NBANDPOWERSNN@ \
+    --ntheta_nn @BV:NWT@ \
+    --ellmin_nn @BV:LMINBANDPOWERSNN@ \
+    --ellmax_nn @BV:LMAXBANDPOWERSNN@ \
+    --thetamin_nn @BV:THETAMINGT@ \
+    --thetamax_nn @BV:THETAMAXgt@ \
     --ntomo ${NTOMO} \
     --nlens ${NLENS} \
     --nobs ${NOBS} \

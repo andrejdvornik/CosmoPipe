@@ -42,8 +42,8 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo
-}
+  echo DATABLOCK RUNROOT STORAGEPATH
+} 
 #}}}
 
 # Input data {{{ 
