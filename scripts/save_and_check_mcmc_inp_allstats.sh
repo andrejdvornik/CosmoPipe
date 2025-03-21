@@ -3,7 +3,7 @@
 # File Name : save_and_check_mcmc_inp.sh
 # Created By : awright
 # Creation Date : 01-04-2023
-# Last Modified : Fri 07 Jul 2023 08:10:16 PM CEST
+# Last Modified : Tue 28 Jan 2025 12:32:14 AM CET
 #
 #=========================================
 
@@ -26,6 +26,7 @@ CHAINSUFFIX=@BV:CHAINSUFFIX@
 #Input data vector
 STATISTIC="@BV:STATISTIC@"
 ITERATION=@BV:ITERATION@
+input_covariance_iterative=
 if [ "${STATISTIC^^}" == "COSEBIS" ] #{{{
 then
   input_datavector="@DB:cosebis_vec@"
@@ -133,23 +134,29 @@ then
 
 if [ ! -z "$input_covariance_iterative" ]
 then
-  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp_allstats.py \
-  --datavector ${input_datavector} \
-  --statistic @BV:STATISTIC@ \
-  --nz @DB:nz@ \
-  --nmaxcosebis @BV:NMAXCOSEBIS@ \
-  --nbandpowers @BV:NBANDPOWERS@ \
-  --nxipm @BV:NTHETAREBIN@ \
-  --ellmin @BV:LMINBANDPOWERS@ \
-  --ellmax @BV:LMAXBANDPOWERS@ \
-  --thetamin @BV:THETAMIN@ \
-  --thetamax @BV:THETAMAX@ \
-  --ntomo ${NTOMO} \
-  --neff @DB:cosmosis_neff@ \
-  --sigmae @DB:cosmosis_sigmae@ \
-  --covariance ${input_covariance_iterative} \
-  --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}${filename_extension} \
-  --plotdir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
+  if [ -f "$input_covariance_iterative" ] 
+  then 
+    @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/save_and_check_mcmc_inp_allstats.py \
+    --datavector ${input_datavector} \
+    --statistic @BV:STATISTIC@ \
+    --nz @DB:nz@ \
+    --nmaxcosebis @BV:NMAXCOSEBIS@ \
+    --nbandpowers @BV:NBANDPOWERS@ \
+    --nxipm @BV:NTHETAREBIN@ \
+    --ellmin @BV:LMINBANDPOWERS@ \
+    --ellmax @BV:LMAXBANDPOWERS@ \
+    --thetamin @BV:THETAMIN@ \
+    --thetamax @BV:THETAMAX@ \
+    --ntomo ${NTOMO} \
+    --neff @DB:cosmosis_neff@ \
+    --sigmae @DB:cosmosis_sigmae@ \
+    --covariance ${input_covariance_iterative} \
+    --outputfile @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}${filename_extension} \
+    --plotdir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/
+  else 
+    cp -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model} \
+    @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}${filename_extension}.fits 
+  fi 
 fi
 _write_datablock "mcmc_inp_@BV:STATISTIC@" "MCMC_input_${non_linear_model}.fits"
 

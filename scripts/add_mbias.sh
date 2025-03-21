@@ -7,9 +7,9 @@
 #
 #=========================================
 
-#Loop over patches & allpatch
-for patch in @BV:PATCHLIST@ @ALLPATCH@
-do
+#Loop over patches & allpatch 
+for patch in @BV:PATCHLIST@ @ALLPATCH@ 
+do 
 
   #Construct the output directory 
   if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mbias_${patch}_@BV:BLIND@ ]

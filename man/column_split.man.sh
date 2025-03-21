@@ -42,7 +42,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BV:SPLITVAR P_RSCRIPT RUNROOT SCRIPTPATH
+  echo BV:SPLITVAR MACHINE P_RSCRIPT RUNROOT SCRIPTPATH
 } 
 #}}}
 

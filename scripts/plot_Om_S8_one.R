@@ -64,7 +64,8 @@ cat<-helpRfuncs::read.chain(args$input)
 colnames(cat)<-gsub("cosmological_parameters--","",colnames(cat),ignore.case=T)
 colnames(cat)<-gsub("intrinsic_alignment_parameters--","IA_",colnames(cat),ignore.case=T)
 colnames(cat)<-gsub("halo_model_parameters--","HM_",colnames(cat),ignore.case=T)
-print(colnames(cat))
+cat("Chain read successful\n")
+#print(colnames(cat))
 #}}}
 
 #Check for the xlabel and ylabel's in the catalogue {{{
@@ -92,6 +93,9 @@ if (args$sampler!='grid') {
     } 
   }
 }
+#remove non-finite weights {{{ 
+cat<-cat[which(is.finite(cat$weight) & is.finite(cat$post) & is.finite(cat[[args$xlabel]]) & is.finite(cat[[args$ylabel]])),]
+#}}}
 #}}}
 
 #If we have requested a reference catalogue {{{
@@ -102,6 +106,7 @@ if (args$refr!='none' & file.exists(args$refr)) {
   colnames(ref)<-gsub("cosmological_parameters--","",colnames(ref),ignore.case=T)
   colnames(ref)<-gsub("intrinsic_alignment_parameters--","IA_",colnames(ref),ignore.case=T)
   colnames(ref)<-gsub("halo_model_parameters--","HM_",colnames(ref),ignore.case=T)
+  cat("Reference read successful\n")
   #If there is no weight column (multinest/polychord)
   if (args$sampler!='grid') { 
     if (!any(colnames(ref)=='weight')) { 
@@ -125,6 +130,10 @@ if (args$refr!='none' & file.exists(args$refr)) {
   }
   ref[[args$ylabel]]<-as.numeric(ref[[args$ylabel]])
   #}}}
+  #remove non-finite weights {{{ 
+  ref<-ref[which(is.finite(ref$weight) & is.finite(ref$post) & is.finite(ref[[args$xlabel]]) & is.finite(ref[[args$ylabel]])),]
+  print(str(ref))
+  #}}}
 }
 #}}}
 
@@ -146,6 +155,7 @@ if (args$prior!='none' & file.exists(args$prior)) {
   colnames(prior)<-gsub("cosmological_parameters--","",colnames(prior),ignore.case=T)
   colnames(prior)<-gsub("intrinsic_alignment_parameters--","IA_",colnames(prior),ignore.case=T)
   colnames(prior)<-gsub("halo_model_parameters--","HM_",colnames(prior),ignore.case=T)
+  cat("Prior read successful\n")
   if (!any(colnames(prior)=='weight')) { 
     #If there is also no log_weight column (nautilus) 
     if (any(colnames(prior)=='log_weight')) { 
@@ -156,8 +166,16 @@ if (args$prior!='none' & file.exists(args$prior)) {
       stop("ERROR: there is no weight or logweight in the prior file?!")
     } 
   }
+  #remove non-finite weights {{{ 
+  print(nrow(prior))
+  prior<-as.data.frame(prior)
+  prior<-prior[which(is.finite(prior$weight) & is.finite(prior$post) & is.finite(prior[[args$xlabel]]) & is.finite(prior[[args$ylabel]])),]
+  prior<-data.table::as.data.table(prior)
+  print(nrow(prior))
+  #}}}
 }
 #}}}
+
 
 #If we want to remove the h^2 dependence from the plotted parameters{{{
 if (args$removeh2) { 

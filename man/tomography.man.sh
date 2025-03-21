@@ -46,7 +46,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:TOMOLIMS BV:TOMOVAR DEF PYTHON3BIN RED RUNROOT SCRIPTPATH
+  echo BLU BV:TOMOLIMS BV:TOMOVAR DEF MACHINE PYTHON3BIN RED RUNROOT SCRIPTPATH
 } 
 #}}}
 

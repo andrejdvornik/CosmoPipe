@@ -3,7 +3,7 @@
 # File Name : plot_TPD.R
 # Created By : awright
 # Creation Date : 18-04-2023
-# Last Modified : Wed 29 Nov 2023 12:09:12 PM CET
+# Last Modified : Tue 07 Jan 2025 02:05:38 PM CET
 #
 #=========================================
 
@@ -116,7 +116,8 @@ for (i in 1:args$ntomo) {
     ind<-start+1:ndata
     #Plot the data vector 
     magicaxis::magplot(dat$V1[ind]/10^mfact,xlab='',ylab='',type='n',side=1:4,labels=c(i==j,F,i==1,j==args$ntomo),
-                       ylim=ylim,xlim=c(0.5,ndata+0.5),grid=F)
+                       #ylim=ylim,xlim=c(0.5,ndata+0.5),grid=F)
+                       ylim=ylim,xlim=c(0.5,6+0.5),grid=F)
     #Zero line 
     abline(h=0,lwd=2)
     #Data points
@@ -139,7 +140,8 @@ for (i in 1:args$ntomo) {
   for (j in i:args$ntomo) { 
     ind<-start+1:ndata
     #Plot the data vector 
-    magicaxis::magplot(1:length(ind),xlab='',ylab='',type='n',ylim=c(-4,4),xlim=c(0.5,ndata+0.5),side=1:4,labels=c(j==args$ntomo,i==1,i==j,F),grid=F)
+    #magicaxis::magplot(1:length(ind),xlab='',ylab='',type='n',ylim=c(-4,4),xlim=c(0.5,ndata+0.5),side=1:4,labels=c(j==args$ntomo,i==1,i==j,F),grid=F)
+    magicaxis::magplot(1:length(ind),xlab='',ylab='',type='n',ylim=c(-4,4),xlim=c(0.5,6+0.5),side=1:4,labels=c(j==args$ntomo,i==1,i==j,F),grid=F)
     #Zero lone 
     abline(h=0,lwd=2)
     #Data 

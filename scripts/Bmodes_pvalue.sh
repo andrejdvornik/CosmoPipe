@@ -70,7 +70,8 @@ MULT=@BV:MULT@
 
 if [ -n "$MULT" ] && [ "$MULT" != "1.0" ]
 then
-  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue_v2.py \
+ # @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue_v2.py \
+  @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue_v2.R \
   --inputfile ${inputfile} \
   --statistic @BV:STATISTIC@ \
   --ntomo ${NTOMO} \
@@ -81,7 +82,8 @@ then
   --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/input/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/ \
   --mult ${MULT}
 else
-  @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue_v2.py \
+  #@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue_v2.py \
+  @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/Bmodes_pvalue_v2.R \
   --inputfile ${inputfile} \
   --statistic @BV:STATISTIC@ \
   --ntomo ${NTOMO} \

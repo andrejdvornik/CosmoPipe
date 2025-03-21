@@ -44,7 +44,7 @@ set -e
 function _inp_var { 
   #Variable inputs (leave blank if none)
   list=''
-  for patch in @PATCHLIST@ @ALLPATCH@ 
+  for patch in @BV:PATCHLIST@ @ALLPATCH@ 
   do 
     list="${list} BV:SURVEYAREA_${patch}"
   done

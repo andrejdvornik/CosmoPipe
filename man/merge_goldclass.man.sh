@@ -43,14 +43,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU DATABLOCK DEF LOGPATH MACHINE PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+  echo BLU BV:WEIGHTNAME DATABLOCK DEF MACHINE PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo som_weight_refr_cats som_weight_reference
+  echo som_weight_refr_cats
 } 
 #}}}
 

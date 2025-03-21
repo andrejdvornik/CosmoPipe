@@ -31,7 +31,7 @@ done
 #Combine the covariances by tomographic bins {{{
 @P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/combine_covariances.R \
   --inputs ${inputs} \
-  --patchlist @PATCHLIST@ \
+  --patchlist @BV:PATCHLIST@ \
   --allpatch @ALLPATCH@ \
   --ntheta @BV:NTHETABIN@ \
   --outputbase @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ \
@@ -40,7 +40,7 @@ done
 
 #Check for results and update bookkeeping 
 outputlist=''
-for patch in @PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
+for patch in @BV:PATCHLIST@ @ALLPATCH@ @ALLPATCH@comb
 do 
   if [ -f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/${patch}_fullcovariance.txt ]
   then 

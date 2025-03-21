@@ -5,7 +5,7 @@
 #Construct the list of data files 
 inplist=''
 for patch in @BV:PATCHLIST@
-do
+do 
   file=`ls @BV:PATCHPATH@/*_${patch}_*`
   if [ "${file}" == "" ] || [ ! -f ${file} ]
   then 

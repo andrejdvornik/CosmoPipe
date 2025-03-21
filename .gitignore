@@ -9,7 +9,10 @@ tmp*
 scripts/unused
 scripts/ImSim
 config/covariance_arb_summary
+config/cosebis/
 kcap_all/
+tex/
+history/
 
 kcap/modules/scale_cuts_new/test_files/twoPoint_PneE+PeeE.fits
 kcap/modules/scale_cuts_new/test_files/twoPoint_KV450.fits

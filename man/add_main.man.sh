@@ -44,7 +44,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo DEF BV:PATCHLIST PATCHPATH RED
+  echo BV:PATCHLIST BV:PATCHPATH DEF RED
 } 
 #}}}
 

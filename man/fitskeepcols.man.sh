@@ -42,7 +42,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:KEEPSTRINGS DEF RED RUNROOT SCRIPTPATH
+  echo BLU BV:KEEPSTRINGS DEF P_RSCRIPT RED RUNROOT SCRIPTPATH
 } 
 #}}}
 

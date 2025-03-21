@@ -42,7 +42,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BV:E1NAME BV:E2NAME BV:XNAME BV:YNAME MACHINE P_RSCRIPT RUNROOT SCRIPTPATH
+  echo BLU BV:E1NAME BV:E2NAME BV:WEIGHTNAME BV:XNAME BV:YNAME DEF MACHINE P_RSCRIPT RED RUNROOT SCRIPTPATH
 } 
 #}}}
 

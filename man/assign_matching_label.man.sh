@@ -44,7 +44,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLU BV:DATAFEATURES BV:LABELNAME DEF PYTHON3BIN RED RUNROOT SCRIPTPATH
+  echo BLU BV:DATAFEATURES BV:LABELNAME DEF MACHINE P_RSCRIPT RED RUNROOT SCRIPTPATH
 } 
 #}}}
 

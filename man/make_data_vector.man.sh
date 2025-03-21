@@ -43,8 +43,8 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BV:TOMOLIMS DATABLOCK BV:PATCHLIST PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH
-}
+  echo ALLPATCH BLU BV:PATCHLIST BV:TOMOLIMS DATABLOCK DEF PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH
+} 
 #}}}
 
 # Input data {{{ 

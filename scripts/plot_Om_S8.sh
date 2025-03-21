@@ -3,7 +3,7 @@
 # File Name : plot_Om_S8.sh
 # Created By : awright
 # Creation Date : 04-05-2023
-# Last Modified : Fri Oct 18 13:01:27 2024
+# Last Modified : Thu 30 Jan 2025 11:43:10 PM CET
 #
 #=========================================
 
@@ -14,7 +14,7 @@ then
 fi 
 
 #Plot the chain 
-@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/plot_Om_S8_one.R \
+@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/plot_Om_S8.R \
   --input @STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/output_@BV:SAMPLER@_@BV:BLIND@@BV:CHAINSUFFIX@.txt \
   --refr @BV:REFCHAIN@ \
   --prior @STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/output_apriori_@BV:BLIND@@BV:CHAINSUFFIX@.txt \
@@ -23,7 +23,7 @@ fi
   --title "@BV:SAMPLER@, Blind @BV:BLIND@, @BV:BOLTZMAN@" 2>&1 || echo "ignore failed plot generation" 
 
 #Plot the chain 
-@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/plot_Om_S8_one.R \
+@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/plot_Om_S8.R \
   --input @STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/output_@BV:SAMPLER@_@BV:BLIND@@BV:CHAINSUFFIX@.txt \
   --refr @BV:REFCHAIN@ \
   --prior @STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/output_apriori_@BV:BLIND@@BV:CHAINSUFFIX@.txt \

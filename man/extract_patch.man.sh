@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLU DEF BV:PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH
+  echo ALLPATCH BLU BV:PATCHLIST DEF MACHINE PYTHON3BIN RED RUNROOT SCRIPTPATH
 } 
 #}}}
 

@@ -43,7 +43,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo ALLPATCH BLU BV:TOMOLIMS BV:TOMOLIMS DEF LOGPATH BV:PATCHLIST P_RSCRIPT RED RUNROOT SCRIPTPATH
+  echo ALLPATCH BLU BV:PATCHLIST BV:TOMOLIMS DEF LOGPATH P_RSCRIPT RED RUNROOT SCRIPTPATH
 } 
 #}}}
 

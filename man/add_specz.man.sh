@@ -50,7 +50,7 @@ function _inp_data {
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo SPECZCAT
+  echo BV:SPECZCAT
 } 
 #}}}
 

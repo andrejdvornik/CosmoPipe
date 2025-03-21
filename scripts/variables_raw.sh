@@ -13,8 +13,14 @@
 #Paths and variables for configuration
 #Variables required for master installation 
 
+#Pipeline that you wish to run
+PIPELINE=test
+
+#Pipeline that you wish to run
+SURVEY=KiDS_Legacy
+
 #Root directory for pipeline scripts
-PACKROOT=`pwd`
+PACKROOT=@PACKROOT@
 
 #Date
 DATE=`date`
@@ -40,97 +46,44 @@ DEF='\033[0m'    #Default
 
 #Variables requires at pipeline compilation 
 
-#Designation for "all patches"
-ALLPATCH=@ALLPATCH@
+#Designation for "all patches" (Default is KiDS-Legacy)
+ALLPATCH=NS 
 
-#COSEBIs binning format; 'lin' or 'log'
-BINNING=@BINNING@
-
-#String for selecting bins in the first split 
-BINSTRINGONE=@BINSTRINGONE@
-#String for selecting bins in the second split 
-BINSTRINGTWO=@BINSTRINGTWO@
+#COSEBIs binning format; 'lin' or 'log' (Default is KiDS-Legacy)
+BINNING='log'
 
 #Blind identifier
-BLINDING=@BLINDING@
+BLINDING=blind_@BV:BLIND@
 
 #Datablock directory
-DATABLOCK=@DATABLOCK@
+DATABLOCK=CosmoPipe_DataBlock
 
 #Root directory for running pipeline
 RUNROOT=@RUNROOT@
 
 #Directory for runtime scripts (relative to RUNROOT)
-RUNTIME=@RUNTIME@
+RUNTIME=RUNTIME_${PIPELINE}
 
 #Path to pipeline config files (relative to RUNTIME)
-CONFIGPATH=@CONFIGPATH@
+CONFIGPATH=${RUNTIME}/config
 
 #Path for modified scripts (relative to RUNTIME)
-SCRIPTPATH=@SCRIPTPATH@
+SCRIPTPATH=${RUNTIME}/scripts
 
 #Path for logfiles (relative to RUNTIME)
-LOGPATH=@LOGPATH@
+LOGPATH=${RUNTIME}/logs
 
 #Path for manual files (relative to RUNTIME)
-MANUALPATH=@MANUALPATH@
+MANUALPATH=${RUNTIME}/man
 
 #Path for outputs (relative to RUNROOT)
-STORAGEPATH=@STORAGEPATH@
+STORAGEPATH=work_${PIPELINE}/
 
 #Nz file suffix
-NZFILESUFFIX=@NZFILESUFFIX@
-
-#Input Nz bias values (if needed) 
-NZBIAS=@NZBIAS@
-
-#Input Nz covariance matrix (if needed) 
-NZCOVFILE=@NZCOVFILE@
-
-#Bin width for Nz construction  
-NZSTEP=@NZSTEP@
-
-#List of m-bias values
-MBIASVALUES=@MBIASVALUES@
-#List of m-bias  errors 
-MBIASERRORS=@MBIASERRORS@
-
-#Correlation in m-biases 
-MBIASCORR=@MBIASCORR@
-
-#Path to Patchwise Catalogues
-PATCHPATH=@PATCHPATH@
-#String containing all patch designations 
-PATCHLIST=@PATCHLIST@
+NZFILESUFFIX=_Nz.fits
 
 #Path to python binary folder
-PYTHON3BIN=@PYTHON3BIN@
-
-#Pipeline that you wish to run
-PIPELINE=@PIPELINE@
-
-#Spectroscopic catalogue for SOM Nz Calibration 
-#SPECZCAT=@#SPECZCAT@
-SPECZCAT=@SPECZCAT@
-
-#COSEBIs covariance (pre-existing, used if requested)
-COSEBICOVFILE=@COSEBICOVFILE@
-
-#COSEBIs Data Vector (pre-existing, used if requested)
-COSEBIDATAVEC=@COSEBIDATAVEC@
-
-#List of input Neff values (pre-existing, used if requested)
-NEFFLIST=@NEFFLIST@
-
-#List of input sigma_e values (pre-existing, used if requested)
-SIGMAELIST=@SIGMAELIST@
-
-#Survey ID  
-SURVEY=@SURVEY@
-
-#Survey Area in arcmin
-SURVEYAREA=@SURVEYAREA@
-SURVEYAREADEG=@SURVEYAREADEG@
+PYTHON3BIN=`which python3`
 
 #Super Sample Covariance Matrix: Matrix elements 
 SSCMATRIX=@SSCMATRIX@

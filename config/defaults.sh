@@ -7,84 +7,94 @@
 
 # Defaults for runtime variables 
 
-#List of magnitudes for use in calibration 
+#Survey Identifier 
+SURVEY=KiDS
+#Patch identification labels 
+PATCHLIST="N S"
+#Folder containing wide-field shear catalogues 
+PATCHPATH=/path/to/patches/           
+
+#Spec-z calibration catalogue 
+SPECZCAT=/path/to/SpeczCalibration.cat
+
+#List of magnitudes for use in Nz calibration (Default is KiDS-Legacy)
 MAGLIST="MAG_GAAP_u MAG_GAAP_g MAG_GAAP_r MAG_GAAP_i1 MAG_GAAP_i2 MAG_GAAP_Z MAG_GAAP_Y MAG_GAAP_J MAG_GAAP_H MAG_GAAP_Ks"
 
-#Reference magnitude for use in calibration 
+#Reference magnitude for use in calibration (Default is KiDS-Legacy)
 REFMAGNAME="MAG_AUTO"
 
 #Form of the SOM calibration feature space ({ALLMAG,MAG,ALLCOLOUR,COLOUR})
 FEATURETYPES="ALLCOLOUR+MAG"
 
-#Blind Character
-BLIND=A                 # KiDS-Legacy
-#BLIND=C                 # KiDS-1000
+#Blind Character (Default is KiDS-1000) 
+BLIND=C                 
 
-#Shape measurement variables: e1
+#Shape measurement variables: e1 (Default is KiDS-Legacy)
 E1NAME=autocal_e1_@BV:BLIND@
-#Shape measurement variables: e2  
+#Shape measurement variables: e2 (Default is KiDS-Legacy) 
 E2NAME=autocal_e2_@BV:BLIND@
 
-#Uncorrected shape measurement variables: e1
+#Uncorrected shape measurement variables: e1 (Default is KiDS-Legacy)
 RAWE1NAME=raw_e1
-#Uncorrected shape measurement variables: e2  
+#Uncorrected shape measurement variables: e2 (Default is KiDS-Legacy)
 RAWE2NAME=raw_e1
 
-#PSF Shape measurement variables: e1
+#PSF Shape measurement variables: e1 (Default is KiDS-Legacy)
 PSFE1NAME=PSF_e1
-#PSF Shape measurement variables: e2
+#PSF Shape measurement variables: e2 (Default is KiDS-Legacy)
 PSFE2NAME=PSF_e2
 
-#RADec names: RA
+#RADec names: RA (Default is KiDS-Legacy)
 RANAME=ALPHA_J2000
-#RADec names: Declination 
+#RADec names: Declination  (Default is KiDS-Legacy)
 DECNAME=DELTA_J2000
 
-#Number of bootstrap realisations
+#Radius for on-sky matching (arcsec)
+RADIUS=1
+
+#Number of bootstrap realisations when required 
 NBOOT=300
 
-#Specz column name
+#Specz column name (Default is KiDS-Legacy)
 ZSPECNAME='z_spec'
 
-#Photo-z column name
+#Photo-z column name (Default is KiDS-Legacy)
 ZPHOTNAME='Z_B'
 
 #Number of threads
-NTHREADS=12
+NTHREADS=180
 
-#Nz delta-z stepsize
+#Nz delta-z stepsize (Default is KiDS-Legacy)
 NZSTEP=0.05
 
-#Number of spatial splits 
+#Number of spatial splits  (Default is SKILLS)
 NSPLIT=5
-#Number of spatial splits to retain
+#Number of spatial splits to retain (Default is SKILLS)
 NSPLITKEEP=5
 
 #Do we want to always save TPDs in the chain file (makes files much larger)
 SAVE_TPDS=False
-#Do we want to split the datavector in any way?
+#Do we want to split the datavector in any way? 
 SPLITMODE=
 
-#List of m-bias values
-#MBIASVALUES="-0.009  -0.011  -0.015  +0.002  +0.007"      #KiDS-1000
-#MBIASVALUES="-0.0230168 -0.015999775 -0.01162315 0.019508625 0.02944635 0.044750725" #KiDS-Legacy Blind A
-MBIASVALUES="-0.013 -0.018 -0.008 0.019 0.034"            #SSL K1000
-#List of m-bias uncertainties
-#MBIASERRORS="0.019 0.020 0.017 0.012 0.010"               #KiDS-1000
-#MBIASERRORS="0.02  0.02  0.02  0.02  0.02"                #KV450
-#MBIASERRORS=                                              #KiDS-Legacy
-MBIASERRORS="0.017 0.007 0.007 0.006 0.006"            #SSL K1000
+#List of m-bias values (Default is KiDS-1000 Asgari+ 2021) 
+MBIASVALUES="-0.009  -0.011  -0.015  +0.002  +0.007"      #KiDS-1000 
+#MBIASVALUES="-0.013 -0.018 -0.008 0.019 0.034"            #SSL K1000  
+#List of m-bias uncertainties (Default is KiDS-1000 Asgari+ 2021)
+MBIASERRORS="0.019 0.020 0.017 0.012 0.010"               #KiDS-1000
+#MBIASERRORS="0.017 0.007 0.007 0.006 0.006"            #SSL K1000  
 #Use an Analytic m-bias covariance?
 ANALYTIC_MCOV=TRUE
-#m-bias correlation
+#m-bias correlation  
 MBIASCORR=0.99
 
-#Limits of the tomographic bins
-#TOMOLIMS='0.1 0.3 0.5 0.7 0.9 1.2'                        #KiDS-1000
-TOMOLIMS='0.10 0.42 0.58 0.71 0.90 1.14 2.00'             #KiDS-Legacy
-#TOMOLIMS='0.10 0.42 0.58 0.71 0.90 1.14 2.00'             #KiDS-Legacy finebins
+#List of sigmae values (Default is KiDS-1000 Asgari+ 2021)
+SIGMAELIST="0.270 0.258 0.273 0.254 0.270"                      #KiDS-1000
 
-#Variable used to define tomographic bins 
+#Limits of the tomographic bins (Default is KiDS-1000)
+TOMOLIMS='0.1 0.3 0.5 0.7 0.9 1.2'                        #KiDS-1000
+
+#Variable used to define tomographic bins (Default is KiDS-Legacy)
 TOMOVAR=Z_B
 
 #Theta limits for covariance 
@@ -107,52 +117,48 @@ THETAMAXM=300
 #Minimum Theta for analysing Xim (arcmin)
 THETAMINM=4
 
-#Minimum Number of modes for COSEBIs
+#Minimum Number of modes for COSEBIs (Default is KiDS-Legacy)
 NMINCOSEBIS=1
-#Maximum Number of modes for COSEBIs
-NMAXCOSEBIS=10
+#Maximum Number of modes for COSEBIs (Default is KiDS-Legacy)
+NMAXCOSEBIS=20
 
-#Name of the lensing weight variable  
-WEIGHTNAME=weight
+#Name of the lensing weight variable (Default is KiDS-Legacy)
+WEIGHTNAME=AlphaRecalC_weight_@BV:BLIND@
 
-#Name of the lensing weight variable  
-CALIBWEIGHTNAME=PriorWeight
+#Name of the lensing weight variable (Default is KiDS-Legacy)
+CALIBWEIGHTNAME=@BV:WEIGHTNAME@_wPV
 
 #Name to base the Nz labels on 
 NZNAME_BASEBLOCK=som_weight_calib_cats
-NZNAME_BASEBLOCK_LENS=som_weight_calib_cats
-NZNAME_BASEBLOCK_OBS=som_weight_calib_cats
 
-##### DANGER WILL ROBINSON!
-##### Inconsistent naming here and with SURVEY will create a bug
-##### This naming is now taken care of by .fiducial_combination in subroutines
-#####Name of the base file for cosmosis/onecov
-#####NPAIRBASE=XI_KiDS_1000_NScomb             #KiDS-1000
-#####NPAIRBASE=XI_KiDS_Legacy_NScomb           #KiDS-Legacy
+#Name of the base file for cosmosis/onecov
+NPAIRBASE_XI=XI_@BV:SURVEY@_NScomb        #Use the combined XIpm counts as fiducial
 
-#Statistic of choice for chain 
+#Statistic of choice for chain (Default is KiDS-Legacy fiducial)
 STATISTIC=cosebis
 
-#Sampler 
+#Sampler (Default is KiDS-Legacy fiducial)
 SAMPLER=nautilus
 
-#Boltzman Code 
-BOLTZMAN=COSMOPOWER_HM2015_S8
+#Nautilus resume 
+NAUTILUS_RESUME=false
+#Nautilus number of samples 
+NAUTILUS_NSAMP=10000
+
+#Boltzmann Code (Default is KiDS-Legacy)
+BOLTZMAN=COSMOPOWER_HM2020 
 
 #Simulated spectroscopic calibration sample(s)
-SIMSPECZCAT=/net/home/fohlen13/jlvdb/LegaZy/TEST/SKiLLS_spec/realisation/
+SIMSPECZCAT=/path/to/specz/simulations/
 
-#Simulated catalogues with constant shear
-#SIMMAINCAT=/net/home/fohlen11/awright/SKiLLS/skills_v07D7ten_single/                          #Legacy Testing
-#SIMMAINCAT=/net/home/fohlen12/awitt/KiDS_mock_photometry/mice2/mag/test_full_all/mice2_all_result_photoz_recalweight.fits  #Legacy MICE2
-#SIMMAINCAT=/net/home/fohlen11/awright/KiDS/Legacy/StratLearn/MICE2_KV450/                    #KiDS-1000
-SIMMAINCAT=/net/home/fohlen11/awright/SKiLLS/skills_v07D7ten/
+#Simulated catalogues with constant shear (Default is KiDS-Legacy)
+SIMMAINCAT=/path/to/KiDSLegacy_data/skills_v07D7ten/                                #KiDS-Legacy
 
 #Simulated catalogues with variable shear 
-SIMVARCAT=/net/home/fohlen11/awright/SKiLLS/skills_v07D7p1/
+SIMVARCAT=/path/to/KiDSLegacy_data/skills_v07D7p1/
 
 #Catalogue of Blended objects in Simulated catalogues
-SIMBLENDCAT=/net/home/fohlen11/awright/SKiLLS/SKiLLS/skills_v07D7p1_lite_blended/
+SIMBLENDCAT=/path/to/KiDSLegacy_data/skills_v07D7p1_lite_blended/
 
 #COSEBI file base name
 COSEBISBASE=@BV:COSEBISBASE@
@@ -180,18 +186,18 @@ G1NAME=@BV:G1NAME@
 #Input shear variable names: gamma_2 
 G2NAME=@BV:G2NAME@
 
-#Compute the Gaussian component of the covariance (True or False)
-GAUSS=True
-#Compute the non-gaussian component of the covariance (True or False)
+#Compute the Gaussian component of the covariance (True or False) 
+GAUSS=True 
+#Compute the non-gaussian component of the covariance (True or False) 
 NONGAUSS=True
-#Compute the mixterm component of the covariance (True or False)
+#Compute the mixterm component of the covariance (True or False) 
 MIXTERM=False
 MIXTERM_BASEFILE=main_all_gold_recal_cc_@BV:BLIND@
-#Split Gaussian contributions in the output file (True or False; True adds considerable runtime (x2+)!)
+#Split Gaussian contributions in the output file (True or False; True adds considerable runtime (x2+)!) 
 SPLIT_GAUSS=False
-#Compute the super-sample component of the covariance (True or False)
+#Compute the super-sample component of the covariance (True or False) 
 SSC=True
-#Second statistic for calculating cross-covariances
+#Second statistic for calculating cross-covariances 
 SECONDSTATISTIC=""
 
 #Number of ell bins for covariance computation 
@@ -208,14 +214,14 @@ BANDPOWERMODE='EE'
 #Number of Bandpowers
 NBANDPOWERS=8
 #Minimum of ell bins for bandpowers computation 
-LMINBANDPOWERS=100
+LMINBANDPOWERS=100.0
 #Maximum of ell bins for bandpowers computation 
-LMAXBANDPOWERS=1500
+LMAXBANDPOWERS=1500.0
 #Apodisation width for bandpowers 
 APODISATIONWIDTH=0.5
 
 #Sampler to use as basis of 'list sampler' 
-LIST_INPUT_SAMPLER=multinest 
+LIST_INPUT_SAMPLER=nautilus
 
 #name of the m1 column 
 M1NAME=@BV:M1NAME@
@@ -280,10 +286,7 @@ SCALELENGTHNAME=@BV:SCALELENGTHNAME@
 SIMLABEL=@BV:SIMLABEL@
 
 #Path to Reference Chain for Figure Construction 
-REFCHAIN=/net/home/fohlen13/stoelzner/kids1000_chains/all_chains/main_chains/cosebis/chain/output_multinest_C.txt
-
-#Statistic to compute 
-STATISTIC=cosebis
+REFCHAIN=/path/to/KiDS1000_data/chain/output_multinest_C.txt
 
 #Priors in cosmosis syntax
 #Priors: Omega_m*h^2
@@ -295,9 +298,7 @@ PRIOR_H0="0.64 0.68980 0.82"
 #Priors: n_s
 PRIOR_NS="0.84 0.96900 1.1"
 #Priors: S_8
-PRIOR_S8INPUT="0.1 0.77700 1.3"
-#Priors: sigma_8
-PRIOR_SIGMA8="0.1 0.77700 1.3"
+PRIOR_S8INPUT="0.5 0.77700 1.0"
 #Priors: Omega_K
 PRIOR_W="-1.0"
 PRIOR_OMEGAK="0.0"
@@ -308,24 +309,24 @@ PRIOR_WA="0.0"
 #Priors: m_nu
 PRIOR_MNU="0.06"
 #Priors: log(T_AGN)
-PRIOR_LOGTAGN="7.1 8.0 8.3"
+PRIOR_LOGTAGN="7.3 8.0 8.3"
 #Priors: Baryon feedback Amplitude A (HM2015)
 PRIOR_ABARY="2.0 2.6 3.13"
 
-#IA model choice: can be linear, linearz, massdep or tatt
-IAMODEL=linear
-#Linear IA model: Amplitude
+#IA model choice: can be linear, linear_z, massdep or tatt
+IAMODEL=massdep
+#Linear IA model: Amplitude 
 PRIOR_AIA="-6.0 1.0 6.0"
-#Linear-z model: IAMODEL=linearz
-#Linear-z IA model: Amplitude
+#Linear-z model: IAMODEL=linear_z
+#Linear-z IA model: Amplitude 
 PRIOR_A_IA="-6.0 1.0 6.0"
-#Linear-z IA model: B
+#Linear-z IA model: B 
 PRIOR_B_IA="gaussian -3.7 4.3"
-#Linear IA model: pivot scale factor
+#Linear IA model: pivot scale factor 
 PRIOR_A_PIV=0.769
 
-#Massdep IA model: IAMODEL=massdep A/Beta are controlled by the ia_models parameter files in /config/ia_models
-#Massdep IA model: pivot mass
+#Massdep IA model: IAMODEL=massdep A/Beta are controlled by the ia_models parameter files in /config/ia_models 
+#Massdep IA model: pivot mass 
 PRIOR_LOG10_M_PIV=13.5
 #Massdep IA model: mean mass bin 1
 PRIOR_LOG10_M_MEAN_1="gaussian 11.732 0.073"
@@ -340,22 +341,26 @@ PRIOR_LOG10_M_MEAN_5="gaussian 13.089 0.058"
 #Massdep IA model: mean mass bin 6
 PRIOR_LOG10_M_MEAN_6="gaussian 13.242 0.055"
 #Massdep IA model: red fraction bin 1
-PRIOR_F_R_1=0.158
+PRIOR_F_R_1=0.146
 #Massdep IA model: red fraction bin 2
-PRIOR_F_R_2=0.198
+PRIOR_F_R_2=0.197
 #Massdep IA model: red fraction bin 3
-PRIOR_F_R_3=0.206
+PRIOR_F_R_3=0.173
 #Massdep IA model: red fraction bin 4
-PRIOR_F_R_4=0.258
+PRIOR_F_R_4=0.240
 #Massdep IA model: red fraction bin 5
-PRIOR_F_R_5=0.207
+PRIOR_F_R_5=0.192
 #Massdep IA model: red fraction bin 6
-PRIOR_F_R_6=0.026
+PRIOR_F_R_6=0.030
+#massdep means
+MASSDEP_MEANS=@RUNROOT@/INSTALL/ia_models/mass_dependent_ia/massdep_means.txt
+#massdep covariance
+MASSDEP_COVARIANCE=@RUNROOT@/INSTALL/ia_models/mass_dependent_ia/massdep_cov.txt
 
 #Scale dependent model: IAMODEL=tatt
-#scale dep IA model: pivot z
+#scale dep IA model: pivot z 
 PRIOR_Z_PIV="0.62"
-#scale dep IA model: Amplitude 1
+#scale dep IA model: Amplitude 1 
 PRIOR_A1="-5.0 1.0 5.0"
 #scale dep IA model: Amplitude 2
 PRIOR_A2=0.0
@@ -363,7 +368,7 @@ PRIOR_A2=0.0
 PRIOR_ALPHA1=0.0
 #scale dep IA model: Alpha 2
 PRIOR_ALPHA2=0.0
-#scale dep IA model: Bias
+#scale dep IA model: Bias 
 PRIOR_BIAS_TA="-0.5 0.0 1.5"
 
 #Magnitude limits for the wide field sample (effective after weighting)
@@ -388,31 +393,6 @@ COVNCORES=@BV:NTHREADS@
 #Number of threads to use for Covariance Calculation
 COVNTHREADS=1
 
-
-#Survey Area in arcmin for the combined patches
-#SURVEYAREA_NS=3.12120e+06     #KiDS-1000
-#Survey Area in arcmin for the combined patches
-#SURVEYAREADEG_NS=867.0        #KiDS-1000
-#Survey Area in arcmin for the combined patches
-SURVEYAREA_NS=3.630254e+06    #KiDS-Legacy
-#Survey Area in arcmin for the combined patches
-SURVEYAREADEG_NS=1008.404     #KiDS-Legacy
-#Survey Area in arcmin for the combined patches
-SURVEYAREA_N=1.860461e+06    #KiDS-Legacy
-#Survey Area in arcmin for the combined patches
-SURVEYAREADEG_N=516.7947     #KiDS-Legacy
-#Survey Area in arcmin for the combined patches
-SURVEYAREA_S=1.784322e+06    #KiDS-Legacy
-#Survey Area in arcmin for the combined patches
-SURVEYAREADEG_S=495.6449     #KiDS-Legacy
-
-#Survey Mask File
-SURVEYMASKFILE_NS=/net/home/fohlen11/awright/KiDS/Legacy/Production/KiDS/mosaic_masks/healpix/KiDS_Legacy_NS_healpix_4096_frac.fits
-#Survey Area in arcmin for the combined patches
-SURVEYMASKFILE_N=/net/home/fohlen11/awright/KiDS/Legacy/Production/KiDS/mosaic_masks/healpix/KiDS_Legacy_N_healpix_4096_frac.fits
-#Survey Area in arcmin for the combined patches
-SURVEYMASKFILE_S=/net/home/fohlen11/awright/KiDS/Legacy/Production/KiDS/mosaic_masks/healpix/KiDS_Legacy_S_healpix_4096_frac.fits
-
 #Bin slop
 BINSLOP=1.5
 BINSLOPNN=""
@@ -424,5 +404,54 @@ SHAPECAL_CTERM=True
 #Multiple to include in Bmode significance computation (Ask Benjmain)
 MULT=1.0
 
+#Input Values for the Nz bias in each tomographic bin (SHOULD BE dz = EST - TRUTH)
+NZBIAS="0.000 +0.002 +0.013 +0.011 -0.006"               #KiDS-1000 
+
+#Decorrelated Values for the Nz bias in each tomographic bin
+NZBIAS_UNCORR=
+
+#Input Nz covariance matrix 
+NZCOVFILE=/path/to/KiDS1000_data/SOM_cov_multiplied.asc    #KiDS-1000
+
+#Number of cores to use for Covariance Calculation 
+COVNCORES=@BV:NTHREADS@
 
 
+#Survey Area in arcmin for the combined patches
+SURVEYAREA_NS=3.12120e+06     #KiDS-1000
+#Survey Area in arcmin for the combined patches
+SURVEYAREADEG_NS=867.0        #KiDS-1000
+
+#Survey Mask File 
+SURVEYMASKFILE_NS=
+#Survey Area in arcmin for the combined patches
+SURVEYMASKFILE_N=
+#Survey Area in arcmin for the combined patches
+SURVEYMASKFILE_S=
+
+#Bin slop 
+BINSLOP=1.5
+
+#Remove SNR-R-Z_B c-term during shape recalibration 
+SHAPECAL_CTERM=True
+
+#Multiple expansion factor for uncertainties, to include in Bmode significance computation
+MULT=1.0
+
+#Filename suffix for chain 
+CHAINSUFFIX=
+#Number of mock data vectors to analyse (empty if not required)
+NMOCKS=
+#Number of iterative-covariance iterations (empty if not required)
+ITERATION=
+#Filename for centers of patches for jackknife covariance (empty if not required)
+PATCH_CENTERFILE=
+
+#Data point in data vector to mask out (i.e. not use)(empty if not required)
+MASKDATAPOINT=
+
+#Tomographic bin to remove in chain (empty if not required)
+REMOVETOMOBIN=
+
+#Statistics to use for summary plot construction (if available) 
+SUMMARY_STATISTICS='cosebis bandpowers 2pcf'

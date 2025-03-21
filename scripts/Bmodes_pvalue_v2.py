@@ -76,11 +76,11 @@ def plot_bmodes(x_data, y_data, y_data_plot, y_error, cov, bin1_data, bin2_data,
             else:
                 ax[x,y].text(0.03, 0.01, 'p = %.2e'%p, horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
             if statistic == 'cosebis':
-                p_nmax5 = pvalue(y_data, cov,  mask=np.where((bin1_data==bin1+1) & (bin2_data==bin2+1) & (angbin<=5))[0], mult=factor)
-                if p_nmax5 > 1e-2:
-                    plt.text(0.03, 0.11, 'p = %.2f'%p_nmax5, color='blue', horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
+                p_nmax6 = pvalue(y_data, cov,  mask=np.where((bin1_data==bin1+1) & (bin2_data==bin2+1) & (angbin<=6))[0], mult=factor)
+                if p_nmax6 > 1e-2:
+                    plt.text(0.03, 0.11, 'p = %.2f'%p_nmax6, color='blue', horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
                 else:
-                    plt.text(0.03, 0.11, 'p = %.2e'%p_nmax5, color='blue', horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
+                    plt.text(0.03, 0.11, 'p = %.2e'%p_nmax6, color='blue', horizontalalignment='left', verticalalignment='bottom', transform = ax[x,y].transAxes)
             bincount+=1
     ax[0,0].set_xscale(xscale)
     fig.supylabel(ylabel)
@@ -94,11 +94,11 @@ def plot_bmodes(x_data, y_data, y_data_plot, y_error, cov, bin1_data, bin2_data,
             plt.text(0.90, 0.9, 'p = %.2e'%p, fontsize=14, transform=plt.gcf().transFigure, color='black', horizontalalignment='right')
         
         if statistic == 'cosebis':
-            p_nmax5 = pvalue(y_data, cov, mask = np.where(angbin <= 5)[0], mult=factor)
-            if p_nmax5 > 1e-2:
-                plt.text(0.90, 0.95, 'p = %.2f'%p_nmax5, fontsize=14, transform=plt.gcf().transFigure, color='blue', horizontalalignment='right')
+            p_nmax6 = pvalue(y_data, cov, mask = np.where(angbin <= 6)[0], mult=factor)
+            if p_nmax6 > 1e-2:
+                plt.text(0.90, 0.95, 'p = %.2f'%p_nmax6, fontsize=14, transform=plt.gcf().transFigure, color='blue', horizontalalignment='right')
             else:
-                plt.text(0.90, 0.95, 'p = %.2e'%p_nmax5, fontsize=14, transform=plt.gcf().transFigure, color='blue', horizontalalignment='right')
+                plt.text(0.90, 0.95, 'p = %.2e'%p_nmax6, fontsize=14, transform=plt.gcf().transFigure, color='blue', horizontalalignment='right')
     if mult:
         plt.savefig(outfile + '_mult_v2.pdf')
     else:

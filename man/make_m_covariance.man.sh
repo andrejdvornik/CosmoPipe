@@ -44,7 +44,7 @@ set -e
 function _inp_var { 
   #Variable inputs (leave blank if none)
   echo ALLPATCH BV:ANALYTIC_MCOV DATABLOCK BV:PATCHLIST PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH
-}
+} 
 #}}}
 
 # Input data {{{

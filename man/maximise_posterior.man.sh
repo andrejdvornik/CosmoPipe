@@ -44,14 +44,14 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLINDING BV:BLIND BV:BOLTZMAN BV:SAMPLER BV:STATISTIC DATABLOCK PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH SURVEY
+  echo BLINDING BLU BV:BLIND BV:BOLTZMAN BV:CHAINSUFFIX BV:ITERATION BV:NMOCKS BV:NTHREADS BV:SAMPLER BV:STATISTIC DATABLOCK DEF LOGPATH PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH SURVEY
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo 
+  echo cosmosis_nz nzcov
 } 
 #}}}
 

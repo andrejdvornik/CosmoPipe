@@ -42,7 +42,7 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BV:BOLTZMAN BV:MCMCINPUTFILE BV:STATISTIC DATABLOCK RUNROOT STORAGEPATH
+  echo BV:BOLTZMAN BV:MCMCINPUTFILE BV:NZCOVFILE BV:STATISTIC DATABLOCK RUNROOT STORAGEPATH
 } 
 #}}}
 
@@ -56,7 +56,7 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo mcmc_inp_@BV:STATISTIC@
+  echo mcmc_inp_@BV:STATISTIC@ nzcov
 } 
 #}}}
 

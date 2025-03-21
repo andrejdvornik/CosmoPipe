@@ -15,13 +15,14 @@ central_value () {
   fi
   echo $value
 }
-PRIOR_LOG10_M_MEAN_1=`central_value "@BV:PRIOR_LOG10_M_MEAN_1@"`
-PRIOR_LOG10_M_MEAN_2=`central_value "@BV:PRIOR_LOG10_M_MEAN_2@"`
-PRIOR_LOG10_M_MEAN_3=`central_value "@BV:PRIOR_LOG10_M_MEAN_3@"`
-PRIOR_LOG10_M_MEAN_4=`central_value "@BV:PRIOR_LOG10_M_MEAN_4@"`
-PRIOR_LOG10_M_MEAN_5=`central_value "@BV:PRIOR_LOG10_M_MEAN_5@"`
-PRIOR_LOG10_M_MEAN_6=`central_value "@BV:PRIOR_LOG10_M_MEAN_6@"`
-NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'` 
+# Uncorrelated massdep priors (deprecated)
+# PRIOR_LOG10_M_MEAN_1=`central_value "@BV:PRIOR_LOG10_M_MEAN_1@"`
+# PRIOR_LOG10_M_MEAN_2=`central_value "@BV:PRIOR_LOG10_M_MEAN_2@"`
+# PRIOR_LOG10_M_MEAN_3=`central_value "@BV:PRIOR_LOG10_M_MEAN_3@"`
+# PRIOR_LOG10_M_MEAN_4=`central_value "@BV:PRIOR_LOG10_M_MEAN_4@"`
+# PRIOR_LOG10_M_MEAN_5=`central_value "@BV:PRIOR_LOG10_M_MEAN_5@"`
+# PRIOR_LOG10_M_MEAN_6=`central_value "@BV:PRIOR_LOG10_M_MEAN_6@"`
+
 # f_r=""
 # logM=""
 # for i in `seq $NTOMO`
@@ -32,14 +33,26 @@ NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 #   logM="${logM} ${logM_centre}"
 # done
 
+NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'` 
 f_r="@BV:PRIOR_F_R_1@ @BV:PRIOR_F_R_2@ @BV:PRIOR_F_R_3@ @BV:PRIOR_F_R_4@ @BV:PRIOR_F_R_5@ @BV:PRIOR_F_R_6@"
 logM="${PRIOR_LOG10_M_MEAN_1} ${PRIOR_LOG10_M_MEAN_2} ${PRIOR_LOG10_M_MEAN_3} ${PRIOR_LOG10_M_MEAN_4} ${PRIOR_LOG10_M_MEAN_5} ${PRIOR_LOG10_M_MEAN_6}"
 
-@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/plot_ia_amplitude_posteriors.py \
+# Uncorrelated massdep priors (deprecated)
+# @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/plot_ia_amplitude_posteriors.py \
+#   --inputbase @STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/output_@BV:SAMPLER@_@BV:BLIND@ \
+#   --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/ \
+#   --f_r ${f_r} \
+#   --logM ${logM} \
+#   --logM_pivot @BV:PRIOR_LOG10_M_PIV@ \
+#   --a_pivot_zdep @BV:PRIOR_A_PIV@ \
+#   --weighted True
+
+#@PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/plot_ia_amplitude_posteriors_correlated.py \
+@P_RSCRIPT@ @RUNROOT@/@SCRIPTPATH@/plot_ia_amplitude_posteriors_correlated.R \
   --inputbase @STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/output_@BV:SAMPLER@_@BV:BLIND@ \
   --output_dir @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/plots/ \
   --f_r ${f_r} \
-  --logM ${logM} \
+  --massdep_cov @BV:MASSDEP_COVARIANCE@ \
   --logM_pivot @BV:PRIOR_LOG10_M_PIV@ \
   --a_pivot_zdep @BV:PRIOR_A_PIV@ \
   --weighted True

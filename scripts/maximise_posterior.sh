@@ -7,12 +7,12 @@ _message " >@BLU@ Status can be monitored in the logfile located here:\n@RED@ `l
 # Create output directory
 if [ ! -d @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/bestfit ]
 then 
-  mkdir @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/bestfit/
+  mkdir -p @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/bestfit/
 fi
 #Create the nz folder inside the covariance_inputs directory
 if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/biased_nz ]
 then 
-  mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/biased_nz/
+  mkdir -p @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/covariance_inputs/biased_nz/
 fi 
 
 BOLTZMAN="@BV:BOLTZMAN@"
@@ -46,7 +46,7 @@ then
   previous=`echo "$ITERATION" | awk '{printf "%d", $1-1}'`
   data_file_iterative=@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}${CHAINSUFFIX}_iteration_$ITERATION.fits
   inputchain=@RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/bestfit/bestfit${CHAINSUFFIX}_chain_iteration_${previous}.txt
-  MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/maximise_posterior.py \
+  MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=@BV:NTHREADS@ @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/maximise_posterior.py \
     --inputchain ${inputchain} \
     --inifile ${inifile} \
     --iteration ${ITERATION} \
@@ -60,7 +60,7 @@ elif [ -n "$NMOCKS" ] && [ "$NMOCKS" -eq "$NMOCKS" ]
 then
   if [ ! -d @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/bestfit/mock ]
   then 
-    mkdir @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/bestfit/mock/
+    mkdir -p @RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/bestfit/mock/
   fi
   for ((i=1; i <= @BV:NMOCKS@; i++)); do
   ( 
@@ -86,7 +86,7 @@ then
   done
 else
   inputchain=@RUNROOT@/@STORAGEPATH@/MCMC/output/@SURVEY@_@BLINDING@/@BV:BOLTZMAN@/@BV:STATISTIC@/chain/output_@BV:SAMPLER@_@BV:BLIND@${CHAINSUFFIX}.txt
-  MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/maximise_posterior.py \
+  MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=@BV:NTHREADS@ @PYTHON3BIN@ @RUNROOT@/@SCRIPTPATH@/maximise_posterior.py \
     --inputchain ${inputchain} \
     --inifile ${inifile} \
     --outputdir ${outputdir} \

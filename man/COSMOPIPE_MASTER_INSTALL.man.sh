@@ -107,3 +107,11 @@ function _existing_install_error {
   exit 1 
 } #}}}
 
+#Error for existing installation {{{
+function _runroot_error { 
+  VERBOSE=1 _message "${RED} ERROR:${DEF} Incorrect calling syntax (--runroot is required)${DEF}\n" 
+  VERBOSE=1 _message " > ${BLU} The master installation script should be run with the minimal set of options:${DEF}\n" 
+  VERBOSE=1 _message "    bash COSMOPIPE_MASTER_INSTALL.sh --runroot /path/to/desired/install/place/\n" 
+  trap : 0 
+  exit 1 
+} #}}}
