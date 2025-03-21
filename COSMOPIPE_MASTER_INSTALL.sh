@@ -161,7 +161,8 @@ then
   then 
     rm -fr cosmosis-standard-library
   fi
-  git clone https://github.com/joezuntz/cosmosis-standard-library.git >> gitclone_output.log 2>&1
+  git clone --single-branch -b two-point-one-point https://github.com/andrejdvornik/cosmosis-standard-library.git >> gitclone_output.log 2>&1
+  #git clone https://github.com/joezuntz/cosmosis-standard-library.git >> gitclone_output.log 2>&1
   _message "${BLU} - Done! ${DEF}\n"
   _message "   >${RED} Installing cosmosis-standard-library ${DEF}"
   #Replace the cpdef instances with cdef in classy.pyx
@@ -228,6 +229,35 @@ EOF
     rm -fr 2pt_stats
   fi
   git clone https://github.com/maricool/2pt_stats.git >> gitclone_output.log 2>&1
+  _message "${BLU} - Done! ${DEF}\n"
+  #}}}
+
+  #Clone the Halo Model repository {{{
+  _message "   >${RED} Cloning the Halo Model Git repository${DEF}"
+    #Clone the repository
+  if [ -d ${RUNROOT}/INSTALL/halo_model ]
+  then
+    rm -fr halo_model
+  fi
+  git clone https://github.com/KiDS-WL/halomodel_for_cosmosis.git >> gitclone_output.log 2>&1
+  _message "${BLU} - Done! ${DEF}\n"
+  #}}}
+
+  #Clone the Datavec Blinding repository {{{
+  _message "   >${RED} Cloning the Datavector Blinding Git repository${DEF}"
+  #Clone the repository
+  if [ -d ${RUNROOT}/INSTALL/legacy_blinding ]
+  then
+    rm -fr legacy_blinding
+  fi
+  git clone --single-branch -b kids https://github.com/andrejdvornik/legacy_blinding.git >> gitclone_output.log 2>&1
+  _message "${BLU} - Done! ${DEF}\n"
+  cat > blinding_make.sh <<-EOF
+cd legacy_blinding
+python -m pip install -e .
+cd ..
+EOF
+  conda run -n ${CONDAPIPENAME} bash blinding_make.sh > blinding_install_output.log 2>&1
   _message "${BLU} - Done! ${DEF}\n"
   #}}}
   
