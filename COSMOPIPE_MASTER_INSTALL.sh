@@ -162,6 +162,8 @@ then
     rm -fr cosmosis-standard-library
   fi
   git clone --single-branch -b two-point-one-point https://github.com/andrejdvornik/cosmosis-standard-library.git >> gitclone_output.log 2>&1
+  # The two-point-one-point branch has one-point function enabled and some further non-PR fixes to CAMB
+  # We will try to merge that with the oficial CSL, until then the rest of CSL is in sync!
   #git clone https://github.com/joezuntz/cosmosis-standard-library.git >> gitclone_output.log 2>&1
   _message "${BLU} - Done! ${DEF}\n"
   _message "   >${RED} Installing cosmosis-standard-library ${DEF}"
