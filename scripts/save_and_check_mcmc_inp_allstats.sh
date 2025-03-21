@@ -120,7 +120,7 @@ then
   --nz @DB:nz@ \
   --nmaxcosebis @BV:NMAXCOSEBIS@ \
   --nbandpowers @BV:NBANDPOWERS@ \
-  --nxipm @BV:XIPM@ \
+  --nxipm @BV:NXIPM@ \
   --ellmin @BV:LMINBANDPOWERS@ \
   --ellmax @BV:LMAXBANDPOWERS@ \
   --thetamin @BV:THETAMINXI@ \
@@ -142,7 +142,7 @@ then
     --nz @DB:nz@ \
     --nmaxcosebis @BV:NMAXCOSEBIS@ \
     --nbandpowers @BV:NBANDPOWERS@ \
-    --nxipm @BV:XIPM@ \
+    --nxipm @BV:NXIPM@ \
     --ellmin @BV:LMINBANDPOWERS@ \
     --ellmax @BV:LMAXBANDPOWERS@ \
     --thetamin @BV:THETAMINXI@ \

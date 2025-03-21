@@ -14,9 +14,9 @@ w_col: @WEIGHTNAME@
 
 # Define the binning.  Binning in TreeCorr uses bins that are equally spaced in log(r).
 # (i.e. Natural log, not log10.)  There are four parameters of which you may specify any 3.
-min_sep: @THETAMIN@    # The minimum separation that you want included.
-max_sep: @THETAMAX@    # The maximum separation that you want included.
-nbins: @NTHETABIN@     # The number of bins
+min_sep: @THETAMINXI@    # The minimum separation that you want included.
+max_sep: @THETAMAXXI@    # The maximum separation that you want included.
+nbins: @NTHETABINXI@     # The number of bins
 sep_units: arcmin
 bin_slop: 0.05
 
