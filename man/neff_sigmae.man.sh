@@ -44,8 +44,10 @@ set -e
 function _inp_var { 
   #Variable inputs (leave blank if none)
   list=''
-  for patch in @BV:PATCHLIST@ @ALLPATCH@ 
-  do 
+  patchlist=`_parse_blockvars @BV:PATCHLIST@`
+  allpatch=`_parse_blockvars @ALLPATCH@`
+  for patch in ${patchlist} ${allpatch}
+  do
     list="${list} BV:SURVEYAREA_${patch}"
   done
   echo ALLPATCH BLU BV:BLIND BV:E1NAME BV:E2NAME BV:WEIGHTNAME DATABLOCK DEF BV:PATCHLIST PYTHON3BIN RED RUNROOT SCRIPTPATH STORAGEPATH ${list}

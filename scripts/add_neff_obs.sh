@@ -19,7 +19,7 @@ NLENS="@BV:NSMFLENSBINS@"
 for inp in `seq ${NLENS}`
 do
   file=`echo ${filelist} | awk -v n=$inp '{print $n}'`
-  neff=`echo @NEFFLIST_OBS@ | awk -v n=$inp '{print $n}'`
+  neff=`echo @BV:NEFFLIST_OBS@ | awk -v n=$inp '{print $n}'`
   file=${file##*/}
   file=${file%.*}_neff.txt
   echo -n " ${neff} " > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/neff_obs/${file}

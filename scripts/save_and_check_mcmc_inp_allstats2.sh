@@ -245,7 +245,7 @@ then
   --ellmin_nn @BV:LMINBANDPOWERSNN@ \
   --ellmax_nn @BV:LMAXBANDPOWERSNN@ \
   --thetamin_nn @BV:THETAMINGT@ \
-  --thetamax_nn @BV:THETAMAXgt@ \
+  --thetamax_nn @BV:THETAMAXGT@ \
   --ntomo ${NTOMO} \
   --nlens ${NLENS} \
   --nobs ${NOBS} \
@@ -289,7 +289,7 @@ then
   --ellmin_nn @BV:LMINBANDPOWERSNN@ \
   --ellmax_nn @BV:LMAXBANDPOWERSNN@ \
   --thetamin_nn @BV:THETAMINGT@ \
-  --thetamax_nn @BV:THETAMAXgt@ \
+  --thetamax_nn @BV:THETAMAXGT@ \
   --ntomo ${NTOMO} \
   --nlens ${NLENS} \
   --nobs ${NOBS} \
@@ -334,7 +334,7 @@ else
       --ellmin_nn @BV:LMINBANDPOWERSNN@ \
       --ellmax_nn @BV:LMAXBANDPOWERSNN@ \
       --thetamin_nn @BV:THETAMINGT@ \
-      --thetamax_nn @BV:THETAMAXgt@ \
+      --thetamax_nn @BV:THETAMAXGT@ \
       --ntomo ${NTOMO} \
       --nlens ${NLENS} \
       --nobs ${NOBS} \
@@ -376,7 +376,7 @@ else
     --ellmin_nn @BV:LMINBANDPOWERSNN@ \
     --ellmax_nn @BV:LMAXBANDPOWERSNN@ \
     --thetamin_nn @BV:THETAMINGT@ \
-    --thetamax_nn @BV:THETAMAXgt@ \
+    --thetamax_nn @BV:THETAMAXGT@ \
     --ntomo ${NTOMO} \
     --nlens ${NLENS} \
     --nobs ${NOBS} \

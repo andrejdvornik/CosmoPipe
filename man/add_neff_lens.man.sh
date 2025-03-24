@@ -42,8 +42,8 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BV:NLENSBINS DATABLOCK NEFFLIST_LENS RUNROOT STORAGEPATH
-} 
+  echo BV:NLENSBINS BV:NEFFLIST_LENS DATABLOCK RUNROOT STORAGEPATH
+}
 #}}}
 
 # Input data {{{ 
