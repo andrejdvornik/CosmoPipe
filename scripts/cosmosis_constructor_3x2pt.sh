@@ -1075,6 +1075,7 @@ zmax_background = 6.0
 zmin_background = 0.0
 nz_background = 6000
 
+sample_S8 = True
 use_specific_k_modes = F
 ; otherwise it uses the k-modes the emulator is trained on
 kmin = 1e-5
