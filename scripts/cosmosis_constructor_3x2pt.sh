@@ -825,12 +825,12 @@ then
     ncombinations_obs=0
   fi
   
-  if [ "${STATISTIC^^}" == "2PCF" ]
-  then
-    ncombinations=$(($ncombinations_ee + $ncombinations_ee + $ncombinations_ne + $ncombinations_nn))
-  else
-    ncombinations=$(($ncombinations_ee + $ncombinations_ne + $ncombinations_nn))
-  fi
+  #if [ "${STATISTIC^^}" == "2PCF" ]
+  #then
+  #  ncombinations=$(($ncombinations_ee + $ncombinations_ee + $ncombinations_ne + $ncombinations_nn))
+  #else
+  #  ncombinations=$(($ncombinations_ee + $ncombinations_ne + $ncombinations_nn))
+  #fi
     
   if [[ .*\ $MODES\ .* =~ " OBS " ]]
   then
@@ -841,15 +841,15 @@ then
   
   if [ "${STATISTIC^^}" == "COSEBIS" ]
   then
-    ndat_=`echo "$ncombinations @BV:NMAXCOSEBIS@" | awk '{printf "%u", $1*$2 }'`
+    ndat_=`echo "$ncombinations_ee $ncombinations_ne $ncombinations_nn @BV:NMAXCOSEBIS@ @BV:NMAXCOSEBISNE@ @BV:NMAXCOSEBISNN@" | awk '{printf "%u", ($1*$4)+($2*$5)+($3*$6) }'`
     ndat=$(($ndat_ + $ndat_obs))
   elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
   then 
-	ndat_=`echo "$ncombinations @BV:NBANDPOWERS@" | awk '{printf "%u", $1*$2 }'`
+	ndat_=`echo "$ncombinations_ee $ncombinations_ne $ncombinations_nn @BV:NBANDPOWERS@ @BV:NBANDPOWERSNE@ @BV:NBANDPOWERSNN@" | awk '{printf "%u", ($1*$4)+($2*$5)+($3*$6) }'`
     ndat=$(($ndat_ + $ndat_obs))
   elif [ "${STATISTIC^^}" == "2PCF" ]
   then 
-	ndat_=`echo "$ncombinations @BV:NTHETAREBIN@" | awk '{printf "%u", $1*$2 }'`
+	ndat_=`echo "$ncombinations_ee $ncombinations_ne $ncombinations_nn @BV:NXIPM@ @BV:NGT@ @BV:NWT@" | awk '{printf "%u", ($1*$4)+($2*$5)+($3*$6) }'`
     ndat=$(($ndat_ + $ndat_obs))
   fi
   listparam="scale_cuts_output/theory#${ndat}"

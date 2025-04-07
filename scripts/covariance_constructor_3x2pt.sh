@@ -120,8 +120,8 @@ then
     n_arb_ee=@BV:NBANDPOWERS@
     theta_lo_lensing=`echo 'e(l(@BV:THETAMINXI@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
     theta_up_lensing=`echo 'e(l(@BV:THETAMAXXI@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-    t_lo=`printf "%.2f" $theta_lo`
-    t_up=`printf "%.2f" $theta_up`
+    t_lo=`printf "%.2f" $theta_lo_lensing`
+    t_up=`printf "%.2f" $theta_up_lensing`
     arb_fourier_filter_mmE_file_@BV:STATISTIC@="fourier_weight_bandpowers_mmE_${t_lo}-${t_up}_?.table"
     arb_fourier_filter_mmB_file_@BV:STATISTIC@="fourier_weight_bandpowers_mmB_${t_lo}-${t_up}_?.table"
     arb_real_filter_mm_p_file_@BV:STATISTIC@="real_weight_bandpowers_mmE_${t_lo}-${t_up}_?.table"
@@ -137,8 +137,8 @@ then
     n_arb_ne=@BV:NBANDPOWERSNE@
     theta_lo_clustering=`echo 'e(l(@BV:THETAMINGT@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
     theta_up_clustering=`echo 'e(l(@BV:THETAMAXGT@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-    t_lo=`printf "%.2f" $theta_lo`
-    t_up=`printf "%.2f" $theta_up`
+    t_lo=`printf "%.2f" $theta_lo_clustering`
+    t_up=`printf "%.2f" $theta_up_clustering`
     arb_fourier_filter_gm_file_@BV:STATISTIC@="fourier_weight_bandpowers_gm_${t_lo}-${t_up}_?.table"
     arb_real_filter_gm_file_@BV:STATISTIC@="real_weight_bandpowers_gm_${t_lo}-${t_up}_?.table"
   else
@@ -152,8 +152,8 @@ then
     n_arb_nn=@BV:NBANDPOWERSNN@
     theta_lo_clustering=`echo 'e(l(@BV:THETAMINWT@)+@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
     theta_up_clustering=`echo 'e(l(@BV:THETAMAXWT@)-@BV:APODISATIONWIDTH@/2)' | bc -l | awk '{printf "%.9f", $0}'`
-    t_lo=`printf "%.2f" $theta_lo`
-    t_up=`printf "%.2f" $theta_up`
+    t_lo=`printf "%.2f" $theta_lo_clustering`
+    t_up=`printf "%.2f" $theta_up_clustering`
     arb_fourier_filter_gg_file_@BV:STATISTIC@="fourier_weight_bandpowers_gg_${t_lo}-${t_up}_?.table"
     arb_real_filter_gg_file_@BV:STATISTIC@="real_weight_bandpowers_gg_${t_lo}-${t_up}_?.table"
   else
@@ -275,7 +275,7 @@ bias_Mmin=9.0,13.0
 bias_Mmax=13.0
 
 # Check if the arbitrary input files exist and copy to input directory
-use_arbitrary=False
+use_arbitrary=True #False
 if [[ .*\ $MODES\ .* =~ " EE " ]]
 then
   for i in $(seq -f "%02g" 1 $n_arb_ee)
@@ -287,7 +287,7 @@ then
     arb_base=@RUNROOT@/@CONFIGPATH@/covariance_arb_summary/
     if [ ! -f $arb_base${file} ] || [ ! -f $arb_base${file2} ] || [ ! -f $arb_base${file3} ] || [ ! -f $arb_base${file4} ]
     then
-      use_arbitrary=False
+      #use_arbitrary=False
       _message "One or more arbitrary input files do not exist. Calculating filters on the fly!\n"
       break
     else
@@ -304,7 +304,7 @@ then
     arb_base=@RUNROOT@/@CONFIGPATH@/covariance_arb_summary/
     if [ ! -f $arb_base${file} ] || [ ! -f $arb_base${file2} ]
     then
-      use_arbitrary=False
+      #use_arbitrary=False
       _message "One or more arbitrary input files do not exist. Calculating filters on the fly!\n"
       break
     else
@@ -321,7 +321,7 @@ then
     arb_base=@RUNROOT@/@CONFIGPATH@/covariance_arb_summary/
     if [ ! -f $arb_base${file} ] || [ ! -f $arb_base${file2} ]
     then
-      use_arbitrary=False
+      #use_arbitrary=False
       _message "One or more arbitrary input files do not exist. Calculating filters on the fly!\n"
       break
     else
@@ -582,7 +582,7 @@ mix_term_do_ec = False
 mix_term_subsample = 1 
 mix_term_nsubr = 7 
 mix_term_file_path_save_triplets = @RUNROOT@/INSTALL/OneCovariance/input/catalogue_mixed/tripletcounts_legacy.fits
-mix_term_file_path_load_triplets = /net/home/fohlen13/reischke/Git/OneCovariance/input/catalogue_mixed/legacytriplets.fits
+mix_term_file_path_load_triplets = @RUNROOT@/INSTALL/OneCovariance/input/catalogue_mixed/legacytriplets.fits
 
 EOF
 else
@@ -889,7 +889,7 @@ then
         arb_base=@RUNROOT@/@CONFIGPATH@/covariance_arb_summary/
         if [ ! -f $arb_base${file} ] || [ ! -f $arb_base${file2} ] || [ ! -f $arb_base${file3} ] || [ ! -f $arb_base${file4} ]
         then
-          use_arbitrary=False
+          #use_arbitrary=False
           _message "One or more arbitrary input files do not exist. Calculating filters on the fly!\n"
           break
         else
@@ -906,7 +906,7 @@ then
         arb_base=@RUNROOT@/@CONFIGPATH@/covariance_arb_summary/
         if [ ! -f $arb_base${file} ] || [ ! -f $arb_base${file2} ]
         then
-          use_arbitrary=False
+          #use_arbitrary=False
           _message "One or more arbitrary input files do not exist. Calculating filters on the fly!\n"
           break
         else
@@ -923,7 +923,7 @@ then
         arb_base=@RUNROOT@/@CONFIGPATH@/covariance_arb_summary/
         if [ ! -f $arb_base${file} ] || [ ! -f $arb_base${file2} ]
         then
-          use_arbitrary=False
+          #use_arbitrary=False
           _message "One or more arbitrary input files do not exist. Calculating filters on the fly!\n"
           break
         else
