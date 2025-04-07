@@ -33,7 +33,8 @@ class TwoPointBuilder:
                   prefix_Flinc=None,
                   prefix_CosmoSIS=None,
                   verbose=True,
-                  nnAuto=False):
+                  nnAuto=False,
+                  smbinAuto=True):
     
         ## File prefixes
         self.prefix_Flinc    = 'data/mockFootprint/' if prefix_Flinc is None else prefix_Flinc
@@ -76,6 +77,7 @@ class TwoPointBuilder:
         self.nbModes_nn   = nbModes_nn
 
         self.nnAuto     = nnAuto
+        self.smbinAuto  = smbinAuto
         self.verbose    = verbose
         self.mean       = None
         self.cov        = None
@@ -586,41 +588,50 @@ class TwoPointBuilder:
                 Pnn  = True if labConv.P_nn == stat else False
                 Psi_gg = True if labConv.Psi_gg == stat else False
                 if wTh:
-                    ind_nn = []
-                    for i in range(self.nbTomoN):
-                        for j in range(i, self.nbTomoN):
-                            if self.nnAuto:
-                                if i==j:
+                    if not self.smbinAuto:
+                        ind_nn = []
+                        for i in range(self.nbTomoN):
+                            for j in range(i, self.nbTomoN):
+                                if self.nnAuto:
+                                    if i==j:
+                                        ind_nn += [True]*self.N_theta_nn
+                                    else:
+                                        ind_nn += [False]*self.N_theta_nn
+                                else:
                                     ind_nn += [True]*self.N_theta_nn
-                                else:
-                                    ind_nn += [False]*self.N_theta_nn
-                            else:
-                                ind_nn += [True]*self.N_theta_nn
-                    ind += ind_nn
+                        ind += ind_nn
+                    else:
+                        ind += [wTh]*self.N_theta_nn*self.__nbPairsNN
                 if Pnn:
-                    ind_nn = []
-                    for i in range(self.nbTomoN):
-                        for j in range(i, self.nbTomoN):
-                            if self.nnAuto:
-                                if i==j:
+                    if not self.smbinAuto:
+                        ind_nn = []
+                        for i in range(self.nbTomoN):
+                            for j in range(i, self.nbTomoN):
+                                if self.nnAuto:
+                                    if i==j:
+                                        ind_nn += [True]*self.N_ell_nn
+                                    else:
+                                        ind_nn += [False]*self.N_ell_nn
+                                else:
                                     ind_nn += [True]*self.N_ell_nn
-                                else:
-                                    ind_nn += [False]*self.N_ell_nn
-                            else:
-                                ind_nn += [True]*self.N_ell_nn
-                    ind += ind_nn
+                        ind += ind_nn
+                    else:
+                        ind += [Pnn]*self.N_ell_nn*self.__nbPairsNN
                 if Psi_gg:
-                    ind_nn = []
-                    for i in range(self.nbTomoN):
-                        for j in range(i, self.nbTomoN):
-                            if self.nnAuto:
-                                if i==j:
-                                    ind_nn += [True]*self.nbModes_nn
+                    if not self.smbinAuto:
+                        ind_nn = []
+                        for i in range(self.nbTomoN):
+                            for j in range(i, self.nbTomoN):
+                                if self.nnAuto:
+                                    if i==j:
+                                        ind_nn += [True]*self.nbModes_nn
+                                    else:
+                                        ind_nn += [False]*self.nbModes_nn
                                 else:
-                                    ind_nn += [False]*self.nbModes_nn
-                            else:
-                                ind_nn += [True]*self.nbModes_nn
-                    ind += ind_nn
+                                    ind_nn += [True]*self.nbModes_nn
+                        ind += ind_nn
+                    else:
+                        ind += [Psi_gg]*self.nbModes_nn*self.__nbPairsNN
         
             if self.nbTomoN > 0 and self.nbTomoG > 0:
                 gT  = True if labConv.gamma_t == stat else False
@@ -973,6 +984,7 @@ def saveFitsTwoPoint(
         N_ell_nn=8, ell_min_nn=100, ell_max_nn=1500,
         nbModes_nn=5,
         nnAuto=False,
+        smbinAuto=True,
         prefix_Flinc=None,
         prefix_CosmoSIS=None,
         scDict={},
@@ -998,6 +1010,7 @@ def saveFitsTwoPoint(
         N_ell_nn=N_ell_nn, ell_min_nn=ell_min_nn, ell_max_nn=ell_max_nn,
         nbModes_nn=nbModes_nn,
         nnAuto=nnAuto,
+        smbinAuto=smbinAuto,
         prefix_Flinc=prefix_Flinc,
         prefix_CosmoSIS=prefix_CosmoSIS
     )
