@@ -595,7 +595,7 @@ class TwoPointBuilder:
                                 else:
                                     ind_nn += [False]*self.N_theta_nn
                             else:
-                                ind_nn += [True]*self.N_theta
+                                ind_nn += [True]*self.N_theta_nn
                     ind += ind_nn
                 if Pnn:
                     ind_nn = []
