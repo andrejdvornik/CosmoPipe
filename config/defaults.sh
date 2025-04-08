@@ -67,6 +67,9 @@ NTHREADS=180
 #Nz delta-z stepsize (Default is KiDS-Legacy)
 NZSTEP=0.05
 
+#Nz delta-z stepsize for lenses (Default is KiDS-Legacy)
+NZSTEP_LENS=0.01
+
 #Number of spatial splits  (Default is SKILLS)
 NSPLIT=5
 #Number of spatial splits to retain (Default is SKILLS)
@@ -91,8 +94,10 @@ MBIASCORR=0.99
 #List of sigmae values (Default is KiDS-1000 Asgari+ 2021)
 SIGMAELIST="0.270 0.258 0.273 0.254 0.270"                      #KiDS-1000
 
-#Limits of the tomographic bins (Default is KiDS-1000)
-TOMOLIMS='0.1 0.3 0.5 0.7 0.9 1.2'                        #KiDS-1000
+#Limits of the tomographic bins (Default is KiDS-Legacy)
+#TOMOLIMS='0.1 0.3 0.5 0.7 0.9 1.2'                        #KiDS-1000
+#Limits of the tomographic bins (Default is KiDS-Legacy)
+TOMOLIMS='0.10 0.42 0.58 0.71 0.90 1.14 2.00'                        #KiDS-Legacy
 
 #Variable used to define tomographic bins (Default is KiDS-Legacy)
 TOMOVAR=Z_B
@@ -157,6 +162,8 @@ NZNAME_BASEBLOCK=som_weight_calib_cats
 
 #Name of the base file for cosmosis/onecov
 NPAIRBASE_XI=XI_@BV:SURVEY@_NScomb        #Use the combined XIpm counts as fiducial
+NPAIRBASE_GT=GT_@BV:SURVEY@_NScomb        #Use the combined XIpm counts as fiducial
+NPAIRBASE_WT=WT_@BV:SURVEY@_NScomb        #Use the combined XIpm counts as fiducial
 
 #Statistic of choice for chain (Default is KiDS-Legacy fiducial)
 STATISTIC=cosebis
@@ -234,7 +241,7 @@ LMAXCOV=10000
 SECONDSTATISTIC=""
 
 #String which determines type of bandpowers correlation function (EE,NE,NN) (shear, GGL, clustering)
-BANDPOWERMODE='EE'
+MODE='EE'
 #Number of Bandpowers for EE
 NBANDPOWERS=8
 #Minimum of ell bins for bandpowers computation for EE
@@ -314,9 +321,6 @@ RNAME=R
 
 #Label for simulation tiles 
 SIMLABEL=tile_label
-
-#Sampler name 
-SAMPLER=multinest
 
 #Scale-length variable column name 
 SCALELENGTHNAME=@BV:SCALELENGTHNAME@
@@ -443,18 +447,8 @@ SHAPECAL_CTERM=True
 #Multiple to include in Bmode significance computation (Ask Benjmain)
 MULT=1.0
 
-#Input Values for the Nz bias in each tomographic bin (SHOULD BE dz = EST - TRUTH)
-NZBIAS="0.000 +0.002 +0.013 +0.011 -0.006"               #KiDS-1000 
-
 #Decorrelated Values for the Nz bias in each tomographic bin
 NZBIAS_UNCORR=
-
-#Input Nz covariance matrix 
-NZCOVFILE=/path/to/KiDS1000_data/SOM_cov_multiplied.asc    #KiDS-1000
-
-#Number of cores to use for Covariance Calculation 
-COVNCORES=@BV:NTHREADS@
-
 
 #Survey Area in arcmin for the combined patches
 SURVEYAREA_NS=3.12120e+06     #KiDS-1000
@@ -468,14 +462,10 @@ SURVEYMASKFILE_N=
 #Survey Area in arcmin for the combined patches
 SURVEYMASKFILE_S=
 
-#Bin slop 
-BINSLOP=1.5
 
 #Remove SNR-R-Z_B c-term during shape recalibration 
 SHAPECAL_CTERM=True
 
-#Multiple expansion factor for uncertainties, to include in Bmode significance computation
-MULT=1.0
 
 #Filename suffix for chain 
 CHAINSUFFIX=
@@ -494,3 +484,54 @@ REMOVETOMOBIN=
 
 #Statistics to use for summary plot construction (if available) 
 SUMMARY_STATISTICS='cosebis bandpowers 2pcf'
+
+
+# 3x2pt bright setting
+# Input LePhare cosmology
+H0_IN=1.0
+OMEGAM_IN=0.3
+OMEGAV_IN=0.7
+  
+# Some limits for SMF function
+MAXMASS=12.1
+MINMASS=7.0
+MAXZ=0.7
+MINZ=0.0
+
+# Lens photo-z properties for stacked n(z)
+STACKED_NZ="True"
+ZSIGMA=0.018
+ZDEPERR="True"
+  
+# Default lens binning in stellar mass
+LENSLIMSX="9.1 9.6 9.95 10.25 10.5 10.7 11.3"
+LENSLIMSY="0.0 1.0"
+  
+# One SMF bin
+SMFLENSLIMSX="7.0 12.5"
+SMFLENSLIMSY="0.0 0.7"
+NSMFBINS=30
+
+# lens catalogue (default is Bright)
+LENSMAINCAT=/net/home/fohlen13/dvornik/lephare_bright_stellarmasses/absmag_ugriZYJHKs/bright_DR4_NS.fits
+LENSRANAME=RAJ2000
+LENSDECNAME=DECJ2000
+LENSWEIGHTNAME=None
+
+# lens randoms (default is Bright)
+RANDMAINCAT=/net/home/fohlen13/dvornik/random_cats/bright_randoms/ANNzBright_match_100A_randoms.fits
+RANDRANAME=RA
+RANDDECNAME=DEC
+  
+# 3x2pt values and priors file
+VALUESINI=/net/home/fohlen13/dvornik/CosmoPipe_runs/values.ini
+PRIORSINI=/net/home/fohlen13/dvornik/CosmoPipe_runs/priors.ini
+
+# Default modes for 3x2pt + SMF
+MODES="EE NE NN OBS"
+
+# Quantities needed to create red/blue statistics for IA halo model
+IA_OBSERVABLE=mstar_bestfit
+IA_OBSERVABLE_LOG=False
+IA_SPLIT=T_B
+IA_SPLIT_VAL=3.0

@@ -801,7 +801,7 @@ then
     then
       if [[ .*\ $MODES\ .* =~ " EE " ]]
       then
-        n_arb_ee2=@BV:NTHETAREBIN@
+        n_arb_ee2=@BV:NXIPM@
         arb_fourier_filter_mmE_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
         arb_fourier_filter_mmB_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_mm_m_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
         arb_real_filter_mm_p_file_@BV:SECONDSTATISTIC@="real_weight_realspace_cf_mm_p_@BV:THETAMINXI@-@BV:THETAMAXXI@_?.table"
@@ -809,13 +809,13 @@ then
       fi
       if [[ .*\ $MODES\ .* =~ " NE " ]]
       then
-        n_arb_ne2=@BV:NTHETAREBIN@
+        n_arb_ne2=@BV:NGT@
         arb_fourier_filter_gm_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_gm_@BV:THETAMINGT@-@BV:THETAMAXGT@_?.table"
         arb_real_filter_gm_file_@BV:SECONDSTATISTIC@="real_weight_realspace_cf_gm_@BV:THETAMINGT@-@BV:THETAMAXGT@_?.table"
       fi
       if [[ .*\ $MODES\ .* =~ " NN " ]]
       then
-        n_arb_nn2=@BV:NTHETAREBIN@
+        n_arb_nn2=@BV:NWT@
         arb_fourier_filter_gg_file_@BV:SECONDSTATISTIC@="fourier_weight_realspace_cf_gg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
         arb_real_filter_gg_file_@BV:SECONDSTATISTIC@="real_weight_realspace_cf_gg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
       fi
@@ -831,13 +831,13 @@ then
       fi
       if [[ .*\ $MODES\ .* =~ " NE " ]]
       then
-        n_arb_ne2=@BV:NMAXCOSEBIS@
+        n_arb_ne2=@BV:NMAXCOSEBISNE@
         arb_fourier_filter_gm_file_@BV:SECONDSTATISTIC@="Qgm_@BV:THETAMINGT@-@BV:THETAMAXGT@_?.table"
         arb_real_filter_gm_file_@BV:SECONDSTATISTIC@="Wn_psigm_@BV:THETAMINGT@-@BV:THETAMAXGT@_?.table"
       fi
       if [[ .*\ $MODES\ .* =~ " NN " ]]
       then
-        n_arb2_nn=@BV:NMAXCOSEBIS@
+        n_arb2_nn=@BV:NMAXCOSEBISNN@
         arb_fourier_filter_gg_file_@BV:SECONDSTATISTIC@="Ugg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
         arb_real_filter_gg_file_@BV:SECONDSTATISTIC@="Wn_psigg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
       fi

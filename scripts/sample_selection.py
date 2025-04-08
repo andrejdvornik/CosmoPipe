@@ -149,7 +149,7 @@ if __name__ == '__main__':
         details['x_data_name'] = stellar_mass_column
         details['y_data_name'] = z_column
         if stacked_nz:
-            centers = np.arange(0.0, 6.0, step=nz_step)
+            centers = np.arange(0.0, 1.0, step=nz_step)
             nz_tot = np.zeros_like(centers)
             #nz = create_nz(centers, np.nan_to_num(y_data), z_sigma, z_dependent_error)
             #np.savetxt(f'{outpath}/nz_tot.txt', np.column_stack([centers, nz]), header='binstart, density')
@@ -165,7 +165,7 @@ if __name__ == '__main__':
         details['x_data_name'] = z_column
         details['y_data_name'] = stellar_mass_column
         if stacked_nz:
-            centers = np.arange(0.0, 6.0, step=nz_step)
+            centers = np.arange(0.0, 1.0, step=nz_step)
             nz_tot = np.zeros_like(centers)
             #nz = create_nz(centers, np.nan_to_num(x_data), z_sigma, z_dependent_error)
             #np.savetxt(f'{outpath}/nz_tot.txt', np.column_stack([centers, nz]), header='binstart, density')
@@ -224,7 +224,7 @@ if __name__ == '__main__':
                     details['slice_in'] = 'obs'
                     details['f_tomo'] = len(x_data[idx])/len(x_data[idx00])
                     if stacked_nz:
-                        centers = np.arange(0.0, 6.0, step=nz_step)
+                        centers = np.arange(0.0, 1.0, step=nz_step)
                         nz = create_nz(centers, y_data[idx], z_sigma, z_dependent_error)
                         nz_tot += nz
                         np.savetxt(f'{outname_nz}{count+1}.txt', np.column_stack([centers, nz]), header='binstart, density')
@@ -234,7 +234,7 @@ if __name__ == '__main__':
                     details['slice_in'] = 'z'
                     details['f_tomo'] = len(y_data[idx])/len(y_data[idx00])
                     if stacked_nz:
-                        centers = np.arange(0.0, 6.0, step=nz_step)
+                        centers = np.arange(0.0, 1.0, step=nz_step)
                         nz = create_nz(centers, x_data[idx], z_sigma, z_dependent_error)
                         nz_tot += nz
                         np.savetxt(f'{outname_nz}{count+1}.txt', np.column_stack([centers, nz]), header='binstart, density')
@@ -328,7 +328,7 @@ if __name__ == '__main__':
                     details['slice_in'] = 'obs'
                     details['f_tomo'] = len(x_data[idx])/len(x_data[idx00])
                     if stacked_nz:
-                        centers = np.arange(0.0, 6.0, step=nz_step)
+                        centers = np.arange(0.0, 1.0, step=nz_step)
                         nz = create_nz(centers, y_data[idx], z_sigma, z_dependent_error)
                         nz_tot += nz
                         np.savetxt(f'{outname_nz}{count+1}.txt', np.column_stack([centers, nz]), header='binstart, density')
@@ -338,7 +338,7 @@ if __name__ == '__main__':
                     details['slice_in'] = 'z'
                     details['f_tomo'] = len(y_data[idx])/len(y_data[idx00])
                     if stacked_nz:
-                        centers = np.arange(0.0, 6.0, step=nz_step)
+                        centers = np.arange(0.0, 1.0, step=nz_step)
                         nz = create_nz(centers, x_data[idx], z_sigma, z_dependent_error)
                         nz_tot += nz
                         np.savetxt(f'{outname_nz}{count+1}.txt', np.column_stack([centers, nz]), header='binstart, density')

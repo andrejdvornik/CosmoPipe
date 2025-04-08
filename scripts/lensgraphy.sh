@@ -159,7 +159,7 @@ MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 \
   --stacked_nz ${stacked_nz} \
   --z_dependent_error @BV:ZDEPERR@ \
   --z_sigma @BV:ZSIGMA@ \
-  --nz_step @BV:NZSTEP@ 2>&1
+  --nz_step @BV:NZSTEP_LENS@ 2>&1
 _message " - @RED@Done! (`date +'%a %H:%M'`)@DEF@\n"
 
 _write_blockvars "N${prefix^^}LENSBINS" `awk '{print $2}' @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/${append_prefix}lens_cats_metadata/nbins.txt`
