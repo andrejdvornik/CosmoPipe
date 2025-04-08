@@ -425,11 +425,11 @@ MAGLIMIT_FILTER="r"
 #Input Values for the Nz bias in each tomographic bin (SHOULD BE dz = EST - TRUTH)
 #NZBIAS="0.000 +0.002 +0.013 +0.011 -0.006"               #KiDS-1000
 #NZBIAS="0.000 +0.002 +0.013 +0.011 -0.006"               #SSL KiDS-1000
-NZBIAS="-0.0258348876411008 0.0134629476830202 -0.00130607068876168 0.00825655331002634 -0.0112282260145437 -0.0541954439985493" #KiDS-Legacy Blinded_v2/Legacy_fiducial_v2
+NZBIAS="-0.0258348876411008 0.0134629476830202 -0.00130607068876168 0.00825655331002634 -0.0112282260145437 -0.0541954439985493" #KiDS-Legacy
 
 #Input Nz covariance matrix
 #NZCOVFILE=/net/home/fohlen13/stoelzner/Cat_to_Obs_K1000_P1/data/kids/nofz/SOM_cov_multiplied.asc    #KiDS-1000
-NZCOVFILE=/net/home/fohlen14/awright/KiDS/Legacy/CosmicShear/Blinded_v2/work_Legacy_fiducial_v2/CosmoPipe_DataBlock/nzcov/Nz_covariance.txt
+NZCOVFILE=/path/to/legacy/Nz_covariance.txt
 
 #Number of cores to use for Covariance Calculation
 COVNCORES=@BV:NTHREADS@
@@ -513,19 +513,19 @@ SMFLENSLIMSY="0.0 0.7"
 NSMFBINS=30
 
 # lens catalogue (default is Bright)
-LENSMAINCAT=/net/home/fohlen13/dvornik/lephare_bright_stellarmasses/absmag_ugriZYJHKs/bright_DR4_NS.fits
+LENSMAINCAT=/path/to/bright/cat.fits
 LENSRANAME=RAJ2000
 LENSDECNAME=DECJ2000
 LENSWEIGHTNAME=None
 
 # lens randoms (default is Bright)
-RANDMAINCAT=/net/home/fohlen13/dvornik/random_cats/bright_randoms/ANNzBright_match_100A_randoms.fits
+RANDMAINCAT=/path/to/bright/randoms.fits
 RANDRANAME=RA
 RANDDECNAME=DEC
   
 # 3x2pt values and priors file
-VALUESINI=/net/home/fohlen13/dvornik/CosmoPipe_runs/values.ini
-PRIORSINI=/net/home/fohlen13/dvornik/CosmoPipe_runs/priors.ini
+VALUESINI=/path/to/3x2pt/values.ini
+PRIORSINI=/path/to/3x2pt/priors.ini
 
 # Default modes for 3x2pt + SMF
 MODES="EE NE NN OBS"
