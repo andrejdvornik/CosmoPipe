@@ -244,20 +244,21 @@ if __name__ == '__main__':
     
                 if random:
                     print('\nApplying selection to randoms...')
-                    """
+                    #"""
                     random_in = fits.open(args.file_rand, memmap=True)
                     randoms = random_in[1].data
                     
                     index = np.in1d(randoms['clone_ID'].astype(bytes), data_out['ID'])
                 
-                    rand_out = np.copy(randoms[np.where(randoms[index])])#[::3]) # remove every 3nd after testing
+                    rand_out = np.copy(randoms[np.where(randoms[index])][::10]) # remove every 3nd after testing
                     num_col = np.arange(len(rand_out['clone_ID']))
                 
                     cols_rand = fits.ColDefs(rand_out)
                     num = fits.Column(name='UNIQUEID', format='J', array=num_col)
                     hdu = fits.BinTableHDU.from_columns(cols_rand + num)
-                    """
-                    subprocess.call(['ln', '-sf', args.file_rand, f'{outname_rand}{count+1}_rand.fits'])
+                    hdu.writeto(f'{outname_rand}{count+1}_rand.fits', overwrite=True)
+                    #"""
+                    #subprocess.call(['ln', '-sf', args.file_rand, f'{outname_rand}{count+1}_rand.fits'])
                 count += 1
                 
     if not volume_limited:
@@ -349,19 +350,20 @@ if __name__ == '__main__':
     
                 if random:
                     print('\nApplying selection to randoms...')
-                    """
+                    #"""
                     random_in = fits.open(args.file_rand, memmap=True)
                     randoms = random_in[1].data
                     index = np.in1d(randoms['clone_ID'].astype(bytes), data_out['ID'])
                 
-                    rand_out = np.copy(randoms[np.where(randoms[index])])#[::3]) # remove every 3nd after testing
+                    rand_out = np.copy(randoms[np.where(randoms[index])][::10]) # remove every 3nd after testing
                     num_col = np.arange(len(rand_out['clone_ID']))
                 
                     cols_rand = fits.ColDefs(rand_out)
                     num = fits.Column(name='UNIQUEID', format='J', array=num_col)
                     hdu = fits.BinTableHDU.from_columns(cols_rand + num)
-                    """
-                    subprocess.call(['ln', '-sf', args.file_rand, f'{outname_rand}{count+1}_rand.fits'])
+                    hdu.writeto(f'{outname_rand}{count+1}_rand.fits', overwrite=True)
+                    #"""
+                    #subprocess.call(['ln', '-sf', args.file_rand, f'{outname_rand}{count+1}_rand.fits'])
                 count += 1
             
             
