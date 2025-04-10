@@ -52,14 +52,13 @@ if __name__ == '__main__':
     hdul = fits.open(catalogue, memmap=True)
     hdul[1].header
     
-    df = hdul[1].data
-    
+    df = hdul['OBJECTS'].data
     df_obs = df[observable]
     
     # For the moment we use a cut in the u-r absolute color vs redshift
     if len(split_tag) == 1:
-        df_split = df[split_tag]
-        plot_tag = split_tag
+        df_split = df[split_tag[0]]
+        plot_tag = split_tag[0]
     if len(split_tag) == 2:
         df_split = df[split_tag[0]] - df[split_tag[1]]
         plot_tag = split_tag[0] + '-' + split_tag[1]
