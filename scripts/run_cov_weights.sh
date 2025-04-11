@@ -127,10 +127,10 @@ then
   if [ "${STATISTIC^^}" == "2PCF" ]
   then
     _message "    -> @BLU@Generating arbitrary statistic weights for 2pcfs @DEF@"
-    @PYTHON3BIN@ @RUNROOT@/INSTALL/OneCovariance/input/script_weights/get_weights_realspace.py \
+    @PYTHON3BIN@ @RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/script_weights/get_weights_realspace.py \
       -n @BV:NTHREADS@ \
-      -nf 1e5 \
-      -nt 1e5 \
+      -nf 100000 \
+      -nt 100000 \
       --theta_lo_mm @BV:THETAMINXI@ \
       --theta_up_mm @BV:THETAMAXXI@ \
       --t_bins_mm @BV:NXIPM@ \
@@ -142,17 +142,18 @@ then
       --theta_lo_gg @BV:THETAMINWT@\
       --theta_up_gg @BV:THETAMAXWT@\
       --t_bins_gg @BV:NWT@ \
-      --t_type_gg "log" 2>&1
+      --t_type_gg "log" \
+      --output_path "${outfold}" 2>&1
   
-    cp -a @RUNROOT@/INSTALL/OneCovariance/input/rcf/. ${outfold}
+    #cp -a @RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/rcf/. ${outfold}
   
   elif [ "${STATISTIC^^}" == "COSEBIS" ]
   then
     _message "    -> @BLU@Generating arbitrary statistic weights for cosebis / psi stats @DEF@"
-    @PYTHON3BIN@ @RUNROOT@/INSTALL/OneCovariance/input/script_weights/get_weights_cosebis.py \
+    @PYTHON3BIN@ @RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/script_weights/get_weights_cosebis.py \
       -n @BV:NTHREADS@ \
-      -nf 1e5 \
-      -nt 1e5 \
+      -nf 100000 \
+      -nt 100000 \
       --Nmax_mm @BV:NMAXCOSEBIS@ \
       --tmin_mm @BV:THETAMINXI@ \
       --tmax_mm @BV:THETAMAXXI@ \
@@ -161,18 +162,19 @@ then
       --tmax_gm @BV:THETAMAXGT@ \
       --Nmax_gg @BV:NMAXCOSEBISNN@ \
       --tmin_gg @BV:THETAMINWT@ \
-      --tmax_gg @BV:THETAMAXWT@ 2>&1
+      --tmax_gg @BV:THETAMAXWT@ \
+      --output_path "${outfold}" 2>&1
   
-    cp -a @RUNROOT@/INSTALL/OneCovariance/input/cosebis/. ${outfold}
+    #cp -a @RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/cosebis/. ${outfold}
   
   
   elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
   then
     _message "    -> @BLU@Generating arbitrary statistic weights for bandpowers @DEF@"
-    @PYTHON3BIN@ @RUNROOT@/INSTALL/OneCovariance/input/script_weights/get_weights_bandpowers.py \
+    @PYTHON3BIN@ @RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/script_weights/get_weights_bandpowers.py \
       -n @BV:NTHREADS@ \
-      -nf 1e4 \
-      -nt 1e4 \
+      -nf 10000 \
+      -nt 10000 \
       --delta_ln_theta_mm @BV:APODISATIONWIDTH@ \
       --theta_lo_mm ${t_lo_mm} \
       --theta_up_mm ${t_up_mm} \
@@ -193,9 +195,10 @@ then
       --L_min_gg @BV:LMINBANDPOWERSNN@ \
       --L_max_gg @BV:LMAXBANDPOWERSNN@ \
       --L_bins_gg @BV:NBANDPOWERSNN@ \
-      --L_type_gg "log"  2>&1
+      --L_type_gg "log" \
+      --output_path "${outfold}" 2>&1
   
-    cp -a @RUNROOT@/INSTALL/OneCovariance/input/bandpowers/. ${outfold}
+    #cp -a @RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/bandpowers/. ${outfold}
   fi
 fi
 

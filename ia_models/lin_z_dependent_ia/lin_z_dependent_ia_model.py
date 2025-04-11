@@ -13,7 +13,7 @@ def setup(options):
     suffix = options.get_string(option_section, "suffix", "")
     new_suffix = options.get_string(option_section, "new_suffix", "")
     sample = options.get_string(option_section, "sample", "")
-    do_shear_shear = True
+    do_shear_shear = options.get_bool(option_section, "do_shear_intrinsic", True)
     do_position_shear = options.get_bool(option_section, "do_galaxy_intrinsic", False)
 
     if suffix:
