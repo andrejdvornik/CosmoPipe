@@ -1088,12 +1088,18 @@ EOF
 #Requested boltzman {{{
 if [ "${BOLTZMAN^^}" == "HALO_MODEL" ] #{{{
 then
+  if [ "@BV:COSMOSIS_PIPELINE@" == "lin_bias" ]
+  then
+    nl="pk"
+  else
+    nl="none"
+  fi
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_boltzman.ini <<- EOF
 [camb]
 file = %(CSL_PATH)s/boltzmann/camb/camb_interface.py
 do_reionization = F
 mode = power
-nonlinear = none ; pk
+nonlinear = ${nl} ; none ; pk
 halofit_version = mead2020_feedback
 neutrino_hierarchy = normal
 kmax = 20.0
@@ -1110,12 +1116,22 @@ EOF
 #}}}
 elif [ "${BOLTZMAN^^}" == "COSMOPOWER_HALO_MODEL" ] #{{{
 then
+  if [ "@BV:COSMOSIS_PIPELINE@" == "lin_bias" ]
+  then
+    nl="pk"
+    emu="nonlin_matter_power_emulator = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/train_emulator_camb_S8/outputs/log10_reference_non_lin_matter_power_emulator_mead2020_feedback"
+    ref="reference_nonlinear_spectra = %(MY_PATH)s/INSTALL/INSTALL/CosmoPowerCosmosis/train_emulator_camb_S8/outputs/center_non_linear_matter_mead2020_feedback.npz"
+  else
+    nl="none"
+    emu=""
+    ref=""
+  fi
 cat > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_boltzman.ini <<- EOF
 [cosmopower]
 file = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/cosmosis_modules/cosmopower_interface_new.py
 do_reionization = F
 mode = power
-nonlinear = none ; pk
+nonlinear = ${nl} ; none ; pk
 halofit_version = mead2020_feedback ; We need to use this here in order to correctly select the emulator
 neutrino_hierarchy = normal
 kmax = 20.0
@@ -1135,8 +1151,10 @@ kmin = 1e-5
 
 lin_matter_power_emulator = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/train_emulator_camb_S8/outputs/log10_reference_lin_matter_power_emulator_mead2020_feedback
 ; nonlin_matter_power_emulator = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/train_emulator_camb_S8/outputs/log10_reference_non_lin_matter_power_emulator_mead2020_feedback
+${emu}
 reference_linear_spectra = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/train_emulator_camb_S8/outputs/center_linear_matter_mead2020_feedback.npz
 ; reference_nonlinear_spectra = %(MY_PATH)s/INSTALL/INSTALL/CosmoPowerCosmosis/train_emulator_camb_S8/outputs/center_non_linear_matter_mead2020_feedback.npz
+${ref}
 ; As_emulator = %(MY_PATH)s/INSTALL/CosmoPowerCosmosis/train_emulator_camb_S8/outputs/As_emulator
 
 EOF
