@@ -156,7 +156,7 @@ fi
 if [[ .*\ $MODES\ .* =~ " OBS " ]]
 then
   stats="${stats} 1pt"
-  twopt_modules="${twopt_modules} predict_observable correct_cosmo_observable"
+  twopt_modules="${twopt_modules} predict_observable"
 fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 use_stats = ${stats}
@@ -302,7 +302,7 @@ fi
 if [[ .*\ $MODES\ .* =~ " OBS " ]]
 then
   stats="${stats} 1pt"
-  twopt_modules="${twopt_modules} predict_observable correct_cosmo_observable"
+  twopt_modules="${twopt_modules} predict_observable"
 fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_scalecut.ini <<- EOF
 use_stats = ${stats}
@@ -552,7 +552,7 @@ then
   if [[ .*\ $MODES\ .* =~ " OBS " ]]
   then
     stats="${stats} 1pt"
-    twopt_modules="${twopt_modules} predict_observable correct_cosmo_observable"
+    twopt_modules="${twopt_modules} predict_observable"
   fi
   
 twopt_modules="${twopt_modules} scale_cuts likelihood"
@@ -1469,6 +1469,8 @@ do
 	"predict_observable") #{{{
 			obs_mins=""
 			obs_maxs=""
+			z_mins=""
+			z_maxs=""
 			nobs=""
 			suffix=`seq -s ' ' ${NSMFLENSBINS}`
 			file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB1.txt"
@@ -1480,53 +1482,13 @@ do
 					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
 					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
 					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
 					obs_mins="${obs_mins} ${x_lo}"
 					obs_maxs="${obs_maxs} ${x_hi}"
-					nobs="${nobs} ${NSMFBINS}"
-				done
-			elif [ "${slice}" == "z" ]
-			then
-				for i in `seq ${NSMFLENSBINS}`
-				do
-					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
-					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
-					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
-					obs_mins="${obs_mins} ${y_lo}"
-					obs_maxs="${obs_maxs} ${y_hi}"
-					nobs="${nobs} ${NSMFBINS}"
-				done
-			else
-				_message "Got wrong or no information about slicing of the lens sample.\n"
-				#exit 1
-			fi
-			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-			[$module]
-			file = %(HMPATH)s/predict_observable.py
-			input_section_name = stellar_mass_function
-			output_section_name = one_point
-			suffixes = ${suffix}
-			sample = nz_obs
-			log10_obs_min = ${obs_mins}
-			log10_obs_max = ${obs_maxs}
-			n_obs = ${nobs}
-			edges = True
-			
-			EOF
-			;; #}}}
-	"correct_cosmo_observable") #{{{
-			z_mins=""
-			z_maxs=""
-			file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB1.txt"
-			slice=`grep '^slice_in' ${file1} | awk '{printf $2}'`
-			if [ "${slice}" == "obs" ]
-			then
-				for i in `seq ${NSMFLENSBINS}`
-				do
-					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
-					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
-					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
 					z_mins="${z_mins} ${y_lo}"
 					z_maxs="${z_maxs} ${y_hi}"
+					nobs="${nobs} ${NSMFBINS}"
 				done
 			elif [ "${slice}" == "z" ]
 			then
@@ -1535,8 +1497,13 @@ do
 					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
 					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
 					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
+					obs_mins="${obs_mins} ${y_lo}"
+					obs_maxs="${obs_maxs} ${y_hi}"
 					z_mins="${z_mins} ${x_lo}"
 					z_maxs="${z_maxs} ${x_hi}"
+					nobs="${nobs} ${NSMFBINS}"
 				done
 			else
 				_message "Got wrong or no information about slicing of the lens sample.\n"
@@ -1547,10 +1514,18 @@ do
 			omega_v="@BV:OMEGAV_IN@"
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
-			file = %(HMPATH)s/correct_cosmo_observable.py
-			section_name = one_point
+			file = %(HMPATH)s/predict_observable.py
+			input_section_name = stellar_mass_function
+			output_section_name = one_point
+			suffixes = ${suffix}
+			sample = nz_obs
+			log10_obs_min = ${obs_mins}
+			log10_obs_max = ${obs_maxs}
 			zmin = ${z_mins}
 			zmax = ${z_maxs}
+			n_obs = ${nobs}
+			edges = True
+			correct_cosmo = True
 			astropy_cosmology_class = LambdaCDM
 			cosmo_kwargs = "{'H0':${h0_in}, 'Om0':${omega_m}, 'Ode0':${omega_v}}"
 			
