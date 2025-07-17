@@ -77,6 +77,8 @@ do
     #If the step is a substep
     if [ "${step:0:1}" == "." ]
     then 
+      echo "Parsing variables for step: ${step}"
+      step=`_parse_blockvars ${step}`
       echo "Getting substeps for step: ${step}"
       #Read the substep modes 
       sublist=`VERBOSE=1 _read_pipe $step ${stepnum}` 
@@ -310,6 +312,7 @@ do
     #Modify the HEAD to the request value {{{
     _target=${step:1}
     _target=`VERBOSE=0 _parse_blockvars ${_target}`
+    echo parsed: ${_target}
     if [ "$(_inblock $_target)" == "0" ]
     then 
       absent_block="${absent_block} ${_target}"

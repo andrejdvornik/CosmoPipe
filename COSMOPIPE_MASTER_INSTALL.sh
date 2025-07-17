@@ -250,6 +250,7 @@ EOF
   else 
     wget https://marvinweb.astro.uni-bonn.de/data_products/theli/theli-1.6.1.tgz > THELI_wget.log 2>&1
   fi 
+  cd ${RUNROOT}/INSTALL
   tar -xf theli-1.6.1.tgz >> THELI_install.log 2>&1
   rm -f theli-1.6.1.tgz  >> THELI_install.log 2>&1
   cd theli-1.6.1/pipesetup
@@ -273,9 +274,11 @@ EOF
   fi 
   cd ${RUNROOT}/INSTALL
   #}}}
+
   #Copy IA model to the INSTALL directory {{{
   _message "   >${RED} Copying IA models${DEF}"
   rsync -autv ${PACKROOT}/ia_models ${RUNROOT}/INSTALL/ > ${RUNROOT}/INSTALL/ia_models_rsync.log 2>&1
+  #}}}
   
   #Install cosebis functions {{{
   _message "   >${RED} Installing COSEBIs tools${DEF}"
@@ -293,6 +296,8 @@ EOF
   cd ${RUNROOT}/INSTALL/
   _message "${BLU} - Done! ${DEF}\n"
   #}}}
+
+fi 
   
   #Install OneCovariance {{{
   _message "   >${RED} Installing OneCovariance ${DEF}"
@@ -315,7 +320,6 @@ EOF
   cd ${RUNROOT}/INSTALL/
   _message "${BLU} - Done! ${DEF}\n"
   #}}}
-fi 
 
 cd ${RUNROOT}
 

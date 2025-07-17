@@ -3,7 +3,7 @@
 # File Name : plot_Om_S8.sh
 # Created By : awright
 # Creation Date : 04-05-2023
-# Last Modified : Tue Feb  4 13:41:55 2025
+# Last Modified : Fri 14 Mar 2025 09:43:06 AM CET
 #
 #=========================================
 
@@ -63,7 +63,7 @@ fi
   --ytitle "sigma[8]" \
   --ylim 0.45 1.2 \
   --xlim 0.14 0.62 \
-  --hval 0.0075 0.0075 \
+  --hval 0.0085 0.0085 \
   --minbuff 0.15 \
   --priorh 0.01 0.01 \
   --title " " 2>&1 || echo "ignore failed plot generation" 

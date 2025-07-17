@@ -3,7 +3,7 @@
 # File Name : plot_whisker.R
 # Created By : awright
 # Creation Date : 03-03-2024
-# Last Modified : Tue Feb 25 07:24:22 2025
+# Last Modified : Tue Mar  4 09:25:09 2025
 #
 #=========================================
 
@@ -216,11 +216,13 @@ data.table::fwrite(file='whisker_status.txt',file.dt)
 add_point<-function(struct,index,type,yloc,col,do_rect=FALSE,dotitle=TRUE,title="",alpha=0.5,titleeps=0,dosig=TRUE) { 
   #Read the catalogue
   if (file.exists(sub(".txt","_dens.txt",struct$files[index]))) { 
+    cat(sub(".txt","_dens.txt",struct$files[index]))
     cat<-helpRfuncs::read.chain(file=sub(".txt","_dens.txt",struct$files[index]),strip_labels=TRUE)
   } else { 
+    cat(struct$files[index])
     cat<-helpRfuncs::read.chain(file=struct$files[index],strip_labels=TRUE)
   }
-  cat("> ")
+  cat("\n> ")
   if (is.na(alpha)) { 
     if (struct$statistic[index]=='cosebis') { 
       alpha = 0.58

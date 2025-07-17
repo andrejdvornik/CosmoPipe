@@ -3,7 +3,7 @@
 # File Name : match_to_sims.sh
 # Created By : awright
 # Creation Date : 15-06-2023
-# Last Modified : Thu 13 Feb 2025 07:16:46 AM CET
+# Last Modified : Fri Mar 28 07:51:04 2025
 #
 #=========================================
 
@@ -108,6 +108,7 @@ do
      -o ${output_file} \
      -l @BV:LABELNAME@ \
      -r @BV:RADIUS@ \
+     @BV:OPTIMISE_RADIUS@ \
      -f ${target_features} 2>&1
   #Notify 
   _message " -@RED@ Done! (`date +'%a %H:%M'`)@DEF@\n"
