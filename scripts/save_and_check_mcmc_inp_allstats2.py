@@ -536,7 +536,7 @@ parser.add_argument("--thetamax_ee", dest="thetamax_ee",type=float,
 parser.add_argument("--ntheta_ee", dest="ntheta_ee",type=int,
     help="number of xipm bins",required=False, default=9)
     
-    parser.add_argument("--thetamin_ne", dest="thetamin_ne",type=float,
+parser.add_argument("--thetamin_ne", dest="thetamin_ne",type=float,
     help="gt theta_min",required=False, default=0.5)
 parser.add_argument("--thetamax_ne", dest="thetamax_ne",type=float,
     help="gt theta_max",required=False, default=300)
