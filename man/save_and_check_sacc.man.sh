@@ -1,5 +1,5 @@
 #
-# cosmosis_constructor_3x2pt.sh Documentation & Housekeeping functions
+# save_and_check_sacc.sh Documentation & Housekeeping functions
 #
 
 #Starting Prompt {{{
@@ -7,9 +7,9 @@ function _prompt {
   #Check if we do want verbose output
   if [ "$1" != "0" ] 
   then
-    _message "@BLU@============================================@DEF@\n"
-    _message "@BLU@== @RED@ Running cosmosis_constructor_3x2pt.sh Mode @BLU@ ==@DEF@\n"
-    _message "@BLU@============================================@DEF@\n"
+    _message "@BLU@===================================================@DEF@\n"
+    _message "@BLU@== @RED@ Running save_and_check_sacc.sh Mode @BLU@ ==@DEF@\n"
+    _message "@BLU@===================================================@DEF@\n"
   fi 
 }
 #}}}
@@ -17,8 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Constructs a cosmosis .ini file from CosmoPipe '
-  echo '# variables'
+  echo '# Construct the MCMC input file for all statistics'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -43,14 +42,15 @@ set -e
 # Input variables {{{ 
 function _inp_var { 
   #Variable inputs (leave blank if none)
-  echo BLINDING BV:APODISATIONWIDTH BV:BLIND BV:BOLTZMAN BV:CHAINSUFFIX BV:COSMOSIS_PIPELINE BV:H0_IN BV:IAMODEL BV:LIST_INPUT_SAMPLER BV:LMAXBANDPOWERS BV:LMAXBANDPOWERSNE BV:LMAXBANDPOWERSNN BV:LMINBANDPOWERS BV:LMINBANDPOWERSNE BV:LMINBANDPOWERSNN BV:MODES BV:NBANDPOWERS BV:NBANDPOWERSNE BV:NBANDPOWERSNN BV:NGT BV:NLENSBINS BV:NMAXCOSEBIS BV:NMAXCOSEBISNE BV:NMAXCOSEBISNN BV:NMINCOSEBIS BV:NMINCOSEBISNE BV:NMINCOSEBISNN BV:NSMFBINS BV:NSMFLENSBINS BV:NTHREADS BV:NWT BV:NXIPM BV:OMEGAM_IN BV:OMEGAV_IN BV:SAMPLER BV:SAVE_TPDS BV:STATISTIC BV:THETAMAXGT BV:THETAMAXWT BV:THETAMAXXI BV:THETAMAXXIM BV:THETAMINGT BV:THETAMINWT BV:THETAMINXI BV:THETAMINXIM BV:TOMOLIMS CONFIGPATH DATABLOCK RUNROOT STORAGEPATH SURVEY
+  echo BLINDING BV:BOLTZMAN BV:CHAINSUFFIX BV:ITERATION BV:LMAXBANDPOWERS BV:LMAXBANDPOWERSNE BV:LMAXBANDPOWERSNN BV:LMINBANDPOWERS BV:LMINBANDPOWERSNE BV:LMINBANDPOWERSNN BV:MODES BV:NBANDPOWERS BV:NBANDPOWERSNE BV:NBANDPOWERSNN BV:NGT BV:NLENSBINS BV:NMAXCOSEBIS BV:NMAXCOSEBISNE BV:NMAXCOSEBISNN BV:NSMFLENSBINS BV:NWT BV:NXIPM BV:STATISTIC BV:THETAMAXGT BV:THETAMAXXI BV:THETAMINGT BV:THETAMINXI BV:TOMOLIMS DATABLOCK PYTHON3BIN RUNROOT SCRIPTPATH STORAGEPATH SURVEY
 } 
 #}}}
 
 # Input data {{{ 
 function _inp_data { 
   #Data inputs (leave blank if none)
-  echo mcmc_inp_@BV:STATISTIC@ #nzcov
+  echo
+  #@BV:STATISTIC@_vec covariance_@BV:STATISTIC@ cosmosis_neff_source cosmosis_neff_lens cosmosis_neff_obs smf_datavec cosmosis_sigmae nz_source nz_lens nz_obs
 }
 #}}}
 
@@ -64,8 +64,8 @@ function _outputs {
 # Execution command {{{ 
 function _runcommand { 
   #Command for running the script 
-  echo bash @RUNROOT@/@SCRIPTPATH@/cosmosis_constructor_3x2pt.sh
-}
+  echo bash @RUNROOT@/@SCRIPTPATH@/save_and_check_sacc.sh
+} 
 #}}}
 
 # Unset Function command {{{ 

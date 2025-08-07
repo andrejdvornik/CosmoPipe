@@ -41,20 +41,26 @@ fi
 
 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 @PYTHON3BIN@ -m blind_2pt_cosmosis \
     -i @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_@BV:STATISTIC@.ini \
-    -u @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}.fits \
+    -u @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}.sacc \
     -b -r \
     -m ${mode} \
+    --sacc \
     --key_path @BV:KEYPATH@ \
     --file_path @BV:BLINDFILE@ 2>&1
 
 mbias=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/`
 if [[ ${mbias} =~ .*"no_m_bias".* ]]
 then
+  eval "search_string='@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}.sacc'"
+  eval "replace_string='@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}_no_m_bias.sacc'"
+  sed "s|${search_string}|${replace_string}|g" "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_@BV:STATISTIC@.ini" > "@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_@BV:STATISTIC@_no_m_bias.ini"
+
   MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1 @PYTHON3BIN@ -m blind_2pt_cosmosis \
-    -i @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_@BV:STATISTIC@.ini \
-    -u @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}_no_m_bias.fits \
+    -i @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_@BV:STATISTIC@_no_m_bias.ini \
+    -u @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/MCMC_input_${non_linear_model}_no_m_bias.sacc \
     -b -r \
     -m ${mode} \
+    --sacc \
     --key_path @BV:KEYPATH@ \
     --file_path @BV:BLINDFILE@ 2>&1
 fi
@@ -70,7 +76,7 @@ inputlist=`ls @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/mcmc_inp_@BV:STATISTIC@/`
 for file in ${inputlist}
 do
   _message "${file}\n"
-  if [[ ! "${file}" =~ "MCMC_input_${non_linear_model}.fits" ]] && [[ ! "${file}" =~ "MCMC_input_${non_linear_model}_no_m_bias.fits" ]]
+  if [[ ! "${file}" =~ "MCMC_input_${non_linear_model}.sacc" ]] && [[ ! "${file}" =~ "MCMC_input_${non_linear_model}_no_m_bias.sacc" ]]
   then
     _message "Adding to datablock\n"
     # Add blinds to datablock

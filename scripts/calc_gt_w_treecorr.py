@@ -161,22 +161,25 @@ if __name__ == '__main__':
 
     if center_file:
 
-        lenscat = treecorr.Catalog(args.lenscat, ra_col=lensraname, dec_col=lensdecname, ra_units='deg', 
+        lenscat = treecorr.Catalog(args.lenscat, ra_col=lensraname, dec_col=lensdecname, ra_units='deg',
                                    dec_units='deg', w_col=lenswname, patch_centers=center_file)
-        rancat = treecorr.Catalog(args.randcat, ra_col=randraname, dec_col=randdecname, ra_units='deg', 
-                                  dec_units='deg', patch_centers=lenscat.patch_centers)
+        rancat = treecorr.Catalog(args.randcat, ra_col=randraname, dec_col=randdecname, ra_units='deg',
+                                  dec_units='deg', patch_centers=lenscat.patch_centers, every_nth=100)
         if lensing:
             sourcecat = treecorr.Catalog(args.sourcecat, ra_col=sourceraname, dec_col=sourcedecname,
-                                    ra_units='deg', dec_units='deg', g1_col=e1name, g2_col=e2name, 
-                                    w_col=sourcewname, patch_centers=lenscat.patch_centers)
+                                    ra_units='deg', dec_units='deg', g1_col=e1name, g2_col=e2name,
+                                    w_col=sourcewname, patch_centers=lenscat.patch_centers)#, flip_g1=True)
     else:
-        lenscat = treecorr.Catalog(args.lenscat, ra_col=lensraname, dec_col=lensdecname, 
+        lenscat = treecorr.Catalog(args.lenscat, ra_col=lensraname, dec_col=lensdecname,
                                    ra_units='deg', dec_units='deg', w_col=lenswname)
-        rancat = treecorr.Catalog(args.randcat, ra_col=randraname, dec_col=randdecname, 
-                                  ra_units='deg', dec_units='deg')
+        rancat = treecorr.Catalog(args.randcat, ra_col=randraname, dec_col=randdecname,
+                                  ra_units='deg', dec_units='deg', every_nth=100)
         if lensing:
             sourcecat = treecorr.Catalog(args.sourcecat, ra_col=sourceraname, dec_col=sourcedecname,
-                                    ra_units='deg', dec_units='deg', g1_col=e1name, g2_col=e2name, w_col=sourcewname)
+                                    ra_units='deg', dec_units='deg', g1_col=e1name, g2_col=e2name, w_col=sourcewname)#, flip_g1=True)
+    
+        
+    
 
     ## Set bin_slop
     #if nbins > 100: ## Fine-binning
