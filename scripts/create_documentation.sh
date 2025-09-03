@@ -107,12 +107,12 @@ EOF
 #}}}
 
 #Construct the list of variables present in this script {{{
-variables=`cat $1 | grep -v "^#" | grep "@" | sed 's/\(@.*@\)/\n\1\n/g' | grep "@" | \
+variables=`cat $1 | grep -Ev "^[[:space:]]{0,}#" | grep "@" | sed 's/\(@.*@\)/\n\1\n/g' | grep "@" | \
   awk -F@ '{s="";for (i=2;i<=NF;i+=2) {s=s? s "\n" $i:$i} print s }' | grep -v "^$" | sort | uniq | grep -v "DB:" | xargs echo `
 #If there is a python script, add the variables from that too
 if [ -f ${script/.${ext}/.py} ]
 then 
-  variables="${variables} `cat ${script/.${ext}/.py} | grep -v "^#" | grep "@" | sed 's/\(@.*@\)/\n\1\n/g' | grep "@" | \
+  variables="${variables} `cat ${script/.${ext}/.py} | grep -Ev "^[[:space:]]{0,}#" | grep "@" | sed 's/\(@.*@\)/\n\1\n/g' | grep "@" | \
   awk -F@ '{s="";for (i=2;i<=NF;i+=2) {s=s? s "\n" $i:$i} print s }' | grep -v "^$" | sort | uniq | grep -v "DB:" | xargs echo `"
 fi 
 #If there is a cosmosis .ini file, add the variables from that too 
@@ -121,13 +121,13 @@ inifile=../config/${inifile}
 echo ${inifile}
 if [ -f ${inifile} ]
 then 
-  variables="${variables} `cat ${inifile} | grep -v "^#" | grep "@" | sed 's/\(@.*@\)/\n\1\n/g' | grep "@" | \
+  variables="${variables} `cat ${inifile} | grep -Ev "^[[:space:]]{0,}#" | grep "@" | sed 's/\(@.*@\)/\n\1\n/g' | grep "@" | \
   awk -F@ '{s="";for (i=2;i<=NF;i+=2) {s=s? s "\n" $i:$i} print s }' | grep -v "^$" | sort | uniq | grep -v "DB:" | xargs echo `"
 fi 
 #If there is an R script, add the variables from that too
 if [ -f ${script/.${ext}/.R} ]
 then 
-  variables="${variables} `cat ${script/.${ext}/.R} | grep -v "^#" | grep "@" | sed 's/\(@.*@\)/\n\1\n/g' | grep "@" | \
+  variables="${variables} `cat ${script/.${ext}/.R} | grep -Ev "^[[:space:]]{0,}#" | grep "@" | sed 's/\(@.*@\)/\n\1\n/g' | grep "@" | \
   awk -F@ '{s="";for (i=2;i<=NF;i+=2) {s=s? s "\n" $i:$i} print s }' | grep -v "^$" | sort | uniq | grep -v "DB:" | xargs echo `"
 fi 
 variables=`echo ${variables} | tr " " "\n" | sort | uniq | xargs echo`

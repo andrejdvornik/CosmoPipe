@@ -3,7 +3,7 @@
 # File Name : compute_m_bias.sh
 # Created By : awright
 # Creation Date : 08-05-2023
-# Last Modified : Mon Mar 18 15:48:04 2024
+# Last Modified : Sat Jul 26 05:28:14 2025
 #
 #=========================================
 
@@ -185,6 +185,15 @@ do
 
   #Output the m-prior files {{{
   nfile=`echo ${filelist} | awk '{print NF}'`
+  for i in `seq $nfile` 
+  do 
+    file=`echo ${filelist} | awk -v i=$i '{print $i}'`
+    if [ ! -f ${file} ] 
+    then 
+      _message " - @RED@ERROR!\n@DEF@There are missing output files! Parallel computation must have failed?!\n"
+      exit 1 
+    fi 
+  done 
   if [ ${nfile} -gt ${NTOMO} ]
   then 
     #If there are multiple realisations {{{

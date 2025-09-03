@@ -68,6 +68,7 @@ idx = RANN::nn2(query=test_white$data.white,
 cat(paste0("There are ",length(which(idx$nn.idx[,1]!=0))," matches (out of ",nrow(train_data),")"))
 if (!args$duplicates) { 
   #Use the best match, keeping only the best-est match for duplicates 
+  prediction = rep(NA,nrow(test_data))
   for (run_id in 1:ncol(idx$nn.idx)) { 
     #For everything not yet predicted: 
     pred_id = which(is.na(prediction))

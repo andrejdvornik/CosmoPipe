@@ -5,6 +5,12 @@
 #Get the number of tomographic bins 
 NTOMO=`echo @BV:TOMOLIMS@ | awk '{print NF-1}'`
 
+if [ ${NTOMO} -lt 1 ] 
+then 
+  _message "@RED@ERROR - @BLU@ There are no TOMOLIMS specified?!@DEF@\n"
+  exit 1 
+fi 
+
 #Input Filename & Extension {{{
 inputfile=@DB:DATAHEAD@
 extn=${inputfile##*.}

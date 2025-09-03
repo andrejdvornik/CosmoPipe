@@ -127,7 +127,7 @@ function _clean_variable {
 
 #Get option list {{{
 function _get_optlist { 
-  cat $1 | grep -v "^#" | grep "=" | awk -F= '{print $1}' 
+  cat $1 | grep -Ev "^[[:space:]]{0,}#" | grep "=" | awk -F= '{print $1}' 
 }
 #}}}
 
@@ -824,6 +824,22 @@ function _write_blockvars {
   grep -v "^${1}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt | \
     awk -v name="${1}" -v list="${_filelist}" '{ print $0 } END { print name "=" list }' \
     > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars_$$.txt
+  if [ ${#_filelist} -gt 100000 ] 
+  then 
+    grep -v "^${1}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars_$$.txt
+    _nchunk=50000
+    _ccount=0 
+    echo -n "${1}=" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars_$$.txt
+    while [ ${_ccount} -lt ${#_filelist} ]
+    do 
+      echo -n "${_filelist:${_ccount}:${_nchunk}}" >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars_$$.txt
+      _ccount=$((_ccount+_nchunk))
+    done 
+  else 
+    grep -v "^${1}=" @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt | \
+      awk -v name="${1}" -v list="${_filelist}" '{ print $0 } END { print name "=" list }' \
+      > @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars_$$.txt
+  fi 
   mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars_$$.txt @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/vars.txt
 }
 #}}}
@@ -1023,7 +1039,7 @@ function _incorporate_datablock {
 
   #Update the script to include the blockvars {{{
   nloop=0
-  while [ "`grep -v "^#" ${1//.${ext}/_prehead.${ext}} | grep -c @BV: || echo`" != "0" ]
+  while [ "`grep -Ev "^[[:space:]]{0,}#" ${1//.${ext}/_prehead.${ext}} | grep -c @BV: || echo`" != "0" ]
   do 
     for item in ${_vars}
     do 
