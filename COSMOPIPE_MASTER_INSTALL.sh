@@ -234,17 +234,6 @@ EOF
   _message "${BLU} - Done! ${DEF}\n"
   #}}}
 
-  #Clone the Halo Model repository {{{
-  _message "   >${RED} Cloning the Halo Model Git repository${DEF}"
-    #Clone the repository
-  if [ -d ${RUNROOT}/INSTALL/halo_model ]
-  then
-    rm -fr halo_model
-  fi
-  git clone https://github.com/KiDS-WL/halomodel_for_cosmosis.git >> gitclone_output.log 2>&1
-  _message "${BLU} - Done! ${DEF}\n"
-  #}}}
-
   #Clone the Datavec Blinding repository {{{
   _message "   >${RED} Cloning the Datavector Blinding Git repository${DEF}"
   #Clone the repository
