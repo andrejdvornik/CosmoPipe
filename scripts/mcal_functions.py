@@ -3,7 +3,7 @@
 # File Name : mcal_functions.py
 # Created By : awright
 # Creation Date : 25-05-2023
-# Last Modified : Mon 18 Mar 2024 09:55:11 PM CET
+# Last Modified : Sat Jul 26 05:34:04 2025
 #
 #=========================================
 
@@ -39,6 +39,11 @@ def flexible_read(filepath,as_df=True):
         print("reading as feather")
         ldac_cat=None
         cata = pd.read_feather(filepath)
+    elif file_extension == 'parquet':
+        #Read parquet with pandas 
+        print("reading as parquet")
+        ldac_cat=None
+        cata = pd.read_parquet(filepath)
     elif file_extension == 'fits' or file_extension == 'cat':
         #If FITS, try ldac first 
         try:
@@ -493,6 +498,14 @@ def mCalFunc_from_surface(cata, surface,col_SNR, col_R, col_weight, col_m1, col_
     # the indexes of sources with good binning 
     #print(cata['bin_SNR_id'].values)
     #print(cata['bin_SNR_id'].values!=-999)
+    if np.all(np.isfinite(cata['bin_R_id'].values)) is not True:
+        print(f"WARNING: there is/are {len(np.where(np.isnan(cata['bin_R_id'])))} NaN R index/s")
+        cata.loc[np.isnan(cata['bin_R_id']),'bin_R_id']=-999
+    if np.all(np.isfinite(cata['bin_SNR_id'].values)) is not True:
+        print(f"WARNING: there is/are {len(np.where(np.isnan(cata['bin_SNR_id'])))} NaN R index/s")
+        cata.loc[np.isnan(cata['bin_SNR_id']),'bin_SNR_id']=-999
+
+
     good_id = (cata['bin_SNR_id'].values!=-999) & (cata['bin_R_id'].values!=-999) 
 
     # group

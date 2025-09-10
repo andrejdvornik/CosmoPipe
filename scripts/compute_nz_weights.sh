@@ -3,7 +3,7 @@
 # File Name : compute_nz.sh
 # Created By : awright
 # Creation Date : 21-03-2023
-# Last Modified : Tue 14 Nov 2023 10:14:32 PM CET
+# Last Modified : Thu Aug 21 07:24:10 2025
 #
 #=========================================
 
@@ -132,7 +132,7 @@ then
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_cats
 fi 
 #Add the new main files to the datablock 
-calibcats=${outputfiles}`ls -tr @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_refr_DIRsom*.${ext}`
+calibcats=${outputfiles}`ls -tr @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ | grep _refr_DIRsom | grep .${ext}`
 filenames=''
 for i in `seq -w $NTOMO`
 do
@@ -156,7 +156,10 @@ do
   #}}}
 done
 #Move the main catalogues 
-mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_refr_DIRsom* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_cats/
+for f in ${filenames} 
+do 
+  mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/$f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_refr_cats/
+done 
 #Add data block element
 _write_datablock som_weight_refr_cats "${filenames}"
 
@@ -165,7 +168,7 @@ if [ ! -d @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_calib_cats ]
 then 
   mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_calib_cats
 fi 
-calibcats=`ls -tr @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_DIRsom*.${ext} `
+calibcats=`ls -tr @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ | grep _DIRsom | grep .${ext} `
 filenames=''
 for i in `seq -w $NTOMO`
 do
@@ -189,7 +192,10 @@ do
   #}}}
 done
 #Move the main catalogues 
-mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_DIRsom* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_calib_cats/
+for f in ${filenames} 
+do 
+  mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/$f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/som_weight_calib_cats/
+done 
 #Add data block element
 _write_datablock som_weight_calib_cats "${filenames}"
 
@@ -201,7 +207,7 @@ then
     mkdir @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_hc_optim/
   fi 
   #Add the new hcoptim files to the datablock 
-  calibcats=`ls -tr @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_HCoptim* `
+  calibcats=`ls -tr @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/ | grep _HCoptim `
   filenames=''
   for i in `seq -w $NTOMO`
   do
@@ -224,12 +230,17 @@ then
     done
     #}}}
   done
-  _write_datablock nz_hc_optim "${filenames}"
   
-  #Move the HCoptim catalogues 
-  mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/*_HCoptim* @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_hc_optim/
+  for f in ${filenames} 
+  do 
+    mv @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/DATAHEAD/$f @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/nz_hc_optim/
+  done 
+  _write_datablock nz_hc_optim "${filenames}"
 fi 
 
+
+#The datahead folder should be empty after all the mv's; clear it in the documentation too
+_add_datahead ""
 #Notify
 _message "@BLU@ } @RED@ - Done! (`date +'%a %H:%M'`)@DEF@\n"
 

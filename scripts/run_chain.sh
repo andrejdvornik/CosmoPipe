@@ -3,7 +3,7 @@
 # File Name : run_chain.sh
 # Created By : awright
 # Creation Date : 14-04-2023
-# Last Modified : Sat 09 Dec 2023 10:06:57 PM CET
+# Last Modified : Wed Feb 26 22:51:15 2025
 #
 #=========================================
 
@@ -58,7 +58,7 @@ else
 objstr=''
 # Run mpi chain
 {
-mpirun -n @BV:NTHREADS@ --env MKL_NUM_THREADS 1 --env NUMEXPR_NUM_THREADS 1 --env OMP_NUM_THREADS 1 ${pythonbin}/cosmosis --mpi @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_@BV:STATISTIC@.ini 2>&1 && echo "MPI command worked!" || objstr="FAIL"
+mpirun -n @BV:NTHREADS@ -x MKL_NUM_THREADS=1 -x NUMEXPR_NUM_THREADS=1 -x OMP_NUM_THREADS=1 ${pythonbin}/cosmosis --mpi @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_@BV:STATISTIC@.ini 2>&1 && echo "MPI command worked!" || objstr="FAIL"
 } >&1
 # Run mpi chain with --use-hwthread-cpu option (required for openmpi>4.0.3)
 if [ "${objstr}" == "FAIL" ]

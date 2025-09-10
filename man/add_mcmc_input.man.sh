@@ -17,7 +17,7 @@ function _prompt {
 #Mode description {{{
 function _description { 
   echo "#"
-  echo '# Add an existing MCMC input file to the datablock'
+  echo '# does important stuff'
   echo "#"
   echo "# Function takes input data:"
   echo "# `_inp_data`"
@@ -56,7 +56,7 @@ function _inp_data {
 # Output data {{{ 
 function _outputs { 
   #Data outputs (leave blank if none)
-  echo mcmc_inp_@BV:STATISTIC@ nzcov
+  echo 
 } 
 #}}}
 

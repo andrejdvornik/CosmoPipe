@@ -97,7 +97,7 @@ plot_bmodes<-function(x_data, y_data, y_data_plot, y_error, cov, bin1_data, bin2
     if (p > 1e-2){
       mtext(side=3,outer=TRUE,adj=1, parse(text=sprintf('n[max]*"=20"*"  "*italic(p) == %.2f',p)), col='black',line=0)
     } else {
-      mtext(side=3,outer=TRUE,adj=1, parse(text=sprintf('n[max]*"=20"*"  "italic(p) == "%.2e"',p)), col='black',line=0)
+      mtext(side=3,outer=TRUE,adj=1, parse(text=sprintf('n[max]*"=20"*"  "*italic(p) == "%.2e"',p)), col='black',line=0)
     }
 
     if (statistic == 'cosebis'){

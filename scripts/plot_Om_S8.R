@@ -643,7 +643,7 @@ if (length(args$labels>0) & any(args$labels!="") & exists("ref") & exists("prior
 #} else if (exists("ref") & exists("prior")) { 
 #  legend('bottom',inset=0.1,bty='n',legend=parse(text=c("italic(Planck)*'-Legacy '*(CMB)","'Prior Volume'")),col=c("#E41A1CCC",'darkgrey'),pch=NA,lty=1,lwd=2)
 } else if (length(args$labels>0) & any(args$labels!="") & exists("ref")) { 
-  legend('bottomleft',inset=0.03,bty='n',legend=parse(text=c(helpRfuncs::vecsplit(args$labels,by=';'),"italic(Planck)*'-Legacy '*(CMB)")),
+  legend('bottomleft',inset=0.03,bty='n',legend=parse(text=c(helpRfuncs::vecsplit(args$labels,by=';'),args$ref_label)),
          col=c(col[1:length(helpRfuncs::vecsplit(args$labels,by=';'))],"#E41A1CCC"),
          pch=NA,lty=1,lwd=2,cex=0.9)
 #} else if (exists("ref")) { 
