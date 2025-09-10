@@ -184,8 +184,8 @@ then
       x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
       y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
       y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
-      obs_mins="${obs_mins} ${x_lo}"
-      obs_maxs="${obs_maxs} ${x_hi}"
+      obs_mins="${obs_mins} $(echo "$x_lo + l(@BV:H0_IN@)/l(10)" | bc -l)"
+      obs_maxs="${obs_maxs} $(echo "$x_hi + l(@BV:H0_IN@)/l(10)" | bc -l)"
       z_mins="${z_mins} ${y_lo}"
       z_maxs="${z_maxs} ${y_hi}"
     done
@@ -198,8 +198,8 @@ then
       x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
       y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
       y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
-      obs_mins="${obs_mins} ${y_lo}"
-      obs_maxs="${obs_maxs} ${y_hi}"
+      obs_mins="${obs_mins} $(echo "$y_lo + l(@BV:H0_IN@)/l(10)" | bc -l)"
+      obs_maxs="${obs_maxs} $(echo "$y_hi + l(@BV:H0_IN@)/l(10)" | bc -l)"
       z_mins="${z_mins} ${x_lo}"
       z_maxs="${z_maxs} ${x_hi}"
     done
@@ -242,8 +242,8 @@ then
       x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
       y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
       y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
-      obs_mins="${obs_mins} ${x_lo}"
-      obs_maxs="${obs_maxs} ${x_hi}"
+      obs_mins="${obs_mins} $(echo "$x_lo + l(@BV:H0_IN@)/l(10)" | bc -l)"
+      obs_maxs="${obs_maxs} $(echo "$x_hi + l(@BV:H0_IN@)/l(10)" | bc -l)"
       z_mins="${z_mins} ${y_lo}"
       z_maxs="${z_maxs} ${y_hi}"
     done
@@ -256,8 +256,8 @@ then
       x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
       y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
       y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
-      obs_mins="${obs_mins} ${y_lo}"
-      obs_maxs="${obs_maxs} ${y_hi}"
+      obs_mins="${obs_mins} $(echo "$y_lo + l(@BV:H0_IN@)/l(10)" | bc -l)"
+      obs_maxs="${obs_maxs} $(echo "$y_hi + l(@BV:H0_IN@)/l(10)" | bc -l)"
       z_mins="${z_mins} ${x_lo}"
       z_maxs="${z_maxs} ${x_hi}"
     done
@@ -265,14 +265,15 @@ then
     _message "Got wrong or no information about slicing of the lens sample.\n"
     #exit 1
   fi
-  bias_Mmin=`echo ${obs_mins} | sed 's/ /,/g'`
-  bias_Mmax=`echo ${obs_maxs} | sed 's/ /,/g'`
+  #bias_Mmin=`echo ${obs_mins} | sed 's/ /,/g'`
+  #bias_Mmax=`echo ${obs_maxs} | sed 's/ /,/g'`
+  # Merge, split into lines, sort uniquely, and turn back into comma-separated
+  bias_mass=$(echo "$obs_mins $obs_maxs" | tr ' ' '\n' | sort -n | uniq | tr '\n' ',' | sed 's/,$//')
 else
-  bias_Mmin=9.0
-  bias_Mmax=13.0
+  #bias_Mmin=9.0
+  #bias_Mmax=13.0
+  bias_mass=9.0,13.0
 fi
-bias_Mmin=9.0,13.0
-bias_Mmax=13.0
 
 # Check if the arbitrary input files exist and copy to input directory
 use_arbitrary=True #False
@@ -497,8 +498,8 @@ cross_terms = True
 unbiased_clustering = True
 
 [csmf settings]
-csmf_log10Mmin = ${csmf_Mmin}
-csmf_log10Mmax = ${csmf_Mmax}
+csmf_log10M_bins_lower = ${csmf_Mmin}
+csmf_log10M_bins_upper = ${csmf_Mmax}
 csmf_N_log10M_bin = ${csmf_N_log10M_bin}
 csmf_directory = ${csmf_directory}
 ;csmf_log10M_bins =
@@ -728,7 +729,8 @@ model = Tinker10
 bias_2h = 1.0
 mc_relation_cen = duffy08
 mc_relation_sat = duffy08
-log10mass_bins = ${bias_Mmin}
+log10mass_bins = ${bias_mass}
+; log10mass_bins = ${bias_Mmin}
 ; log10mass_bins = ${bias_Mmax}
 
 [IA]

@@ -27,7 +27,7 @@ then
     n_arb_nn=@BV:NWT@
     arb_fourier_filter_gg_file_@BV:STATISTIC@="fourier_weight_realspace_cf_gg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
     arb_real_filter_gg_file_@BV:STATISTIC@="real_weight_realspace_cf_gg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
-    arb_base=@RUNROOT@/INSTALL/OneCovariance/input/rcf/
+    arb_base=@RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/rcf/
     
 elif [ "${STATISTIC^^}" == "COSEBIS" ]
 then
@@ -42,7 +42,7 @@ then
     n_arb_nn=@BV:NMAXCOSEBISNN@
     arb_fourier_filter_gg_file_@BV:STATISTIC@="Ugg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
     arb_real_filter_gg_file_@BV:STATISTIC@="Wn_psigg_@BV:THETAMINWT@-@BV:THETAMAXWT@_?.table"
-    arb_base=@RUNROOT@/INSTALL/OneCovariance/input/cosebis/
+    arb_base=@RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/cosebis/
 
 elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
 then
@@ -69,7 +69,7 @@ then
     t_up_gg=`printf "%.2f" $theta_up_clustering`
     arb_fourier_filter_gg_file_@BV:STATISTIC@="fourier_weight_bandpowers_gg_${t_lo_gg}-${t_up_gg}_?.table"
     arb_real_filter_gg_file_@BV:STATISTIC@="real_weight_bandpowers_gg_${t_lo_gg}-${t_up_gg}_?.table"
-    arb_base=@RUNROOT@/INSTALL/OneCovariance/input/bandpowers/
+    arb_base=@RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/bandpowers/
 else
   #ERROR: Unknown statistic {{{
   _message "Unknown statistic: ${STATISTIC^^}\n"
@@ -142,10 +142,9 @@ then
       --theta_lo_gg @BV:THETAMINWT@\
       --theta_up_gg @BV:THETAMAXWT@\
       --t_bins_gg @BV:NWT@ \
-      --t_type_gg "log" \
-      --output_path "${outfold}" 2>&1
+      --t_type_gg "log" 2>&1
   
-    #cp -a @RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/rcf/. ${outfold}
+    cp -a @RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/rcf/. ${outfold}
   
   elif [ "${STATISTIC^^}" == "COSEBIS" ]
   then
@@ -162,10 +161,9 @@ then
       --tmax_gm @BV:THETAMAXGT@ \
       --Nmax_gg @BV:NMAXCOSEBISNN@ \
       --tmin_gg @BV:THETAMINWT@ \
-      --tmax_gg @BV:THETAMAXWT@ \
-      --output_path "${outfold}" 2>&1
+      --tmax_gg @BV:THETAMAXWT@  2>&1
   
-    #cp -a @RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/cosebis/. ${outfold}
+    cp -a @RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/cosebis/. ${outfold}
   
   
   elif [ "${STATISTIC^^}" == "BANDPOWERS" ]
@@ -195,10 +193,9 @@ then
       --L_min_gg @BV:LMINBANDPOWERSNN@ \
       --L_max_gg @BV:LMAXBANDPOWERSNN@ \
       --L_bins_gg @BV:NBANDPOWERSNN@ \
-      --L_type_gg "log" \
-      --output_path "${outfold}" 2>&1
+      --L_type_gg "log" 2>&1
   
-    #cp -a @RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/bandpowers/. ${outfold}
+    cp -a @RUNROOT@/INSTALL/OneCovariance/input/arbitrary_summary/bandpowers/. ${outfold}
   fi
 fi
 
