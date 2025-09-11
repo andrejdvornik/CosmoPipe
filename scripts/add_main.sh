@@ -2,7 +2,7 @@
 # Add the main samples to the data block 
 #
 
-# Construct the list of data files 
+#Construct the list of data files 
 inplist=''
 for patch in @BV:PATCHLIST@
 do 
@@ -15,6 +15,6 @@ do
   inplist="$inplist ${file}"
 done 
 
-# Update the datablock contents file 
+#Update the datablock contents file 
 _add_datablock main_cats "`echo $inplist`"
 
