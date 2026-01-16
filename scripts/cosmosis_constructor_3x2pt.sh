@@ -43,8 +43,8 @@ zmax_def = 1.2
 nmass_def = 100 ; 200
 logmassmin_def = 9.0
 logmassmax_def = 18.0
-beta_nl = True
-mead2020_corrections = fit_feedback
+nonlinear_mode = bnl
+mead2020_corrections = fit
 
 SAMPLER_NAME = @BV:SAMPLER@
 RUN_NAME = %(SAMPLER_NAME)s_%(blind)s${CHAINSUFFIX}
@@ -1459,14 +1459,14 @@ do
 			fi
 
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-			bnl =  %(beta_nl)s
+			nonlinear_mode =  %(nonlinear_mode)s
 			update_bnl = 10
 			poisson_type = constant
 			point_mass = True
 			dewiggle = True
 			response = False
 			output_suffix = onepower
-			use_mead2020_corrections = %(mead2020_corrections)s
+			hmcode_ingredients = %(mead2020_corrections)s
 			
 			log_mass_min = %(logmassmin_def)s
 			log_mass_max = %(logmassmax_def)s
