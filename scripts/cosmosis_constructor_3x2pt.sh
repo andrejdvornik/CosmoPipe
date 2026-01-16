@@ -44,7 +44,7 @@ nmass_def = 100 ; 200
 logmassmin_def = 9.0
 logmassmax_def = 18.0
 nonlinear_mode = bnl
-mead2020_corrections = fit
+hmcode_ingredients = fit
 
 SAMPLER_NAME = @BV:SAMPLER@
 RUN_NAME = %(SAMPLER_NAME)s_%(blind)s${CHAINSUFFIX}
@@ -1466,7 +1466,7 @@ do
 			dewiggle = True
 			response = False
 			output_suffix = onepower
-			hmcode_ingredients = %(mead2020_corrections)s
+			hmcode_ingredients = %(hmcode_ingredients)s
 			
 			log_mass_min = %(logmassmin_def)s
 			log_mass_max = %(logmassmax_def)s
