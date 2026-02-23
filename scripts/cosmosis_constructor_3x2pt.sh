@@ -43,8 +43,8 @@ zmax_def = 1.2
 nmass_def = 100 ; 200
 logmassmin_def = 9.0
 logmassmax_def = 18.0
-nonlinear_mode = bnl
-hmcode_ingredients = fit
+nonlinear_mode_ = bnl
+hmcode_ingredients_ = fit
 
 SAMPLER_NAME = @BV:SAMPLER@
 RUN_NAME = %(SAMPLER_NAME)s_%(blind)s${CHAINSUFFIX}
@@ -1275,6 +1275,8 @@ do
 			z_maxs=""
 			suffix=`seq -s ' ' ${NSMFLENSBINS}`
 			file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB1.txt"
+			if [ -f ${file1} ]
+			then
 			slice=`grep '^slice_in' ${file1} | awk '{printf $2}'`
 			if [ "${slice}" == "obs" ]
 			then
@@ -1301,6 +1303,17 @@ do
 			else
 				_message "Got wrong or no information about slicing of the lens sample.\n"
 				#exit 1
+				fi
+			else
+				_message "No SMF lens catalog metadata found, setting default CSMF parameters from saved variables.\n"
+    			if [ "${NSMFLENSBINS}" = "1" ]
+    			then
+					z_mins=$(echo @BV:SMFLENSLIMSY@ | awk '{print $1}')
+					z_maxs=$(echo @BV:SMFLENSLIMSY@ | awk '{print $2}')
+				else
+					z_mins=$(echo @BV:SMFLENSLIMSY@ | awk '{for(i=1; i<NF; i++) printf "%s ", $i; print ""}' | sed 's/,$//')
+					z_maxs=$(echo @BV:SMFLENSLIMSY@ | awk '{for(i=2; i<=NF; i++) printf "%s ", $i; print ""}' | sed 's/,$//')
+    			fi
 			fi
 			h0_in=`echo "@BV:H0_IN@" | awk '{printf "%d", 100*$1}'`
 			omega_m="@BV:OMEGAM_IN@"
@@ -1345,6 +1358,8 @@ do
 			hod_z_mins=""
 			hod_z_maxs=""
 			hod_file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB1.txt"
+			if [ -f ${hod_file1} ]
+			then
 			hod_slice=`grep '^slice_in' ${hod_file1} | awk '{printf $2}'`
 			if [ "${hod_slice}" == "obs" ]
 			then
@@ -1382,12 +1397,31 @@ do
 				_message "Got wrong or no information about slicing of the lens sample.\n"
 				#exit 1
 			fi
-			
+			else
+				_message "No lens catalog metadata found, setting default CSMF parameters from saved variables.\n"
+    			if [ "${NLENSBINS}" = "1" ]
+    			then
+					hod_obs_mins=$(echo @BV:LENSLIMSX@ | awk '{print $1}')
+					hod_obs_maxs=$(echo @BV:LENSLIMSX@ | awk '{print $2}')
+					hod_z_mins="${hod_z_mins} 0.0"
+					hod_z_maxs="${hod_z_maxs} 3.0"
+				else
+					hod_obs_mins=$(echo @BV:LENSLIMSX@ | awk '{for(i=1; i<NF; i++) printf "%s ", $i; print ""}' | sed 's/,$//')
+					hod_obs_maxs=$(echo @BV:LENSLIMSX@ | awk '{for(i=2; i<=NF; i++) printf "%s ", $i; print ""}' | sed 's/,$//')
+					for i in `seq ${NLENSBINS}`
+					do
+						hod_z_mins="${hod_z_mins} 0.0"
+						hod_z_maxs="${hod_z_maxs} 3.0"
+					done
+    			fi
+			fi
 			smf_obs_mins=""
 			smf_obs_maxs=""
 			smf_z_mins=""
 			smf_z_maxs=""
 			smf_file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB1.txt"
+			if [ -f ${hod_file1} ]
+			then
 			smf_slice=`grep '^slice_in' ${smf_file1} | awk '{printf $2}'`
 			if [ "${smf_slice}" == "obs" ]
 			then
@@ -1424,6 +1458,24 @@ do
 			else
 				_message "Got wrong or no information about slicing of the lens sample.\n"
 				#exit 1
+				fi
+			else
+				_message "No lens catalog metadata found, setting default CSMF parameters from saved variables.\n"
+    			if [ "${NSMFLENSBINS}" = "1" ]
+    			then
+					smf_obs_mins=$(echo @BV:SMFLENSLIMSX@ | awk '{print $1}')
+					smf_obs_maxs=$(echo @BV:SMFLENSLIMSX@ | awk '{print $2}')
+					smf_z_mins="${hod_z_mins} 0.0"
+					smf_z_maxs="${hod_z_maxs} 3.0"
+				else
+					smf_obs_mins=$(echo @BV:SMFLENSLIMSX@ | awk '{for(i=1; i<NF; i++) printf "%s ", $i; print ""}' | sed 's/,$//')
+					smf_obs_maxs=$(echo @BV:SMFLENSLIMSX@ | awk '{for(i=2; i<=NF; i++) printf "%s ", $i; print ""}' | sed 's/,$//')
+					for i in `seq ${NSMFLENSBINS}`
+					do
+						smf_z_mins="${hod_z_mins} 0.0"
+						smf_z_maxs="${hod_z_maxs} 3.0"
+					done
+    			fi
 			fi
 			
 			red_obs_file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/IA_hm_data/red_cen_obs_pdf.txt"
@@ -1459,14 +1511,14 @@ do
 			fi
 
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
-			nonlinear_mode =  %(nonlinear_mode)s
+			nonlinear_mode =  %(nonlinear_mode_)s
 			update_bnl = 10
 			poisson_type = constant
 			point_mass = True
 			dewiggle = True
 			response = False
 			output_suffix = onepower
-			hmcode_ingredients = %(hmcode_ingredients)s
+			hmcode_ingredients = %(hmcode_ingredients_)s
 			
 			log_mass_min = %(logmassmin_def)s
 			log_mass_max = %(logmassmax_def)s
