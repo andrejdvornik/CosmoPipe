@@ -231,6 +231,17 @@ EOF
   _message "${BLU} - Done! ${DEF}\n"
   #}}}
 
+  #Clone the OnePower repository {{{
+  _message "   >${RED} Cloning the OnePower Git repository${DEF}"
+  #Clone the repository
+  if [ -d ${RUNROOT}/INSTALL/OnePower ] 
+  then 
+    rm -fr OnePower
+  fi
+  git clone https://github.com/KiDS-WL/onepower.git >> gitclone_output.log 2>&1
+  _message "${BLU} - Done! ${DEF}\n"
+  #}}}
+
   #Clone the Datavec Blinding repository {{{
   _message "   >${RED} Cloning the Datavector Blinding Git repository${DEF}"
   #Clone the repository
