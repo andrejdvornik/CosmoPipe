@@ -875,21 +875,55 @@ fi
 #Prepare the pipeline section {{{ 
 extraparams="cosmological_parameters/S_8 cosmological_parameters/sigma_8 cosmological_parameters/A_s cosmological_parameters/omega_m cosmological_parameters/omega_nu cosmological_parameters/omega_lambda"
 
-#Add source nz shift values to outputs {{{
 shifts_source=""
+shifts_lens=""
+shifts_obs=""
+if [[ .*\ $MODES\ .* =~ " EE " ]] || [[ .*\ $MODES\ .* =~ " NE " ]]
+then
+	#Add source nz shift values to outputs {{{
 for i in `seq ${NTOMO}`
 do 
    shifts_source="${shifts_source} nofz_shifts/bias_${i}"
 done
 #}}}
-
+fi
+if [[ .*\ $MODES\ .* =~ " NE " ]] || [[ .*\ $MODES\ .* =~ " NN " ]]
+then
 #Add lens nz shift values to outputs {{{
-shifts_lens=""
 for i in `seq ${NLENSBINS}`
 do
    shifts_lens="${shifts_lens} nofz_shifts_lens/bias_${i}"
 done
 #}}}
+fi
+if [[ .*\ $MODES\ .* =~ " OBS " ]]
+then
+	#Add obs nz shift values to outputs {{{
+	for i in `seq ${NSMFLENSBINS}`
+	do
+		shifts_obs="${shifts_obs} nofz_shifts_obs/bias_${i}"
+	done
+	#}}}
+fi
+
+
+photo_z_bias=""
+corr_dz_priors=""
+if [[ .*\ $MODES\ .* =~ " EE " ]] || [[ .*\ $MODES\ .* =~ " NE " ]]
+then
+	photo_z_bias="${photo_z_bias} source_photoz_bias"
+	corr_dz_priors="${corr_dz_priors} correlated_dz_priors"
+fi
+if [[ .*\ $MODES\ .* =~ " NE " ]] || [[ .*\ $MODES\ .* =~ " NN " ]]
+then
+	photo_z_bias="${photo_z_bias} lens_photoz_bias"
+	corr_dz_priors="${corr_dz_priors} correlated_dz_priors_lens"
+fi
+if [[ .*\ $MODES\ .* =~ " OBS " ]]
+then
+	photo_z_bias="${photo_z_bias} obs_photoz_bias"
+	corr_dz_priors="${corr_dz_priors} correlated_dz_priors_obs"
+fi
 
 
 #Add the values information #{{{
@@ -928,7 +962,7 @@ then
           exit 1
     fi
 
-    COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_sacc consistency ${boltzmann_pipeline} extrapolate onepower ${iamodel_pipeline} source_photoz_bias ${twopt_modules}"
+    COSMOSIS_PIPELINE="sample_S8 ${corr_dz_priors} load_nz_sacc consistency ${boltzmann_pipeline} extrapolate onepower ${iamodel_pipeline} ${photo_z_bias} ${twopt_modules}"
     
 elif [ "@BV:COSMOSIS_PIPELINE@" == "lin_bias" ]
 then
@@ -961,7 +995,7 @@ then
           exit 1
     fi
     
-    COSMOSIS_PIPELINE="sample_S8 correlated_dz_priors load_nz_sacc ${boltzmann_pipeline} extrapolate_power source_photoz_bias ${iamodel_pipeline} ${twopt_modules}"
+    COSMOSIS_PIPELINE="sample_S8 ${corr_dz_priors} load_nz_sacc ${boltzmann_pipeline} extrapolate_power ${photo_z_bias} ${iamodel_pipeline} ${twopt_modules}"
 else
 	COSMOSIS_PIPELINE="@BV:COSMOSIS_PIPELINE@"
 fi
@@ -1061,7 +1095,7 @@ cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_co
 EOF
 fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
-extra_output = ${extraparams} ${shifts} ${listparam} ${tpdparams}
+extra_output = ${extraparams} ${shifts_source} ${shifts_lens} ${listparam} ${tpdparams}
 timing = F ; T
 debug = F
 fast_slow = ${fast_slow}
@@ -1201,6 +1235,40 @@ do
 			
 			EOF
 			;; #}}}
+	"correlated_dz_priors_lens") #{{{
+			shifts_lens=""
+			unc_shifts=""
+			for i in `seq ${NLENSBINS}`
+			do
+				shifts_lens="${shifts_lens} nofz_shifts_lens/bias_${i}"
+				unc_shifts="${unc_shifts} nofz_shifts_lens/uncorr_bias_${i}"
+			done
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(KCAP_PATH)s/utils/correlated_priors.py
+			uncorrelated_parameters = ${unc_shifts}
+			output_parameters = ${shifts_lens}
+			covariance = @DB:nzcov_lens@
+		
+			EOF
+			;; #}}}
+	"correlated_dz_priors_obs") #{{{
+			shifts_obs=""
+			unc_shifts=""
+			for i in `seq ${NSMFLENSBINS}`
+			do
+				shifts_obs="${shifts_obs} nofz_shifts_obs/bias_${i}"
+				unc_shifts="${unc_shifts} nofz_shifts_obs/uncorr_bias_${i}"
+			done
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(KCAP_PATH)s/utils/correlated_priors.py
+			uncorrelated_parameters = ${unc_shifts}
+			output_parameters = ${shifts_obs}
+			covariance = @DB:nzcov_obs@
+			
+			EOF
+			;; #}}}
 	"extrapolate") #{{{
 			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
 			[$module]
@@ -1245,7 +1313,32 @@ do
 			
 			EOF
 			;; #}}}
+	"lens_photoz_bias") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(CSL_PATH)s/number_density/photoz_bias/photoz_bias.py
+			mode = additive
+			sample = nz_%(redshift_name_lens)s
+			bias_section  = nofz_shifts_lens
+			interpolation = cubic
+			output_deltaz = T
+			output_section_name = delta_z_out_lens
+			
+			EOF
+			;; #}}}
+	"obs_photoz_bias") #{{{
+			cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_other.ini <<- EOF
+			[$module]
+			file = %(CSL_PATH)s/number_density/photoz_bias/photoz_bias.py
+			mode = additive
+			sample = nz_%(redshift_name_obs)s
+			bias_section  = nofz_shifts_obs
+			interpolation = cubic
+			output_deltaz = T
+			output_section_name = delta_z_out_obs
 
+			EOF
+			;; #}}}
 	"add_intrinsic") #{{{
 			if [[ .*\ $MODES\ .* =~ " EE " ]]
 			then
