@@ -161,7 +161,7 @@ then
   then 
     rm -fr cosmosis-standard-library
   fi
-  git clone https://github.com/joezuntz/cosmosis-standard-library.git >> gitclone_output.log 2>&1
+  git clone https://github.com/cosmosis-developers/cosmosis-standard-library.git >> gitclone_output.log 2>&1
   _message "${BLU} - Done! ${DEF}\n"
   _message "   >${RED} Installing cosmosis-standard-library ${DEF}"
   #Replace the cpdef instances with cdef in classy.pyx
