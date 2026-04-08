@@ -328,10 +328,10 @@ dependencies:
       - grpcio==1.59.3
       - gsl==0.0.3
       - h5py==3.14.0
-      - halomod @ git+https://github.com/halomod/halomod.git@main
+      - halomod>=2.2.3
       - hankel==1.2.2
       - healpy==1.18.1
-      - hmf==3.5.2
+      - hmf>=3.6.0
       - identify==2.6.7
       - ipython==8.32.0
       - jax==0.4.21
@@ -354,7 +354,7 @@ dependencies:
       - numpy==2.2.0
       - numpydoc==1.8.0
       - oauthlib==3.2.2
-      - onepower==0.7.2
+      - onepower[bnl]==0.8.0
       - opt-einsum==3.3.0
       - palettable==3.3.3
       - pandoc==2.4
