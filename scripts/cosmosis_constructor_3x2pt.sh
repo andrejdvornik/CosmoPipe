@@ -881,20 +881,20 @@ shifts_obs=""
 if [[ .*\ $MODES\ .* =~ " EE " ]] || [[ .*\ $MODES\ .* =~ " NE " ]]
 then
 	#Add source nz shift values to outputs {{{
-for i in `seq ${NTOMO}`
-do 
-   shifts_source="${shifts_source} nofz_shifts/bias_${i}"
-done
-#}}}
+	for i in `seq ${NTOMO}`
+	do 
+		shifts_source="${shifts_source} nofz_shifts/bias_${i}"
+	done
+	#}}}
 fi
 if [[ .*\ $MODES\ .* =~ " NE " ]] || [[ .*\ $MODES\ .* =~ " NN " ]]
 then
-#Add lens nz shift values to outputs {{{
-for i in `seq ${NLENSBINS}`
-do
-   shifts_lens="${shifts_lens} nofz_shifts_lens/bias_${i}"
-done
-#}}}
+	#Add lens nz shift values to outputs {{{
+	for i in `seq ${NLENSBINS}`
+	do
+		shifts_lens="${shifts_lens} nofz_shifts_lens/bias_${i}"
+	done
+	#}}}
 fi
 if [[ .*\ $MODES\ .* =~ " OBS " ]]
 then
@@ -1266,7 +1266,7 @@ do
 			uncorrelated_parameters = ${unc_shifts}
 			output_parameters = ${shifts_obs}
 			covariance = @DB:nzcov_obs@
-			
+		
 			EOF
 			;; #}}}
 	"extrapolate") #{{{
@@ -1370,32 +1370,32 @@ do
 			file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB1.txt"
 			if [ -f ${file1} ]
 			then
-			slice=`grep '^slice_in' ${file1} | awk '{printf $2}'`
-			if [ "${slice}" == "obs" ]
-			then
-				for i in `seq ${NSMFLENSBINS}`
-				do
-					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
-					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
-					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
-					#z_mins="${z_mins} ${y_lo}"
-					z_mins="${z_mins} 0.0"
-					z_maxs="${z_maxs} ${y_hi}"
-				done
-			elif [ "${slice}" == "z" ]
-			then
-				for i in `seq ${NSMFLENSBINS}`
-				do
-					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
-					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
-					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
-					#z_mins="${z_mins} ${x_lo}"
-					z_mins="${z_mins} 0.0"
-					z_maxs="${z_maxs} ${x_hi}"
-				done
-			else
-				_message "Got wrong or no information about slicing of the lens sample.\n"
-				#exit 1
+				slice=`grep '^slice_in' ${file1} | awk '{printf $2}'`
+				if [ "${slice}" == "obs" ]
+				then
+					for i in `seq ${NSMFLENSBINS}`
+					do
+						file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
+						y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+						y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
+						#z_mins="${z_mins} ${y_lo}"
+						z_mins="${z_mins} 0.0"
+						z_maxs="${z_maxs} ${y_hi}"
+					done
+				elif [ "${slice}" == "z" ]
+				then
+					for i in `seq ${NSMFLENSBINS}`
+					do
+						file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
+						x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
+						x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+						#z_mins="${z_mins} ${x_lo}"
+						z_mins="${z_mins} 0.0"
+						z_maxs="${z_maxs} ${x_hi}"
+					done
+				else
+					_message "Got wrong or no information about slicing of the lens sample.\n"
+					#exit 1
 				fi
 			else
 				_message "No SMF lens catalog metadata found, setting default CSMF parameters from saved variables.\n"
@@ -1453,43 +1453,43 @@ do
 			hod_file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB1.txt"
 			if [ -f ${hod_file1} ]
 			then
-			hod_slice=`grep '^slice_in' ${hod_file1} | awk '{printf $2}'`
-			if [ "${hod_slice}" == "obs" ]
-			then
-				for i in `seq ${NLENSBINS}`
-				do
-					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt"
-					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
-					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
-					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
-					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
-					hod_obs_mins="${hod_obs_mins} ${x_lo}"
-					hod_obs_maxs="${hod_obs_maxs} ${x_hi}"
-					#hod_z_mins="${hod_z_mins} ${y_lo}"
-					#hod_z_maxs="${hod_z_maxs} ${y_hi}"
-					hod_z_mins="${hod_z_mins} 0.0"
-					hod_z_maxs="${hod_z_maxs} 3.0"
-				done
-			elif [ "${hod_slice}" == "z" ]
-			then
-				for i in `seq ${NLENSBINS}`
-				do
-					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt"
-					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
-					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
-					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
-					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
-					hod_obs_mins="${hod_obs_mins} ${y_lo}"
-					hod_obs_maxs="${hod_obs_maxs} ${y_hi}"
-					#hod_z_mins="${hod_z_mins} ${x_lo}"
-					#hod_z_maxs="${hod_z_maxs} ${x_hi}"
-					hod_z_mins="${hod_z_mins} 0.0"
-					hod_z_maxs="${hod_z_maxs} 3.0"
-				done
-			else
-				_message "Got wrong or no information about slicing of the lens sample.\n"
-				#exit 1
-			fi
+				hod_slice=`grep '^slice_in' ${hod_file1} | awk '{printf $2}'`
+				if [ "${hod_slice}" == "obs" ]
+				then
+					for i in `seq ${NLENSBINS}`
+					do
+						file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt"
+						x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
+						x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+						y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+						y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
+						hod_obs_mins="${hod_obs_mins} ${x_lo}"
+						hod_obs_maxs="${hod_obs_maxs} ${x_hi}"
+						#hod_z_mins="${hod_z_mins} ${y_lo}"
+						#hod_z_maxs="${hod_z_maxs} ${y_hi}"
+						hod_z_mins="${hod_z_mins} 0.0"
+						hod_z_maxs="${hod_z_maxs} 3.0"
+					done
+				elif [ "${hod_slice}" == "z" ]
+				then
+					for i in `seq ${NLENSBINS}`
+					do
+						file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/lens_cats_metadata/stats_LB${i}.txt"
+						x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
+						x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+						y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+						y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
+						hod_obs_mins="${hod_obs_mins} ${y_lo}"
+						hod_obs_maxs="${hod_obs_maxs} ${y_hi}"
+						#hod_z_mins="${hod_z_mins} ${x_lo}"
+						#hod_z_maxs="${hod_z_maxs} ${x_hi}"
+						hod_z_mins="${hod_z_mins} 0.0"
+						hod_z_maxs="${hod_z_maxs} 3.0"
+					done
+				else
+					_message "Got wrong or no information about slicing of the lens sample.\n"
+					#exit 1
+				fi
 			else
 				_message "No lens catalog metadata found, setting default CSMF parameters from saved variables.\n"
     			if [ "${NLENSBINS}" = "1" ]
@@ -1515,42 +1515,42 @@ do
 			smf_file1="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB1.txt"
 			if [ -f ${hod_file1} ]
 			then
-			smf_slice=`grep '^slice_in' ${smf_file1} | awk '{printf $2}'`
-			if [ "${smf_slice}" == "obs" ]
-			then
-				for i in `seq ${NSMFLENSBINS}`
-				do
-					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
-					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
-					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
-					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
-					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
-					smf_obs_mins="${smf_obs_mins} ${x_lo}"
-					smf_obs_maxs="${smf_obs_maxs} ${x_hi}"
-					#smf_z_mins="${smf_z_mins} ${y_lo}"
-					#smf_z_maxs="${smf_z_maxs} ${y_hi}"
-					smf_z_mins="${smf_z_mins} 0.0"
-					smf_z_maxs="${smf_z_maxs} 3.0"
-				done
-			elif [ "${smf_slice}" == "z" ]
-			then
-				for i in `seq ${NSMFLENSBINS}`
-				do
-					file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
-					x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
-					x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
-					y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
-					y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
-					smf_obs_mins="${smf_obs_mins} ${y_lo}"
-					smf_obs_maxs="${smf_obs_maxs} ${y_hi}"
-					#smf_z_mins="${smf_z_mins} ${x_lo}"
-					#smf_z_maxs="${smf_z_maxs} ${x_hi}"
-					smf_z_mins="${smf_z_mins} 0.0"
-					smf_z_maxs="${smf_z_maxs} 3.0"
-				done
-			else
-				_message "Got wrong or no information about slicing of the lens sample.\n"
-				#exit 1
+				smf_slice=`grep '^slice_in' ${smf_file1} | awk '{printf $2}'`
+				if [ "${smf_slice}" == "obs" ]
+				then
+					for i in `seq ${NSMFLENSBINS}`
+					do
+						file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
+						x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
+						x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+						y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+						y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
+						smf_obs_mins="${smf_obs_mins} ${x_lo}"
+						smf_obs_maxs="${smf_obs_maxs} ${x_hi}"
+						#smf_z_mins="${smf_z_mins} ${y_lo}"
+						#smf_z_maxs="${smf_z_maxs} ${y_hi}"
+						smf_z_mins="${smf_z_mins} 0.0"
+						smf_z_maxs="${smf_z_maxs} 3.0"
+					done
+				elif [ "${smf_slice}" == "z" ]
+				then
+					for i in `seq ${NSMFLENSBINS}`
+					do
+						file="@RUNROOT@/@STORAGEPATH@/@DATABLOCK@/smf_lens_cats_metadata/stats_LB${i}.txt"
+						x_lo=`grep '^x_lims_lo' ${file} | awk '{printf $2}'`
+						x_hi=`grep '^x_lims_hi' ${file} | awk '{printf $2}'`
+						y_lo=`grep '^y_lims_lo' ${file} | awk '{printf $2}'`
+						y_hi=`grep '^y_lims_hi' ${file} | awk '{printf $2}'`
+						smf_obs_mins="${smf_obs_mins} ${y_lo}"
+						smf_obs_maxs="${smf_obs_maxs} ${y_hi}"
+						#smf_z_mins="${smf_z_mins} ${x_lo}"
+						#smf_z_maxs="${smf_z_maxs} ${x_hi}"
+						smf_z_mins="${smf_z_mins} 0.0"
+						smf_z_maxs="${smf_z_maxs} 3.0"
+					done
+				else
+					_message "Got wrong or no information about slicing of the lens sample.\n"
+					#exit 1
 				fi
 			else
 				_message "No lens catalog metadata found, setting default CSMF parameters from saved variables.\n"
