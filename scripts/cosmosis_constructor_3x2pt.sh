@@ -1095,7 +1095,7 @@ cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_co
 EOF
 fi
 cat >> @RUNROOT@/@STORAGEPATH@/@DATABLOCK@/cosmosis_inputs/@SURVEY@_CosmoPipe_constructed_pipe.ini <<- EOF
-extra_output = ${extraparams} ${shifts_source} ${shifts_lens} ${listparam} ${tpdparams}
+extra_output = ${extraparams} ${shifts_source} ${shifts_lens} ${shifts_obs} ${listparam} ${tpdparams}
 timing = F ; T
 debug = F
 fast_slow = ${fast_slow}
