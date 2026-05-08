@@ -962,7 +962,7 @@ then
           exit 1
     fi
 
-    COSMOSIS_PIPELINE="sample_S8 ${corr_dz_priors} load_nz_sacc consistency ${boltzmann_pipeline} extrapolate onepower ${iamodel_pipeline} ${photo_z_bias} ${twopt_modules}"
+    COSMOSIS_PIPELINE="sample_S8 ${corr_dz_priors} load_nz_sacc ${photo_z_bias} consistency ${boltzmann_pipeline} onepower ${iamodel_pipeline} ${twopt_modules}"
     
 elif [ "@BV:COSMOSIS_PIPELINE@" == "lin_bias" ]
 then
@@ -1651,21 +1651,20 @@ do
 			zmax_smf = ${smf_z_maxs}
 			nz_smf = 50 ; %(nz_def)s
 			nobs_smf = 200
+
+			central_IA_depends_on = halo_mass
+			satellite_IA_depends_on = halo_mass
 			
 			hod_section_name_ia_1 = hod_ia_red
 			observables_file_ia_1 = ${red_obs_file}
 			nobs_ia_1 = 200
 			nz_ia_1 = 50 ; %(nz_def)s
-			central_IA_depends_on = halo_mass
-			satellite_IA_depends_on = halo_mass
 			output_suffix_ia_1 = ia_red
 			
 			hod_section_name_ia_2 = hod_ia_blue
 			observables_file_ia_2 = ${blue_obs_file}
 			nobs_ia_2 = 200 
 			nz_ia_2 = 50 ; %(nz_def)s
-			central_IA_depends_on = halo_mass
-			satellite_IA_depends_on = halo_mass
 			output_suffix_ia_2 = ia_blue
 			
 			EOF
